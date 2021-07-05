@@ -12,7 +12,7 @@ namespace Sheaft.Web.Manage.Models
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
         public string Reason { get; set; }
-        public DeliveryModeViewModel Delivery { get; set; }
+        public DeliveryModeViewModel DeliveryMode { get; set; }
         public StoreViewModel Store { get; set; }
         public ProducerViewModel Producer { get; set; }
     }

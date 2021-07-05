@@ -9,6 +9,7 @@ namespace Sheaft.Web.Manage.Mappings
     {
         public ExpectedPurchaseOrderDeliveryViewProfile()
         {
+            CreateMap<ExpectedPurchaseOrderDelivery, ExpectedPurchaseOrderDeliveryViewModel>();
             CreateMap<ExpectedPurchaseOrderDeliveryDto, ExpectedPurchaseOrderDeliveryViewModel>();
             CreateMap<ExpectedPurchaseOrderDeliveryViewModel, ExpectedPurchaseOrderDeliveryDto>();
         }

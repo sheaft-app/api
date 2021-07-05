@@ -19,6 +19,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Quantity)
                 .Name("quantity");
+            
+            descriptor
+                .Field(c => c.RowKind)
+                .Name("kind");
                 
             descriptor
                 .Field(c => c.Vat)

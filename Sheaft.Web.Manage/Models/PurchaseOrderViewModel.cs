@@ -24,10 +24,12 @@ namespace Sheaft.Web.Manage.Models
         public decimal TotalOnSalePrice { get; set; }
         public decimal TotalWeight { get; set; }
         public PurchaseOrderStatus Status { get; set; }
-        public UserProfileViewModel Sender { get; set; }
+        public UserProfileViewModel SenderInfo { get; set; }
         public ExpectedPurchaseOrderDeliveryViewModel ExpectedDelivery { get; set; }
-        public UserProfileViewModel Vendor { get; set; }
+        public UserProfileViewModel VendorInfo { get; set; }
         public TransferInfoViewModel Transfer { get; set; }
+        public Guid ClientId { get; set; }
+        public Guid ProducerId { get; set; }
         public IEnumerable<PurchaseOrderProductViewModel> Products { get; set; }
 
     }

@@ -63,35 +63,35 @@
         }
         <h4>Delivery</h4>
         <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.Name)
-            @Html.TextBoxFor(m => m.Delivery.Name, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(m => m.DeliveryMode.Name)
+            @Html.TextBoxFor(m => m.DeliveryMode.Name, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.Kind)
-            @Html.TextBoxFor(m => m.Delivery.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(m => m.DeliveryMode.Kind)
+            @Html.TextBoxFor(m => m.DeliveryMode.Kind, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(m => m.Delivery.LockOrderHoursBeforeDelivery)
-            @Html.TextBoxFor(m => m.Delivery.LockOrderHoursBeforeDelivery, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(m => m.DeliveryMode.LockOrderHoursBeforeDelivery)
+            @Html.TextBoxFor(m => m.DeliveryMode.LockOrderHoursBeforeDelivery, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
-        @if (Model.Delivery.Address != null)
+        @if (Model.DeliveryMode?.Address != null)
         {
             <h5>Delivery Address</h5>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Line1)
-                @Html.TextBoxFor(m => m.Delivery.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.DeliveryMode.Address.Line1)
+                @Html.TextBoxFor(m => m.DeliveryMode.Address.Line1, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Line2)
-                @Html.TextBoxFor(m => m.Delivery.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.DeliveryMode.Address.Line2)
+                @Html.TextBoxFor(m => m.DeliveryMode.Address.Line2, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.Zipcode)
-                @Html.TextBoxFor(m => m.Delivery.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.DeliveryMode.Address.Zipcode)
+                @Html.TextBoxFor(m => m.DeliveryMode.Address.Zipcode, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.Delivery.Address.City)
-                @Html.TextBoxFor(m => m.Delivery.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
+                @Html.LabelFor(m => m.DeliveryMode.Address.City)
+                @Html.TextBoxFor(m => m.DeliveryMode.Address.City, null, new { @class = "form-control", @disabled = "disabled" })
             </div>
         }
         <h4>Producer</h4>

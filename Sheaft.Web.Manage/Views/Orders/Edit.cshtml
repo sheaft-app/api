@@ -62,22 +62,6 @@
             @Html.LabelFor(m => m.DonationKind)
             @Html.TextBoxFor(m => m.DonationKind, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
-        @if (Model.Donation != null)
-        {
-            <div class="form-group">
-                @Html.LabelFor(m => m.Donation.Identifier)
-                @Html.TextBoxFor(m => m.Donation.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.Donation.Status)
-                @Html.TextBoxFor(m => m.Donation.Status, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-            <a asp-controller="Donations" asp-action="Edit" asp-route-id="@Model.Donation.Id" class="btn btn-info">
-                Donation details
-            </a>
-            <br />
-            <br />
-        }
     }
     <h4>Products</h4>
     <div class="form-group">
@@ -103,23 +87,6 @@
             @Html.LabelFor(m => m.TotalReturnableOnSalePrice)
             @Html.TextBoxFor(m => m.TotalReturnableOnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
-    }
-    @if (Model.Payin != null)
-    {
-        <h4>Paiement</h4>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Payin.Identifier)
-            @Html.TextBoxFor(m => m.Payin.Identifier, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.Payin.Status)
-            @Html.TextBoxFor(m => m.Payin.Status, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <a asp-controller="Payins" asp-action="Edit" asp-route-id="@Model.Payin.Id" class="btn btn-info">
-            Payin details
-        </a>
-        <br />
-        <br />
     }
 
     @if (Model.PurchaseOrders != null && Model.PurchaseOrders.Any())

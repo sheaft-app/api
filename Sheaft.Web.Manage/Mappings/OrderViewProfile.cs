@@ -9,9 +9,11 @@ namespace Sheaft.Web.Manage.Mappings
         public OrderViewProfile()
         {
             CreateMap<Domain.Order, OrderViewModel>()
+                .ForMember(d => d.Donate, opt => opt.MapFrom(r => r.Donation))
                 .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.DonationFeesPrice));
 
             CreateMap<Domain.Order, OrderShortViewModel>()
+                .ForMember(d => d.Donate, opt => opt.MapFrom(r => r.Donation))
                 .ForMember(d => d.TotalFees, opt => opt.MapFrom(r => r.FeesPrice - r.DonationFeesPrice));
 
             CreateMap<OrderDto, OrderViewModel>()
@@ -19,7 +21,7 @@ namespace Sheaft.Web.Manage.Mappings
             CreateMap<OrderDto, OrderShortViewModel>()
                 .ForMember(d => d.Donate, opt => opt.MapFrom(r => r.Donation));
             CreateMap<OrderShortViewModel, OrderDto>()
-                .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donate));
+                .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donate ?? 0));
             CreateMap<OrderViewModel, OrderDto>()
                 .ForMember(d => d.Donation, opt => opt.MapFrom(r => r.Donate));
         }

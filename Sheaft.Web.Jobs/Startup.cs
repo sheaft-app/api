@@ -151,20 +151,26 @@ namespace Sheaft.Web.Jobs
             var rolesOptions = roleSettings.Get<RoleOptions>();
             services.AddAuthorization(options =>
             {
-                options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value)
+                options.AddPolicy("Hangfire", cfg =>
+                {
+                    cfg.AddRequirements().RequireAuthenticatedUser();
+                    cfg.AddAuthenticationSchemes("oidc");
+                    cfg.AddRequirements().RequireRole(rolesOptions.Admin.Value, rolesOptions.Support.Value);
+                });
+                options.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAssertion(c => c.User.Identity is not {IsAuthenticated: true})
                     .Build();
             });
 
             var authConfig = authSettings.Get<AuthOptions>();
             JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "Cookies";
-                options.DefaultChallengeScheme = "oidc";
-            })
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = "Cookies";
+                    options.DefaultChallengeScheme = "oidc";
+                })
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
@@ -206,7 +212,8 @@ namespace Sheaft.Web.Jobs
             services.AddHttpClient();
 
             var mailerConfig = mailerSettings.Get<MailerOptions>();
-            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ => new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
+            services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ =>
+                new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
 
             services.AddScoped<IIdentifierService, IdentifierService>();
             services.AddScoped<IBlobService, BlobService>();
@@ -217,7 +224,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<ITableService, TableService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPdfGenerator, PdfGenerator>();
-            
+
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
             services.AddScoped<IOrderService, OrderService>();
@@ -226,11 +233,15 @@ namespace Sheaft.Web.Jobs
             services.AddSingleton<IIdSerializer, IdSerializer>();
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            
-            services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
-            services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
-            services.AddScopedDynamic<IPurchaseOrdersFileExporter>(typeof(ExcelPurchaseOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPurchaseOrdersFileExporter))));
-            services.AddScopedDynamic<ITransactionsFileExporter>(typeof(ExcelTransactionsExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ITransactionsFileExporter))));
+
+            services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));
+            services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
+            services.AddScopedDynamic<IPurchaseOrdersFileExporter>(typeof(ExcelPurchaseOrdersExporter).Assembly
+                .GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPurchaseOrdersFileExporter))));
+            services.AddScopedDynamic<ITransactionsFileExporter>(typeof(ExcelTransactionsExporter).Assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Contains(typeof(ITransactionsFileExporter))));
 
             services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
@@ -241,7 +252,7 @@ namespace Sheaft.Web.Jobs
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
-            
+
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));
 
@@ -300,10 +311,7 @@ namespace Sheaft.Web.Jobs
                 });
             });
 
-            services.AddLogging(config =>
-            {
-                config.AddSerilog(dispose: true);
-            });
+            services.AddLogging(config => { config.AddSerilog(dispose: true); });
 
             services.AddRazorTemplating();
             services.AddHangfireServer();
@@ -311,7 +319,8 @@ namespace Sheaft.Web.Jobs
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptionsSnapshot<RoutineOptions> routineOptions, IOptionsSnapshot<RoleOptions> roleOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            IOptionsSnapshot<RoutineOptions> routineOptions, IOptionsSnapshot<RoleOptions> roleOptions)
         {
             if (env.IsDevelopment())
             {
@@ -333,20 +342,17 @@ namespace Sheaft.Web.Jobs
             app.UseAuthorization();
 
             app.UseHangfireServer();
-            app.UseHangfireDashboard();
-            
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-                
-                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions()
-                    {
-                        Authorization = new List<IDashboardAuthorizationFilter> { new MyAuthorizationFilter(roleOptions)}
-                    });
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    AppPath = Configuration.GetValue<string>("Portal:Url")
+                }).RequireAuthorization("Hangfire");
             });
-            
+
             RecuringJobs.Register(routineOptions.Value);
             RazorTemplateEngine.Initialize();
         }
@@ -357,55 +363,81 @@ namespace Sheaft.Web.Jobs
         public static void Register(RoutineOptions options)
         {
             RecurringJob.AddOrUpdate<SheaftDispatcher>("79d5e199b5ef41268fade4da1fa3f83b", mediatr =>
-                mediatr.Execute(nameof(CheckOrdersCommand), new CheckOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckOrdersCron);
+                    mediatr.Execute(nameof(CheckOrdersCommand),
+                        new CheckOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckOrdersCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("44d0d009c3d24cb6b05f113e49b60d35", mediatr =>
-                mediatr.Execute(nameof(CheckDonationsCommand), new CheckDonationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckDonationsCron);
+                    mediatr.Execute(nameof(CheckDonationsCommand),
+                        new CheckDonationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckDonationsCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("cd2bc132393f4a379f7ac44d56f84d9e", mediatr =>
-                mediatr.Execute(nameof(CheckPayinsCommand), new CheckPayinsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckPayinsCron);
+                    mediatr.Execute(nameof(CheckPayinsCommand),
+                        new CheckPayinsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckPayinsCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("eaf648de5fe54fc1980c093fd78bb2f7", mediatr =>
-                mediatr.Execute(nameof(CheckPayinRefundsCommand), new CheckPayinRefundsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckPayinRefundsCron);
+                    mediatr.Execute(nameof(CheckPayinRefundsCommand),
+                        new CheckPayinRefundsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckPayinRefundsCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("dddd91a8fa494da3af1477d1b537fd95", mediatr =>
-                mediatr.Execute(nameof(CheckPayoutsCommand), new CheckPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckPayoutsCron);
+                    mediatr.Execute(nameof(CheckPayoutsCommand),
+                        new CheckPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckPayoutsCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("50a160aac50f480a872b04a509ef202c", mediatr =>
-                mediatr.Execute(nameof(CheckTransfersCommand), new CheckTransfersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckTransfersCron);
+                    mediatr.Execute(nameof(CheckTransfersCommand),
+                        new CheckTransfersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckTransfersCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("ae81c9c623f940b386ac9d3144147557", mediatr =>
-                mediatr.Execute(nameof(CheckNewPayoutsCommand), new CheckNewPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckNewPayoutsCron);
+                    mediatr.Execute(nameof(CheckNewPayoutsCommand),
+                        new CheckNewPayoutsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckNewPayoutsCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("0b74e15ec9de4332981a8f933377fc0a", mediatr =>
-                mediatr.Execute(nameof(UpdateZonesProgressCommand), new UpdateZonesProgressCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckZonesProgressCron);
+                    mediatr.Execute(nameof(UpdateZonesProgressCommand),
+                        new UpdateZonesProgressCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckZonesProgressCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("7236b37addc04f62ac2afef157903132", mediatr =>
-                mediatr.Execute(nameof(GenerateZonesFileCommand), new GenerateZonesFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckZonesFileCron);
+                    mediatr.Execute(nameof(GenerateZonesFileCommand),
+                        new GenerateZonesFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckZonesFileCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("4787cf27f6bd491292014902a84a11ae", mediatr =>
-                mediatr.Execute(nameof(GenerateProducersFileCommand), new GenerateProducersFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckProducersFileCron);
+                    mediatr.Execute(nameof(GenerateProducersFileCommand),
+                        new GenerateProducersFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckProducersFileCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("6757cf27f6bd491292014902a84a11ae", mediatr =>
-                mediatr.Execute(nameof(GenerateStoresFileCommand), new GenerateStoresFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
-                    options.CheckStoresFileCron);
+                    mediatr.Execute(nameof(GenerateStoresFileCommand),
+                        new GenerateStoresFileCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckStoresFileCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("41739516c21a48dc907b429a96cd0edd", mediatr =>
-                    mediatr.Execute(nameof(CheckExpiredPurchaseOrdersCommand), new CheckExpiredPurchaseOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                    mediatr.Execute(nameof(CheckExpiredPurchaseOrdersCommand),
+                        new CheckExpiredPurchaseOrdersCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                 options.CheckExpiredPurchaseOrdersCron);
 
             RecurringJob.AddOrUpdate<SheaftDispatcher>("707f7ee279c14f24ad7d5f31e22f4d3c", mediatr =>
-                    mediatr.Execute(nameof(CheckPreAuthorizationsCommand), new CheckPreAuthorizationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                    mediatr.Execute(nameof(CheckPreAuthorizationsCommand),
+                        new CheckPreAuthorizationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c",
+                            Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                 options.CheckPreAuthorizationsCron);
         }
     }

@@ -75,10 +75,6 @@
             @Html.TextBoxFor(c => c.Reference, null, new { @class = "form-control" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.WholeSalePricePerUnit, "WholeSalePricePerUnit", new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.WholeSalePricePerUnit, null, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
             @Html.LabelFor(c => c.Vat, new { @class = "form-label" })
             @Html.DropDownListFor(c => c.Vat, vats, new { @class = "form-control" })
         </div>
@@ -95,38 +91,6 @@
             @Html.DropDownListFor(c => c.Unit, units, new { @class = "form-control" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(m => m.VatPricePerUnit)
-            @Html.TextBoxFor(m => m.VatPricePerUnit, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.OnSalePricePerUnit)
-            @Html.TextBoxFor(m => m.OnSalePricePerUnit, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.VatPrice)
-            @Html.TextBoxFor(m => m.VatPrice, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.OnSalePrice)
-            @Html.TextBoxFor(m => m.OnSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.WholeSalePrice)
-            @Html.TextBoxFor(m => m.WholeSalePrice, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(c => c.Picture, new { @class = "form-label" })
-            @if (!string.IsNullOrWhiteSpace(Model.Picture))
-            {
-                <img src="@Model.Picture" height="100" />
-            }
-            @if (!string.IsNullOrWhiteSpace(Model.Picture))
-            {
-                <a href="@Model.Picture.Replace(PictureSize.SMALL, PictureSize.ORIGINAL).Replace(PictureSize.MEDIUM, PictureSize.ORIGINAL).Replace(PictureSize.LARGE, PictureSize.ORIGINAL)">Download original picture</a>
-            }
-            @Html.TextBoxFor(c => c.Picture, new { @class = "form-control", @type = "file" })
-        </div>
-        <div class="form-group">
             @Html.LabelFor(c => c.ReturnableId, "Returnable", new { @class = "form-label" })
             @Html.DropDownListFor(c => c.ReturnableId, returnables, new { @class = "form-control" })
         </div>
@@ -141,14 +105,6 @@
         <div class="form-check">
             @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
             @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.VisibleToStores, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.VisibleToStores, new { @class = "form-check-label" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.VisibleToConsumers, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.VisibleToConsumers, new { @class = "form-check-label" })
         </div>
         <div class="form-group">
             @Html.LabelFor(m => m.CreatedOn)

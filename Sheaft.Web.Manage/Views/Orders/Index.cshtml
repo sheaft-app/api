@@ -44,7 +44,7 @@
             @foreach (var entity in Model)
             {
                 <tr>
-                    <th scope="row">@entity.User.Name</th>
+                    <th scope="row">@(entity.User?.Name ?? "Anonyme")</th>
                     <td>@entity.Reference</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     <td>@entity.Status.ToString("G")</td>

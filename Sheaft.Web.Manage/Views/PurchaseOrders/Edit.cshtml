@@ -164,25 +164,25 @@
         </div>
         <h4>Sender</h4>
         <div class="form-group">
-            @Html.LabelFor(c => c.Sender.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Sender.Name, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(c => c.SenderInfo.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.SenderInfo.Name, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.Sender.Kind, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Sender.Kind, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(c => c.SenderInfo.Kind, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.SenderInfo.Kind, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.Sender.Email, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Sender.Email, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(c => c.SenderInfo.Email, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.SenderInfo.Email, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <h4>Vendor</h4>
         <div class="form-group">
-            @Html.LabelFor(c => c.Vendor.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Vendor.Name, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(c => c.VendorInfo.Name, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.VendorInfo.Name, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
         <div class="form-group">
-            @Html.LabelFor(c => c.Vendor.Email, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Vendor.Email, null, new { @class = "form-control", @disabled = "disabled" })
+            @Html.LabelFor(c => c.VendorInfo.Email, new { @class = "form-label" })
+            @Html.TextBoxFor(c => c.VendorInfo.Email, null, new { @class = "form-control", @disabled = "disabled" })
         </div>
 
         @if (Model.WithdrawnOn.HasValue || !string.IsNullOrWhiteSpace(Model.Comment))

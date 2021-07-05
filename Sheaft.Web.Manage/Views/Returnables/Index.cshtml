@@ -39,13 +39,13 @@
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
                     @if (!imperonatingId.HasValue)
                     {
-                        <td>@entity.Producer.Name</td>
+                        <td>@entity.Producer.Name
                         @using (Html.BeginForm("ImpersonateById", "Account", new { id = entity.Producer.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
                         {
                             <button type="submit" class="btn btn-info">
                                 <i class="fa fa-user-secret"></i>
                             </button>
-                        }
+                        }</td>
                     }
                     <td>
                         <a asp-controller="Returnables" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
