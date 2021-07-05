@@ -338,7 +338,6 @@ namespace Sheaft.Web.Jobs
             app.UseAuthorization();
 
             app.UseHangfireServer();
-            app.UseHangfireDashboard();
 
             app.UseEndpoints(endpoints =>
             {
