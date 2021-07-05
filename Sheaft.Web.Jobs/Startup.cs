@@ -345,7 +345,7 @@ namespace Sheaft.Web.Jobs
                 endpoints.MapHangfireDashboardWithAuthorizationPolicy("Hangfire", "/hangfire", new DashboardOptions
                 {
                     AppPath = Configuration.GetValue<string>("Portal:Url"),
-                    Authorization = new List<IDashboardAuthorizationFilter> { }
+                    Authorization = new List<IDashboardAuthorizationFilter> { new HangfireAuthorizationFilter("Hangfire")}
                 });
                 
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
