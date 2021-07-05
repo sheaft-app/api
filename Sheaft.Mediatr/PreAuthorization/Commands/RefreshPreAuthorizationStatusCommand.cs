@@ -64,11 +64,15 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             preAuthorization.SetExpirationDate(pspResult.Data.ExpirationDate);
             preAuthorization.SetResult(pspResult.Data.ResultCode, pspResult.Data.ResultMessage);
 
-            if(preAuthorization.Status != PreAuthorizationStatus.Created)
+            if(preAuthorization.PaymentStatus != PaymentStatus.Waiting)
                 preAuthorization.SetAsProcessed();
             
             await _context.SaveChangesAsync(token);
 
+            var order = await _context.Orders.SingleAsync(o => o.Id == preAuthorization.OrderId, token);
+            if(order.Status != OrderStatus.Waiting && order.Status != OrderStatus.Validated && order.Status != OrderStatus.Created)
+                return Success(preAuthorization.Status);
+            
             switch (preAuthorization.Status)
             {
                 case PreAuthorizationStatus.Cancelled:

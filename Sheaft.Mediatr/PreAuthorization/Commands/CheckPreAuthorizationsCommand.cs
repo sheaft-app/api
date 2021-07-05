@@ -49,12 +49,7 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             while (preAuthorizationIds.Any())
             {
                 foreach (var preAuthorizationId in preAuthorizationIds)
-                {
-                    _mediatr.Post(new CheckPreAuthorizationCommand(request.RequestUser)
-                    {
-                        PreAuthorizationId = preAuthorizationId
-                    });
-                }
+                    _mediatr.Post(new RefreshPreAuthorizationStatusCommand(request.RequestUser, preAuthorizationId));
 
                 skip += take;
                 preAuthorizationIds = await GetNextPreAuthorizationIdsAsync(skip, take, token);
@@ -63,12 +58,12 @@ namespace Sheaft.Mediatr.PreAuthorization.Commands
             return Success();
         }
 
-        private async Task<IEnumerable<Guid>> GetNextPreAuthorizationIdsAsync(int skip, int take, CancellationToken token)
+        private async Task<IEnumerable<string>> GetNextPreAuthorizationIdsAsync(int skip, int take, CancellationToken token)
         {
             return await _context.PreAuthorizations
-                .Where(c => !c.Processed && c.Status == PreAuthorizationStatus.Created || c.Status == PreAuthorizationStatus.Succeeded)
+                .Where(c => !c.Processed && (c.Status == PreAuthorizationStatus.Created || c.Status == PreAuthorizationStatus.Succeeded))
                 .OrderBy(c => c.CreatedOn)
-                .Select(c => c.Id)
+                .Select(c => c.Identifier)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(token);
