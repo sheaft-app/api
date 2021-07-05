@@ -20,7 +20,11 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor
                 .Field(c => c.ReschedulePendingDeliveriesOn)
-                .Name("reschedulePendingDeliveriesOn");
+                .Name("scheduledOn");
+
+            descriptor
+                .Field(c => c.From)
+                .Name("from");
         }
     }
 }

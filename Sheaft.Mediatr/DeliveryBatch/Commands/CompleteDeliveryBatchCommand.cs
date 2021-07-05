@@ -37,6 +37,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
         public Guid Id { get; set; }
         public DateTimeOffset? ReschedulePendingDeliveriesOn { get; set; }
+        public TimeSpan? From { get; set; }
     }
 
     public class CompleteDeliveryBatchCommandHandler : CommandsHandler,
@@ -60,7 +61,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 .Where(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected)
                 .ToList();
 
-            if (pendingDeliveries.Any() && !request.ReschedulePendingDeliveriesOn.HasValue)
+            if (pendingDeliveries.Any() && !request.ReschedulePendingDeliveriesOn.HasValue || !request.From.HasValue)
                 return Failure("La tournée de livraison contient encore des livraisons en attente, vous devez spécifier une date de replanification.");
 
             if (pendingDeliveries.Any())
@@ -73,7 +74,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                         ClientId = p.ClientId,
                         PurchaseOrderIds = p.PurchaseOrders.Select(po => po.Id)
                     }),
-                    From = request.ReschedulePendingDeliveriesOn.Value.TimeOfDay,
+                    From = request.From.Value,
                     Name = $"{deliveryBatch.Name} - replanifiée",
                     ScheduledOn = request.ReschedulePendingDeliveriesOn.Value
                 }, token);
