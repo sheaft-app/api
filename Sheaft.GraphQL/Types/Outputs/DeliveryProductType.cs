@@ -10,11 +10,17 @@ namespace Sheaft.GraphQL.Types.Outputs
         protected override void Configure(IObjectTypeDescriptor<DeliveryProduct> descriptor)
         {
             base.Configure(descriptor);
-
+            
+            descriptor
+                .ImplementsNode()
+                .IdField(c => c.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<DeliveryProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
             descriptor
                 .Field(c => c.ProductId)
                 .ID(nameof(Product))
-                .Name("id");
+                .Name("productId");
             
             descriptor
                 .Field(c => c.Quantity)
