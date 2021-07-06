@@ -50,6 +50,13 @@
         </div>
         <div class="card w-25 d-inline-block">
             <div class="card-body">
+                <h5 class="card-title">Catalogs</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Catalogs</h6>
+                <a asp-controller="catalogs" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
                 <h5 class="card-title">Returnables</h5>
                 <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Returnables</h6>
                 <a asp-controller="returnables" asp-action="index" class="card-link">Show</a>

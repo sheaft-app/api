@@ -25,5 +25,6 @@ namespace Sheaft.Web.Manage.Models
         public Guid? ReturnableId { get; set; }
         public ProducerViewModel Producer { get; set; }
         public IEnumerable<Guid> Tags { get; set; }
+        public IEnumerable<CatalogViewModel> Catalogs { get; set; }
     }
 }

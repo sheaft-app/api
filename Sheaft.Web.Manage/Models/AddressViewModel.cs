@@ -1,4 +1,5 @@
-﻿using Sheaft.Domain.Enum;
+﻿using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Web.Manage.Models
 {

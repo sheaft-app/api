@@ -43,7 +43,7 @@ namespace Sheaft.Domain
 
         public void SetWholeSalePricePerUnit(decimal newPrice)
         {
-            if (newPrice <= 0)
+            if (newPrice < 0)
                 throw SheaftException.Validation("Le prix d'un produit du catalogue ne peut être inférieur à 0€.");
 
             WholeSalePricePerUnit = Math.Round(newPrice, DIGITS_COUNT);
