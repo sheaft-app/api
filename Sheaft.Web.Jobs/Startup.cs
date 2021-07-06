@@ -45,6 +45,7 @@ using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Mediatr;
+using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Mediatr.Donation.Commands;
 using Sheaft.Mediatr.Order.Commands;
 using Sheaft.Mediatr.Payin.Commands;
@@ -410,6 +411,10 @@ namespace Sheaft.Web.Jobs
             RecurringJob.AddOrUpdate<SheaftDispatcher>("707f7ee279c14f24ad7d5f31e22f4d3c", mediatr =>
                     mediatr.Execute(nameof(CheckPreAuthorizationsCommand), new CheckPreAuthorizationsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
                 options.CheckPreAuthorizationsCron);
+            
+            RecurringJob.AddOrUpdate<SheaftDispatcher>("47854516c21a48dc907b429a96cd0edd", mediatr =>
+                    mediatr.Execute(nameof(CheckDeliveryBatchsCommand), new CheckDeliveryBatchsCommand(new RequestUser("037e7e93c73f4406a4e31994d8686b7c", Guid.NewGuid().ToString("N"), null)), CancellationToken.None),
+                options.CheckDeliveryBatchsCron);
         }
     }
 }
