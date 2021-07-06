@@ -1,0 +1,33 @@
+﻿@model List<Guid>
+
+@{
+    ViewData["Title"] = "Add Product to catalogs";
+    Guid id = ViewBag.Id;
+    List<SelectListItem> catalogs = ViewBag.Catalogs;
+}
+
+<div class="container">
+    <h1 class="display-5">Add product to catalogs</h1>
+    <br />
+
+    @using (Html.BeginForm("AddCatalogs", "Products", new {Id = id}, FormMethod.Post, null, new { @class = "form"}))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        
+        <br />
+        <div class="form-group">
+            @Html.Label(null, "Catalogs")
+            @Html.ListBox("Catalogs", catalogs, new { @class = "form-control" })
+        </div>
+
+        <br />
+        <a asp-controller="Products" asp-action="Edit" asp-route-id="@ViewBag.Id" class="btn btn-light">
+            Cancel
+        </a>
+        <button type="submit" class="btn btn-success">
+            <i class="fa fa-plus">&nbsp;Add</i>
+        </button>
+    }
+
+</div>

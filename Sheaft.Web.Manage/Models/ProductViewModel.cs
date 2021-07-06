@@ -15,7 +15,6 @@ namespace Sheaft.Web.Manage.Models
         public string Name { get; set; }
         public decimal? Weight { get; set; }
         public string Description { get; set; }
-        public string Picture { get; set; }
         public decimal QuantityPerUnit { get; set; }
         public UnitKind Unit { get; set; }
         public ConditioningKind Conditioning { get; set; }
@@ -24,7 +23,8 @@ namespace Sheaft.Web.Manage.Models
         public decimal? Rating { get; set; }
         public Guid? ReturnableId { get; set; }
         public ProducerViewModel Producer { get; set; }
-        public IEnumerable<Guid> Tags { get; set; }
-        public IEnumerable<CatalogViewModel> Catalogs { get; set; }
+        public List<Guid> Tags { get; set; }
+        public List<CatalogPriceViewModel> CatalogsPrices { get; set; }
+        public List<PictureViewModel> Pictures { get; set; }
     }
 }

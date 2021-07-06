@@ -84,18 +84,31 @@
             </div>
         }
         <h2>Products Prices</h2>
-        @foreach (var product in Model.Products)
-        {
-            var id = i++;
-            <div class="form-group">
-                <label>@product.Name (@product.Reference)</label>
-                @Html.HiddenFor(m => m.Products[id].Id)  
-                @Html.CheckBoxFor(m => m.Products[id].Remove)  
-                @Html.LabelFor(m => m.Products[id].Remove, new {@class = "form-check-label"})  
-                @Html.TextBoxFor(m => m.Products[id].WholeSalePricePerUnit, null, new {@class = "form-control"})
-            </div>
-        }
-
+        <table class="table table-striped table-dark">
+            <thead>
+            <tr>
+                <td>Reference</td>
+                <td>Name</td>
+                <td>Price</td>
+                <td>Remove</td>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var product in Model.Products)
+            {
+                var id = i++;
+                <tr>
+                    <td>
+                        @Html.HiddenFor(m => m.Products[id].Id)
+                        @product.Reference
+                    </td>
+                    <td>@product.Name</td>
+                    <td>@Html.TextBoxFor(m => m.Products[id].WholeSalePricePerUnit, null, new {@class = "form-control"})</td>
+                    <td>@Html.CheckBoxFor(m => m.Products[id].Remove)</td>
+                </tr>
+            }
+            </tbody>
+        </table>
         <a asp-controller="Catalogs" asp-action="AddProducts" asp-route-id="@Model.Id" class="btn btn-primary">
             Add Products
         </a>

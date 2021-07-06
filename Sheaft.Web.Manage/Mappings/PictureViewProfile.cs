@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Models;
+using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Web.Manage.Models;
 
@@ -10,7 +12,8 @@ namespace Sheaft.Web.Manage.Mappings
         public PictureViewProfile()
         {
             CreateMap<ProfilePicture, PictureViewModel>();
-            CreateMap<ProductPicture, PictureViewModel>();
+            CreateMap<ProductPicture, PictureViewModel>()
+                .ForMember(c => c.Url, opt => opt.MapFrom(e => PictureExtensions.GetPictureUrl(e.ProductId, e.Url, PictureSize.MEDIUM)));
             
             CreateMap<PictureDto, PictureViewModel>();
             CreateMap<PictureViewModel, PictureDto>();

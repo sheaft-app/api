@@ -13,9 +13,8 @@ namespace Sheaft.Web.Manage.Mappings
         public ProductViewProfile()
         {
             CreateMap<Domain.Product, ProductViewModel>()
-                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)))
-                .ForMember(d => d.Picture,
-                    opt => opt.MapFrom(r => PictureExtensions.GetPictureUrl(r.Id, r.Picture, PictureSize.LARGE)));
+                .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
+                
                 
             CreateMap<ProductDto, ProductViewModel>();
             CreateMap<ProductViewModel, ProductDto>()

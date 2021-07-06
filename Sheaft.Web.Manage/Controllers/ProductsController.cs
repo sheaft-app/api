@@ -11,13 +11,16 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Sheaft.Application.Interfaces;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
+using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Mediatr.Catalog.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
@@ -81,7 +84,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(ProductViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Add(ProductViewModel model, List<IFormFile> newPictures, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating())
@@ -93,12 +96,16 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            if (picture != null)
+            var images = model.Pictures?.Where(p => !p.Remove).Select(p => new PictureInputDto{Id = p.Id, Data = p.Url, Position = p.Position})?.ToList() ?? new List<PictureInputDto>();
+            if (newPictures != null && newPictures.Any())
             {
-                using (var ms = new MemoryStream())
+                foreach (var picture in newPictures)
                 {
-                    await picture.CopyToAsync(ms, token);
-                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                    using (var ms = new MemoryStream())
+                    {
+                        await picture.CopyToAsync(ms, token);
+                        images.Add(new PictureInputDto{Data = Convert.ToBase64String(ms.ToArray()), Position = images.Count});
+                    }
                 }
             }
 
@@ -115,7 +122,9 @@ namespace Sheaft.Web.Manage.Controllers
                 Unit = model.Unit,
                 Conditioning = model.Conditioning,
                 Vat = model.Vat,
-                Weight = model.Weight
+                Weight = model.Weight,
+                Pictures = images,
+                Catalogs = model.CatalogsPrices?.Where(c => !c.Remove).Select(c => new CatalogPriceInputDto{CatalogId = c.Id, WholeSalePricePerUnit = c.WholeSalePricePerUnit}) ?? new List<CatalogPriceInputDto>()
             }, token);
 
             if (!result.Succeeded)
@@ -154,7 +163,7 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ProductViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Edit(ProductViewModel model, List<IFormFile> newPictures, CancellationToken token)
         {
             var requestUser = await GetRequestUserAsync(token);
             if (!requestUser.IsImpersonating())
@@ -166,12 +175,16 @@ namespace Sheaft.Web.Manage.Controllers
                 return View(model);
             }
 
-            if (picture != null)
+            var images = model.Pictures?.Where(p => !p.Remove).Select(p => new PictureInputDto{Id = p.Id, Data = p.Url, Position = p.Position})?.ToList() ?? new List<PictureInputDto>();
+            if (newPictures != null && newPictures.Any())
             {
-                using (var ms = new MemoryStream())
+                foreach (var picture in newPictures)
                 {
-                    await picture.CopyToAsync(ms, token);
-                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                    using (var ms = new MemoryStream())
+                    {
+                        await picture.CopyToAsync(ms, token);
+                        images.Add(new PictureInputDto{Data = Convert.ToBase64String(ms.ToArray()), Position = images.Count});
+                    }
                 }
             }
 
@@ -188,7 +201,9 @@ namespace Sheaft.Web.Manage.Controllers
                 Conditioning = model.Conditioning,
                 Unit = model.Unit,
                 Vat = model.Vat,
-                Weight = model.Weight
+                Weight = model.Weight,
+                Pictures = images,
+                Catalogs = model.CatalogsPrices?.Where(c => !c.Remove).Select(c => new CatalogPriceInputDto{CatalogId = c.Id, WholeSalePricePerUnit = c.WholeSalePricePerUnit}) ?? new List<CatalogPriceInputDto>()
             }, token);
 
             if (!result.Succeeded)
@@ -201,6 +216,78 @@ namespace Sheaft.Web.Manage.Controllers
             }
 
             return RedirectToAction("Edit", new {model.Id});
+        }
+        
+        
+
+        [HttpGet]
+        public async Task<IActionResult> AddCatalogs(Guid id, CancellationToken token)
+        {
+            var requestUser = await GetRequestUserAsync(token);
+            if (!requestUser.IsImpersonating())
+                return RedirectToAction("Impersonate", "Account");
+
+            var product = await _context.Products.SingleAsync(c => c.Id == id, token);
+            var catalogIds = product.CatalogsPrices.Select(p => p.CatalogId);
+            
+            var catalogs = await _context.Catalogs
+                .Where(p => p.ProducerId == requestUser.Id && !catalogIds.Contains(p.Id))
+                .ToListAsync(token);
+
+            ViewBag.Id = id;
+            ViewBag.Catalogs = catalogs.Select(p => new SelectListItem(p.Name, p.Id.ToString("N"))).ToList();
+            
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddCatalogs(Guid id, List<Guid> catalogs, CancellationToken token)
+        {
+            var product = await _context.Products.SingleAsync(c => c.Id == id, token);
+            var catalogIds = product.CatalogsPrices.Select(p => p.CatalogId);
+            
+            var requestUser = await GetRequestUserAsync(token);
+            if (!requestUser.IsImpersonating())
+            {
+                var pp = await _context.Catalogs
+                    .Where(p => p.ProducerId == requestUser.Id && !catalogIds.Contains(p.Id))
+                    .ToListAsync(token);
+
+                ViewBag.Id = id;
+                ViewBag.Catalogs = pp.Select(p => new SelectListItem(p.Name, p.Id.ToString("N"))).ToList();
+
+                ModelState.AddModelError("", "You must impersonate catalog's producer to edit it.");
+                return View();
+            }
+
+            Result result = null;
+            foreach (var catalogId in catalogs)
+            {
+                result = await _mediatr.Process(new AddOrUpdateProductsToCatalogCommand(requestUser)
+                {
+                    CatalogId = catalogId,
+                    Products = new List<ProductPriceInputDto>{new ProductPriceInputDto{ProductId = id, WholeSalePricePerUnit = 0}},
+                }, token);
+
+                if (!result.Succeeded)
+                    break;
+            }
+
+            if (!result.Succeeded)
+            {
+                var pp = await _context.Catalogs
+                    .Where(p => p.ProducerId == requestUser.Id && !catalogIds.Contains(p.Id))
+                    .ToListAsync(token);
+
+                ViewBag.Id = id;
+                ViewBag.Catalogs = pp.Select(p => new SelectListItem(p.Name, p.Id.ToString("N"))).ToList();
+
+                ModelState.AddModelError("", result.Exception.Message);
+                return View();
+            }
+
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]

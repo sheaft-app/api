@@ -6,5 +6,7 @@ namespace Sheaft.Web.Manage.Models
     {
         public Guid Id { get; set; }
         public string Url { get; set; }
+        public int Position { get; set; }
+        public bool Remove { get; set; }
     }
 }

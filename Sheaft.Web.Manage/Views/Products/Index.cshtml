@@ -4,7 +4,7 @@
     ViewData["Title"] = "Products";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
-    Guid? imperonatingId = Context.Request.ImpersonificationId();
+    var impersonatingId = Context.Request.ImpersonificationId();
 }
 
 <div class="container">
@@ -36,7 +36,7 @@
                 <th scope="col">WholeSalePrice</th>
                 <th scope="col">Vat</th>
                 <th scope="col">Available</th>
-                @if (!imperonatingId.HasValue)
+                @if (!impersonatingId.HasValue)
                 {
                     <th scope="col">Producer</th>
                 }
@@ -57,7 +57,7 @@
                     <td>@entity.Name</td>
                     <td>@(entity.Vat)%</td>
                     <td>@entity.Available</td>
-                    @if (!imperonatingId.HasValue)
+                    @if (!impersonatingId.HasValue)
                     {
                         <td>
                             @entity.Producer.Name
