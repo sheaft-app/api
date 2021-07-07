@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QueryDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210707193534_Delivery_ProducerName")]
+    partial class Delivery_ProducerName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -397,9 +399,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("CompletedOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("CreatedFromBatchId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
 
@@ -468,10 +467,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
-
-                    b.HasIndex("CreatedFromBatchId")
-                        .IsUnique()
-                        .HasFilter("[CreatedFromBatchId] IS NOT NULL");
 
                     b.ToTable("DeliveryBatches");
                 });
@@ -3578,10 +3573,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasForeignKey("AssignedToId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.DeliveryBatch", null)
-                        .WithOne()
-                        .HasForeignKey("Sheaft.Domain.DeliveryBatch", "CreatedFromBatchId");
 
                     b.Navigation("AssignedTo");
                 });

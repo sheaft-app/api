@@ -16,7 +16,7 @@ namespace Sheaft.Domain
         }
 
         public DeliveryBatch(Guid id, string name, DateTimeOffset scheduledOn, TimeSpan from, User assignedTo,
-            IEnumerable<Delivery> deliveries = null)
+            IEnumerable<Delivery> deliveries = null, Guid? createdFromPartialBatchId = null)
         {
             Id = id;
             Name = name;
@@ -26,6 +26,7 @@ namespace Sheaft.Domain
             AssignedTo = assignedTo;
             AssignedToId = assignedTo.Id;
             Status = DeliveryBatchStatus.Waiting;
+            CreatedFromBatchId = createdFromPartialBatchId;
 
             SetDeliveries(deliveries);
         }
@@ -55,6 +56,7 @@ namespace Sheaft.Domain
         public string Reason { get; private set; }
         public string DeliveryFormsUrl { get; private set; }
         public Guid AssignedToId { get; private set; }
+        public Guid? CreatedFromBatchId { get; set; }
         public virtual User AssignedTo { get; private set; }
         public virtual ICollection<Delivery> Deliveries { get; private set; }
         public byte[] RowVersion { get; set; }

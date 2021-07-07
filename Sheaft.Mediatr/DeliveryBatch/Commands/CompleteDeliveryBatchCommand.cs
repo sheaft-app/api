@@ -68,6 +68,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             {
                 var result = await _mediatr.Process(new CreateDeliveryBatchCommand(request.RequestUser)
                 {
+                    CreatedFromPartialBatchId = deliveryBatch.Id,
                     Deliveries = pendingDeliveries.Select(p => new ClientDeliveryPositionDto
                     {
                         Position = p.Position,

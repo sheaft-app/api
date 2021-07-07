@@ -72,7 +72,11 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
                     new EmailAttachmentDto()
                     {
                         Content = blobResult.Data,
-                        Name =  $"{producer.Name.Replace(" ", "")}_{delivery.Reference.AsDeliveryIdentifier()}_{delivery.DeliveredOn.Value:dd/MM/yyyy}",
+                        Name =  $@"{producer.Name.Replace(" ", "")}_{delivery.Reference.AsDeliveryIdentifier()}_{delivery.DeliveredOn.Value.ToString("dd/MM/yyyy")
+                            .Replace(" ", "")
+                            .Replace("'", "")
+                            .Replace("\"", "")
+                            .Replace("/", "")}.pdf",
                     }
                 },
                 true,

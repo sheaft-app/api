@@ -49,6 +49,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("client");
             
             descriptor
+                .Field(c => c.Producer)
+                .Name("producer");
+            
+            descriptor
                 .Field("reference")
                 .Resolve((ctx, token) => ctx.Parent<Delivery>().Reference.AsDeliveryIdentifier());
             
@@ -56,6 +60,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.ClientId)
                 .ID(nameof(User))
                 .Name("clientId");
+            
+            descriptor
+                .Field(c => c.ProducerId)
+                .ID(nameof(User))
+                .Name("producerId");
 
             descriptor
                 .Field(c => c.Address)

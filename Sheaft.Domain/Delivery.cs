@@ -16,8 +16,7 @@ namespace Sheaft.Domain
         }
 
         public Delivery(int reference, Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn,
-            ExpectedAddress address,
-            Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders, int? position)
+            ExpectedAddress address, Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders, int? position)
         {
             Id = Guid.NewGuid();
             Status = DeliveryStatus.Waiting;
@@ -29,15 +28,18 @@ namespace Sheaft.Domain
             Position = position;
             Address = address;
             ProducerId = producer.Id;
+            Producer = producer.Name;
 
             Reference = reference;
             AddPurchaseOrders(purchaseOrders);
         }
 
         public Guid Id { get; private set; }
+        public int Reference { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Client { get; private set; }
+        public string Producer { get; private set; }
         public DeliveryKind Kind { get; private set; }
         public DeliveryStatus Status { get; private set; }
         public DateTimeOffset ScheduledOn { get; private set; }
@@ -68,7 +70,6 @@ namespace Sheaft.Domain
         public virtual ICollection<DeliveryReturnable> ReturnedReturnables { get; private set; }
         public byte[] RowVersion { get; set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-        public int Reference { get; set; }
 
         public void SetReturnedReturnables(IEnumerable<KeyValuePair<Returnable, int>> returnables)
         {

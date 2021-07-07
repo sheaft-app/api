@@ -33,6 +33,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
 
+            entity.HasOne<DeliveryBatch>().WithOne().HasForeignKey<DeliveryBatch>(c => c.CreatedFromBatchId);
+
             entity.Ignore(c => c.DomainEvents);
 
             entity.HasKey(c => c.Id);

@@ -33,6 +33,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         public DateTimeOffset ScheduledOn { get; set; }
         public TimeSpan From { get; set; }
         public Guid ProducerId { get; set; }
+        public Guid? CreatedFromPartialBatchId { get; set; }
         public IEnumerable<ClientDeliveryPositionDto> Deliveries { get; set; }
 
         public override void SetRequestUser(RequestUser user)
@@ -150,7 +151,11 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             }
 
             var deliveryBatch = new Domain.DeliveryBatch(Guid.NewGuid(), name, request.ScheduledOn, request.From,
-                producer, deliveries);
+                producer, deliveries, request.CreatedFromPartialBatchId);
+
+            if(request.CreatedFromPartialBatchId.HasValue)
+                foreach (var delivery in deliveries)
+                    delivery.PostponeDelivery();
 
             await _context.AddAsync(deliveryBatch, token);
             await _context.SaveChangesAsync(token);
