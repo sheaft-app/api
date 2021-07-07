@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mailing
 {
@@ -20,5 +21,6 @@ namespace Sheaft.Mailing
         public string Address { get; set; }
         public string Reason { get; set; }
         public string Id { get; set; }
+        public ProfileKind ClientKind { get; set; }
     }
 }

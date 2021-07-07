@@ -33,7 +33,8 @@ namespace Sheaft.Mailing.Extensions
                 ExpectedFrom = purchaseOrder.ExpectedDelivery.From,
                 ExpectedTo = purchaseOrder.ExpectedDelivery.To,
                 Address = address != null ? $"{address.Line1} {address.Line2} {address.Zipcode} {address.City}" : null,
-                Reason = purchaseOrder.Reason
+                Reason = purchaseOrder.Reason,
+                ClientKind = purchaseOrder.SenderInfo.Kind
             };
         }
 
