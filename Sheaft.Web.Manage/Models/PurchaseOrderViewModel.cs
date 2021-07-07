@@ -14,7 +14,7 @@ namespace Sheaft.Web.Manage.Models
         public DateTimeOffset? DeliveredOn { get; private set; }
         public DateTimeOffset? WithdrawnOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; set; }
-        public string Reference { get; set; }
+        public int Reference { get; set; }
         public string Reason { get; set; }
         public string Comment { get; set; }
         public int LinesCount { get; set; }

@@ -1,0 +1,101 @@
+﻿@using Sheaft.Domain.Enum
+@using Sheaft.Domain.Extensions
+@using Sheaft.Web.Manage.Extensions
+@model IEnumerable<DeliveryViewModel>
+@{
+    ViewData["Title"] = "Deliveries";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+    string status = ((DeliveryStatus?) ViewBag.Status)?.ToString("G");
+    Guid? imperonatingId = Context.Request.ImpersonificationId();
+}
+
+<div class="container">
+    <h2 class="display-5">Deliveries</h2>
+    <br/>
+
+    <div class="btn-group">
+        <label class="btn btn-secondary @(status == null ? "active" : "")">
+            <a asp-controller="Deliveries" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+        </label>
+        @foreach (var existingStatus in Enum.GetNames(typeof(DeliveryStatus)))
+        {
+            <label class="btn btn-secondary @(status == existingStatus ? "active" : "")">
+                <a asp-controller="Deliveries" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
+            </label>
+        }
+    </div>
+    <br/>
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Reference</th>
+            <th scope="col">Status</th>
+            <th scope="col">CreatedOn</th>
+            <th scope="col">ScheduledOn</th>
+            <th scope="col">Producer</th>
+            <th scope="col">Client</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var entity in Model)
+        {
+            <tr>
+                <th scope="row">@entity.Reference.AsDeliveryIdentifier()</th>
+                <td>@entity.Status</td>
+                <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                <td>@entity.ScheduledOn.ToString("dd/MM/yy hh:mm")</td>
+                <td>
+                    @entity.Producer
+                    @if (!imperonatingId.HasValue)
+                    {
+                        @using (Html.BeginForm("ImpersonateById", "Account", new {id = entity.ProducerId}, FormMethod.Post, true, new {@class = "form d-inline"}))
+                        {
+                            <button type="submit" class="btn btn-info">
+                                <i class="fa fa-user-secret"></i>
+                            </button>
+                        }
+                    }
+                </td>
+                <td>
+                    @entity.Client
+                    @if (!imperonatingId.HasValue)
+                    {
+                        @using (Html.BeginForm("ImpersonateById", "Account", new {id = entity.ClientId}, FormMethod.Post, true, new {@class = "form d-inline"}))
+                        {
+                            <button type="submit" class="btn btn-info">
+                                <i class="fa fa-user-secret"></i>
+                            </button>
+                        }
+                    }
+                </td>
+                <td>
+                    <a asp-controller="Deliveries" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr class="text-center">
+            <td colspan="7">
+                @if (currentPage >= 1)
+                {
+                    <a asp-controller="Deliveries" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage - 1)" class="btn btn-outline-secondary">
+                        <i class="fa fa-caret-left"></i>
+                    </a>
+                }
+                @if (take == Model.Count())
+                {
+                    <a asp-controller="Deliveries" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage + 1)" class="btn btn-outline-secondary">
+                        <i class="fa fa-caret-right"></i>
+                    </a>
+                }
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>

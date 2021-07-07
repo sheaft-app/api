@@ -17,6 +17,7 @@ namespace Sheaft.Web.Manage.Models
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
         public decimal? TotalWeight { get; set; }
+        public bool HasReturnable { get; set; }
         public string ReturnableName { get; set; }
         public decimal? ReturnableVat { get; set; }
         public decimal? ReturnableVatPrice { get; set; }
