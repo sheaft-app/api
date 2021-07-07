@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 .Where(d => d.Status != DeliveryStatus.Delivered && d.Status != DeliveryStatus.Rejected)
                 .ToList();
 
-            if (pendingDeliveries.Any() && !request.ReschedulePendingDeliveriesOn.HasValue || !request.From.HasValue)
+            if (pendingDeliveries.Any() && (!request.ReschedulePendingDeliveriesOn.HasValue || !request.From.HasValue))
                 return Failure("La tournée de livraison contient encore des livraisons en attente, vous devez spécifier une date de replanification.");
 
             if (pendingDeliveries.Any())

@@ -94,8 +94,24 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("productsToDeliverCount");
             
             descriptor
-                .Field(c => c.ReturnedProductsCount)
-                .Name("returnedProductsCount");
+                .Field(c => c.ProductsDeliveredCount)
+                .Name("productsDeliveredCount");
+            
+            descriptor
+                .Field(c => c.BrokenProductsCount)
+                .Name("brokenProductsCount");
+            
+            descriptor
+                .Field(c => c.MissingProductsCount)
+                .Name("missingProductsCount");
+            
+            descriptor
+                .Field(c => c.ImproperProductsCount)
+                .Name("improperProductsCount");
+            
+            descriptor
+                .Field(c => c.ExcessProductsCount)
+                .Name("excessProductsCount");
             
             descriptor
                 .Field(c => c.ReturnedReturnablesCount)

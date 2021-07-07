@@ -10,33 +10,68 @@ namespace Sheaft.Mediatr.Delivery.Commands
 {
     internal static class DeliveryModelHelpers
     {
-        public static DeliveryFormMailerModel GetDeliveryFormModel(Domain.Producer producer, string producerSiret, Domain.User client, string clientSiret, Domain.Delivery delivery)
+        public static DeliveryFormMailerModel GetDeliveryFormModel(Domain.Producer producer, string producerSiret,
+            Domain.User client, string clientSiret, Domain.Delivery delivery)
         {
             var purchaseOrders = GetPurchaseOrders(delivery.PurchaseOrders);
-            var returnedProducts = delivery.Products
+
+            var productsToDeliver = delivery.Products
+                .Where(p => p.RowKind == ModificationKind.ToDeliver)
+                .Select(p => GetProductModel(p))
+                .ToList();
+
+            var productsDiffs = delivery.Products
                 .Where(p => p.RowKind != ModificationKind.ToDeliver)
                 .Select(p => GetProductModel(p))
                 .ToList();
+
+            var returnablesDiffs = delivery.Products
+                .Where(p => p.RowKind != ModificationKind.ToDeliver && p.HasReturnable)
+                .GroupBy(p => new {p.ReturnableId, p.RowKind})
+                .Select(p =>
+                {
+                    var returnable = p.First();
+                    return new DeliveryReturnableMailerModel
+                    {
+                        Id = p.Key.ReturnableId.Value,
+                        Name = returnable.ReturnableName,
+                        Quantity = returnable.Quantity,
+                        Vat = returnable.ReturnableVat.Value,
+                        RowKind = p.Key.RowKind,
+                        TotalVatPrice = p.Sum(r => r.TotalReturnableVatPrice.Value),
+                        TotalOnSalePrice = p.Sum(r => r.TotalReturnableOnSalePrice.Value),
+                        TotalWholeSalePrice = p.Sum(r => r.TotalReturnableWholeSalePrice.Value),
+                        WholeSalePrice = returnable.ReturnableWholeSalePrice.Value
+                    };
+                }).ToList();
+
             var returnedReturnables = delivery.ReturnedReturnables
                 .Select(r => GetReturnedReturnableModel(r))
                 .ToList();
-            
+
             return new DeliveryFormMailerModel()
             {
                 Identifier = delivery.Reference.AsDeliveryIdentifier(),
                 Producer = GetUserModel(producer, producerSiret),
                 Client = GetUserModel(client, clientSiret),
                 PurchaseOrders = purchaseOrders,
-                Products = delivery.Products.Select(p => GetProductModel(p)).ToList(),
-                ReturnedProducts = returnedProducts,
+                ProductsToDeliver = productsToDeliver,
+                ProductsDiffs = productsDiffs,
                 ReturnedReturnables = returnedReturnables,
+                ReturnablesDiffs = returnablesDiffs,
                 DeliveredOn = delivery.DeliveredOn ?? delivery.ScheduledOn,
                 ScheduledOn = delivery.ScheduledOn,
                 ReceptionnedBy = delivery.ReceptionedBy,
                 Comment = delivery.Comment,
-                TotalWholeSalePrice = purchaseOrders.Sum(po => po.TotalWholeSalePrice) + returnedProducts.Sum(p => p.TotalWholeSalePrice) + returnedReturnables.Sum(p => p.TotalWholeSalePrice),
-                TotalVatPrice = purchaseOrders.Sum(po => po.TotalVatPrice) + returnedProducts.Sum(p => p.TotalVatPrice) + returnedReturnables.Sum(p => p.TotalVatPrice),
-                TotalOnSalePrice = purchaseOrders.Sum(po => po.TotalOnSalePrice) + returnedProducts.Sum(p => p.TotalOnSalePrice) + returnedReturnables.Sum(p => p.TotalOnSalePrice),
+                TotalWholeSalePrice = productsToDeliver.Sum(po => po.TotalWholeSalePrice) +
+                                      productsDiffs.Sum(p => p.TotalWholeSalePrice) +
+                                      returnedReturnables.Sum(p => p.TotalWholeSalePrice),
+                TotalVatPrice = productsToDeliver.Sum(po => po.TotalVatPrice) +
+                                productsDiffs.Sum(p => p.TotalVatPrice) + 
+                                returnedReturnables.Sum(p => p.TotalVatPrice),
+                TotalOnSalePrice = productsToDeliver.Sum(po => po.TotalOnSalePrice) +
+                                   productsDiffs.Sum(p => p.TotalOnSalePrice) +
+                                   returnedReturnables.Sum(p => p.TotalOnSalePrice),
             };
         }
 
@@ -76,10 +111,21 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     Reference = product.Reference,
                     RowKind = ModificationKind.ToDeliver,
                     Vat = product.Vat,
+                    ProductWholeSalePrice = product.UnitWholeSalePrice,
+                    ProductTotalVatPrice = groupedProduct.Sum(po => po.TotalProductVatPrice),
+                    ProductTotalWholeSalePrice = groupedProduct.Sum(po => po.TotalProductWholeSalePrice),
+                    ProductTotalOnSalePrice = groupedProduct.Sum(po => po.TotalProductOnSalePrice),
+                    HasReturnable = groupedProduct.FirstOrDefault()?.HasReturnable ?? false,
+                    ReturnableName = groupedProduct.FirstOrDefault()?.Name,
+                    ReturnableQuantity = product.Quantity,
+                    ReturnableVat = groupedProduct.FirstOrDefault()?.Vat,
+                    ReturnableWholeSalePrice = groupedProduct.FirstOrDefault()?.ReturnableWholeSalePrice,
+                    ReturnableTotalVatPrice = groupedProduct.Sum(po => po.TotalReturnableVatPrice),
+                    ReturnableTotalWholeSalePrice = groupedProduct.Sum(po => po.TotalReturnableWholeSalePrice),
+                    ReturnableTotalOnSalePrice = groupedProduct.Sum(po => po.TotalReturnableOnSalePrice),
                     TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
                     TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
                     TotalOnSalePrice = groupedProduct.Sum(po => po.TotalOnSalePrice),
-                    UnitWholeSalePrice = product.UnitWholeSalePrice
                 });
             }
 
@@ -95,10 +141,16 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 Reference = p.Reference,
                 RowKind = p.RowKind,
                 Vat = p.Vat,
-                TotalVatPrice = p.TotalVatPrice,
-                TotalWholeSalePrice = p.TotalWholeSalePrice,
-                TotalOnSalePrice = p.TotalOnSalePrice,
-                UnitWholeSalePrice = p.UnitWholeSalePrice
+                ProductTotalVatPrice = p.TotalVatPrice,
+                ProductTotalWholeSalePrice = p.TotalWholeSalePrice,
+                ProductTotalOnSalePrice = p.TotalOnSalePrice,
+                ProductWholeSalePrice = p.UnitWholeSalePrice,
+                HasReturnable = p.HasReturnable,
+                ReturnableName = p.ReturnableName,
+                ReturnableQuantity = p.Quantity,
+                ReturnableVat = p.ReturnableVat,
+                ReturnableWholeSalePrice = p.ReturnableWholeSalePrice,
+                ReturnableTotalWholeSalePrice = p.TotalReturnableWholeSalePrice,
             };
         }
 
@@ -111,16 +163,17 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 var product = groupedProduct.First();
                 if (!product.HasReturnable)
                     continue;
-                
+
                 returnables.Add(new DeliveryReturnableMailerModel()
                 {
                     Name = product.ReturnableName,
                     Quantity = product.Quantity,
+                    RowKind = ModificationKind.ToDeliver,
                     Vat = product.ReturnableVat ?? 0,
                     TotalVatPrice = groupedProduct.Sum(po => po.TotalReturnableVatPrice ?? 0),
                     TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalReturnableWholeSalePrice ?? 0),
                     TotalOnSalePrice = groupedProduct.Sum(po => po.TotalReturnableOnSalePrice ?? 0),
-                    UnitWholeSalePrice = product.ReturnableWholeSalePrice ?? 0
+                    WholeSalePrice = product.ReturnableWholeSalePrice ?? 0
                 });
             }
 
@@ -133,7 +186,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             {
                 Name = p.Name,
                 Quantity = p.Quantity,
-                UnitWholeSalePrice = p.UnitWholeSalePrice,
+                WholeSalePrice = p.UnitWholeSalePrice,
                 Vat = p.Vat,
                 TotalWholeSalePrice = p.TotalWholeSalePrice,
             };

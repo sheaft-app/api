@@ -80,7 +80,7 @@
     <tbody>
     @foreach (var item in Model.PurchaseOrders)
     {
-        <tr style="text-align: left;">
+        <tr style="padding: 10px 15px;text-align: left;">
             <th colspan="5" style="padding:15px 5px;">Commande @item.Reference du @item.CreatedOn.ToString("dd/MM/yyyy")</th>
         </tr>
         @foreach (var product in item.Products)
@@ -88,9 +88,9 @@
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.UnitWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductWholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalWholeSalePrice</td>
             </tr>
         }
         @foreach (var returnable in item.Returnables)
@@ -98,34 +98,51 @@
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">@returnable.Name</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Quantity</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.UnitWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalWholeSalePrice</td>
             </tr>
         }
     }
-    @if (Model.ReturnedProducts.Any())
+    @if (Model.ProductsDiffs.Any())
     {
-        @foreach (var productGrouping in Model.ReturnedProducts.GroupBy(p => p.RowKind))
+        @foreach (var productGrouping in Model.ProductsDiffs.GroupBy(p => p.RowKind))
         {
-            <tr style="text-align: left;">
+            <tr style="padding: 10px 15px;text-align: left;">
                 <th colspan="5" style="padding:15px 5px;">Produits @productGrouping.Key.ToEnumString()s</th>
             </tr>
             @foreach (var product in productGrouping)
             {
-                <tr >
+                <tr>
                     <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
                     <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
-                    <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.UnitWholeSalePrice</td>
+                    <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductWholeSalePrice</td>
                     <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
-                    <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalWholeSalePrice</td>
+                    <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalWholeSalePrice</td>
                 </tr>
+            }
+
+            if (Model.ReturnablesDiffs.Any(p => p.RowKind == @productGrouping.Key))
+            {
+                <tr style="padding: 10px 15px;text-align: left;">
+                    <th colspan="5" style="padding:15px 5px;">Consignes @productGrouping.Key.ToEnumString()es</th>
+                </tr>
+                @foreach (var returnable in Model.ReturnablesDiffs.Where(p => p.RowKind == @productGrouping.Key))
+                {
+                    <tr>
+                        <td style="padding: 10px 15px;vertical-align: center;">@returnable.Name</td>
+                        <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Quantity</td>
+                        <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
+                        <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
+                        <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalWholeSalePrice</td>
+                    </tr>
+                }
             }
         }
     }
     @if (Model.ReturnedReturnables.Any())
     {
-        <tr style="text-align: left;">
+        <tr style="padding: 10px 15px;text-align: left;">
             <th colspan="5" style="padding:15px 5px;">Consignes rendues</th>
         </tr>
         @foreach (var product in Model.ReturnedReturnables)
@@ -133,7 +150,7 @@
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
-                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.UnitWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalWholeSalePrice</td>
             </tr>

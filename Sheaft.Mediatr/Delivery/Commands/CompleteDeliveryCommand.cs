@@ -108,21 +108,27 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     .ToList();
             }
 
-            delivery.CompleteDelivery(returnedProducts, returnedReturnables, request.ReceptionedBy, request.Comment);
-            await _context.SaveChangesAsync(token);
-
-            _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id});
-
-            if (delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatch.Deliveries.All(d =>
-                d.Status is DeliveryStatus.Delivered or DeliveryStatus.Rejected))
+            using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var result = await _mediatr.Process(new CompleteDeliveryBatchCommand(request.RequestUser)
-                    {Id = delivery.DeliveryBatchId.Value}, token);
+                delivery.CompleteDelivery(returnedProducts, returnedReturnables, request.ReceptionedBy,
+                    request.Comment);
+                
+                await _context.SaveChangesAsync(token);
 
-                if (!result.Succeeded)
-                    return Failure(result);
+                if (delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatch.Deliveries.All(d =>
+                    d.Status is DeliveryStatus.Delivered or DeliveryStatus.Rejected))
+                {
+                    var result = await _mediatr.Process(new CompleteDeliveryBatchCommand(request.RequestUser)
+                        {Id = delivery.DeliveryBatchId.Value}, token);
+
+                    if (!result.Succeeded)
+                        return Failure(result);
+                }
+
+                await transaction.CommitAsync(token);
             }
 
+            _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id});
             return Success();
         }
     }

@@ -37,10 +37,14 @@ namespace Sheaft.Domain
         public string Name { get; set; }
         public DeliveryBatchStatus Status { get; private set; }
         public int ProductsToDeliverCount { get; private set; }
+        public int ProductsDeliveredCount { get; private set; }
         public int DeliveriesCount { get; private set; }
         public int ReturnablesCount { get; private set; }
         public int ReturnedReturnablesCount { get; private set; }
-        public int ReturnedProductsCount { get; private set; }
+        public int BrokenProductsCount { get; private set; }
+        public int MissingProductsCount { get; private set; }
+        public int ImproperProductsCount { get; private set; }
+        public int ExcessProductsCount { get; private set; }
         public int PurchaseOrdersCount { get; private set; }
         public DateTimeOffset ScheduledOn { get; private set; }
         public DayOfWeek Day { get; private set; }
@@ -160,8 +164,12 @@ namespace Sheaft.Domain
             ReturnablesCount = Deliveries.Sum(d => d.ReturnablesCount);
             ProductsToDeliverCount = Deliveries.Sum(d => d.ProductsToDeliverCount);
             PurchaseOrdersCount = Deliveries.Sum(d => d.PurchaseOrdersCount);
-            ReturnedProductsCount = Deliveries.Sum(d => d.ReturnedProductsCount);
+            BrokenProductsCount = Deliveries.Sum(d => d.BrokenProductsCount);
+            MissingProductsCount = Deliveries.Sum(d => d.MissingProductsCount);
+            ImproperProductsCount = Deliveries.Sum(d => d.ImproperProductsCount);
+            ExcessProductsCount = Deliveries.Sum(d => d.ExcessProductsCount);
             ReturnedReturnablesCount = Deliveries.Sum(d => d.ReturnedReturnablesCount);
+            ProductsDeliveredCount = Deliveries.Sum(d => d.ProductsDeliveredCount);
         }
 
         public void RemoveDelivery(Delivery delivery)

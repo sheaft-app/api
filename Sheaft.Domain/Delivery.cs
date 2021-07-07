@@ -50,8 +50,12 @@ namespace Sheaft.Domain
         public ExpectedAddress Address { get; private set; }
         public int PurchaseOrdersCount { get; private set; }
         public int ProductsToDeliverCount { get; private set; }
+        public int ProductsDeliveredCount { get; private set; }
         public int ReturnablesCount { get; private set; }
-        public int ReturnedProductsCount { get; private set; }
+        public int BrokenProductsCount { get; private set; }
+        public int ImproperProductsCount { get; private set; }
+        public int MissingProductsCount { get; private set; }
+        public int ExcessProductsCount { get; private set; }
         public int ReturnedReturnablesCount { get; private set; }
         public string DeliveryFormUrl { get; private set; }
         public string DeliveryReceiptUrl { get; private set; }
@@ -264,11 +268,17 @@ namespace Sheaft.Domain
         private void Refresh()
         {
             ReturnedReturnablesCount = ReturnedReturnables?.Sum(p => p.Quantity) ?? 0;
-            ReturnedProductsCount = Products.Where(p => p.RowKind != ModificationKind.ToDeliver).Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver && p.HasReturnable)
+            BrokenProductsCount = Products.Where(p => p.RowKind == ModificationKind.Broken).Sum(p => p.Quantity);
+            ImproperProductsCount = Products.Where(p => p.RowKind == ModificationKind.Improper).Sum(p => p.Quantity);
+            ExcessProductsCount = Products.Where(p => p.RowKind == ModificationKind.Excess).Sum(p => p.Quantity);
+            MissingProductsCount = Products.Where(p => p.RowKind == ModificationKind.Missing).Sum(p => p.Quantity);
+            ReturnablesCount = Products.Where(p => (p.RowKind == ModificationKind.ToDeliver || p.RowKind == ModificationKind.Excess) && p.HasReturnable)
+                .Sum(p => p.Quantity) + Products.Where(p => (p.RowKind == ModificationKind.Broken || p.RowKind == ModificationKind.Improper || p.RowKind == ModificationKind.Missing) && p.HasReturnable)
                 .Sum(p => p.Quantity);
             ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver).Sum(p => p.Quantity);
             PurchaseOrdersCount = PurchaseOrders.Count;
+            ProductsDeliveredCount = ProductsToDeliverCount + BrokenProductsCount + MissingProductsCount +
+                                     ImproperProductsCount + ExcessProductsCount;
 
             DeliveryBatch?.Refresh();
         }
