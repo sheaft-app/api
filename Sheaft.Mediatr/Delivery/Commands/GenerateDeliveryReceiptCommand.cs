@@ -68,7 +68,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             if (!result.Succeeded)
                 return Failure(result);
             
-            var resultUrl = await _blobService.UploadProducerDeliveryReceiptAsync(delivery.ProducerId, delivery.Id, $"Reception_{delivery.Reference.AsDeliveryIdentifier()}.pdf",  result.Data, token);
+            var resultUrl = await _blobService.UploadProducerDeliveryReceiptAsync(delivery.ProducerId, delivery.Id, $"{delivery.Reference.AsReceiptIdentifier()}.pdf",  result.Data, token);
             if (!resultUrl.Succeeded)
                 return Failure(resultUrl);
             

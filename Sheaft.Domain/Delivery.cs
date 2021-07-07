@@ -170,7 +170,7 @@ namespace Sheaft.Domain
 
         public void SetAsReady()
         {
-            if (Status != DeliveryStatus.Waiting)
+            if (Status != DeliveryStatus.Waiting && Status != DeliveryStatus.Ready)
                 throw SheaftException.Validation("La livraison n'est pas en attente.");
 
             StartedOn = null;
