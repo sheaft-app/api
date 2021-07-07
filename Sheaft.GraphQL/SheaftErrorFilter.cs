@@ -91,7 +91,7 @@ namespace Sheaft.GraphQL
                 case "AUTH_NOT_AUTHORIZED":
                     statusCode = 403;
                     kind = ExceptionKind.Forbidden;
-                    message = "Vous n'êtes pas authorisé à accéder à la ressource.";
+                    message = "Vous n'êtes pas autorisé à accéder à la ressource.";
                     code = ExceptionKind.Forbidden.ToString("G");
                     extensions.Add(ExceptionKind.Forbidden.ToString("G"), message);
                     break;

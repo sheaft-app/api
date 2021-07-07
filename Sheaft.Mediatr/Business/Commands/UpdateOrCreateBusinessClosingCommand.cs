@@ -52,7 +52,7 @@ namespace Sheaft.Mediatr.Business.Commands
         {
             var entity = await _context.Businesses.SingleAsync(e => e.Id == request.UserId, token);
             if(entity.Id != request.RequestUser.Id)
-                return Failure<Guid>("Vous n'êtes pas authorisé à accéder à cette ressource.");
+                return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             Guid closingId;
             if (request.Closing.Id.HasValue)

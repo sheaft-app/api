@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -15,6 +16,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Agreement.Commands
@@ -54,11 +56,16 @@ namespace Sheaft.Mediatr.Agreement.Commands
                 await _context.Agreements.SingleOrDefaultAsync(a => a.Id == request.AgreementId && a.RemovedOn.HasValue, token);
             
             if(request.RequestUser.IsInRole(_roleOptions.Producer.Value) && entity.ProducerId != request.RequestUser.Id)
-                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
             
             if(request.RequestUser.IsInRole(_roleOptions.Store.Value) && entity.StoreId != request.RequestUser.Id)
-                return Failure("Vous n'êtes pas authorisé à accéder à cette ressource.");
+                return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
+            if (await _context.Agreements.AnyAsync(
+                a => a.Id != entity.Id && a.StoreId == entity.StoreId && a.ProducerId == entity.ProducerId &&
+                     a.Status != AgreementStatus.Cancelled && a.Status != AgreementStatus.Refused, token))
+                return Failure("Un partenariat est déjà actif ou en attente d'acceptation.");
+            
             _context.Restore(entity);
             await _context.SaveChangesAsync(token);
 
