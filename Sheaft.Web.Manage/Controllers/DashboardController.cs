@@ -79,6 +79,9 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.Catalogs =
                     await _context.Catalogs.CountAsync(c => !c.RemovedOn.HasValue && c.ProducerId == requestUser.Id,
                         token);
+                ViewBag.PreAuthorizations =
+                    await _context.PreAuthorizations.CountAsync(c => !c.RemovedOn.HasValue && c.Order.UserId == requestUser.Id,
+                        token);
             }
             else
             {
@@ -98,6 +101,7 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.Donations = await _context.Donations.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Withholdings = await _context.Withholdings.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Catalogs = await _context.Catalogs.CountAsync(c => !c.RemovedOn.HasValue, token);
+                ViewBag.PreAuthorizations = await _context.PreAuthorizations.CountAsync(c => !c.RemovedOn.HasValue, token);
             }
 
             ViewBag.RequestUser = requestUser;

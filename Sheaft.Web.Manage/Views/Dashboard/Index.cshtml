@@ -113,6 +113,13 @@
     </div>
     <div class="card w-25 d-inline-block">
         <div class="card-body">
+            <h5 class="card-title">PreAuthorizations</h5>
+            <h6 class="card-subtitle mb-2 text-muted">@ViewBag.PreAuthorizations</h6>
+            <a asp-controller="PreAuthorizations" asp-action="index" class="card-link">Show</a>
+        </div>
+    </div>
+    <div class="card w-25 d-inline-block">
+        <div class="card-body">
             <h5 class="card-title">Payins</h5>
             <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Payins</h6>
             <a asp-controller="Payins" asp-action="index" class="card-link">Show</a>

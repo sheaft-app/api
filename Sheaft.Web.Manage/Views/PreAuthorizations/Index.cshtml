@@ -1,24 +1,24 @@
 ﻿@using Sheaft.Domain.Enum
-@model IEnumerable<OrderViewModel>
+@model IEnumerable<PreAuthorizationViewModel>
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = "PreAuthorizations";
     int take = ViewBag.Take;
     int currentPage = ViewBag.Page;
-    string status = ((OrderStatus?)ViewBag.Status)?.ToString("G");
+    string status = ((PreAuthorizationStatus?)ViewBag.Status)?.ToString("G");
 }
 
 <div class="container">
-    <h2 class="display-5">Orders</h2>
+    <h2 class="display-5">PreAuthorizations</h2>
     <br />
 
     <div class="btn-group">
         <label class="btn btn-secondary @(status == null ? "active": "")">
-            <a asp-controller="Orders" asp-action="Index" asp-route-kind="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
+            <a asp-controller="PreAuthorizations" asp-action="Index" asp-route-status="" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">All</a>
         </label>
-        @foreach (var existingStatus in Enum.GetNames(typeof(OrderStatus)))
+        @foreach (var existingStatus in Enum.GetNames(typeof(PreAuthorizationStatus)))
         {
             <label class="btn btn-secondary @(status == existingStatus ? "active": "")">
-                <a asp-controller="Orders" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
+                <a asp-controller="PreAuthorizations" asp-action="Index" asp-route-status="@existingStatus" asp-route-take="@take" asp-route-page="@currentPage" class="text-white">@existingStatus</a>
             </label>
         }
     </div>
@@ -29,12 +29,11 @@
             <tr>
                 <th scope="col">User</th>
                 <th scope="col">CreatedOn</th>
+                <th scope="col">ExpiresOn</th>
+                <th scope="col">Debited</th>
+                <th scope="col">Remaining</th>
                 <th scope="col">Status</th>
-                <th scope="col">Lines</th>
-                <th scope="col">Products</th>
-                <th scope="col">TotalPrice</th>
-                <th scope="col">Donation</th>
-                <th scope="col">Fees</th>
+                <th scope="col">Payment</th>
                 <th scope="col">
                 </th>
             </tr>
@@ -43,16 +42,15 @@
             @foreach (var entity in Model)
             {
                 <tr>
-                    <th scope="row">@(entity.User?.Name ?? "Anonyme")</th>
+                    <td>@entity.Order.User.Name</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.ExpirationDate?.ToString("dd/MM/yyyy")</td>
+                    <td>@entity.Debited€</td>
+                    <td>@entity.Remaining€</td>
                     <td>@entity.Status.ToString("G")</td>
-                    <td>@entity.LinesCount</td>
-                    <td>@entity.ProductsCount</td>
-                    <td>@entity.TotalPrice€</td>
-                    <td>@entity.Donate€</td>
-                    <td>@entity.FeesPrice€</td>
+                    <td>@entity.PaymentStatus.ToString("G")</td>
                     <td>
-                        <a asp-controller="Orders" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <a asp-controller="PreAuthorizations" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-eye"></i>
                         </a>
                     </td>
@@ -64,13 +62,13 @@
                 <td colspan="6">
                     @if (currentPage >= 1)
                     {
-                        <a asp-controller="Orders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
+                        <a asp-controller="PreAuthorizations" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage-1)" class="btn btn-outline-secondary">
                             <i class="fa fa-caret-left"></i>
                         </a>
                     }
                     @if (take == Model.Count())
                     {
-                        <a asp-controller="Orders" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
+                        <a asp-controller="PreAuthorizations" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage+1)" class="btn btn-outline-secondary">
                             <i class="fa fa-caret-right"></i>
                         </a>
                     }
