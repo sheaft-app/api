@@ -3,6 +3,7 @@
 @model DeliveryViewModel
 @{
     ViewData["Title"] = "Delivery details";
+    DeliveryBatchViewModel deliveryBatch = ViewBag.DeliveryBatch;
 }
 <div class="container">
 <h2 class="display-4 d-inline">Delivery details</h2>
@@ -54,6 +55,25 @@
     @Html.ValidationSummary(true, "", new {@class = "text-danger"})
     @Html.HiddenFor(model => model.Id)
     <br/>
+    
+    @if (deliveryBatch != null)
+    {
+        <h2>DeliveryBatch</h2>
+        <div class="form-group">
+            @Html.Label("DeliveryBatch_Name")
+            @Html.TextBox("DeliveryBatch_Name", deliveryBatch.Name, null, new {@class = "form-control", @disabled = "disabled"})
+        </div>    
+        <div class="form-group">
+            @Html.Label("DeliveryBatch_Status")
+            @Html.TextBox("DeliveryBatch_Status", deliveryBatch.Status, null, new {@class = "form-control", @disabled = "disabled"})
+        </div>  
+        <a asp-controller="DeliveryBatches" asp-action="Edit" asp-route-id="@deliveryBatch.Id" class="btn btn-primary">
+            Voir le batch
+        </a>
+        <br/>
+        <br/>
+        <h2>Delivery</h2>
+    }
     <div class="form-group">
         @Html.LabelFor(m => m.Reference)
         @Html.TextBox("Reference", Model.Reference.AsDeliveryIdentifier(), null, new {@class = "form-control", @disabled = "disabled"})
@@ -224,6 +244,10 @@
     <div class="form-group">
         @Html.LabelFor(m => m.DeliveredOn)
         @Html.TextBoxFor(m => m.DeliveredOn, null, new {@class = "form-control", @disabled = "disabled"})
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.RejectedOn)
+        @Html.TextBoxFor(m => m.RejectedOn, null, new {@class = "form-control", @disabled = "disabled"})
     </div>
     <div class="form-group">
         @Html.LabelFor(m => m.ReceptionedBy)

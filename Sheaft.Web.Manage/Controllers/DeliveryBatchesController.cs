@@ -20,14 +20,15 @@ using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Agreement.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
+using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Options;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Controllers
 {
-    public class DeliveriesController : ManageController
+    public class DeliveryBatchesController : ManageController
     {
-        public DeliveriesController(
+        public DeliveryBatchesController(
             IAppDbContext context,
             IMapper mapper,
             ISheaftMediatr mediatr,
@@ -38,7 +39,7 @@ namespace Sheaft.Web.Manage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken token, DeliveryStatus? status = null, int page = 0,
+        public async Task<IActionResult> Index(CancellationToken token, DeliveryBatchStatus? status = null, int page = 0,
             int take = 25)
         {
             if (page < 0)
@@ -47,15 +48,13 @@ namespace Sheaft.Web.Manage.Controllers
             if (take > 100)
                 take = 100;
 
-            var query = _context.Deliveries.AsNoTracking();
+            var query = _context.DeliveryBatches.AsNoTracking();
 
             var requestUser = await GetRequestUserAsync(token);
             if (requestUser.IsImpersonating())
             {
-                if (requestUser.IsInRole(_roleOptions.Store.Value))
-                    query = query.Where(p => p.ClientId == requestUser.Id);
-                else
-                    query = query.Where(p => p.ProducerId == requestUser.Id);
+                if (requestUser.IsInRole(_roleOptions.Producer.Value))
+                    query = query.Where(p => p.AssignedToId == requestUser.Id);
             }
 
             if (status != null)
@@ -65,7 +64,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<DeliveryViewModel>(_configurationProvider)
+                .ProjectTo<DeliveryBatchViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             ViewBag.Page = page;
@@ -77,28 +76,21 @@ namespace Sheaft.Web.Manage.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id, CancellationToken token)
         {
-            var entity = await _context.Deliveries
+            var entity = await _context.DeliveryBatches
                 .AsNoTracking()
                 .Where(c => c.Id == id)
-                .ProjectTo<DeliveryViewModel>(_configurationProvider)
+                .ProjectTo<DeliveryBatchViewModel>(_configurationProvider)
                 .SingleOrDefaultAsync(token);
 
             if (entity == null)
                 throw SheaftException.NotFound();
-            
-            if(entity.DeliveryBatchId.HasValue)
-                ViewBag.DeliveryBatch = await _context.DeliveryBatches
-                    .AsNoTracking()
-                    .Where(c => c.Id == entity.DeliveryBatchId.Value)
-                    .ProjectTo<DeliveryBatchViewModel>(_configurationProvider)
-                    .SingleOrDefaultAsync(token);
 
             return View(entity);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(DeliveryViewModel model, CancellationToken token)
+        public async Task<IActionResult> Edit(DeliveryBatchViewModel model, CancellationToken token)
         {
             var entity = await _context.Deliveries.SingleAsync(a => a.Id == model.Id, token);
             return RedirectToAction("Edit", new {entity.Id});
@@ -108,9 +100,9 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new DeleteDeliveryCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new DeleteDeliveryBatchCommand(await GetRequestUserAsync(token))
             {
-                DeliveryId = id
+                DeliveryBatchId = id
             }, token);
 
             if (!result.Succeeded)
@@ -121,26 +113,11 @@ namespace Sheaft.Web.Manage.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GenerateForm(Guid id, CancellationToken token)
+        public async Task<IActionResult> GenerateForms(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new GenerateDeliveryFormCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new GenerateDeliveryBatchFormsCommand(await GetRequestUserAsync(token))
             {
-                DeliveryId = id
-            }, token);
-
-            if (!result.Succeeded)
-                throw result.Exception;
-
-            return RedirectToAction("Edit", new {id});
-        }
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GenerateReceipt(Guid id, CancellationToken token)
-        {
-            var result = await _mediatr.Process(new GenerateDeliveryReceiptCommand(await GetRequestUserAsync(token))
-            {
-                DeliveryId = id
+                DeliveryBatchId = id
             }, token);
 
             if (!result.Succeeded)
@@ -153,24 +130,9 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Complete(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new CompleteDeliveryCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new CompleteDeliveryBatchCommand(await GetRequestUserAsync(token))
             {
-                DeliveryId = id
-            }, token);
-
-            if (!result.Succeeded)
-                throw result.Exception;
-
-            return RedirectToAction("Edit", new {id});
-        }
-        
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Skip(Guid id, CancellationToken token)
-        {
-            var result = await _mediatr.Process(new SkipDeliveryCommand(await GetRequestUserAsync(token))
-            {
-                DeliveryId = id
+                DeliveryBatchId = id
             }, token);
 
             if (!result.Succeeded)
@@ -183,9 +145,9 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Start(Guid id, CancellationToken token)
         {
-            var result = await _mediatr.Process(new StartDeliveryCommand(await GetRequestUserAsync(token))
+            var result = await _mediatr.Process(new StartDeliveryBatchCommand(await GetRequestUserAsync(token))
             {
-                DeliveryId = id
+                DeliveryBatchId = id
             }, token);
 
             if (!result.Succeeded)

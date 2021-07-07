@@ -14,7 +14,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("StartDeliveryBatchInput");
 
             descriptor
-                .Field(c => c.Id)
+                .Field(c => c.DeliveryBatchId)
                 .ID(nameof(DeliveryBatch))
                 .Name("id");
 

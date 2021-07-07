@@ -90,7 +90,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);
-            return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
+            return await deliveryBatchesDataLoader.LoadAsync(input.DeliveryBatchId, token);
         }
 
         [GraphQLName("completeDeliveryBatch")]
@@ -102,7 +102,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
             DeliveryBatchesByIdBatchDataLoader deliveryBatchesDataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);
-            return await deliveryBatchesDataLoader.LoadAsync(input.Id, token);
+            return await deliveryBatchesDataLoader.LoadAsync(input.DeliveryBatchId, token);
         }
 
         [GraphQLName("postponeDeliveryBatch")]

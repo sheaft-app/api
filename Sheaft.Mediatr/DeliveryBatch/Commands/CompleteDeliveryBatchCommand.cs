@@ -35,7 +35,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         {
         }
 
-        public Guid Id { get; set; }
+        public Guid DeliveryBatchId { get; set; }
         public DateTimeOffset? ReschedulePendingDeliveriesOn { get; set; }
         public TimeSpan? From { get; set; }
     }
@@ -53,7 +53,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
         public async Task<Result> Handle(CompleteDeliveryBatchCommand request, CancellationToken token)
         {
-            var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.Id, token);
+            var deliveryBatch = await _context.DeliveryBatches.SingleOrDefaultAsync(c => c.Id == request.DeliveryBatchId, token);
             if (deliveryBatch == null)
                 return Failure("La tournée de livraison est introuvable.");
 

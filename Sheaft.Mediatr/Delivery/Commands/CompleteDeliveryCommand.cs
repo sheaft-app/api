@@ -119,7 +119,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     d.Status is DeliveryStatus.Delivered or DeliveryStatus.Rejected))
                 {
                     var result = await _mediatr.Process(new CompleteDeliveryBatchCommand(request.RequestUser)
-                        {Id = delivery.DeliveryBatchId.Value}, token);
+                        {DeliveryBatchId = delivery.DeliveryBatchId.Value}, token);
 
                     if (!result.Succeeded)
                         return Failure(result);
