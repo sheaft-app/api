@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Mediatr.Business.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.User.Commands;
 using Sheaft.Options;
@@ -81,19 +83,58 @@ namespace Sheaft.Web.Manage.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(StoreViewModel model, IFormFile picture, CancellationToken token)
+        public async Task<IActionResult> Edit(StoreViewModel model, List<IFormFile> newPictures, CancellationToken token)
         {
-            if (picture != null)
+            var images =
+                model.Pictures?.Where(p => !p.Remove).Select(p => new PictureInputDto
+                    {Id = p.Id, Data = p.Url, Position = p.Position})?.ToList() ?? new List<PictureInputDto>();
+            if (newPictures != null && newPictures.Any())
             {
-                using (var ms = new MemoryStream())
+                foreach (var picture in newPictures)
                 {
-                    picture.CopyTo(ms);
-                    model.Picture = Convert.ToBase64String(ms.ToArray());
+                    using (var ms = new MemoryStream())
+                    {
+                        await picture.CopyToAsync(ms, token);
+                        images.Add(new PictureInputDto
+                            {Data = Convert.ToBase64String(ms.ToArray()), Position = images.Count});
+                    }
                 }
             }
-
+            
             var store = await _context.Users.OfType<Store>().SingleOrDefaultAsync(c => c.Id == model.Id, token);
-            var result = await _mediatr.Process(new UpdateStoreCommand(await GetRequestUserAsync(token))
+            var requestUser = new RequestUser() {Id = store.Id};
+            if (model.Closings != null)
+            {
+                var removeClosingsResult = await _mediatr.Process(
+                    new DeleteBusinessClosingsCommand(requestUser)
+                    {
+                        ClosingIds = model.Closings?
+                            .Where(c => c.Id.HasValue && c.Remove)
+                            .Select(c => c.Id.Value).ToList()
+                    }, token);
+                
+                if (!removeClosingsResult.Succeeded)
+                    throw removeClosingsResult.Exception;
+                
+                var newClosingsResult = await _mediatr.Process(
+                    new UpdateOrCreateBusinessClosingsCommand(requestUser)
+                    {
+                        UserId = store.Id, Closings = model.Closings?
+                            .Where(c => !c.Remove && c.ClosedFrom.HasValue && c.ClosedTo.HasValue)
+                            .Select(c => new ClosingInputDto
+                            {
+                                Id = c.Id,
+                                From = c.ClosedFrom.Value,
+                                To = c.ClosedTo.Value,
+                                Reason = c.Reason
+                            }).ToList()
+                    }, token);
+
+                if (!newClosingsResult.Succeeded)
+                    throw newClosingsResult.Exception;
+            }
+
+            var result = await _mediatr.Process(new UpdateStoreCommand(requestUser)
             {
                 StoreId = model.Id,
                 Address = _mapper.Map<AddressDto>(model.Address),
@@ -105,9 +146,16 @@ namespace Sheaft.Web.Manage.Controllers
                 Kind = model.Kind,
                 Phone = model.Phone,
                 Tags = model.Tags,
-                Picture = model.Picture,
-                OpeningHours = store.OpeningHours?.GroupBy(oh => new {oh.From, oh.To}).Select(c =>
-                    new TimeSlotGroupDto {From = c.Key.From, To = c.Key.To, Days = c.Select(o => o.Day)})
+                Pictures = images,
+                OpeningHours = model.OpeningHours?
+                    .Where(d => !d.Remove && d.Day.HasValue && d.From.HasValue && d.To.HasValue)
+                    .GroupBy(d => new {d.From, d.To})
+                    .Select(d => new TimeSlotGroupDto
+                    {
+                        Days = d.Select(e => e.Day.Value).ToList(),
+                        From = d.Key.From.Value,
+                        To = d.Key.To.Value
+                    })
             }, token);
 
             if (!result.Succeeded)

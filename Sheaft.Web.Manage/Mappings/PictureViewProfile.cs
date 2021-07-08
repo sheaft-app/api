@@ -11,12 +11,10 @@ namespace Sheaft.Web.Manage.Mappings
     {
         public PictureViewProfile()
         {
-            CreateMap<ProfilePicture, PictureViewModel>();
+            CreateMap<ProfilePicture, PictureViewModel>()
+                .ForMember(c => c.Url, opt => opt.MapFrom(e => PictureExtensions.GetPictureUrl(e.UserId, e.Url, PictureSize.MEDIUM)));
             CreateMap<ProductPicture, PictureViewModel>()
                 .ForMember(c => c.Url, opt => opt.MapFrom(e => PictureExtensions.GetPictureUrl(e.ProductId, e.Url, PictureSize.MEDIUM)));
-            
-            CreateMap<PictureDto, PictureViewModel>();
-            CreateMap<PictureViewModel, PictureDto>();
         }
     }
 }

@@ -18,6 +18,7 @@
                 <th scope="col">LastName</th>
                 <th scope="col">Email</th>
                 <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
                 <th scope="col"></th>
             </tr>
         </thead>
@@ -29,6 +30,7 @@
                     <th scope="row">@entity.LastName</th>
                     <th>@entity.Email</th>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="Consumers" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>
