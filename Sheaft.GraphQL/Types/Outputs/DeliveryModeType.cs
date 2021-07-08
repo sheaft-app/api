@@ -8,6 +8,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.DeliveryModes;
 using Sheaft.GraphQL.Producers;
@@ -118,7 +119,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 CancellationToken token)
             {
                 var agreementsId = await context.Set<Agreement>()
-                    .Where(d => d.DeliveryModeId == delivery.Id)
+                    .Where(d => d.DeliveryModeId == delivery.Id && d.Status == AgreementStatus.Accepted)
                     .Select(d => d.Id)
                     .ToListAsync(token);
 
