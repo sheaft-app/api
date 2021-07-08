@@ -13,13 +13,23 @@ namespace Sheaft.Web.Manage.Models
         public string Name { get; set; }
         public decimal? Weight { get; set; }
         public string Description { get; set; }
-        public decimal QuantityPerUnit { get; set; }
+        public string Picture { get; set; }
         public UnitKind Unit { get; set; }
+        public decimal QuantityPerUnit { get; set; }
         public ConditioningKind Conditioning { get; set; }
         public decimal Vat { get; set; }
-        public bool Available { get; set; } = true;
+        public bool Available { get; set; }
+        public int RatingsCount { get; set; }
+        public int TagsCount { get; set; }
+        public int PicturesCount { get; set; }
+        public int CatalogsPricesCount { get; set; }
+        public VisibleToKind VisibleTo { get; set; }
         public decimal? Rating { get; set; }
+
         public Guid? ReturnableId { get; set; }
-        public ProducerViewModel Producer { get; set; }
+
+        public Guid ProducerId { get; set; }
+        public virtual ReturnableViewModel Returnable { get; set; }
+        public virtual ProducerViewModel Producer { get; set; }
     }
 }

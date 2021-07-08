@@ -33,9 +33,9 @@
             <tr>
                 <th scope="col">Reference</th>
                 <th scope="col">Name</th>
-                <th scope="col">WholeSalePrice</th>
                 <th scope="col">Vat</th>
                 <th scope="col">Available</th>
+                <th scope="col">Catalogs</th>
                 @if (!impersonatingId.HasValue)
                 {
                     <th scope="col">Producer</th>
@@ -57,6 +57,7 @@
                     <td>@entity.Name</td>
                     <td>@(entity.Vat)%</td>
                     <td>@entity.Available</td>
+                    <td>@entity.CatalogsPricesCount</td>
                     @if (!impersonatingId.HasValue)
                     {
                         <td>
