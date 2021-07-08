@@ -151,6 +151,9 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 ReturnableVat = p.ReturnableVat,
                 ReturnableWholeSalePrice = p.ReturnableWholeSalePrice,
                 ReturnableTotalWholeSalePrice = p.TotalReturnableWholeSalePrice,
+                TotalVatPrice = p.TotalVatPrice,
+                TotalOnSalePrice = p.TotalOnSalePrice,
+                TotalWholeSalePrice = p.TotalWholeSalePrice
             };
         }
 

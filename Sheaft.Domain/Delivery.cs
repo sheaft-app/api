@@ -233,11 +233,13 @@ namespace Sheaft.Domain
                     
                     Products.Add(new DeliveryProduct(product, productReturned.Item2, productReturned.Item3));
                 }
+                
+                Refresh();
             }
 
             if (returnedReturnables != null && returnedReturnables.Any())
                 SetReturnedReturnables(returnedReturnables);
-
+            
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Delivered, true);
         }
@@ -273,9 +275,7 @@ namespace Sheaft.Domain
             ImproperProductsCount = Products.Where(p => p.RowKind == ModificationKind.Improper).Sum(p => p.Quantity);
             ExcessProductsCount = Products.Where(p => p.RowKind == ModificationKind.Excess).Sum(p => p.Quantity);
             MissingProductsCount = Products.Where(p => p.RowKind == ModificationKind.Missing).Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p => (p.RowKind == ModificationKind.ToDeliver || p.RowKind == ModificationKind.Excess) && p.HasReturnable)
-                .Sum(p => p.Quantity) + Products.Where(p => (p.RowKind == ModificationKind.Broken || p.RowKind == ModificationKind.Improper || p.RowKind == ModificationKind.Missing) && p.HasReturnable)
-                .Sum(p => p.Quantity);
+            ReturnablesCount = Products.Where(p =>  p.HasReturnable).Sum(p => p.Quantity);
             ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver).Sum(p => p.Quantity);
             PurchaseOrdersCount = PurchaseOrders.Count;
             ProductsDeliveredCount = ProductsToDeliverCount + BrokenProductsCount + MissingProductsCount +
