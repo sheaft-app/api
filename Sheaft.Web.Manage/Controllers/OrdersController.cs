@@ -55,7 +55,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<OrderViewModel>(_configurationProvider)
+                .ProjectTo<ShortOrderViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             ViewBag.Page = page;

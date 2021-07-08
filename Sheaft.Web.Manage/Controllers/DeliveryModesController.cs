@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
+using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 using Sheaft.Options;
@@ -53,7 +54,7 @@ namespace Sheaft.Web.Manage.Controllers
                 .OrderByDescending(c => c.CreatedOn)
                 .Skip(page * take)
                 .Take(take)
-                .ProjectTo<DeliveryModeViewModel>(_configurationProvider)
+                .ProjectTo<ShortDeliveryModeViewModel>(_configurationProvider)
                 .ToListAsync(token);
 
             ViewBag.Page = page;
@@ -81,7 +82,11 @@ namespace Sheaft.Web.Manage.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(DeliveryModeViewModel model, CancellationToken token)
         {
-            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(await GetRequestUserAsync(token))
+            var entity = await _context.DeliveryModes
+                .Where(c => c.Id == model.Id)
+                .SingleOrDefaultAsync(token);
+            
+            var result = await _mediatr.Process(new UpdateDeliveryModeCommand(new RequestUser(){Id = entity.ProducerId})
             {
                 DeliveryModeId = model.Id,
                 Description = model.Description,
@@ -92,7 +97,31 @@ namespace Sheaft.Web.Manage.Controllers
                 MaxPurchaseOrdersPerTimeSlot = model.MaxPurchaseOrdersPerTimeSlot,
                 AutoAcceptRelatedPurchaseOrder = model.AutoAcceptRelatedPurchaseOrder,
                 AutoCompleteRelatedPurchaseOrder = model.AutoCompleteRelatedPurchaseOrder,
-                LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery
+                LockOrderHoursBeforeDelivery = model.LockOrderHoursBeforeDelivery,
+                Closings = model.Closings?
+                    .Where(d => !d.Remove && d.ClosedFrom.HasValue && d.ClosedTo.HasValue)
+                    .Select(c => new ClosingInputDto
+                    {
+                        Id = c.Id,
+                        From = c.ClosedFrom.Value,
+                        To = c.ClosedTo.Value,
+                        Reason = c.Reason
+                    }),
+                Agreements = model.Agreements?
+                    .Select(p => new AgreementPositionDto
+                    {
+                        Id = p.Id,
+                        Position = p.Position
+                    }),
+                DeliveryHours = model.DeliveryHours?
+                    .Where(d => !d.Remove && d.Day.HasValue && d.From.HasValue && d.To.HasValue)
+                    .GroupBy(d => new {d.From, d.To})
+                    .Select(d => new TimeSlotGroupDto
+                    {
+                        Days = d.Select(e => e.Day.Value).ToList(),
+                        From = d.Key.From.Value,
+                        To = d.Key.To.Value
+                    }),
             }, token);
 
             if (!result.Succeeded)
@@ -102,6 +131,20 @@ namespace Sheaft.Web.Manage.Controllers
             }
 
             return RedirectToAction("Edit", new {model.Id});
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDeliveryHour(Guid id, TimeSlotViewModel deliveryHour, CancellationToken token)
+        {
+            return RedirectToAction("Edit", new {id});
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddClosing(Guid id, ClosingViewModel closing, CancellationToken token)
+        {
+            return RedirectToAction("Edit", new {id});
         }
 
         [HttpPost]

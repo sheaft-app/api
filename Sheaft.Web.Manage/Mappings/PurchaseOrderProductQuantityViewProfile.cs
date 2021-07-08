@@ -10,8 +10,6 @@ namespace Sheaft.Web.Manage.Mappings
         public PurchaseOrderProductQuantityViewProfile()
         {
             CreateMap<PurchaseOrderProduct, PurchaseOrderProductViewModel>();
-            CreateMap<PurchaseOrderProductQuantityDto, PurchaseOrderProductViewModel>();
-            CreateMap<PurchaseOrderProductViewModel, PurchaseOrderProductQuantityDto>();
         }
     }
 }

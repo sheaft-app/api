@@ -1,5 +1,5 @@
 ﻿@using Sheaft.Web.Manage.Extensions
-@model IEnumerable<DeliveryModeViewModel>
+@model IEnumerable<ShortDeliveryModeViewModel>
 @{
     ViewData["Title"] = "DeliveryModes";
     int take = ViewBag.Take;
@@ -22,6 +22,7 @@
                 }
                 <th scope="col">Lock</th>
                 <th scope="col">CreatedOn</th>
+                <th scope="col">Removed</th>
                 <th scope="col">
                 </th>
             </tr>
@@ -46,6 +47,7 @@
                     }
                     <td>@(entity.LockOrderHoursBeforeDelivery)h</td>
                     <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                    <td>@entity.RemovedOn.HasValue</td>
                     <td>
                         <a asp-controller="DeliveryModes" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                             <i class="fa fa-pen"></i>

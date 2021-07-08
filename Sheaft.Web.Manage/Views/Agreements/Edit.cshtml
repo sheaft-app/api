@@ -82,6 +82,10 @@
             @Html.LabelFor(m => m.Producer.Name)
             @Html.TextBoxFor(m => m.Producer.Name, null, new {@class = "form-control", @disabled = "disabled"})
         </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Position)
+            @Html.TextBoxFor(m => m.Position, null, new {@class = "form-control", @disabled = "disabled"})
+        </div>
         <h4>Store</h4>
         <div class="form-group">
             @Html.LabelFor(m => m.Store.Name)

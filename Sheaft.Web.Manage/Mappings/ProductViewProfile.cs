@@ -14,11 +14,9 @@ namespace Sheaft.Web.Manage.Mappings
         {
             CreateMap<Domain.Product, ProductViewModel>()
                 .ForMember(d => d.Tags, opt => opt.MapFrom(r => r.Tags.Select(t => t.Tag.Id)));
-                
-                
-            CreateMap<ProductDto, ProductViewModel>();
-            CreateMap<ProductViewModel, ProductDto>()
-                .ForMember(d => d.IsReturnable, opt => opt.MapFrom(r => r.ReturnableId.HasValue));
+
+            CreateMap<Domain.Product, ShortProductViewModel>();
+
         }
     }
 }

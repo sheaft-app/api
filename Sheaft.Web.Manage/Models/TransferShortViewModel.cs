@@ -9,6 +9,6 @@ namespace Sheaft.Web.Manage.Models
         public string Identifier { get; set; }
         public decimal Credited { get; set; }
         public TransactionStatus Status { get; set; }
-        public PurchaseOrderShortViewModel PurchaseOrder { get; set; }
+        public ShortPurchaseOrderViewModel PurchaseOrder { get; set; }
     }
 }

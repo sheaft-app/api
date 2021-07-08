@@ -9,9 +9,7 @@ namespace Sheaft.Web.Manage.Mappings
         public AgreementViewProfile()
         {
             CreateMap<Domain.Agreement, AgreementViewModel>();
-            
-            CreateMap<AgreementViewModel, AgreementDto>();
-            CreateMap<AgreementDto, AgreementViewModel>();
+            CreateMap<Domain.Agreement, ShortAgreementViewModel>();
         }
     }
 }

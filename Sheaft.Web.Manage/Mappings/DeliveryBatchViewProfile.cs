@@ -8,6 +8,7 @@ namespace Sheaft.Web.Manage.Mappings
         public DeliveryBatchViewProfile()
         {
             CreateMap<Domain.DeliveryBatch, DeliveryBatchViewModel>();
+            CreateMap<Domain.DeliveryBatch, ShortDeliveryBatchViewModel>();
         }
     }
 }

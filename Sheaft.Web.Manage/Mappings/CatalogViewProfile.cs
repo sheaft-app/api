@@ -9,10 +9,7 @@ namespace Sheaft.Web.Manage.Mappings
         public CatalogViewProfile()
         {
             CreateMap<Domain.Catalog, CatalogViewModel>();
-            CreateMap<Domain.Catalog, CatalogDto>();
-            
-            CreateMap<CatalogViewModel, CatalogDto>();
-            CreateMap<CatalogDto, CatalogViewModel>();
+            CreateMap<Domain.Catalog, ShortCatalogViewModel>();
         }
     }
 }

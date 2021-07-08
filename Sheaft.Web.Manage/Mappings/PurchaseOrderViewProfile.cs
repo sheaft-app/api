@@ -8,12 +8,8 @@ namespace Sheaft.Web.Manage.Mappings
     {
         public PurchaseOrderViewProfile()
         {
-            CreateMap<Domain.PurchaseOrder, PurchaseOrderShortViewModel>();
+            CreateMap<Domain.PurchaseOrder, ShortPurchaseOrderViewModel>();
             CreateMap<Domain.PurchaseOrder, PurchaseOrderViewModel>();
-            CreateMap<PurchaseOrderDto, PurchaseOrderViewModel>();
-            CreateMap<PurchaseOrderDto, PurchaseOrderShortViewModel>();
-            CreateMap<PurchaseOrderViewModel, PurchaseOrderDto>();
-            CreateMap<PurchaseOrderShortViewModel, PurchaseOrderDto>();
 
         }
     }

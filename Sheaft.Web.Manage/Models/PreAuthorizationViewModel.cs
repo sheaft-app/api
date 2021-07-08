@@ -24,7 +24,7 @@ namespace Sheaft.Web.Manage.Models
         public Guid OrderId { get; set; }
         public Guid CardId { get; set; }
         public Guid? PreAuthorizedPayinId { get; set; }
-        public virtual OrderViewModel Order { get; set; }
+        public virtual ShortOrderViewModel Order { get; set; }
         public virtual CardViewModel Card { get; set; }
         public virtual PayinViewModel PreAuthorizedPayin { get; set; }
     }

@@ -22,6 +22,6 @@ namespace Sheaft.Web.Manage.Models
         public UserProfileViewModel Author { get; set; }
         public UserProfileViewModel DebitedUser { get; set; }
         public UserProfileViewModel CreditedUser { get; set; }
-        public PurchaseOrderShortViewModel PurchaseOrder { get; set; }
+        public ShortPurchaseOrderViewModel PurchaseOrder { get; set; }
     }
 }

@@ -3,124 +3,279 @@
 @{
     ViewData["Title"] = "DeliveryMode details";
     var kinds = new List<SelectListItem>
-{
-        new SelectListItem("Farm", ((int)DeliveryKind.Farm).ToString()),
-        new SelectListItem("Market", ((int)DeliveryKind.Market).ToString()),
-        new SelectListItem("Collective", ((int)DeliveryKind.Collective).ToString()),
-        new SelectListItem("ProducerToStore", ((int)DeliveryKind.ProducerToStore).ToString())
+    {
+        new SelectListItem("Farm", ((int) DeliveryKind.Farm).ToString()),
+        new SelectListItem("Market", ((int) DeliveryKind.Market).ToString()),
+        new SelectListItem("Collective", ((int) DeliveryKind.Collective).ToString()),
+        new SelectListItem("ProducerToStore", ((int) DeliveryKind.ProducerToStore).ToString())
     };
+    var days = new List<SelectListItem>
+    {
+        new SelectListItem("", null),
+        new SelectListItem("Monday", ((int) DayOfWeek.Monday).ToString()),
+        new SelectListItem("Tuesday", ((int) DayOfWeek.Tuesday).ToString()),
+        new SelectListItem("Wednesday", ((int) DayOfWeek.Wednesday).ToString()),
+        new SelectListItem("Thursday", ((int) DayOfWeek.Thursday).ToString()),
+        new SelectListItem("Friday", ((int) DayOfWeek.Friday).ToString()),
+        new SelectListItem("Saturday", ((int) DayOfWeek.Saturday).ToString()),
+        new SelectListItem("Sunday", ((int) DayOfWeek.Sunday).ToString())
+    };
+
+    Model.Agreements = Model.Agreements?.OrderBy(a => a.Position).ToList() ?? new List<ShortAgreementViewModel>();
+    Model.Closings ??= new List<ClosingViewModel>();
+    Model.DeliveryHours ??= new List<TimeSlotViewModel>();
+    
+    Model.Closings.Add(new ClosingViewModel());
+    Model.DeliveryHours.Add(new TimeSlotViewModel());
 }
 
 <div class="container">
-    <h2 class="display-4 d-inline">DeliveryMode details @(Model.RemovedOn.HasValue ? "(removed)":"")</h2>
-    <div class="d-inline">
-        @if (!Model.RemovedOn.HasValue)
-        {
-            @using (Html.BeginForm("Delete", "DeliveryModes", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-            {
-                <button type="submit" class="btn btn-danger">
-                    <i class="fa fa-trash"></i>
-                </button>
-            }
-        }
-        else
-        {
-            @using (Html.BeginForm("Restore", "DeliveryModes", new { id = Model.Id }, FormMethod.Post, true, new { @class = "form d-inline" }))
-            {
-                <button type="submit" class="btn btn-info">
-                    <i class="fa fa-trash-restore"></i>
-                </button>
-            }
-        }
-    </div>
-    <div class="clearfix"></div>
-    <br />
-
-    @using (Html.BeginForm("Edit", "DeliveryModes", FormMethod.Post, new { @class = "form" }))
+<h2 class="display-4 d-inline">DeliveryMode details @(Model.RemovedOn.HasValue ? "(removed)" : "")</h2>
+<div class="d-inline">
+    @if (!Model.RemovedOn.HasValue)
     {
-        @Html.AntiForgeryToken()
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
-        <br />
-        <div class="form-group">
-            @Html.LabelFor(c => c.Name, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.Name, null, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(c => c.Kind, new { @class = "form-label" })
-            @Html.DropDownListFor(c => c.Kind, kinds, new { @class = "form-control" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(c => c.LockOrderHoursBeforeDelivery, new { @class = "form-label" })
-            @Html.TextBoxFor(c => c.LockOrderHoursBeforeDelivery, null, new { @class = "form-control" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.Available, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.Available, new { @class = "form-check-label" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.AutoAcceptRelatedPurchaseOrder, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.AutoAcceptRelatedPurchaseOrder, new { @class = "form-check-label" })
-        </div>
-        <div class="form-check">
-            @Html.CheckBoxFor(m => m.AutoCompleteRelatedPurchaseOrder, new { @class = "form-check-input" })
-            @Html.LabelFor(m => m.AutoCompleteRelatedPurchaseOrder, new { @class = "form-check-label" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(c => c.Description, new { @class = "form-label" })
-            @Html.TextAreaFor(c => c.Description, new { @class = "form-control" })
-        </div>
-        @if ((int)Model.Kind < 4)
+        @using (Html.BeginForm("Delete", "DeliveryModes", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
         {
-            <h4>Address</h4>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.Line1, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.Line1, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.Line2, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.Line2, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.Zipcode, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.Zipcode, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.City, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.City, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.Latitude, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.Latitude, null, new { @class = "form-control" })
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(c => c.Address.Longitude, new { @class = "form-label" })
-                @Html.TextBoxFor(c => c.Address.Longitude, null, new { @class = "form-control" })
-            </div>
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
         }
-        <div class="form-group">
-            @Html.LabelFor(m => m.CreatedOn)
-            @Html.TextBoxFor(m => m.CreatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.UpdatedOn)
-            @Html.TextBoxFor(m => m.UpdatedOn, null, new { @class = "form-control", @disabled = "disabled" })
-        </div>
-        @if (Model.RemovedOn.HasValue)
-        {
-            <div class="form-group">
-                @Html.LabelFor(m => m.RemovedOn)
-                @Html.TextBoxFor(m => m.RemovedOn, null, new { @class = "form-control", @disabled = "disabled" })
-            </div>
-        }
-
-        <br />
-        <a asp-controller="DeliveryModes" asp-action="Index" class="btn btn-light">
-            Cancel
-        </a>
-        <button type="submit" class="btn btn-success">
-            <i class="fa fa-check">&nbsp;Save</i>
-        </button>
     }
+    else
+    {
+        @using (Html.BeginForm("Restore", "DeliveryModes", new {id = Model.Id}, FormMethod.Post, true, new {@class = "form d-inline"}))
+        {
+            <button type="submit" class="btn btn-info">
+                <i class="fa fa-trash-restore"></i>
+            </button>
+        }
+    }
+</div>
+<div class="clearfix"></div>
+<br/>
+
+@using (Html.BeginForm("Edit", "DeliveryModes", FormMethod.Post, new {@class = "form"}))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+    @Html.HiddenFor(model => model.Id)
+    <br/>
+    <div class="form-group">
+        @Html.LabelFor(c => c.Name, new {@class = "form-label"})
+        @Html.TextBoxFor(c => c.Name, null, new {@class = "form-control"})
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(c => c.Kind, new {@class = "form-label"})
+        @Html.DropDownListFor(c => c.Kind, kinds, new {@class = "form-control"})
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(c => c.LockOrderHoursBeforeDelivery, new {@class = "form-label"})
+        @Html.TextBoxFor(c => c.LockOrderHoursBeforeDelivery, null, new {@class = "form-control"})
+    </div>
+    <div class="form-check">
+        @Html.CheckBoxFor(m => m.Available, new {@class = "form-check-input"})
+        @Html.LabelFor(m => m.Available, new {@class = "form-check-label"})
+    </div>
+    <div class="form-check">
+        @Html.CheckBoxFor(m => m.AutoAcceptRelatedPurchaseOrder, new {@class = "form-check-input"})
+        @Html.LabelFor(m => m.AutoAcceptRelatedPurchaseOrder, new {@class = "form-check-label"})
+    </div>
+    <div class="form-check">
+        @Html.CheckBoxFor(m => m.AutoCompleteRelatedPurchaseOrder, new {@class = "form-check-input"})
+        @Html.LabelFor(m => m.AutoCompleteRelatedPurchaseOrder, new {@class = "form-check-label"})
+    </div>
+    <br/>
+    <div class="form-group">
+        @Html.LabelFor(c => c.Description, new {@class = "form-label"})
+        @Html.TextAreaFor(c => c.Description, new {@class = "form-control"})
+    </div>
+    @if ((int) Model.Kind < 4)
+    {
+        <h4>Address</h4>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Line1, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.Line1, null, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Line2, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.Line2, null, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Zipcode, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.Zipcode, null, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.City, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.City, null, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Latitude, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.Latitude, null, new {@class = "form-control"})
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(c => c.Address.Longitude, new {@class = "form-label"})
+            @Html.TextBoxFor(c => c.Address.Longitude, null, new {@class = "form-control"})
+        </div>
+    }
+    <div class="form-group">
+        @Html.LabelFor(m => m.CreatedOn)
+        @Html.TextBoxFor(m => m.CreatedOn, null, new {@class = "form-control", @disabled = "disabled"})
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.UpdatedOn)
+        @Html.TextBoxFor(m => m.UpdatedOn, null, new {@class = "form-control", @disabled = "disabled"})
+    </div>
+    @if (Model.RemovedOn.HasValue)
+    {
+        <div class="form-group">
+            @Html.LabelFor(m => m.RemovedOn)
+            @Html.TextBoxFor(m => m.RemovedOn, null, new {@class = "form-control", @disabled = "disabled"})
+        </div>
+    }
+    <br/>
+    <h2>DeliveryHours</h2>
+    <table class="table table-striped table-dark">
+        <thead>
+        <tr>
+            <td>Day</td>
+            <td>From</td>
+            <td>To</td>
+            <td>Remove</td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model.DeliveryHours.Any())
+        {
+            var i = 0;
+            @foreach (var deliveryHour in Model.DeliveryHours)
+            {
+                <tr>
+                    <td>
+                        @Html.HiddenFor(m => m.DeliveryHours[i].Id)
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DeliveryHours[i].Day, days, new {@class = "form-control"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DeliveryHours[i].From, null, new {@class = "form-control", @type="time"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DeliveryHours[i].To, null, new {@class = "form-control", @type="time"})
+                        </div>
+                    </td>
+                    <td>
+                        @if (Model.DeliveryHours[i].Id.HasValue)
+                        {
+                            @Html.CheckBoxFor(m => m.DeliveryHours[i].Remove)
+                        }
+                    </td>
+                </tr>
+                
+                i++;
+            }
+        }
+        </tbody>
+    </table>
+    <br/>
+    <h2>Closings</h2>
+    <table class="table table-striped table-dark">
+        <thead>
+        <tr>
+            <td>From</td>
+            <td>To</td>
+            <td>Reason</td>
+            <td>Remove</td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model.Closings.Any())
+        {
+            var i = 0;
+            @foreach (var closing in Model.Closings)
+            {
+                <tr>
+                    <td>
+                        @Html.HiddenFor(m => m.Closings[i].Id)
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Closings[i].ClosedFrom, null, new {@class = "form-control", @type="datetime"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Closings[i].ClosedTo, null, new {@class = "form-control", @type="datetime"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Closings[i].Reason, null, new {@class = "form-control"})
+                        </div>
+                    </td>
+                    <td>
+                        @if (Model.Closings[i].Id.HasValue)
+                        {
+                            @Html.CheckBoxFor(m => m.Closings[i].Remove)
+                        }
+                    </td>
+                </tr>
+
+                i++;
+            }
+        }
+        </tbody>
+    </table>
+    <br/>
+    <h2>Agreements</h2>
+    <table class="table table-striped table-dark">
+        <thead>
+        <tr>
+            <td>Position</td>
+            <td>Producer</td>
+            <td>Store</td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model.Agreements.Any())
+        {
+            var i = 0;
+            @foreach (var agreement in Model.Agreements)
+            {
+                <tr>
+                    <td>
+                        @Html.HiddenFor(m => m.Agreements[i].Id)
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Agreements[i].Position, null, new {@class = "form-control"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Agreements[i].Producer.Name, null, new {@class = "form-control", @disabled = "disabled"})
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Agreements[i].Store.Name, null, new {@class = "form-control", @disabled = "disabled"})
+                        </div>
+                    </td>
+                </tr>
+
+                i++;
+            }
+        }
+        </tbody>
+    </table>
+    <br/>
+    <a asp-controller="DeliveryModes" asp-action="Index" class="btn btn-light">
+        Cancel
+    </a>
+    <button type="submit" class="btn btn-success">
+        <i class="fa fa-check">&nbsp;Save</i>
+    </button>
+}
 
 </div>

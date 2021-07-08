@@ -8,6 +8,7 @@ namespace Sheaft.Web.Manage.Mappings
         public DeliveryViewProfile()
         {
             CreateMap<Domain.Delivery, DeliveryViewModel>();
+            CreateMap<Domain.Delivery, ShortDeliveryViewModel>();
         }
     }
 }
