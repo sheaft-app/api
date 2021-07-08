@@ -58,7 +58,7 @@ namespace Sheaft.Domain
         {
             TotalVatPrice = Math.Round(UnitVatPrice * Quantity, DIGITS_COUNT);
             TotalWholeSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT);
+            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
         }
     }
 }

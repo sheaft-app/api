@@ -150,6 +150,8 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 ReturnableQuantity = p.Quantity,
                 ReturnableVat = p.ReturnableVat,
                 ReturnableWholeSalePrice = p.ReturnableWholeSalePrice,
+                ReturnableTotalVatPrice = p.TotalReturnableVatPrice,
+                ReturnableTotalOnSalePrice = p.TotalReturnableOnSalePrice,
                 ReturnableTotalWholeSalePrice = p.TotalReturnableWholeSalePrice,
                 TotalVatPrice = p.TotalVatPrice,
                 TotalOnSalePrice = p.TotalOnSalePrice,
@@ -192,6 +194,8 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 WholeSalePrice = p.UnitWholeSalePrice,
                 Vat = p.Vat,
                 TotalWholeSalePrice = p.TotalWholeSalePrice,
+                TotalVatPrice = p.TotalVatPrice,
+                TotalOnSalePrice = p.TotalOnSalePrice
             };
         }
 
