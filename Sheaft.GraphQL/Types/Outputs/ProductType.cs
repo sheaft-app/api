@@ -8,6 +8,7 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
@@ -22,6 +23,7 @@ using Sheaft.GraphQL.Returnables;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -73,7 +75,8 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor
                 .Field(c => c.CatalogsPricesCount)
-                .Name("catalogsCount");
+                .Name("catalogsCount")
+                .Authorize(Policies.PRODUCER);
 
             descriptor
                 .Field(c => c.QuantityPerUnit)
@@ -140,38 +143,38 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field("vatPricePerUnit")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductVatPricePerUnit(default, default, default, default))
+                .ResolveWith<ProductResolvers>(c => c.GetProductVatPricePerUnit(default, default, default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("onSalePricePerUnit")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePricePerUnit(default, default, default, default))
+                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePricePerUnit(default, default, default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("wholeSalePricePerUnit")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c =>
-                    c.GetProductWholeSalePricePerUnit(default, default, default, default))
+                    c.GetProductWholeSalePricePerUnit(default, default, default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("onSalePrice")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePrice(default, default, default, default))
+                .ResolveWith<ProductResolvers>(c => c.GetProductOnSalePrice(default, default, default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("wholeSalePrice")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductWholeSalePrice(default, default, default, default))
+                .ResolveWith<ProductResolvers>(c => c.GetProductWholeSalePrice(default, default, default, default, default, default))
                 .Type<DecimalType>();
 
             descriptor
                 .Field("vatPrice")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<ProductResolvers>(c => c.GetProductVatPrice(default, default, default, default))
+                .ResolveWith<ProductResolvers>(c => c.GetProductVatPrice(default, default, default, default,  default, default))
                 .Type<DecimalType>();
 
             descriptor
@@ -179,7 +182,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("catalogs")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetProductCatalogs(default, default, default, default))
-                .Type<ListType<CatalogPriceType>>();
+                .Type<ListType<CatalogPriceType>>()
+                .Authorize(Policies.PRODUCER);
 
             descriptor
                 .Field("currentUserHasRatedProduct")
@@ -298,106 +302,153 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return returnablesDataLoader.LoadAsync(product.ReturnableId.Value, token);
             }
 
-            public async Task<decimal> GetProductVatPricePerUnit(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductVatPricePerUnit(Product product, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
 
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.VatPricePerUnit;
             }
 
-            public async Task<decimal> GetProductWholeSalePricePerUnit(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductWholeSalePricePerUnit(Product product, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
 
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.WholeSalePricePerUnit;
             }
 
-            public async Task<decimal> GetProductOnSalePricePerUnit(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductOnSalePricePerUnit(Product product, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
-
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.OnSalePricePerUnit;
             }
 
-            public async Task<decimal> GetProductVatPrice(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductVatPrice(Product product,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
 
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.VatPrice;
             }
 
-            public async Task<decimal> GetProductWholeSalePrice(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductWholeSalePrice(Product product, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
 
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.WholeSalePrice;
             }
 
-            public async Task<decimal> GetProductOnSalePrice(Product product, [ScopedService] QueryDbContext context,
+            public async Task<decimal> GetProductOnSalePrice(Product product, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 CatalogProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var catalogProductId = await context.Set<CatalogProduct>()
-                    .Where(cp =>
-                        cp.ProductId == product.Id && cp.Catalog.Kind == CatalogKind.Consumers &&
-                        cp.Catalog.Available)
-                    .Select(c => c.Id)
-                    .FirstOrDefaultAsync(token);
+                var catalogProductId =
+                    await GetCatalogProductId(product, context, currentUserService, roleOptions, token);
 
-                if (catalogProductId == Guid.Empty)
+                if (!catalogProductId.HasValue)
                     return 0m;
 
-                var catalogProduct = await dataLoader.LoadAsync(catalogProductId, token);
+                var catalogProduct = await dataLoader.LoadAsync(catalogProductId.Value, token);
                 return catalogProduct.OnSalePrice;
+            }
+
+            private static async Task<Guid?> GetCatalogProductId(Product product, QueryDbContext context,
+                ICurrentUserService currentUserService, IOptionsSnapshot<RoleOptions> roleOptions, CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return null;
+
+                Guid? catalogProductId = null;
+                if (currentUser.Data.IsInRole(roleOptions.Value.Store.Value))
+                {
+                    var hasAgreement = await context.Agreements
+                        .Where(c => 
+                            c.StoreId == currentUser.Data.Id 
+                            && c.ProducerId == product.ProducerId 
+                            && c.Status == AgreementStatus.Accepted)
+                        .AnyAsync(token);
+
+                    if (hasAgreement)
+                        catalogProductId = await context.Agreements
+                            .Where(c => 
+                                c.StoreId == currentUser.Data.Id 
+                                && c.ProducerId == product.ProducerId 
+                                && c.Catalog.Kind == CatalogKind.Stores 
+                                && c.Status == AgreementStatus.Accepted)
+                            .SelectMany(a => a.Catalog.Products)
+                            .Where(c => c.ProductId == product.Id)
+                            .Select(c => c.Id)
+                            .SingleOrDefaultAsync(token);
+                    else
+                        catalogProductId = await context.Products
+                            .Where(p => p.Id == product.Id)
+                            .SelectMany(p => p.CatalogsPrices)
+                            .Where(cp =>
+                                cp.Catalog.Kind == CatalogKind.Stores 
+                                && cp.Catalog.Available 
+                                && cp.Catalog.IsDefault)
+                            .Select(p => p.Id)
+                            .SingleOrDefaultAsync(token);
+                }
+                else
+                {
+                    catalogProductId = await context.Set<CatalogProduct>()
+                        .Where(cp =>
+                            cp.ProductId == product.Id 
+                            && cp.Catalog.Kind == CatalogKind.Consumers 
+                            && cp.Catalog.Available)
+                        .Select(c => c.Id)
+                        .FirstOrDefaultAsync(token);
+                }
+
+                return catalogProductId;
             }
         }
     }
