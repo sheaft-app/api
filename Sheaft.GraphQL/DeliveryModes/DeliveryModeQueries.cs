@@ -89,7 +89,7 @@ namespace Sheaft.GraphQL.DeliveryModes
         [UseSorting]
         public IQueryable<DeliveryClosing> GetClosings([ID] Guid deliveryId, [ScopedService] QueryDbContext context)
         {
-            SetLogTransaction();
+            SetLogTransaction(deliveryId);
             return context.Set<DeliveryClosing>()
                 .Where(d => d.DeliveryModeId == deliveryId && d.ClosedTo > DateTimeOffset.UtcNow);
         }
@@ -99,7 +99,7 @@ namespace Sheaft.GraphQL.DeliveryModes
         [UseDbContext(typeof(QueryDbContext))]
         public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token, DateTimeOffset? currentDate = null)
         {
-            SetLogTransaction();
+            SetLogTransaction(new {Ids = ids, Kinds = kinds});
 
             var deliveriesModes = new List<DeliveryMode>();
             if (CurrentUser.IsInRole(_roleOptions.Store.Value))

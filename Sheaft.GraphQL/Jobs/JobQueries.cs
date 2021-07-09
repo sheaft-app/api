@@ -64,7 +64,7 @@ namespace Sheaft.GraphQL.Jobs
             if (kinds == null)
                 kinds = new List<JobKind>();
 
-            SetLogTransaction();
+            SetLogTransaction(kinds);
             return await context.Jobs
                 .AnyAsync(r => kinds.Contains(r.Kind) && !r.Archived &&
                             r.Kind == JobKind.ImportProducts &&

@@ -66,6 +66,8 @@ namespace Sheaft.GraphQL.Stores
             SearchTermsDto terms,
             [ScopedService] QueryDbContext context, CancellationToken token)
         {
+            SetLogTransaction(terms);
+            
             var query = context.Stores.AsQueryable();
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(c => c.Name.Contains(terms.Text));
@@ -82,6 +84,8 @@ namespace Sheaft.GraphQL.Stores
             [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
+            SetLogTransaction(terms);
+            
             var query = context.Stores.Where(c => c.OpenForNewBusiness);
 
             if (!string.IsNullOrWhiteSpace(terms.Text))

@@ -68,7 +68,7 @@ namespace Sheaft.GraphQL.DeliveryBatchs
         public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatches(
             bool includeProcessingPurchaseOrders, CancellationToken token)
         {
-            SetLogTransaction();
+            SetLogTransaction(includeProcessingPurchaseOrders);
             
             return await _deliveryBatchService.GetAvailableDeliveryBatchesAsync(CurrentUser.Id,
                 includeProcessingPurchaseOrders, token);

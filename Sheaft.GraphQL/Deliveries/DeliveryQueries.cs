@@ -41,10 +41,10 @@ namespace Sheaft.GraphQL.Deliveries
         [Authorize(Policy = Policies.REGISTERED)]
         [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
-        public IQueryable<Delivery> GetPurchaseOrderDelivery([ID] Guid id,
+        public IQueryable<Delivery> GetDelivery([ID] Guid id,
             [ScopedService] QueryDbContext context)
         {
-            SetLogTransaction(CurrentUser.Id);
+            SetLogTransaction(id);
             
             return context.Set<Delivery>()
                 .Where(c => c.Id == id);

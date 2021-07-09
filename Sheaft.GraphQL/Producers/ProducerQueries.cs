@@ -14,6 +14,7 @@ using Microsoft.Azure.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
@@ -68,6 +69,8 @@ namespace Sheaft.GraphQL.Producers
             SearchTermsDto terms,
             [ScopedService] QueryDbContext context, CancellationToken token)
         {
+            SetLogTransaction(terms);
+            
             var query = context.Producers.Where(c => c.ProductsCount > 0);
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(c => c.Name.Contains(terms.Text));
@@ -84,6 +87,8 @@ namespace Sheaft.GraphQL.Producers
             [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
+            SetLogTransaction(terms);
+            
             var query = context.Catalogs
                 .Where(c => c.Kind == CatalogKind.Stores && c.Available && c.Producer.OpenForNewBusiness);
 
@@ -125,6 +130,59 @@ namespace Sheaft.GraphQL.Producers
                 Count = producersId.Count,
                 Producers = results
             };
+        }
+        
+        [GraphQLName("producersDeliveries")]
+        [GraphQLType(typeof(ListType<ProducerDeliveriesDtoType>))]
+        [UseDbContext(typeof(QueryDbContext))]
+        public async Task<IEnumerable<ProducerDeliveriesDto>> GetNextDeliveries([ID(nameof(Producer))]IEnumerable<Guid> ids, IEnumerable<DeliveryKind> kinds, [ScopedService] QueryDbContext context, CancellationToken token, DateTimeOffset? currentDate = null)
+        {
+            SetLogTransaction(new {Ids = ids, Kinds = kinds});
+
+            var deliveriesModes = await context.DeliveryModes
+                    .Where(d =>
+                        d.Available
+                        && ids.Contains(d.ProducerId)
+                        && kinds.Contains(d.Kind))
+                    .Include(d => d.DeliveryHours)
+                    .Include(d => d.Producer)
+                    .ToListAsync(token);
+
+            return deliveriesModes
+                .GroupBy(dm => dm.ProducerId)
+                .Select(p =>
+                {
+                    var deliveryMode = p.First();
+                    return new ProducerDeliveriesDto
+                    {
+                        Id = deliveryMode.Producer.Id,
+                        Name = deliveryMode.Producer.Name,
+                        Deliveries = p.Select(dm => new DeliveryDto
+                        {
+                            Id = dm.Id,
+                            Name = dm.Name,
+                            Available = dm.Available,
+                            Kind = dm.Kind,
+                            Address = dm.Address != null ? new AddressDto
+                            {
+                                Line1 = dm.Address.Line1,
+                                Line2 = dm.Address.Line2,
+                                Zipcode = dm.Address.Zipcode,
+                                City = dm.Address.City,
+                                Country = dm.Address.Country,
+                                Latitude = dm.Address.Latitude,
+                                Longitude = dm.Address.Longitude
+                            } : null,
+                            DeliveryHours = dm.DeliveryHours?.Select(dh => new DeliveryHourDto
+                            {
+                                Day = dh.Day,
+                                From = dh.From,
+                                To = dh.To,
+                                ExpectedDeliveryDate = default
+                            })
+                        })
+                    };
+                });
         }
     }
 }

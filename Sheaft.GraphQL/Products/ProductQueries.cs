@@ -127,6 +127,7 @@ namespace Sheaft.GraphQL.Products
             [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
+            SetLogTransaction(terms);
             var query = context.ConsumerProducts.AsQueryable();
             if (!string.IsNullOrWhiteSpace(terms.Text))
                 query = query.Where(p => p.Name.Contains(terms.Text));

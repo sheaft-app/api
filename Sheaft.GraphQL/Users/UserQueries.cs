@@ -52,7 +52,7 @@ namespace Sheaft.GraphQL.Users
         [UseSingleOrDefault]
         public IQueryable<User> Get([ScopedService] QueryDbContext context)
         {
-            SetLogTransaction(CurrentUser.Id);
+            SetLogTransaction();
             
             if (!CurrentUser.IsAuthenticated())
                 return null;
@@ -66,7 +66,7 @@ namespace Sheaft.GraphQL.Users
         [Authorize(Policy = Policies.AUTHENTICATED)]
         public async Task<string> GetFreshdeskToken()
         {
-            SetLogTransaction(CurrentUser.Id);
+            SetLogTransaction();
             
             if (!CurrentUser.IsAuthenticated())
                 return null;
@@ -86,6 +86,8 @@ namespace Sheaft.GraphQL.Users
         [GraphQLType(typeof(SirenBusinessDtoType))]
         public async Task<SirenBusinessDto> RetrieveSiretInfosAsync(string siret, CancellationToken token)
         {
+            SetLogTransaction(siret);
+            
             var result = await _httpClient.GetAsync(string.Format(_sireneOptions.SearchSiretUrl, siret), token);
             if (!result.IsSuccessStatusCode)
                 return null;
