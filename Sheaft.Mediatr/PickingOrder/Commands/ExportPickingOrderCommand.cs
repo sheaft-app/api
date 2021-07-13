@@ -69,7 +69,7 @@ namespace Sheaft.Mediatr.PickingOrder.Commands
                 if (!pickingOrdersExportResult.Succeeded)
                     throw pickingOrdersExportResult.Exception;
 
-                var response = await _blobsService.UploadPickingOrderFileAsync(job.UserId, job.Id,
+                var response = await _blobsService.UploadPickingOrderFileAsync(job.UserId,
                     $"Preparation_{job.CreatedOn:dd-MM-yyyy}.{pickingOrdersExportResult.Data.Extension}",
                     pickingOrdersExportResult.Data.Data, token);
                 if (!response.Succeeded)

@@ -13,6 +13,5 @@ namespace Sheaft.Mailing
         public decimal Vat { get; set; }
         public int Quantity { get; set; }
         public ModificationKind RowKind { get; set; }
-        public Guid Id { get; set; }
     }
 }

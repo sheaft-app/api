@@ -17,12 +17,12 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
             var productsToDeliver = delivery.Products
                 .Where(p => p.RowKind == ModificationKind.ToDeliver)
-                .Select(p => GetProductModel(p))
+                .Select(p => GetProductModel(p, p.RowKind))
                 .ToList();
 
             var productsDiffs = delivery.Products
                 .Where(p => p.RowKind != ModificationKind.ToDeliver)
-                .Select(p => GetProductModel(p))
+                .Select(p => GetProductModel(p, p.RowKind))
                 .ToList();
 
             var returnablesDiffs = delivery.Products
@@ -33,7 +33,6 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     var returnable = p.First();
                     return new DeliveryReturnableMailerModel
                     {
-                        Id = p.Key.ReturnableId.Value,
                         Name = returnable.ReturnableName,
                         Quantity = returnable.Quantity,
                         Vat = returnable.ReturnableVat.Value,
@@ -67,7 +66,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                                       productsDiffs.Sum(p => p.TotalWholeSalePrice) +
                                       returnedReturnables.Sum(p => p.TotalWholeSalePrice),
                 TotalVatPrice = productsToDeliver.Sum(po => po.TotalVatPrice) +
-                                productsDiffs.Sum(p => p.TotalVatPrice) + 
+                                productsDiffs.Sum(p => p.TotalVatPrice) +
                                 returnedReturnables.Sum(p => p.TotalVatPrice),
                 TotalOnSalePrice = productsToDeliver.Sum(po => po.TotalOnSalePrice) +
                                    productsDiffs.Sum(p => p.TotalOnSalePrice) +
@@ -81,65 +80,61 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var results = new List<DeliveryPurchaseOrderMailerModel>();
             foreach (var purchaseOrder in purchaseOrders)
             {
-                var products = purchaseOrder.Products.GroupBy(p => p.ProductId);
-                results.Add(new DeliveryPurchaseOrderMailerModel
+                var po = new DeliveryPurchaseOrderMailerModel
                 {
                     Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(),
                     CreatedOn = purchaseOrder.CreatedOn,
-                    Products = GetProductsModel(products),
-                    Returnables = GetReturnablesModel(products),
-                    TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
-                    TotalVatPrice = purchaseOrder.TotalVatPrice,
-                    TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
-                });
+                    Products = GetProductsModel(purchaseOrder),
+                    Returnables = GetReturnablesModel(purchaseOrder)
+                };
+
+                if (purchaseOrder.PickingId.HasValue)
+                {
+                    po.TotalVatPrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalVatPrice);
+                    po.TotalOnSalePrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalOnSalePrice);
+                    po.TotalWholeSalePrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalWholeSalePrice);
+                }
+                else
+                {
+                    po.TotalVatPrice = purchaseOrder.TotalVatPrice;
+                    po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice;
+                    po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice;
+                }
+                
+                results.Add(po);
             }
 
             return results;
         }
 
-        private static List<DeliveryProductMailerModel> GetProductsModel(
-            IEnumerable<IGrouping<Guid, ProductRow>> groupedProducts)
+        private static List<DeliveryProductMailerModel> GetProductsModel(Domain.PurchaseOrder purchaseOrder)
         {
             var products = new List<DeliveryProductMailerModel>();
-            foreach (var groupedProduct in groupedProducts)
+            if (purchaseOrder.PickingId.HasValue)
             {
-                var product = groupedProduct.First();
-                products.Add(new DeliveryProductMailerModel()
-                {
-                    Name = product.Name,
-                    Quantity = product.Quantity,
-                    Reference = product.Reference,
-                    RowKind = ModificationKind.ToDeliver,
-                    Vat = product.Vat,
-                    ProductWholeSalePrice = product.UnitWholeSalePrice,
-                    ProductTotalVatPrice = groupedProduct.Sum(po => po.TotalProductVatPrice),
-                    ProductTotalWholeSalePrice = groupedProduct.Sum(po => po.TotalProductWholeSalePrice),
-                    ProductTotalOnSalePrice = groupedProduct.Sum(po => po.TotalProductOnSalePrice),
-                    HasReturnable = groupedProduct.FirstOrDefault()?.HasReturnable ?? false,
-                    ReturnableName = groupedProduct.FirstOrDefault()?.Name,
-                    ReturnableQuantity = product.Quantity,
-                    ReturnableVat = groupedProduct.FirstOrDefault()?.Vat,
-                    ReturnableWholeSalePrice = groupedProduct.FirstOrDefault()?.ReturnableWholeSalePrice,
-                    ReturnableTotalVatPrice = groupedProduct.Sum(po => po.TotalReturnableVatPrice),
-                    ReturnableTotalWholeSalePrice = groupedProduct.Sum(po => po.TotalReturnableWholeSalePrice),
-                    ReturnableTotalOnSalePrice = groupedProduct.Sum(po => po.TotalReturnableOnSalePrice),
-                    TotalVatPrice = groupedProduct.Sum(po => po.TotalVatPrice),
-                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalWholeSalePrice),
-                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalOnSalePrice),
-                });
+                products = purchaseOrder.Picking.PreparedProducts
+                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id && p.Quantity > 0)
+                    .Select(p => GetProductModel(p, ModificationKind.ToDeliver))
+                    .ToList();
+            }
+            else
+            {
+                products = purchaseOrder.Products
+                    .Select(p => GetProductModel(p, ModificationKind.ToDeliver))
+                    .ToList();
             }
 
             return products;
         }
-
-        private static DeliveryProductMailerModel GetProductModel(DeliveryProduct p)
+        
+        private static DeliveryProductMailerModel GetProductModel(ProductRow p, ModificationKind rowKind)
         {
             return new DeliveryProductMailerModel()
             {
                 Name = p.Name,
                 Quantity = p.Quantity,
                 Reference = p.Reference,
-                RowKind = p.RowKind,
+                RowKind = rowKind,
                 Vat = p.Vat,
                 ProductTotalVatPrice = p.TotalProductVatPrice,
                 ProductTotalWholeSalePrice = p.TotalProductWholeSalePrice,
@@ -159,30 +154,40 @@ namespace Sheaft.Mediatr.Delivery.Commands
             };
         }
 
-        private static List<DeliveryReturnableMailerModel> GetReturnablesModel(
-            IEnumerable<IGrouping<Guid, ProductRow>> groupedProducts)
+        private static List<DeliveryReturnableMailerModel> GetReturnablesModel(Domain.PurchaseOrder purchaseOrder)
         {
             var returnables = new List<DeliveryReturnableMailerModel>();
-            foreach (var groupedProduct in groupedProducts)
+            if (purchaseOrder.PickingId.HasValue)
             {
-                var product = groupedProduct.First();
-                if (!product.HasReturnable)
-                    continue;
-
-                returnables.Add(new DeliveryReturnableMailerModel()
-                {
-                    Name = product.ReturnableName,
-                    Quantity = product.Quantity,
-                    RowKind = ModificationKind.ToDeliver,
-                    Vat = product.ReturnableVat ?? 0,
-                    TotalVatPrice = groupedProduct.Sum(po => po.TotalReturnableVatPrice ?? 0),
-                    TotalWholeSalePrice = groupedProduct.Sum(po => po.TotalReturnableWholeSalePrice ?? 0),
-                    TotalOnSalePrice = groupedProduct.Sum(po => po.TotalReturnableOnSalePrice ?? 0),
-                    WholeSalePrice = product.ReturnableWholeSalePrice ?? 0
-                });
+                returnables = purchaseOrder.Picking.PreparedProducts
+                    .Where(p => p.HasReturnable && p.PurchaseOrderId == purchaseOrder.Id && p.Quantity > 0)
+                    .Select(p => GetReturnableModel(p, ModificationKind.ToDeliver))
+                    .ToList();
+            }
+            else
+            {
+                returnables = purchaseOrder.Products
+                    .Where(p => p.HasReturnable)
+                    .Select(p => GetReturnableModel(p, ModificationKind.ToDeliver))
+                    .ToList();
             }
 
             return returnables;
+        }
+
+        private static DeliveryReturnableMailerModel GetReturnableModel(ProductRow product, ModificationKind rowKind)
+        {
+            return new DeliveryReturnableMailerModel()
+            {
+                Name = product.ReturnableName,
+                Quantity = product.Quantity,
+                RowKind = rowKind,
+                Vat = product.ReturnableVat ?? 0,
+                TotalVatPrice = product.TotalReturnableVatPrice ?? 0,
+                TotalWholeSalePrice = product.TotalReturnableWholeSalePrice ?? 0,
+                TotalOnSalePrice = product.TotalReturnableOnSalePrice ?? 0,
+                WholeSalePrice = product.ReturnableWholeSalePrice ?? 0
+            };
         }
 
         private static DeliveryReturnableMailerModel GetReturnedReturnableModel(DeliveryReturnable p)

@@ -81,9 +81,11 @@ namespace Sheaft.Domain
         public Guid ProducerId { get; private set; }
         public Guid ClientId { get; private set; }
         public Guid? DeliveryId { get; private set; }
+        public Guid? PickingId { get; private set; }
         public PurchaseOrderSender SenderInfo { get; private set; }
         public PurchaseOrderVendor VendorInfo { get; private set; }
         public virtual Delivery Delivery { get; private set; }
+        public virtual Picking Picking { get; private set; }
         public virtual ExpectedPurchaseOrderDelivery ExpectedDelivery { get; private set; }
         public virtual ICollection<PurchaseOrderProduct> Products { get; private set; }
 
@@ -97,6 +99,9 @@ namespace Sheaft.Domain
             switch (newStatus)
             {
                 case PurchaseOrderStatus.Accepted:
+                    if (Status == PurchaseOrderStatus.Processing)
+                        break;
+                    
                     if (Status != PurchaseOrderStatus.Waiting)
                         throw SheaftException.Validation("Impossible d'accepter la commande, elle n'est plus en attente.");
 
@@ -104,11 +109,11 @@ namespace Sheaft.Domain
                         throw SheaftException.Validation("Impossible d'accepter la commande, le délai de 72h est écoulé.");
 
                     AcceptedOn = DateTimeOffset.UtcNow;
-                    Status = PurchaseOrderStatus.Processing;
 
                     if (!skipNotification)
                         DomainEvents.Add(new PurchaseOrderAcceptedEvent(Id));
-                    return;
+
+                    break;
                 case PurchaseOrderStatus.Completed:
                     if (Status != PurchaseOrderStatus.Processing)
                         throw SheaftException.Validation("La commande doit être en préparation pour pouvoir être complétée.");

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Behaviours
@@ -35,7 +36,7 @@ namespace Sheaft.Application.Behaviours
             var requestName = typeof(TRequest).Name;
             _logger.LogWarning(
                 "Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) for {@UserId}",
-                requestName, _timer.ElapsedMilliseconds, request.RequestUser.Name);
+                requestName, _timer.ElapsedMilliseconds, request.RequestUser?.Name);
 
             return response;
         }

@@ -16,7 +16,8 @@ namespace Sheaft.Domain
         }
 
         public Delivery(int reference, Producer producer, DeliveryKind kind, DateTimeOffset scheduledOn,
-            ExpectedAddress address, Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders, int? position)
+            ExpectedAddress address, Guid clientId, string clientName, IEnumerable<PurchaseOrder> purchaseOrders,
+            int? position)
         {
             Id = Guid.NewGuid();
             Status = DeliveryStatus.Waiting;
@@ -115,24 +116,39 @@ namespace Sheaft.Domain
 
             PurchaseOrders ??= new List<PurchaseOrder>();
             foreach (var purchaseOrder in purchaseOrders)
+            {
+                if (purchaseOrder.DeliveryId.HasValue)
+                    purchaseOrder.Delivery.RemovePurchaseOrders(new List<PurchaseOrder> {purchaseOrder});
+
                 PurchaseOrders.Add(purchaseOrder);
+            }
 
             Products ??= new List<DeliveryProduct>();
-            var purchaseOrderProducts = purchaseOrders.SelectMany(p => p.Products).GroupBy(p => p.ProductId);
-            foreach (var groupedPurchaseOrderProduct in purchaseOrderProducts)
+            foreach (var purchaseOrder in purchaseOrders)
             {
-                var groupedProduct = groupedPurchaseOrderProduct.First();
-                var quantity = groupedPurchaseOrderProduct.Sum(p => p.Quantity);
-                var existingProduct = Products.FirstOrDefault(p =>
-                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
-                if (existingProduct != null)
+                foreach (var purchaseOrderProduct in purchaseOrder.Products)
                 {
-                    existingProduct.AddQuantity(quantity);
-                    if (existingProduct.Quantity <= 0)
-                        Products.Remove(existingProduct);
+                    var preparedQuantity = 0;
+                    if (purchaseOrder.PickingId.HasValue)
+                    {
+                        var preparedProduct = purchaseOrder.Picking.PreparedProducts.FirstOrDefault(p =>
+                            p.ProductId == purchaseOrderProduct.ProductId && p.PurchaseOrderId == purchaseOrder.Id);
+
+                        if (preparedProduct != null)
+                            preparedQuantity = preparedProduct.Quantity;
+                    }
+                    else
+                        preparedQuantity = purchaseOrderProduct.Quantity;
+
+                    var existingProduct = Products.FirstOrDefault(p =>
+                        p.ProductId == purchaseOrderProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
+
+                    if (existingProduct != null)
+                        existingProduct.AddQuantity(preparedQuantity);
+                    else if (preparedQuantity > 0)
+                        Products.Add(new DeliveryProduct(purchaseOrderProduct, preparedQuantity,
+                            ModificationKind.ToDeliver));
                 }
-                else if (quantity > 0)
-                    Products.Add(new DeliveryProduct(groupedProduct, quantity, ModificationKind.ToDeliver));
             }
 
             Refresh();
@@ -148,21 +164,37 @@ namespace Sheaft.Domain
                 throw SheaftException.NotFound("Cette livraison ne contient pas de commandes.");
 
             foreach (var purchaseOrder in purchaseOrders)
-                PurchaseOrders.Remove(purchaseOrder);
-
-            var purchaseOrderProducts = purchaseOrders.SelectMany(p => p.Products).GroupBy(p => p.ProductId);
-            foreach (var groupedPurchaseOrderProduct in purchaseOrderProducts)
             {
-                var groupedProduct = groupedPurchaseOrderProduct.First();
-                var existingProduct = Products.FirstOrDefault(p =>
-                    p.ProductId == groupedProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
-                if (existingProduct == null)
-                    continue;
+                foreach (var purchaseOrderProduct in purchaseOrder.Products)
+                {
+                    var preparedQuantity = 0;
+                    if (purchaseOrder.PickingId.HasValue)
+                    {
+                        var preparedProduct = purchaseOrder.Picking.PreparedProducts.FirstOrDefault(p =>
+                            p.ProductId == purchaseOrderProduct.ProductId && p.PurchaseOrderId == purchaseOrder.Id);
 
-                var quantity = groupedPurchaseOrderProduct.Sum(p => p.Quantity);
-                existingProduct.RemoveQuantity(quantity);
-                if (existingProduct.Quantity <= 0)
-                    Products.Remove(existingProduct);
+                        if (preparedProduct != null)
+                            preparedQuantity = preparedProduct.Quantity;
+                    }
+                    else
+                        preparedQuantity = purchaseOrderProduct.Quantity;
+
+                    var existingProduct = Products.FirstOrDefault(p =>
+                        p.ProductId == purchaseOrderProduct.ProductId && p.RowKind == ModificationKind.ToDeliver);
+
+                    if (existingProduct == null)
+                        continue;
+
+                    existingProduct.RemoveQuantity(preparedQuantity);
+                    if (existingProduct.Quantity <= 0)
+                    {
+                        foreach (var productToRemove in Products
+                            .Where(p => p.ProductId == purchaseOrderProduct.ProductId).ToList())
+                            Products.Remove(productToRemove);
+                    }
+                }
+
+                PurchaseOrders.Remove(purchaseOrder);
             }
 
             Refresh();
@@ -226,20 +258,22 @@ namespace Sheaft.Domain
                 {
                     var product = Products.FirstOrDefault(p => p.ProductId == productReturned.Item1.ProductId);
                     if (product == null)
-                        throw SheaftException.NotFound($"Le produit {productReturned.Item1.Name} retourné est introuvable dans la liste des produits livrés.");
+                        throw SheaftException.NotFound(
+                            $"Le produit {productReturned.Item1.Name} retourné est introuvable dans la liste des produits livrés.");
 
-                    if(productReturned.Item3 != ModificationKind.Excess && product.Quantity < productReturned.Item2)
-                        throw SheaftException.NotFound($"Le produit {productReturned.Item1.Name} possède une quantité retournée supérieure à la quantité livrée.");
-                    
+                    if (productReturned.Item3 != ModificationKind.Excess && product.Quantity < productReturned.Item2)
+                        throw SheaftException.NotFound(
+                            $"Le produit {productReturned.Item1.Name} possède une quantité retournée supérieure à la quantité livrée.");
+
                     Products.Add(new DeliveryProduct(product, productReturned.Item2, productReturned.Item3));
                 }
-                
+
                 Refresh();
             }
 
             if (returnedReturnables != null && returnedReturnables.Any())
                 SetReturnedReturnables(returnedReturnables);
-            
+
             foreach (var purchaseOrder in PurchaseOrders)
                 purchaseOrder.SetStatus(PurchaseOrderStatus.Delivered, true);
         }
@@ -275,7 +309,7 @@ namespace Sheaft.Domain
             ImproperProductsCount = Products.Where(p => p.RowKind == ModificationKind.Improper).Sum(p => p.Quantity);
             ExcessProductsCount = Products.Where(p => p.RowKind == ModificationKind.Excess).Sum(p => p.Quantity);
             MissingProductsCount = Products.Where(p => p.RowKind == ModificationKind.Missing).Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p =>  p.HasReturnable).Sum(p => p.Quantity);
+            ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
             ProductsToDeliverCount = Products.Where(p => p.RowKind == ModificationKind.ToDeliver).Sum(p => p.Quantity);
             PurchaseOrdersCount = PurchaseOrders.Count;
             ProductsDeliveredCount = ProductsToDeliverCount + BrokenProductsCount + MissingProductsCount +

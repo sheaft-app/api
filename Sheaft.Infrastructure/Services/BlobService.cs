@@ -464,14 +464,14 @@ namespace Sheaft.Infrastructure.Services
             return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.DeliveryBatches));
         }
 
-        public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename,
+        public async Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, string filename,
             byte[] data, CancellationToken token)
         {
             var containerClient = new BlobContainerClient(_storageOptions.ConnectionString,
                 _storageOptions.Containers.PickingOrders);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{SanitizeFileName(filename)}");
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{Guid.NewGuid():N}/{SanitizeFileName(filename)}");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))

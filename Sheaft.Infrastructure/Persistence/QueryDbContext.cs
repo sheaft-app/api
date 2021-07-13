@@ -33,6 +33,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Payin> Payins { get; set; }
         public DbSet<Payout> Payouts { get; set; }
         public DbSet<PreAuthorization> PreAuthorizations { get; set; }
+        public DbSet<Picking> Pickings { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
         public DbSet<Refund> Refunds { get; set; }

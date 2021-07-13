@@ -8,7 +8,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
 {
     public interface IBlobService
     {
-        Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
+        Task<Result<string>> UploadPickingOrderFileAsync(Guid userId, string filename, byte[] data, CancellationToken token);
         Task<Result<string>> UploadRgpdFileAsync(Guid userId, Guid jobId, string filename, byte[] data, CancellationToken token);
         Task<Result> UploadImportProductsFileAsync(Guid userId, Guid jobId, byte[] data, CancellationToken token);
         Task<Result<byte[]>> DownloadImportProductsFileAsync(Guid userId, Guid jobId, CancellationToken token);
