@@ -36,11 +36,14 @@ namespace Sheaft.Business
                     && po.ProducerId == producerId
                     && !po.DeliveryId.HasValue
                     && po.ExpectedDelivery.Kind == DeliveryKind.ProducerToStore)
+                .Include(p => p.Picking)
+                    .ThenInclude(p => p.PreparedProducts)
                 .ToListAsync(token);
 
             var storeIds = purchaseOrders.Select(po => po.ClientId);
             var agreements = await context.Agreements
-                .Where(a => storeIds.Contains(a.StoreId) && a.Status == AgreementStatus.Accepted && a.ProducerId == producerId)
+                .Where(a => storeIds.Contains(a.StoreId) && a.Status == AgreementStatus.Accepted &&
+                            a.ProducerId == producerId)
                 .ToListAsync(token);
 
             var maxPosition = agreements.Count;
@@ -66,13 +69,14 @@ namespace Sheaft.Business
 
                         if (client == null)
                         {
-                            var position = agreements.FirstOrDefault(a => a.StoreId == purchaseOrder.ClientId)?.Position ?? -1;
+                            var position =
+                                agreements.FirstOrDefault(a => a.StoreId == purchaseOrder.ClientId)?.Position ?? -1;
                             if (position < 0)
                                 position = maxPosition++;
 
                             if (deliveryBatch.Clients.Any(c => c.Position == position))
                             {
-                                while(deliveryBatch.Clients.Any(c => c.Position == position))
+                                while (deliveryBatch.Clients.Any(c => c.Position == position))
                                     position++;
 
                                 if (position > maxPosition)
@@ -90,7 +94,7 @@ namespace Sheaft.Business
                             deliveryBatch.Clients.Add(client);
                         }
 
-                        client.PurchaseOrders.Add(new AvailablePurchaseOrderDto
+                        var po = new AvailablePurchaseOrderDto
                         {
                             Id = purchaseOrder.Id,
                             Status = purchaseOrder.Status,
@@ -99,14 +103,29 @@ namespace Sheaft.Business
                             Client = purchaseOrder.SenderInfo.Name,
                             ClientId = purchaseOrder.ClientId,
                             Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(),
-                            LinesCount = purchaseOrder.LinesCount,
-                            ProductsCount = purchaseOrder.ProductsCount,
-                            ReturnablesCount = purchaseOrder.ReturnablesCount,
-                            TotalOnSalePrice = purchaseOrder.TotalOnSalePrice,
-                            TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice,
-                            TotalWeight = purchaseOrder.TotalWeight,
                             ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate
-                        });
+                        };
+
+                        if (purchaseOrder.PickingId.HasValue)
+                        {
+                            po.LinesCount = purchaseOrder.Picking.PreparedProducts.Select(p => p.ProductId).Distinct().Count();
+                            po.ProductsCount = purchaseOrder.Picking.PreparedProducts.Sum(p => p.Quantity);
+                            po.TotalOnSalePrice = purchaseOrder.Picking.PreparedProducts.Sum(p => p.TotalOnSalePrice);
+                            po.TotalWholeSalePrice = purchaseOrder.Picking.PreparedProducts.Sum(p => p.TotalWholeSalePrice);
+                            po.ReturnablesCount = purchaseOrder.Picking.PreparedProducts.Where(p => p.HasReturnable).Sum(p => p.Quantity);
+                            po.TotalWeight = purchaseOrder.Picking.PreparedProducts.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight.Value);
+                        }
+                        else
+                        {
+                            po.LinesCount = purchaseOrder.LinesCount;
+                            po.ProductsCount = purchaseOrder.ProductsCount;
+                            po.ReturnablesCount = purchaseOrder.ReturnablesCount;
+                            po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice;
+                            po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice;
+                            po.TotalWeight = purchaseOrder.TotalWeight;
+                        }
+
+                        client.PurchaseOrders.Add(po);
                     }
 
                     if (client == null)
@@ -115,16 +134,18 @@ namespace Sheaft.Business
                     client.PurchaseOrdersCount = client.PurchaseOrders.Count;
                 }
 
-                if (deliveryBatch == null) 
+                if (deliveryBatch == null)
                     continue;
-                
+
                 deliveryBatch.ClientsCount = deliveryBatch.Clients.Count;
                 deliveryBatch.PurchaseOrdersCount = deliveryBatch.Clients.Sum(c => c.PurchaseOrdersCount);
+                deliveryBatch.ProductsCount =
+                    deliveryBatch.Clients.Sum(c => c.PurchaseOrders.Sum(po => po.ProductsCount));
 
                 var currentPosition = 0;
                 foreach (var client in deliveryBatch.Clients.OrderBy(c => c.Position))
                     client.Position = currentPosition++;
-                
+
                 availableDeliveryBatchs.Add(deliveryBatch);
             }
 

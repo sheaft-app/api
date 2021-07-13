@@ -50,6 +50,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("clientsCount");
             
             descriptor
+                .Field(c => c.ProductsCount)
+                .Name("productsCount");
+            
+            descriptor
                 .Field(c => c.Clients)
                 .Name("clients")
                 .Type<ListType<AvailableClientDeliveryDtoType>>();

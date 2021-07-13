@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Behaviours
@@ -21,6 +22,9 @@ namespace Sheaft.Application.Behaviours
         public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
             RequestHandlerDelegate<TResponse> next)
         {
+            if (request.RequestUser == null)
+                throw SheaftException.Unexpected("The requestUser must be assigned for the command.");
+            
             var requestName = typeof(TRequest).Name;
             _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Name);
             

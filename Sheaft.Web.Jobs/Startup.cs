@@ -226,6 +226,7 @@ namespace Sheaft.Web.Jobs
             
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
+            services.AddScoped<IPickingService, PickingService>();
             services.AddScoped<IOrderService, OrderService>();
 
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));

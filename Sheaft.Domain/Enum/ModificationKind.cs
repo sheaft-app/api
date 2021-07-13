@@ -6,7 +6,7 @@ namespace Sheaft.Domain.Enum
         Missing,
         Broken,
         Improper,
-        Excess
+        Excess,
     }
 
     public static class ModificationKindOverrides

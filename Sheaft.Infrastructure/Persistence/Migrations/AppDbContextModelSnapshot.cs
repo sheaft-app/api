@@ -1716,6 +1716,171 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("Payouts");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Picking", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PickingFormUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PreparedProductsCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProducerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ProductsToPrepareCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrdersCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("RemovedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset?>("StartedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProducerId");
+
+                    b.ToTable("Pickings");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.PickingProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasReturnable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
+
+                    b.Property<Guid>("PickingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PurchaseOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReturnableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReturnableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("ReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("UnitWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Vat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PickingId");
+
+                    b.ToTable("PickingProducts");
+                });
+
             modelBuilder.Entity("Sheaft.Domain.PreAuthorization", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1797,6 +1962,123 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasFilter("[PreAuthorizedPayinId] IS NOT NULL");
 
                     b.ToTable("PreAuthorizations");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.PreparedProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasReturnable")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .UseCollation("Latin1_general_CI_AI");
+
+                    b.Property<Guid>("PickingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PreparedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("PreparedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PurchaseOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReturnableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReturnableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("ReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("ReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalProductWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalReturnableWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("TotalWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitOnSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitVatPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("UnitWeight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("UnitWholeSalePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTimeOffset?>("UpdatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Vat")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PickingId");
+
+                    b.ToTable("PreparedProducts");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProducerTag", b =>
@@ -2010,6 +2292,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PickingId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ProducerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2074,6 +2359,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("DeliveryId");
 
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("PickingId");
 
                     b.HasIndex("ProducerId", "Reference")
                         .IsUnique();
@@ -3971,6 +4258,26 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("DebitedWallet");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.Picking", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Producer", "Producer")
+                        .WithMany()
+                        .HasForeignKey("ProducerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Producer");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.PickingProduct", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Picking", null)
+                        .WithMany("ProductsToPrepare")
+                        .HasForeignKey("PickingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.PreAuthorization", b =>
                 {
                     b.HasOne("Sheaft.Domain.Card", "Card")
@@ -3995,6 +4302,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("PreAuthorizedPayin");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.PreparedProduct", b =>
+                {
+                    b.HasOne("Sheaft.Domain.Picking", null)
+                        .WithMany("PreparedProducts")
+                        .HasForeignKey("PickingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProducerTag", b =>
@@ -4079,6 +4395,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.Picking", "Picking")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("PickingId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.OwnsOne("Sheaft.Domain.ExpectedPurchaseOrderDelivery", "ExpectedDelivery", b1 =>
                         {
@@ -4229,6 +4550,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Delivery");
 
                     b.Navigation("ExpectedDelivery");
+
+                    b.Navigation("Picking");
 
                     b.Navigation("SenderInfo");
 
@@ -4741,6 +5064,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Transfers");
 
                     b.Navigation("Withholdings");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.Picking", b =>
+                {
+                    b.Navigation("PreparedProducts");
+
+                    b.Navigation("ProductsToPrepare");
+
+                    b.Navigation("PurchaseOrders");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.Product", b =>

@@ -39,6 +39,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Payin> Payins { get; set; }
         DbSet<Domain.Payout> Payouts { get; set; }
         DbSet<PreAuthorization> PreAuthorizations { get; set; }
+        DbSet<Domain.Picking> Pickings { get; set; }
         DbSet<Domain.Product> Products { get; set; }
         DbSet<Domain.QuickOrder> QuickOrders { get; set; }
         DbSet<Refund> Refunds { get; set; }

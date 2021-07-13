@@ -24,7 +24,7 @@ namespace Sheaft.Domain
         public ModificationKind RowKind { get; private set; }
         public Guid DeliveryId { get; private set; }
         
-        protected sealed override void SetQuantity(int quantity)
+        public sealed override void SetQuantity(int quantity)
         {
             if(RowKind is ModificationKind.ToDeliver or ModificationKind.Excess)
                 Quantity = quantity;

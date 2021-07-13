@@ -1,3 +1,4 @@
+using System;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mailing

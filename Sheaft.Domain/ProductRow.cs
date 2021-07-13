@@ -7,7 +7,7 @@ namespace Sheaft.Domain
 {
     public abstract class ProductRow: IIdEntity, ITrackCreation, ITrackUpdate
     {
-        private const int DIGITS_COUNT = 2;
+        protected const int DIGITS_COUNT = 2;
 
         protected ProductRow()
         {
@@ -105,7 +105,7 @@ namespace Sheaft.Domain
             SetQuantity(quantity);
         }
 
-        protected virtual void SetQuantity(int quantity)
+        public virtual void SetQuantity(int quantity)
         {
             Quantity = quantity;
             RefreshLine();
@@ -162,6 +162,7 @@ namespace Sheaft.Domain
         public void AddQuantity(int quantity)
         {
             Quantity += quantity;
+            RefreshLine();
         }
 
         public void RemoveQuantity(int quantity)
@@ -169,6 +170,8 @@ namespace Sheaft.Domain
             Quantity -= quantity;
             if (Quantity < 0)
                 Quantity = 0;
+            
+            RefreshLine();
         }
     }
 }

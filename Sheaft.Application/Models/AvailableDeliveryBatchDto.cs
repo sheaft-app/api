@@ -11,6 +11,7 @@ namespace Sheaft.Application.Models
         public TimeSpan To { get; set; }
         public DayOfWeek Day { get; set; }
         public int ClientsCount { get; set; }
+        public int ProductsCount { get; set; }
         public int PurchaseOrdersCount { get; set; }
         public List<AvailableClientDeliveryDto> Clients { get; set; }
     }

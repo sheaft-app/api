@@ -150,6 +150,9 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new DeliveryBatchConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new DeliveryProductConfiguration());
             modelBuilder.ApplyConfiguration(new DeliveryReturnableConfiguration());
+            modelBuilder.ApplyConfiguration(new PickingConfiguration());
+            modelBuilder.ApplyConfiguration(new PickingProductConfiguration());
+            modelBuilder.ApplyConfiguration(new PreparedProductConfiguration());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

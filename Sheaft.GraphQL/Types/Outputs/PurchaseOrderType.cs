@@ -10,6 +10,7 @@ using Sheaft.Application.Models;
 using Sheaft.Domain;
 using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Deliveries;
+using Sheaft.GraphQL.Pickings;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
 
@@ -30,71 +31,71 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.CreatedOn)
                 .Name("createdOn");
-                
+
             descriptor
                 .Field(c => c.Status)
                 .Name("status");
-                
+
             descriptor
                 .Field(c => c.UpdatedOn)
                 .Name("updatedOn");
-                
+
             descriptor
                 .Field(c => c.Reason)
                 .Name("reason");
-                
+
             descriptor
                 .Field(c => c.Comment)
                 .Name("comment");
-                
+
             descriptor
                 .Field(c => c.TotalWeight)
                 .Name("totalWeight");
-                
+
             descriptor
                 .Field(c => c.TotalWholeSalePrice)
                 .Name("totalWholeSalePrice");
-                
+
             descriptor
                 .Field(c => c.TotalVatPrice)
                 .Name("totalVatPrice");
-                
+
             descriptor
                 .Field(c => c.TotalOnSalePrice)
                 .Name("totalOnSalePrice");
-                
+
             descriptor
                 .Field(c => c.TotalReturnableWholeSalePrice)
                 .Name("totalReturnableWholeSalePrice");
-                
+
             descriptor
                 .Field(c => c.TotalReturnableVatPrice)
                 .Name("totalReturnableVatPrice");
-                
+
             descriptor
                 .Field(c => c.TotalReturnableOnSalePrice)
                 .Name("totalReturnableOnSalePrice");
-                
+
             descriptor
                 .Field(c => c.TotalProductWholeSalePrice)
                 .Name("totalProductWholeSalePrice");
-                
+
             descriptor
                 .Field(c => c.TotalProductVatPrice)
                 .Name("totalProductVatPrice");
-                
+
             descriptor
                 .Field(c => c.TotalProductOnSalePrice)
                 .Name("totalProductOnSalePrice");
-                
+
             descriptor
                 .Field(c => c.ReturnablesCount)
                 .Name("returnablesCount");
-                
+
             descriptor
                 .Field(c => c.LinesCount)
                 .Name("linesCount");
-                
+
             descriptor
                 .Field(c => c.ProductsCount)
                 .Name("productsCount");
@@ -115,6 +116,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<DeliveryType>();
 
             descriptor
+                .Field(c => c.Picking)
+                .Name("picking")
+                .ResolveWith<PurchaseOrderResolvers>(c => c.GetPicking(default, default, default))
+                .Type<PickingType>();
+
+            descriptor
                 .Field(c => c.SenderInfo)
                 .Name("sender")
                 .ResolveWith<PurchaseOrderResolvers>(c => c.GetSender(default))
@@ -132,6 +139,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<PurchaseOrderResolvers>(c => c.GetProducts(default, default, default, default))
                 .Type<NonNullType<ListType<PurchaseOrderProductType>>>();
+            
+            descriptor
+                .Field("preparedProducts")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<PurchaseOrderResolvers>(c => c.GetPreparedProducts(default, default, default, default))
+                .Type<NonNullType<ListType<PreparedProductType>>>();
         }
 
         private class PurchaseOrderResolvers
@@ -181,8 +194,32 @@ namespace Sheaft.GraphQL.Types.Outputs
             {
                 if (!purchaseOrder.DeliveryId.HasValue)
                     return null;
-                
+
                 return deliveriesDataLoader.LoadAsync(purchaseOrder.DeliveryId.Value, token);
+            }
+
+            public Task<Picking> GetPicking(PurchaseOrder purchaseOrder,
+                PickingsByIdBatchDataLoader pickingsDataLoader, CancellationToken token)
+            {
+                if (!purchaseOrder.PickingId.HasValue)
+                    return null;
+
+                return pickingsDataLoader.LoadAsync(purchaseOrder.PickingId.Value, token);
+            }
+
+            public async Task<IEnumerable<PreparedProduct>> GetPreparedProducts(PurchaseOrder purchaseOrder,
+                [ScopedService] QueryDbContext context, PreparedProductsByIdBatchDataLoader preparedProductsDataLoader,
+                CancellationToken token)
+            {
+                if (!purchaseOrder.PickingId.HasValue)
+                    return new List<PreparedProduct>();
+
+                var preparedProductIds = await context.Set<PreparedProduct>()
+                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id)
+                    .Select(p => p.Id)
+                    .ToListAsync(token);
+
+                return await preparedProductsDataLoader.LoadAsync(preparedProductIds, token);
             }
         }
     }
