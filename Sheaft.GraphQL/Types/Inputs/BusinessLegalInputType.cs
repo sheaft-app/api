@@ -31,8 +31,20 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Type<NonNullType<StringType>>();
 
             descriptor
-                .Field(c => c.Kind)
+                .Field(c => c.LegalKind)
                 .Name("kind");
+            
+            descriptor
+                .Field(c => c.RegistrationKind)
+                .Name("registrationKind");
+            
+            descriptor
+                .Field(c => c.RegistrationCity)
+                .Name("registrationCity");
+            
+            descriptor
+                .Field(c => c.RegistrationCode)
+                .Name("registrationCode");
 
             descriptor
                 .Field(c => c.Owner)

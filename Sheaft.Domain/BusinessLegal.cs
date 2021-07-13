@@ -22,7 +22,8 @@ namespace Sheaft.Domain
             SetVatIdentifier(vatIdentifier);
         }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
+        public string Identifier { get; private set; }
         public string Email { get; private set; }
         public string Siret { get; private set; }
         public string VatIdentifier { get; private set; }
@@ -79,6 +80,18 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation("Le nom de l'entreprise est requis.");
 
             Name = name;
+        }
+
+        public void SetRegistrationKind(RegistrationKind kind, string city, string code)
+        {
+            if(kind == RegistrationKind.RCS)
+                Identifier = $"{kind:G} {city} {code} {Siret.Substring(0, 9)} ";
+            
+            if(kind == RegistrationKind.RM)
+                Identifier = $"{kind:G} {Siret.Substring(0, 9)} {code}";
+            
+            if(kind == RegistrationKind.RSEIRL)
+                Identifier = $"{kind:G} {Siret.Substring(0, 9)}";
         }
     }
 }

@@ -139,7 +139,7 @@ namespace Sheaft.Mediatr.Store.Commands
                     Name = request.Legals.Name,
                     Email = request.Legals.Email,
                     Siret = request.Legals.Siret,
-                    Kind = request.Legals.Kind,
+                    Kind = request.Legals.LegalKind,
                     VatIdentifier = request.Legals.VatIdentifier,
                     UserId = store.Id,
                     Owner = request.Legals.Owner

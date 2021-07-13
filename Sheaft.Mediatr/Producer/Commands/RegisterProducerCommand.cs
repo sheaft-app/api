@@ -81,6 +81,9 @@ namespace Sheaft.Mediatr.Producer.Commands
             if (producer != null)
                 return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
+            // if (request.Legals.RegistrationKind == null)
+            //     return Failure<Guid>("Le numéro RCS ou RM est requis pour la création d'un compte producteur.");
+            
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
@@ -138,9 +141,12 @@ namespace Sheaft.Mediatr.Producer.Commands
                     Name = request.Legals.Name,
                     Email = request.Legals.Email,
                     Siret = request.Legals.Siret,
-                    Kind = request.Legals.Kind,
+                    Kind = request.Legals.LegalKind,
                     VatIdentifier = request.NotSubjectToVat ? null : request.Legals.VatIdentifier,
                     UserId = producer.Id,
+                    RegistrationKind = request.Legals.RegistrationKind,
+                    RegistrationCity = request.Legals.RegistrationCity,
+                    RegistrationCode = request.Legals.RegistrationCode,
                     Owner = request.Legals.Owner
                 }, token);
 

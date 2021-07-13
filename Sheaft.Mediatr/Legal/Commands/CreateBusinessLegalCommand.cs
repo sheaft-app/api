@@ -37,6 +37,9 @@ namespace Sheaft.Mediatr.Legal.Commands
         public string Siret { get; set; }
         public OwnerInputDto Owner { get; set; }
         public AddressDto Address { get; set; }
+        public RegistrationKind? RegistrationKind { get; set; }
+        public string RegistrationCity { get; set; }
+        public string RegistrationCode { get; set; }
     }
 
     public class CreateBusinessLegalCommandHandler : CommandsHandler,
@@ -74,7 +77,10 @@ namespace Sheaft.Mediatr.Legal.Commands
                         request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country),
                     request.Owner.Nationality,
                     request.Owner.CountryOfResidence
-                ));
+                ),
+                request.RegistrationCity,
+                request.RegistrationCode,
+                request.RegistrationKind);
             
             await _context.SaveChangesAsync(token);
 

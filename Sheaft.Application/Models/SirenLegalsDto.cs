@@ -7,5 +7,6 @@
         public string DenominationUsuelle1UniteLegale { get; set; }
         public string CategorieJuridiqueUniteLegale { get; set; }
         public string EtatAdministratifUniteLegale { get; set; }
+        public string NumeroTvaIntra { get; set; }
     }
 }

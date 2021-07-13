@@ -18,6 +18,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.PrenomUsuelUniteLegale)
                 .Name("firstName");
+            
+            descriptor
+                .Field(c => c.NumeroTvaIntra)
+                .Name("vatNumber");
+            
+            descriptor
+                .Field(c => c.DenominationUsuelle1UniteLegale)
+                .Name("name");
         }
     }
 }
