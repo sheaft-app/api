@@ -17,6 +17,10 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("name");
             
             descriptor
+                .Field(c => c.AutoStart)
+                .Name("autostart");
+            
+            descriptor
                 .Field(c => c.PurchaseOrderIds)
                 .ID(nameof(PurchaseOrder))
                 .Name("purchaseOrderIds");

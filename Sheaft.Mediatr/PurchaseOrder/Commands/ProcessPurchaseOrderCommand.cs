@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -14,6 +15,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Picking.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
@@ -21,8 +23,8 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
     {
         protected ProcessPurchaseOrderCommand()
         {
-            
         }
+
         [JsonConstructor]
         public ProcessPurchaseOrderCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -46,13 +48,15 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public async Task<Result> Handle(ProcessPurchaseOrderCommand request, CancellationToken token)
         {
             var purchaseOrder = await _context.PurchaseOrders.SingleAsync(e => e.Id == request.PurchaseOrderId, token);
-            if(purchaseOrder.ProducerId != request.RequestUser.Id)
+            if (purchaseOrder.ProducerId != request.RequestUser.Id)
                 return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
-            
-            purchaseOrder.Process(request.SkipNotification);
 
-            await _context.SaveChangesAsync(token);
-            return Success();
+            var result =
+                await _mediatr.Process(
+                    new CreatePickingCommand(request.RequestUser)
+                        {PurchaseOrderIds = new List<Guid> {purchaseOrder.Id}, AutoStart = true}, token);
+            
+            return !result.Succeeded ? Failure(result) : Success();
         }
     }
 }

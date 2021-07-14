@@ -31,6 +31,7 @@ namespace Sheaft.Mediatr.Picking.Commands
 
         public Guid ProducerId { get; set; }
         public string Name { get; set; }
+        public bool AutoStart { get; set; }
         public IEnumerable<Guid> PurchaseOrderIds { get; set; }
 
         public override void SetRequestUser(RequestUser user)
@@ -60,6 +61,9 @@ namespace Sheaft.Mediatr.Picking.Commands
             var producer = await _context.Producers.SingleAsync(p => p.Id == request.ProducerId, token);
             var entity = new Domain.Picking(Guid.NewGuid(), request.Name, producer, purchaseOrders);
 
+            if(request.AutoStart)
+                entity.Start();
+            
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
