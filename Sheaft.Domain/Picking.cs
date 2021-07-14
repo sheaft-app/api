@@ -64,9 +64,9 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation("La préparation requiert une commande à minima.");
 
             if (purchaseOrders.Any(po =>
-                po.Status != PurchaseOrderStatus.Accepted && po.Status != PurchaseOrderStatus.Processing))
+                po.Status != PurchaseOrderStatus.Waiting && po.Status != PurchaseOrderStatus.Accepted && po.Status != PurchaseOrderStatus.Processing))
                 throw SheaftException.Validation(
-                    "Seule des commandes acceptées ou en cours de préparation peuvent être ajoutées à une préparation.");
+                    "Seule des commandes en attente ou acceptées peuvent être ajoutées à une préparation.");
 
             if (Status == PickingStatus.Completed)
                 throw SheaftException.Validation(
@@ -78,6 +78,9 @@ namespace Sheaft.Domain
                 if (purchaseOrder.PickingId.HasValue)
                     purchaseOrder.Picking.RemovePurchaseOrders(new List<PurchaseOrder> {purchaseOrder});
 
+                if(purchaseOrder.Status == PurchaseOrderStatus.Waiting)
+                    purchaseOrder.Accept(true);
+                
                 PurchaseOrders.Add(purchaseOrder);
             }
 
@@ -170,12 +173,15 @@ namespace Sheaft.Domain
         }
 
         public void SetProductPreparedQuantity(Guid productId, Guid purchaseOrderId, int quantity, string preparedBy,
-            bool completed)
+            bool completed, IEnumerable<Batch> batches)
         {
             var existingPreparedProduct =
                 PreparedProducts.SingleOrDefault(p => p.ProductId == productId && p.PurchaseOrderId == purchaseOrderId);
             if (existingPreparedProduct != null)
+            {
+                existingPreparedProduct.SetBatches(batches);
                 existingPreparedProduct.SetQuantity(quantity);
+            }
             else
             {
                 var productToPrepare = ProductsToPrepare.SingleOrDefault(p =>
@@ -184,9 +190,10 @@ namespace Sheaft.Domain
                     throw SheaftException.NotFound("Le produit est introuvable dans la préparation.");
 
                 existingPreparedProduct = new PreparedProduct(productToPrepare, purchaseOrderId, quantity);
+                existingPreparedProduct.SetBatches(batches);
                 PreparedProducts.Add(existingPreparedProduct);
             }
-
+            
             if (completed)
                 existingPreparedProduct.CompleteProduct(preparedBy);
 

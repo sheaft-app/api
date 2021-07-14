@@ -31,6 +31,7 @@ namespace Sheaft.Mediatr.Picking.Commands
         public Guid PickingId { get; set; }
         public Guid ProductId { get; set; }
         public IEnumerable<PickingPurchaseOrderProductQuantityDto> Quantities { get; set; }
+        public IEnumerable<Guid> Batches { get; set; }
         public string PreparedBy { get; set; }
         public bool Completed { get; set; }
     }
@@ -64,9 +65,13 @@ namespace Sheaft.Mediatr.Picking.Commands
             if (request.Quantities == null || !request.Quantities.Any())
                 return Failure("Les quantités préparées pour le produit sont requises.");
             
+            var batches = request.Batches != null && request.Batches.Any() ? await _context.Batches
+                .Where(b => request.Batches.Contains(b.Id))
+                .ToListAsync(token) : new List<Domain.Batch>();
+            
             foreach (var quantity in request.Quantities)
                 picking.SetProductPreparedQuantity(request.ProductId, quantity.PurchaseOrderId,
-                    quantity.PreparedQuantity, preparedBy, request.Completed);
+                    quantity.PreparedQuantity, preparedBy, request.Completed, batches);
 
             await _context.SaveChangesAsync(token);
             return Success();

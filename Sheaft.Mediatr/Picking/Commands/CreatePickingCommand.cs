@@ -13,6 +13,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Core.Enums;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Picking.Commands
 {
@@ -61,7 +62,7 @@ namespace Sheaft.Mediatr.Picking.Commands
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
-            
+
             return Success(entity.Id);
         }
     }
