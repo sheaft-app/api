@@ -13,6 +13,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Extensions;
+using Sheaft.Mailer.Helpers;
 
 namespace Sheaft.Mediatr.Delivery.Commands
 {
@@ -57,13 +58,9 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 .SingleAsync(d => d.Id == request.DeliveryId, token);
             
             var producer = await _context.Producers.SingleAsync(p => p.Id == delivery.ProducerId, token);
-            var producerSiret =
-                (await _context.Set<BusinessLegal>().FirstOrDefaultAsync(b => b.UserId == producer.Id, token)).Siret;
             var client = await _context.Users.SingleAsync(s => s.Id == delivery.ClientId, token);
-            var clientSiret =
-                (await _context.Set<BusinessLegal>().FirstOrDefaultAsync(b => b.UserId == client.Id, token)).Siret;
-
-            var data = DeliveryModelHelpers.GetDeliveryFormModel(producer, producerSiret, client, clientSiret, delivery);
+           
+            var data = DeliveryModelHelpers.GetDeliveryFormModel(producer, client, delivery);
             var result = await _pdfGenerator.GeneratePdfAsync("Bon de réception", "DeliveryReceipt", data, token);
             if (!result.Succeeded)
                 return Failure(result);
