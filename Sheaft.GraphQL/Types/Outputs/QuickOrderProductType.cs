@@ -33,6 +33,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("quantity");
 
             descriptor
+                .Field("quantityPerUnit")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.QuantityPerUnit);
+                
+            descriptor
+                .Field("conditioning")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Conditioning);
+                
+            descriptor
+                .Field("unit")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Unit);
+            
+            descriptor
                 .Field("vat")
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Vat);
             

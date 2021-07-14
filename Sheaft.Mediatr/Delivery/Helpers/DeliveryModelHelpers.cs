@@ -45,7 +45,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 }).ToList();
 
             var returnedReturnables = delivery.ReturnedReturnables
-                .Select(r => GetReturnedReturnableModel(r))
+                .Select(GetReturnedReturnableModel)
                 .ToList();
 
             return new DeliveryFormMailerModel()
@@ -90,9 +90,9 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
                 if (purchaseOrder.PickingId.HasValue)
                 {
-                    po.TotalVatPrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalVatPrice);
-                    po.TotalOnSalePrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalOnSalePrice);
-                    po.TotalWholeSalePrice = po.Products.Where(p => p.Quantity > 0).Sum(p => p.TotalWholeSalePrice);
+                    po.TotalVatPrice = po.Products.Sum(p => p.TotalVatPrice);
+                    po.TotalOnSalePrice = po.Products.Sum(p => p.TotalOnSalePrice);
+                    po.TotalWholeSalePrice = po.Products.Sum(p => p.TotalWholeSalePrice);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice;
                     po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice;
                 }
-                
+
                 results.Add(po);
             }
 
@@ -113,7 +113,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             if (purchaseOrder.PickingId.HasValue)
             {
                 products = purchaseOrder.Picking.PreparedProducts
-                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id && p.Quantity > 0)
+                    .Where(p => p.PurchaseOrderId == purchaseOrder.Id)
                     .Select(p => GetProductModel(p, ModificationKind.ToDeliver))
                     .ToList();
             }
@@ -126,7 +126,19 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
             return products;
         }
-        
+
+        private static DeliveryProductMailerModel GetProductModel(PreparedProduct p, ModificationKind rowKind)
+        {
+            var model = GetProductModel((ProductRow) p, rowKind);
+            model.Batches = p.Batches?.Select(b => new BatchMailerModel
+            {
+                Number = b.Batch.Number,
+                DLC = b.Batch.DLC,
+                DLUO = b.Batch.DLUO
+            }).ToList() ?? new List<BatchMailerModel>();
+            return model;
+        }
+
         private static DeliveryProductMailerModel GetProductModel(ProductRow p, ModificationKind rowKind)
         {
             return new DeliveryProductMailerModel()
@@ -134,6 +146,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 Name = p.Name,
                 Quantity = p.Quantity,
                 Reference = p.Reference,
+                Conditioning = GetConditioning(p),
                 RowKind = rowKind,
                 Vat = p.Vat,
                 ProductTotalVatPrice = p.TotalProductVatPrice,
@@ -152,6 +165,27 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 TotalOnSalePrice = p.TotalOnSalePrice,
                 TotalWholeSalePrice = p.TotalWholeSalePrice
             };
+        }
+
+        private static string GetConditioning(ProductRow productRow)
+        {
+            switch (productRow.Conditioning)
+            {
+                case ConditioningKind.Basket:
+                    return $"Panier pour {productRow.QuantityPerUnit:0} personnes";
+                case ConditioningKind.Bouquet:
+                    return $"{productRow.QuantityPerUnit:0} bouquet(s)";
+                case ConditioningKind.Box:
+                    return $"Boite de {productRow.QuantityPerUnit:0}";
+                case ConditioningKind.Bulk:
+                    return $"{productRow.QuantityPerUnit:0}{productRow.Unit:G}";
+                case ConditioningKind.Piece:
+                    return $"{productRow.QuantityPerUnit:0} pièce(s)";
+                case ConditioningKind.Bunch:
+                    return $"{productRow.QuantityPerUnit:0} botte(s)";
+                    default:
+                    return string.Empty;
+            }
         }
 
         private static List<DeliveryReturnableMailerModel> GetReturnablesModel(Domain.PurchaseOrder purchaseOrder)

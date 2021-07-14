@@ -15,6 +15,9 @@ namespace Sheaft.Domain
 
         protected ProductRow(ProductRow product)
         {
+            Unit = product.Unit;
+            Conditioning = product.Conditioning;
+            QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = product.UnitWholeSalePrice;
             UnitOnSalePrice = product.UnitOnSalePrice;
             UnitVatPrice = product.UnitVatPrice;
@@ -54,6 +57,9 @@ namespace Sheaft.Domain
         
         protected ProductRow(ProductRow product, int quantity)
         {
+            Unit = product.Unit;
+            Conditioning = product.Conditioning;
+            QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = product.UnitWholeSalePrice;
             UnitOnSalePrice = product.UnitOnSalePrice;
             UnitVatPrice = product.UnitVatPrice;
@@ -82,6 +88,9 @@ namespace Sheaft.Domain
         {
             var productPrice = product.CatalogsPrices.Single(p => p.CatalogId == catalogId);
             
+            Unit = product.Unit;
+            Conditioning = product.Conditioning;
+            QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = productPrice.WholeSalePricePerUnit;
             UnitOnSalePrice = productPrice.OnSalePricePerUnit;
             UnitVatPrice = productPrice.VatPricePerUnit;
@@ -139,6 +148,9 @@ namespace Sheaft.Domain
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
+        public UnitKind Unit { get; private set; }
+        public decimal QuantityPerUnit { get; private set; }
+        public ConditioningKind Conditioning { get; private set; }
         public Guid ProductId { get; private set; }
         public byte[] RowVersion { get; private set; }
 
