@@ -7,6 +7,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Pickings;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.Infrastructure.Persistence;
@@ -140,6 +141,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Reference)
                 .Name("reference")
                 .Type<NonNullType<StringType>>();
+
+            descriptor
+                .Field("batches")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<PreparedProductResolvers>(c => c.GetBatches(default, default, default, default))
+                .Type<ListType<BatchType>>();
         }
 
         private class PreparedProductResolvers
@@ -148,6 +155,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 PurchaseOrdersByIdBatchDataLoader purchaseOrdersBatchDataLoader, CancellationToken token)
             {
                 return purchaseOrdersBatchDataLoader.LoadAsync(product.PurchaseOrderId, token);
+            }
+
+            public async Task<IEnumerable<Batch>> GetBatches(PreparedProduct product,
+                [ScopedService] QueryDbContext context,
+                BatchesByIdBatchDataLoader batchesBatchDataLoader, CancellationToken token)
+            {
+                var batchIds = await context.Set<PreparedProductBatch>()
+                    .Where(pb => pb.PreparedProductId == product.Id)
+                    .Select(pb => pb.BatchId)
+                    .ToListAsync(token);
+                
+                return await batchesBatchDataLoader.LoadAsync(batchIds, token);
             }
         }
     }

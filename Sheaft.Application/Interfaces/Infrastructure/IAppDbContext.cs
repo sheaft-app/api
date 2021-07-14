@@ -18,7 +18,9 @@ namespace Sheaft.Application.Interfaces.Infrastructure
     {
         public DbSet<TEntity> Set<TEntity>()
             where TEntity : class;
+        
         DbSet<Domain.Agreement> Agreements { get; set; }
+        DbSet<Batch> Batches { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
         DbSet<Domain.Card> Cards { get; set; }
         DbSet<Domain.Catalog> Catalogs { get; set; }

@@ -34,6 +34,11 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.Quantities)
                 .Type<ListType<PickingPurchaseOrderProductQuantityInputType>>()
                 .Name("preparedQuantities");
+            
+            descriptor
+                .Field(c => c.Batches)
+                .ID(nameof(Batch))
+                .Name("batches");
         }
     }
 }
