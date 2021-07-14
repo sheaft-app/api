@@ -46,7 +46,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("preparedOn");
 
             descriptor
-                .Field("prepared")
+                .Field("completed")
                 .Resolve(ctx => ctx.Parent<PreparedProduct>().PreparedOn.HasValue);
 
             descriptor

@@ -21,7 +21,7 @@ namespace Sheaft.Domain
         public PurchaseOrder(Guid id, int reference, PurchaseOrderStatus status, Producer producer, Order order)
         {
             if (producer == null)
-                throw SheaftException.Validation("Impossible de créer la commande, le vendeur est requis.");
+                throw SheaftException.Validation("Impossible de créer la commande, le producteur est requis.");
 
             Id = id;
 
@@ -52,6 +52,39 @@ namespace Sheaft.Domain
             foreach (var orderProduct in orderProducts)
                 AddProduct(orderProduct);
         }
+        public PurchaseOrder(Guid id, int reference, PurchaseOrderStatus status, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, DeliveryMode deliveryMode, Producer producer, User client, IEnumerable<KeyValuePair<Domain.Product, int>> products, Catalog catalog, bool skipNotification, string comment = null)
+        {
+            if (producer == null)
+                throw SheaftException.Validation("Impossible de créer la commande, le producteur est requis.");
+
+            Id = id;
+            Products = new List<PurchaseOrderProduct>();
+            DomainEvents = new List<DomainEvent> {new PurchaseOrderCreatedEvent(Id)};
+            Status = PurchaseOrderStatus.Waiting;
+            CreatedOn = DateTimeOffset.UtcNow;
+            
+            SetSender(client);
+            SetVendor(producer);
+
+            var address = (int) deliveryMode.Kind <= 4
+                ? new ExpectedAddress(deliveryMode.Address.Line1, deliveryMode.Address.Line2,
+                    deliveryMode.Address.Zipcode, deliveryMode.Address.City,
+                    deliveryMode.Address.Country, deliveryMode.Address.Longitude,
+                    deliveryMode.Address.Latitude)
+                : new ExpectedAddress(client.Address.Line1, client.Address.Line2, client.Address.Zipcode,
+                    client.Address.City, client.Address.Country, client.Address.Longitude,
+                    client.Address.Latitude);
+
+            ExpectedDelivery = new ExpectedPurchaseOrderDelivery(deliveryMode, expectedDeliveryDate, from, to, address);
+            
+            SetComment(comment);
+            SetReference(reference);
+
+            foreach (var product in products)
+                AddProduct(new PurchaseOrderProduct(product.Key, catalog.Id, product.Value));
+            
+            SetStatus(status, skipNotification);
+        }
 
         public Guid Id { get; }
         public DateTimeOffset CreatedOn { get; private set; }
@@ -77,7 +110,7 @@ namespace Sheaft.Domain
         public decimal TotalOnSalePrice { get; private set; }
         public decimal TotalWeight { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
-        public Guid OrderId { get; private set; }
+        public Guid? OrderId { get; private set; }
         public Guid ProducerId { get; private set; }
         public Guid ClientId { get; private set; }
         public Guid? DeliveryId { get; private set; }

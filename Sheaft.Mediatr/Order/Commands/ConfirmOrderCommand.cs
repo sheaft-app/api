@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 var producerIds = order.Products.Select(p => p.Producer.Id).Distinct();
                 foreach (var producerId in producerIds)
                 {
-                    var result = await _mediatr.Process(new CreatePurchaseOrderCommand(request.RequestUser)
+                    var result = await _mediatr.Process(new CreatePurchaseOrderFromOrderCommand(request.RequestUser)
                     {
                         OrderId = order.Id,
                         ProducerId = producerId,

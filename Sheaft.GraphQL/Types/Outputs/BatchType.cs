@@ -32,6 +32,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.CreatedOn)
                 .Name("createdOn");
+            
+            descriptor
+                .Field(c => c.Comment)
+                .Name("comment");
         }
     }
 }
