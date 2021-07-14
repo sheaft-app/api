@@ -116,6 +116,18 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.HasReturnable)
                 .Name("isReturnable");
+            
+            descriptor
+                .Field(c => c.QuantityPerUnit)
+                .Name("quantityPerUnit");
+                
+            descriptor
+                .Field(c => c.Conditioning)
+                .Name("conditioning");
+                
+            descriptor
+                .Field(c => c.Unit)
+                .Name("unit");
 
             descriptor
                 .Field(c => c.ReturnableId)
