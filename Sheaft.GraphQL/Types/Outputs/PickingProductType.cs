@@ -113,7 +113,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field("purchaseOrder")
                 .ResolveWith<PickingProductResolvers>(c => c.GetPurchaseOrder(default, default, default))
-                .Type<ListType<PurchaseOrderType>>();
+                .Type<PurchaseOrderType>();
             
             descriptor
                 .Field(c => c.Name)
