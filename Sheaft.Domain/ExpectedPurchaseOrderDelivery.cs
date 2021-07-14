@@ -10,15 +10,20 @@ namespace Sheaft.Domain
         }
         
         public ExpectedPurchaseOrderDelivery(OrderDelivery delivery, ExpectedAddress address)
+            : this(delivery.DeliveryMode, delivery.ExpectedDeliveryDate, delivery.From, delivery.To, address)
         {
-            DeliveryModeId = delivery.DeliveryModeId;
+        }
+        
+        public ExpectedPurchaseOrderDelivery(DeliveryMode deliveryMode, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, ExpectedAddress address)
+        {
+            DeliveryModeId = deliveryMode.Id;
             Address = address;
-            Day = delivery.Day;
-            From = delivery.From;
-            Kind = delivery.DeliveryMode.Kind;
-            Name = delivery.DeliveryMode.Name;
-            To = delivery.To;
-            ExpectedDeliveryDate = delivery.ExpectedDeliveryDate;
+            Day = expectedDeliveryDate.DayOfWeek;
+            From = from;
+            Kind = deliveryMode.Kind;
+            Name = deliveryMode.Name;
+            To = to;
+            ExpectedDeliveryDate = expectedDeliveryDate;
         }
         
         public string Name { get; private set; }

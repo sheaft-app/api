@@ -19,6 +19,11 @@ namespace Sheaft.Domain
         {
         }
 
+        public PurchaseOrderProduct(Product product, Guid catalogId, int quantity)
+            : base(product, catalogId, quantity)
+        {
+        }
+
         public Guid PurchaseOrderId { get; private set; }
     }
 }

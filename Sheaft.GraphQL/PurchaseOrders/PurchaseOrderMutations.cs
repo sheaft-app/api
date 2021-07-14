@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -25,6 +26,18 @@ namespace Sheaft.GraphQL.PurchaseOrders
             IHttpContextAccessor httpContextAccessor)
             : base(currentUserService, httpContextAccessor)
         {
+        }
+
+        [GraphQLName("createPurchaseOrder")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(PurchaseOrderType))]
+        public async Task<PurchaseOrder> CreatePurchaseOrderAsync(
+            [GraphQLType(typeof(CreatePurchaseOrderInputType))] [GraphQLName("input")]
+            CreatePurchaseOrderCommand input, [Service] ISheaftMediatr mediatr,
+            PurchaseOrdersByIdBatchDataLoader purchaseOrdersDataLoader, CancellationToken token)
+        {
+            var result = await ExecuteAsync<CreatePurchaseOrderCommand, Guid>(mediatr, input, token);
+            return await purchaseOrdersDataLoader.LoadAsync(result, token);
         }
 
         [GraphQLName("acceptPurchaseOrders")]
