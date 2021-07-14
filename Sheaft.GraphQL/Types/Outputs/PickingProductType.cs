@@ -1,8 +1,11 @@
+using System.Threading;
+using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.Pickings;
+using Sheaft.GraphQL.PurchaseOrders;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -108,6 +111,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("purchaseOrderId");
             
             descriptor
+                .Field("purchaseOrder")
+                .ResolveWith<PickingProductResolvers>(c => c.GetPurchaseOrder(default, default, default))
+                .Type<ListType<PurchaseOrderType>>();
+            
+            descriptor
                 .Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();
@@ -116,6 +124,15 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Reference)
                 .Name("reference")
                 .Type<NonNullType<StringType>>();
+        }
+
+        private class PickingProductResolvers
+        {
+            public Task<PurchaseOrder> GetPurchaseOrder(PickingProduct product,
+                PurchaseOrdersByIdBatchDataLoader purchaseOrdersBatchDataLoader, CancellationToken token)
+            {
+                return purchaseOrdersBatchDataLoader.LoadAsync(product.PurchaseOrderId, token);
+            }
         }
     }
 }
