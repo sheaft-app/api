@@ -56,7 +56,10 @@ namespace Sheaft.Mediatr.Picking.Commands
                 .SingleOrDefaultAsync(c => c.Id == request.PickingId, token);
             if (picking == null)
                 return Failure("La préparation est introuvable.");
-
+            
+            if (picking.ProductsToPrepare.Select(pp => pp.ProductId).Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
+                return Failure("Certain produits n'ont pas été préparés.");
+            
             if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
                 return Failure("Certaines quantités de produits n'ont pas été validées.");
             

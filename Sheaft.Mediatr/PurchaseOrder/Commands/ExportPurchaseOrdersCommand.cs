@@ -84,7 +84,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                     throw purchaseOrdersExportResult.Exception;
 
                 var response = await _blobService.UploadUserPurchaseOrdersFileAsync(job.UserId, job.Id,
-                    $"Commandes{request.From:dd-MM-yyyy}_{request.To:dd-MM-yyyy}.{purchaseOrdersExportResult.Data.Extension}", purchaseOrdersExportResult.Data.Data, token);
+                    $"Commandes_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{purchaseOrdersExportResult.Data.Extension}", purchaseOrdersExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 

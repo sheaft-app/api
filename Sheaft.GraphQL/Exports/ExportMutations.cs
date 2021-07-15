@@ -12,6 +12,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Jobs;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.Transaction.Commands;
@@ -51,6 +52,19 @@ namespace Sheaft.GraphQL.Exports
         {
             var result =
                 await ExecuteAsync<QueueExportPurchaseOrdersCommand, Guid>(mediatr, input, token);
+            return await jobsDataLoader.LoadAsync(result, token);
+        }
+
+        [GraphQLName("exportDeliveries")]
+        [Authorize(Policy = Policies.STORE_OR_PRODUCER)]
+        [GraphQLType(typeof(JobType))]
+        public async Task<Job> ExportDeliveriesAsync(
+            [GraphQLType(typeof(QueueExportDeliveriesInputType))] [GraphQLName("input")]
+            QueueExportDeliveriesCommand input, [Service] ISheaftMediatr mediatr,
+            JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
+        {
+            var result =
+                await ExecuteAsync<QueueExportDeliveriesCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 

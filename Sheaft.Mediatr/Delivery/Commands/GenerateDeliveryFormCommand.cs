@@ -9,9 +9,8 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
-using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Extensions;
+using Sheaft.Mailer.Helpers;
 
 namespace Sheaft.Mediatr.Delivery.Commands
 {
@@ -66,7 +65,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var clientSiret =
                 (await _context.Set<BusinessLegal>().FirstOrDefaultAsync(b => b.UserId == client.Id, token)).Siret;
 
-            var data = DeliveryModelHelpers.GetDeliveryFormModel(producer, producerSiret, client, clientSiret, delivery);
+            var data = DeliveryModelHelpers.GetDeliveryFormModel(producer, client, delivery, producerSiret, clientSiret);
             var result = await _pdfGenerator.GeneratePdfAsync("Bon de livraison", "DeliveryForm", data, token);
             if (!result.Succeeded)
                 return Failure(result);

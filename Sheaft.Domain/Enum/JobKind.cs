@@ -6,5 +6,7 @@ namespace Sheaft.Domain.Enum
         ImportProducts,
         ExportUserData,
         ExportUserTransactions,
+        ExportUserPurchaseOrders,
+        ExportUserDeliveries,
     }
 }

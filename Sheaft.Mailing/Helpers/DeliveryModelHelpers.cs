@@ -6,12 +6,12 @@ using Sheaft.Domain.Enum;
 using Sheaft.Domain.Extensions;
 using Sheaft.Mailing;
 
-namespace Sheaft.Mediatr.Delivery.Commands
+namespace Sheaft.Mailer.Helpers
 {
-    internal static class DeliveryModelHelpers
+    public static class DeliveryModelHelpers
     {
-        public static DeliveryFormMailerModel GetDeliveryFormModel(Domain.Producer producer, string producerSiret,
-            Domain.User client, string clientSiret, Domain.Delivery delivery)
+        public static DeliveryFormMailerModel GetDeliveryFormModel(Domain.User producer, Domain.User client,
+            Domain.Delivery delivery, string producerSiret = null, string clientSiret = null)
         {
             var purchaseOrders = GetPurchaseOrders(delivery.PurchaseOrders);
 
@@ -84,6 +84,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 {
                     Reference = purchaseOrder.Reference.AsPurchaseOrderIdentifier(),
                     CreatedOn = purchaseOrder.CreatedOn,
+                    ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                     Products = GetProductsModel(purchaseOrder),
                     Returnables = GetReturnablesModel(purchaseOrder)
                 };
@@ -146,7 +147,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 Name = p.Name,
                 Quantity = p.Quantity,
                 Reference = p.Reference,
-                Conditioning = GetConditioning(p),
+                Conditioning = p.GetConditioning(),
                 RowKind = rowKind,
                 Vat = p.Vat,
                 ProductTotalVatPrice = p.TotalProductVatPrice,
@@ -165,27 +166,6 @@ namespace Sheaft.Mediatr.Delivery.Commands
                 TotalOnSalePrice = p.TotalOnSalePrice,
                 TotalWholeSalePrice = p.TotalWholeSalePrice
             };
-        }
-
-        private static string GetConditioning(ProductRow productRow)
-        {
-            switch (productRow.Conditioning)
-            {
-                case ConditioningKind.Basket:
-                    return $"Panier pour {productRow.QuantityPerUnit:0} personnes";
-                case ConditioningKind.Bouquet:
-                    return $"{productRow.QuantityPerUnit:0} bouquet(s)";
-                case ConditioningKind.Box:
-                    return $"Boite de {productRow.QuantityPerUnit:0}";
-                case ConditioningKind.Bulk:
-                    return $"{productRow.QuantityPerUnit:0}{productRow.Unit:G}";
-                case ConditioningKind.Piece:
-                    return $"{productRow.QuantityPerUnit:0} pièce(s)";
-                case ConditioningKind.Bunch:
-                    return $"{productRow.QuantityPerUnit:0} botte(s)";
-                    default:
-                    return string.Empty;
-            }
         }
 
         private static List<DeliveryReturnableMailerModel> GetReturnablesModel(Domain.PurchaseOrder purchaseOrder)

@@ -186,4 +186,29 @@ namespace Sheaft.Domain
             RefreshLine();
         }
     }
+
+    public static class ProductRowExtensions
+    {
+        
+        public static string GetConditioning(this ProductRow productRow)
+        {
+            switch (productRow.Conditioning)
+            {
+                case ConditioningKind.Basket:
+                    return $"Panier pour {productRow.QuantityPerUnit:0} personnes";
+                case ConditioningKind.Bouquet:
+                    return $"{productRow.QuantityPerUnit:0} bouquet(s)";
+                case ConditioningKind.Box:
+                    return $"Boite de {productRow.QuantityPerUnit:0}";
+                case ConditioningKind.Bulk:
+                    return $"{productRow.QuantityPerUnit:0}{productRow.Unit:G}";
+                case ConditioningKind.Piece:
+                    return $"{productRow.QuantityPerUnit:0} pièce(s)";
+                case ConditioningKind.Bunch:
+                    return $"{productRow.QuantityPerUnit:0} botte(s)";
+                default:
+                    return string.Empty;
+            }
+        }
+    }
 }

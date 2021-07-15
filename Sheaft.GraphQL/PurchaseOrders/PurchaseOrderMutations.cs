@@ -123,15 +123,5 @@ namespace Sheaft.GraphQL.PurchaseOrders
             await ExecuteAsync(mediatr, input, token);
             return await purchaseOrdersDataLoader.LoadAsync(input.PurchaseOrderIds.ToList(), token);
         }
-
-        [GraphQLName("deleteConsumerOrder")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> DeletePurchaseOrdersAsync(
-            [GraphQLType(typeof(DeletePurchaseOrdersInputType))] [GraphQLName("input")]
-            DeletePurchaseOrdersCommand input, [Service] ISheaftMediatr mediatr,
-            CancellationToken token)
-        {
-            return await ExecuteAsync(mediatr, input, token);
-        }
     }
 }
