@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -88,6 +88,9 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.Deliveries =
                     await _context.Deliveries.CountAsync(c => c.ClientId == requestUser.Id || c.ProducerId == requestUser.Id,
                         token);
+                ViewBag.Batches =
+                    await _context.Batches.CountAsync(c => c.ProducerId == requestUser.Id,
+                        token);
             }
             else
             {
@@ -109,6 +112,7 @@ namespace Sheaft.Web.Manage.Controllers
                 ViewBag.PreAuthorizations = await _context.PreAuthorizations.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.DeliveryBatches = await _context.DeliveryBatches.CountAsync(c => !c.RemovedOn.HasValue, token);
                 ViewBag.Deliveries = await _context.Deliveries.CountAsync(token);
+                ViewBag.Batches = await _context.Batches.CountAsync(token);
             }
 
             ViewBag.RequestUser = requestUser;

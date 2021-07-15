@@ -1,4 +1,4 @@
-﻿@using Sheaft.Domain
+@using Sheaft.Domain
 @using Sheaft.Application.Extensions
 @{
     ViewData["Title"] = "Dashboard";
@@ -67,6 +67,13 @@
                 <h5 class="card-title">DeliveryModes</h5>
                 <h6 class="card-subtitle mb-2 text-muted">@ViewBag.DeliveryModes</h6>
                 <a asp-controller="deliveryModes" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Batches</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Batches</h6>
+                <a asp-controller="Batches" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
     }

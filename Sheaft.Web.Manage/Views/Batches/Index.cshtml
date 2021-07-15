@@ -1,0 +1,82 @@
+﻿@using Sheaft.Domain.Enum
+@using Sheaft.Domain.Extensions
+@using Sheaft.Web.Manage.Extensions
+@model IEnumerable<ShortBatchViewModel>
+@{
+    ViewData["Title"] = "Batches";
+    int take = ViewBag.Take;
+    int currentPage = ViewBag.Page;
+    Guid? imperonatingId = Context.Request.ImpersonificationId();
+}
+
+<div class="container">
+    <h2 class="display-5">Batches</h2>
+    <br/>
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Number</th>
+            <th scope="col">CreatedOn</th>
+            <th scope="col">Producer</th>
+            <th scope="col">DLC</th>
+            <th scope="col">DLUO</th>
+            <th scope="col">Removed</th>
+            <th scope="col">Comment</th>
+                <th scope="col">
+                    <a asp-controller="Batches" asp-action="Add" class="btn btn-success">
+                        <i class="fa fa-plus"></i>
+                    </a>
+                </th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var entity in Model)
+        {
+            <tr>
+                <td>@entity.Number</td>
+                <td>@entity.CreatedOn.ToString("dd/MM/yy hh:mm")</td>
+                <td>
+                    @entity.Producer.Name
+                    @if (!imperonatingId.HasValue)
+                    {
+                        @using (Html.BeginForm("ImpersonateById", "Account", new {id = entity.ProducerId}, FormMethod.Post, true, new {@class = "form d-inline"}))
+                        {
+                            <button type="submit" class="btn btn-info">
+                                <i class="fa fa-user-secret"></i>
+                            </button>
+                        }
+                    }
+                </td>
+                <td>@entity.DLC</td>
+                <td>@entity.DLUO</td>
+                <td>@entity.RemovedOn.HasValue</td>
+                <td>@entity.Comment</td>
+                <td>
+                    <a asp-controller="Batches" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+        <tr class="text-center">
+            <td colspan="7">
+                @if (currentPage >= 1)
+                {
+                    <a asp-controller="Batches" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage - 1)" class="btn btn-outline-secondary">
+                        <i class="fa fa-caret-left"></i>
+                    </a>
+                }
+                @if (take == Model.Count())
+                {
+                    <a asp-controller="Batches" asp-action="Index" asp-route-take="@take" asp-route-page="@(currentPage + 1)" class="btn btn-outline-secondary">
+                        <i class="fa fa-caret-right"></i>
+                    </a>
+                }
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
