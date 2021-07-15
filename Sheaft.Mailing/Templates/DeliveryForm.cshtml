@@ -91,23 +91,21 @@
                 <td style="padding: 10px 15px;vertical-align: center;">
                     @if (product.Quantity > 0)
                     {
-                        <ul>
-                            @foreach (var batch in product.Batches)
+                        @foreach (var batch in product.Batches)
+                        {
+                            if (batch.DLC.HasValue)
                             {
-                                if (batch.DLC.HasValue)
-                                {
-                                    <li>N°@batch.Number - DLC: @batch.DLC.Value.ToString("dd/MM/yyyy")</li>
-                                }
-                                else if (batch.DLUO.HasValue)
-                                {
-                                    <li>N°@batch.Number - DLUO: @batch.DLUO.Value.ToString("dd/MM/yyyy")</li>
-                                }
-                                else
-                                {
-                                    <li>N°@batch.Number</li>
-                                }
+                                <p>@batch.Number - DLC: @batch.DLC.Value.ToString("dd/MM/yyyy")</p>
                             }
-                        </ul>
+                            else if (batch.DLUO.HasValue)
+                            {
+                                <p>@batch.Number - DLUO: @batch.DLUO.Value.ToString("dd/MM/yyyy")</p>
+                            }
+                            else
+                            {
+                                <p>@batch.Number</p>
+                            }
+                        }
                     }
                 </td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
@@ -120,6 +118,7 @@
         {
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">Consigne - @returnable.Name</td>
+                <td/>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Quantity</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
@@ -155,6 +154,7 @@
                 {
                     <tr>
                         <td style="padding: 10px 15px;vertical-align: center;">Consigne - @returnable.Name</td>
+                        <td/>
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Quantity</td>
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
@@ -173,6 +173,7 @@
         {
             <tr >
                 <td style="padding: 10px 15px;vertical-align: center;">@product.Name</td>
+                <td/>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Quantity</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
@@ -203,13 +204,13 @@
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <tbody>
     <tr style="border:none;">
-        <td style="border:none; padding:10px 0px;">
+        <td style="border:none;">
             <strong>Remarques :</strong>
         </td>
     </tr>
-    <tr>
-        <td>
-            <div style="min-height: 120px;border: #dddddd solid 1px; margin: 10px;">@Model.Comment</div>
+    <tr style="border:none!important;">
+        <td style="border:none!important;">
+            <div style="min-height: 120px;border: #dddddd solid 1px; padding: 10px;">@Model.Comment</div>
         </td>
     </tr>
     </tbody>
