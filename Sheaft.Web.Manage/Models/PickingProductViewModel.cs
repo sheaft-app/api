@@ -3,9 +3,8 @@ using Sheaft.Domain.Enum;
 
 namespace Sheaft.Web.Manage.Models
 {
-    public class DeliveryProductViewModel
+    public class PickingProductViewModel
     {
-        
         public Guid Id { get; set; }
         public DateTimeOffset CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
@@ -38,7 +37,7 @@ namespace Sheaft.Web.Manage.Models
         public decimal QuantityPerUnit { get; set; }
         public ConditioningKind Conditioning { get; set; }
         public Guid ProductId { get; set; }
-        public ModificationKind RowKind { get; set; }
-        public Guid DeliveryId { get; set; }
+        public Guid PickingId { get; set; }
+        public Guid PurchaseOrderId { get; set; }
     }
 }
