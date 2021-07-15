@@ -50,7 +50,7 @@ namespace Sheaft.Business
                     {
                         picking ??= new AvailablePickingDto
                         {
-                            Name = purchaseOrder.ExpectedDelivery.Name,
+                            Name = $"Préparation pour le {purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate:dd/MM/yyyy}",
                             ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                             Clients = new List<AvailableClientPickingDto>()
                         };
