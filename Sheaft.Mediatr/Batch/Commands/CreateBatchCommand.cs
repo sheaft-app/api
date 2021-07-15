@@ -24,6 +24,7 @@ namespace Sheaft.Mediatr.Batch.Commands
         [JsonConstructor]
         public CreateBatchCommand(RequestUser requestUser) : base(requestUser)
         {
+            ProducerId = requestUser.Id;
         }
 
         public Guid ProducerId { get; set; }

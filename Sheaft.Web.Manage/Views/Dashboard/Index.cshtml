@@ -69,6 +69,34 @@
                 <a asp-controller="deliveryModes" asp-action="index" class="card-link">Show</a>
             </div>
         </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Batches</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Batches</h6>
+                <a asp-controller="Batches" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Pickings</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Pickings</h6>
+                <a asp-controller="Pickings" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">DeliveryBatches</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.DeliveryBatches</h6>
+                <a asp-controller="DeliveryBatches" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
+        <div class="card w-25 d-inline-block">
+            <div class="card-body">
+                <h5 class="card-title">Deliveries</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Deliveries</h6>
+                <a asp-controller="Deliveries" asp-action="index" class="card-link">Show</a>
+            </div>
+        </div>
     }
     @if (!user.IsInRole("CONSUMER"))
     {
@@ -102,20 +130,6 @@
             <h5 class="card-title">Purchase Orders</h5>
             <h6 class="card-subtitle mb-2 text-muted">@ViewBag.PurchaseOrders</h6>
             <a asp-controller="purchaseOrders" asp-action="index" class="card-link">Show</a>
-        </div>
-    </div>
-    <div class="card w-25 d-inline-block">
-        <div class="card-body">
-            <h5 class="card-title">DeliveryBatches</h5>
-            <h6 class="card-subtitle mb-2 text-muted">@ViewBag.DeliveryBatches</h6>
-            <a asp-controller="DeliveryBatches" asp-action="index" class="card-link">Show</a>
-        </div>
-    </div>
-    <div class="card w-25 d-inline-block">
-        <div class="card-body">
-            <h5 class="card-title">Deliveries</h5>
-            <h6 class="card-subtitle mb-2 text-muted">@ViewBag.Deliveries</h6>
-            <a asp-controller="Deliveries" asp-action="index" class="card-link">Show</a>
         </div>
     </div>
     <div class="card w-25 d-inline-block">
