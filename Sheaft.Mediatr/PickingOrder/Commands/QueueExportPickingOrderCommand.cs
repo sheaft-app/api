@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.PickingOrder.Commands
                 {JobId = Guid.NewGuid(), PurchaseOrderIds = request.PurchaseOrderIds};
 
             var entity = new Domain.Job(command.JobId, JobKind.ExportPickingOrders,
-                request.Name ?? $"Export bon préparation",
+                request.Name ?? $"Export du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}",
                 producer, command);
 
             await _context.AddAsync(entity, token);

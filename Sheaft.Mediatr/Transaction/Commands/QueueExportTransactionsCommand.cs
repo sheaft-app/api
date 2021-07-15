@@ -29,6 +29,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
         public Guid UserId { get; set; }
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
+        public string Name { get; set; }
 
         public override void SetRequestUser(RequestUser user)
         {
@@ -56,7 +57,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
 
             var command = new ExportTransactionsCommand(request.RequestUser)
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To};
-            var entity = new Domain.Job(command.JobId, JobKind.ExportUserTransactions, $"Export Virements", sender, command);
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserTransactions, request.Name ?? $"Export du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

@@ -37,6 +37,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
         public IEnumerable<DeliveryKind> Kinds { get; set; }
+        public string Name { get; set; }
 
         public override void SetRequestUser(RequestUser user)
         {
@@ -65,7 +66,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
             var command = new ExportDeliveriesCommand(request.RequestUser)
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To, Kinds = request.Kinds};
             
-            var entity = new Domain.Job(command.JobId, JobKind.ExportUserDeliveries, $"Export Livraisons", sender, command);
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserDeliveries, request.Name ?? $"Export du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

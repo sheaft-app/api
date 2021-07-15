@@ -18,6 +18,14 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.To)
                 .Name("to");
+                
+            descriptor
+                .Field(c => c.Kinds)
+                .Name("kinds");
+            
+            descriptor
+                .Field(c => c.Name)
+                .Name("name");
         }
     }
 }
