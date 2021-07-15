@@ -6,5 +6,6 @@
         PuchaseOrdersExporter,
         PickingOrdersExporter,
         TransactionsExporter,
+        DeliveriesExporter,
     }
 }

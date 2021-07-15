@@ -316,6 +316,33 @@ namespace Sheaft.Infrastructure.Services
             return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
         }
 
+        public async Task<Result<string>> UploadUserDeliveriesFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
+            CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/exports/{jobId:N}/{SanitizeFileName(filename)}");
+            await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+
+            using (var ms = new MemoryStream(data))
+                await blobClient.UploadAsync(ms, token);
+
+            var sasBuilder = new BlobSasBuilder()
+            {
+                BlobContainerName = _storageOptions.Containers.Deliveries,
+                BlobName = blobClient.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddYears(10)
+            };
+
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+        }
+
         public async Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)
         {
             var containerClient =

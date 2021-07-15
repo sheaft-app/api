@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -17,16 +19,16 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Transaction.Commands;
 
-namespace Sheaft.Mediatr.PurchaseOrder.Commands
+namespace Sheaft.Mediatr.Delivery.Commands
 {
-    public class QueueExportPurchaseOrdersCommand : Command<Guid>
+    public class QueueExportDeliveriesCommand : Command<Guid>
     {
-        protected QueueExportPurchaseOrdersCommand()
+        protected QueueExportDeliveriesCommand()
         {
             
         }
         [JsonConstructor]
-        public QueueExportPurchaseOrdersCommand(RequestUser requestUser) : base(requestUser)
+        public QueueExportDeliveriesCommand(RequestUser requestUser) : base(requestUser)
         {
             UserId = RequestUser.Id;
         }
@@ -34,6 +36,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         public Guid UserId { get; set; }
         public DateTimeOffset From { get; set; }
         public DateTimeOffset To { get; set; }
+        public IEnumerable<DeliveryKind> Kinds { get; set; }
 
         public override void SetRequestUser(RequestUser user)
         {
@@ -42,33 +45,32 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
         }
     }
 
-    public class QueueExportPurchaseOrdersCommandHandler : CommandsHandler,
-        IRequestHandler<QueueExportPurchaseOrdersCommand, Result<Guid>>
+    public class QueueExportDeliveriesCommandHandler : CommandsHandler,
+        IRequestHandler<QueueExportDeliveriesCommand, Result<Guid>>
     {
-        public QueueExportPurchaseOrdersCommandHandler(
+        public QueueExportDeliveriesCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<QueueExportPurchaseOrdersCommandHandler> logger)
+            ILogger<QueueExportDeliveriesCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<Guid>> Handle(QueueExportPurchaseOrdersCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportDeliveriesCommand request, CancellationToken token)
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
                 return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
-            var command = new ExportPurchaseOrdersCommand(request.RequestUser)
-                {JobId = Guid.NewGuid(), From = request.From, To = request.To};
+            var command = new ExportDeliveriesCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), From = request.From, To = request.To, Kinds = request.Kinds};
             
-            var entity = new Domain.Job(command.JobId, JobKind.ExportUserPurchaseOrders, $"Export Commandes", sender, command);
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserDeliveries, $"Export Livraisons", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
 
             _mediatr.Post(command);
-            
             return Success(entity.Id);
         }
     }

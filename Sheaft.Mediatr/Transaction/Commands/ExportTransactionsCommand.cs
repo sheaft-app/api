@@ -77,7 +77,7 @@ namespace Sheaft.Mediatr.Transaction.Commands
                     throw transactionsExportResult.Exception;
 
                 var response = await _blobService.UploadUserTransactionsFileAsync(job.UserId, job.Id,
-                    $"Virements_{request.From:dd-MM-yyyy}_{request.To:dd-MM-yyyy}.{transactionsExportResult.Data.Extension}", transactionsExportResult.Data.Data, token);
+                    $"Virements_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{transactionsExportResult.Data.Extension}", transactionsExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
                 
