@@ -21,12 +21,8 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("dlc");
             
             descriptor
-                .Field(c => c.DLUO)
-                .Name("dluo");
-            
-            descriptor
-                .Field(c => c.Comment)
-                .Name("comment");
+                .Field(c => c.DDM)
+                .Name("ddm");
         }
     }
 }

@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Models;
+using Sheaft.Core;
+using Sheaft.Domain;
+using Sheaft.Domain.Common;
+
+namespace Sheaft.Mediatr.BatchObservation.Commands
+{
+    public class UpdateBatchObservationCommand : Command
+    {
+        protected UpdateBatchObservationCommand()
+        {
+        }
+
+        [JsonConstructor]
+        public UpdateBatchObservationCommand(RequestUser requestUser) : base(requestUser)
+        {
+        }
+
+        public Guid BatchObservationId { get; set; }
+        public string Comment { get; set; }
+    }
+
+    public class UpdateBatchObservationCommandHandler : CommandsHandler,
+        IRequestHandler<UpdateBatchObservationCommand, Result>
+    {
+        public UpdateBatchObservationCommandHandler(
+            ISheaftMediatr mediatr,
+            IAppDbContext context,
+            ILogger<UpdateBatchObservationCommandHandler> logger)
+            : base(mediatr, context, logger)
+        {
+        }
+
+        public async Task<Result> Handle(UpdateBatchObservationCommand request, CancellationToken token)
+        {
+            var batch = await _context.Batches.SingleOrDefaultAsync(b => b.Observations.Any(o => o.Id == request.BatchObservationId), token);
+            if (batch == null)
+                return Failure("Le lot est introuvable.");
+
+            batch.UpdateObservation(request.BatchObservationId, request.Comment);
+
+            await _context.SaveChangesAsync(token);
+            return Success();
+        }
+    }
+}

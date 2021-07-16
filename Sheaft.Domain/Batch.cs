@@ -1,4 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Sheaft.Core.Exceptions;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
@@ -9,12 +14,15 @@ namespace Sheaft.Domain
         {
         }
 
-        public Batch(Guid id, string number, Producer producer)
+        public Batch(Guid id, string number, Producer producer, BatchDefinition definition)
         {
             Id = id;
             Number = number;
             ProducerId = producer.Id;
             Producer = producer;
+            DefinitionId = definition.Id;
+            Definition = definition;
+            JsonFields = "[]";
         }
 
         public Guid Id { get; private set; }
@@ -23,11 +31,15 @@ namespace Sheaft.Domain
         public DateTimeOffset? UpdatedOn { get; private set; }
         public DateTimeOffset? RemovedOn { get; private set; }
         public DateTimeOffset? DLC { get; private set; }
-        public DateTimeOffset? DLUO { get; private set; }
-        public string Comment { get; private set; }
+        public DateTimeOffset? DDM { get; private set; }
+        public string JsonFields { get; private set; }
         public Guid ProducerId { get; private set; }
+        public Guid DefinitionId { get; private set; }
         public virtual Producer Producer { get; private set; }
+        public virtual BatchDefinition Definition { get; private set; }
+        public virtual ICollection<BatchObservation> Observations { get; private set; }
         public byte[] RowVersion { get; private set; }
+        public IEnumerable<BatchField> Fields => JsonConvert.DeserializeObject<IEnumerable<BatchField>>(JsonFields);
         
         public void SetNumber(string number)
         {
@@ -39,14 +51,56 @@ namespace Sheaft.Domain
             DLC = dlc;
         }
 
-        public void SetDLUO(DateTimeOffset? dluo)
+        public void SetDDM(DateTimeOffset? ddm)
         {
-            DLUO = dluo;
+            DDM = ddm;
         }
 
-        public void SetComment(string comment)
+        public void SetValues(IEnumerable<BatchField> fields)
         {
-            Comment = comment;
+            foreach (var field in fields)
+            {
+                var fieldDefinition = Definition.FieldDefinitions.SingleOrDefault(f => f.Identifier == field.Identifier);
+                if(fieldDefinition == null)
+                    throw SheaftException.NotFound($"Le champs {field.Identifier} est introuvable.");
+
+                field.Required = fieldDefinition.Required;
+                field.Type = fieldDefinition.Type;
+            }
+
+            JsonFields = JsonConvert.SerializeObject(fields);
+        }
+
+        public void AddObservation(string comment, User user)
+        {
+            if (Observations == null)
+                Observations = new List<BatchObservation>();
+            
+            Observations.Add(new BatchObservation(Guid.NewGuid(), comment, user));
+        }
+
+        public void UpdateObservation(Guid observationId, string comment)
+        {
+            if (Observations == null)
+                throw SheaftException.NotFound("L'observation est introuvable.");
+
+            var observation = Observations.SingleOrDefault(o => o.Id == observationId);
+            if (observation == null)
+                throw SheaftException.NotFound("L'observation est introuvable.");
+
+            observation.SetComment(comment);
+        }
+
+        public void RemoveObservation(Guid observationId)
+        {
+            if (Observations == null)
+                throw SheaftException.NotFound("L'observation est introuvable.");
+
+            var observation = Observations.SingleOrDefault(o => o.Id == observationId);
+            if (observation == null)
+                throw SheaftException.NotFound("L'observation est introuvable.");
+            
+            Observations.Remove(observation);
         }
     }
 }

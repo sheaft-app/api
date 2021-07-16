@@ -16,8 +16,10 @@ using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Auth.Commands;
+using Sheaft.Mediatr.BatchDefinition.Commands;
 using Sheaft.Mediatr.Catalog.Commands;
 using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.User.Commands;
@@ -176,6 +178,17 @@ namespace Sheaft.Mediatr.Producer.Commands
                 
                 if (!catalogStoreResult.Succeeded)
                     return catalogStoreResult;
+                
+                var batchDefinitionResult = await _mediatr.Process(new CreateBatchDefinitionCommand(request.RequestUser)
+                {
+                    Name = "Tracabilité par défaut",
+                    IsDefault = true,
+                    Description = "Configuration générée par défaut, vous pouvez la modifier pour ajouter des champs spécifiques à votre gestion de la tracabilité pour votre production.",
+                    FieldDefinitions = new List<BatchField>()
+                }, token);
+                
+                if (!batchDefinitionResult.Succeeded)
+                    return batchDefinitionResult;
 
                 await transaction.CommitAsync(token);
 

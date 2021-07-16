@@ -155,6 +155,8 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new PreparedProductConfiguration());
             modelBuilder.ApplyConfiguration(new BatchConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new PreparedProductBatchConfiguration());
+            modelBuilder.ApplyConfiguration(new BatchDefinitionConfiguration(isAdminContext));
+            modelBuilder.ApplyConfiguration(new BatchObservationConfiguration());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

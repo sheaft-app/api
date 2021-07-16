@@ -20,7 +20,7 @@
             <th scope="col">CreatedOn</th>
             <th scope="col">Producer</th>
             <th scope="col">DLC</th>
-            <th scope="col">DLUO</th>
+            <th scope="col">DDM</th>
             <th scope="col">Removed</th>
             <th scope="col">Comment</th>
                 <th scope="col">
@@ -49,9 +49,8 @@
                     }
                 </td>
                 <td>@entity.DLC</td>
-                <td>@entity.DLUO</td>
+                <td>@entity.DDM</td>
                 <td>@entity.RemovedOn.HasValue</td>
-                <td>@entity.Comment</td>
                 <td>
                     <a asp-controller="Batches" asp-action="Edit" asp-route-id="@entity.Id" class="btn btn-info">
                         <i class="fa fa-pen"></i>

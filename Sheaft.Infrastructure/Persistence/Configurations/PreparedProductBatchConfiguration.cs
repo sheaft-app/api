@@ -8,7 +8,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<PreparedProductBatch> entity)
         {
-            entity.HasOne(c => c.Batch).WithMany().HasForeignKey(c=>c.BatchId).OnDelete(DeleteBehavior.Restrict).IsRequired();
+            entity.HasOne(c => c.Batch).WithMany().HasForeignKey(c=>c.BatchId).OnDelete(DeleteBehavior.NoAction).IsRequired();
 
             entity.HasKey(c => new {c.BatchId, c.PreparedProductId});
 

@@ -135,7 +135,7 @@ namespace Sheaft.Mailer.Helpers
             {
                 Number = b.Batch.Number,
                 DLC = b.Batch.DLC,
-                DLUO = b.Batch.DLUO
+                DDM = b.Batch.DDM
             }).ToList() ?? new List<BatchMailerModel>();
             return model;
         }
