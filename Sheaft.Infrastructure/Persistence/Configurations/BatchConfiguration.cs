@@ -19,13 +19,16 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.UpdatedOn);
             entity.Property(c => c.RowVersion).IsRowVersion();
             entity.Property(c => c.RemovedOn);
+            entity.Ignore(c => c.Fields);
             
             if(!_isAdmin)
                 entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
 
             entity.Property(o => o.Number).UseCollation("Latin1_general_CI_AI").IsRequired();
             
-            entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+            entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.NoAction).IsRequired();
+            entity.HasOne(c => c.Definition).WithMany().HasForeignKey(c => c.DefinitionId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Observations).WithOne().HasForeignKey(c => c.BatchId).OnDelete(DeleteBehavior.Cascade);
             
             entity.HasKey(c => c.Id);
             entity.HasIndex(c => new {c.ProducerId, c.Number}).IsUnique();

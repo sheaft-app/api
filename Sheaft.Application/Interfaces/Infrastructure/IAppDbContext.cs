@@ -21,6 +21,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         
         DbSet<Domain.Agreement> Agreements { get; set; }
         DbSet<Batch> Batches { get; set; }
+        DbSet<BatchDefinition> BatchDefinitions { get; set; }
         DbSet<BankAccount> BankAccounts { get; set; }
         DbSet<Domain.Card> Cards { get; set; }
         DbSet<Domain.Catalog> Catalogs { get; set; }

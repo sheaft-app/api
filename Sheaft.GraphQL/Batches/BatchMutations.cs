@@ -41,7 +41,7 @@ namespace Sheaft.GraphQL.Catalogs
             return await catalogsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("updateCatalog")]
+        [GraphQLName("updateBatch")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(BatchType))]
         public async Task<Batch> UpdateBatchAsync(

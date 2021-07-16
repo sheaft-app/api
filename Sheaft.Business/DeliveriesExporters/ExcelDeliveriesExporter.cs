@@ -97,7 +97,7 @@ namespace Sheaft.Business.DeliveriesExporters
                     .OrderBy(po => po.Reference)
                     .Select(po => $"{po.Reference.AsPurchaseOrderIdentifier()} ({po.CreatedOn:dd/MM/yyyy})"));
                 worksheet.Cells[i, 4].Value = string.Join(", ",
-                    clientBatches.Select(po => $"{po.Number} - {po.DLC:dd/MM/yyyy}{po.DLUO:dd/MM/yyyy}"));
+                    clientBatches.Select(po => $"{po.Number} - {po.DLC:dd/MM/yyyy}{po.DDM:dd/MM/yyyy}"));
 
                 var clientGroupedProducts = groupedDelivery
                     .SelectMany(gd => gd.Products)

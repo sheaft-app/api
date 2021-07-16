@@ -6,6 +6,6 @@ namespace Sheaft.Mailing
     {
         public string Number { get; set; }
         public DateTimeOffset? DLC { get; set; }
-        public DateTimeOffset? DLUO { get; set; }
+        public DateTimeOffset? DDM { get; set; }
     }
 }

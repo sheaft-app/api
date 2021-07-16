@@ -173,7 +173,7 @@
                         <td>@product.Quantity</td>
                         <td>@product.PreparedOn?.ToString("dd/MM/yyyy")</td>
                         <td>@product.PreparedBy</td>
-                        <td>@(string.Join(",", product.Batches.Select(b => $"{b.Number}: {b.DLC:dd/MM/yyyy}{b.DLUO:dd/MM/yyyy}")))</td>
+                        <td>@(string.Join(",", product.Batches.Select(b => $"{b.Number}: {b.DLC:dd/MM/yyyy}{b.DDM:dd/MM/yyyy}")))</td>
                         <td>
                             <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.ProductId" class="btn btn-light">
                                 <i class="fa fa-eye"></i>

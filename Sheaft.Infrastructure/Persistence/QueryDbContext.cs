@@ -14,6 +14,7 @@ namespace Sheaft.Infrastructure.Persistence
         
         public DbSet<Agreement> Agreements { get; set; }
         public DbSet<Batch> Batches { get; set; }
+        public DbSet<BatchDefinition> BatchDefinitions { get; set; }
         public DbSet<BankAccount> BankAccounts { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<Catalog> Catalogs { get; set; }

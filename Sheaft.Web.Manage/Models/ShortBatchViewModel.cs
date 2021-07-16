@@ -10,8 +10,7 @@ namespace Sheaft.Web.Manage.Models
         public DateTimeOffset? UpdatedOn { get; set; }
         public DateTimeOffset? RemovedOn { get; set; }
         public DateTimeOffset? DLC { get; set; }
-        public DateTimeOffset? DLUO { get; set; }
-        public string Comment { get; set; }
+        public DateTimeOffset? DDM { get; set; }
         public Guid ProducerId { get; set; }
         public UserViewModel Producer { get; set; }
     }

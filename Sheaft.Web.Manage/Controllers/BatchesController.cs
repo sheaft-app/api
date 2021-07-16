@@ -81,7 +81,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new CreateBatchCommand(requestUser)
             {
-                Comment = model.Comment, Number = model.Number, DLC = model.DLC, DLUO = model.DLUO
+                Number = model.Number, DLC = model.DLC, DDM = model.DDM
             }, token);
 
             if (!result.Succeeded)
@@ -122,7 +122,7 @@ namespace Sheaft.Web.Manage.Controllers
 
             var result = await _mediatr.Process(new UpdateBatchCommand(requestUser)
             {
-                BatchId = model.Id, Comment = model.Comment, Number = model.Number, DLC = model.DLC, DLUO = model.DLUO
+                BatchId = model.Id, Number = model.Number, DLC = model.DLC, DDM = model.DDM
             }, token);
 
             if (!result.Succeeded)

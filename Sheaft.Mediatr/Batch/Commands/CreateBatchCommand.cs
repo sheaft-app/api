@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -12,6 +13,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 
 namespace Sheaft.Mediatr.Batch.Commands
 {
@@ -19,8 +21,8 @@ namespace Sheaft.Mediatr.Batch.Commands
     {
         protected CreateBatchCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateBatchCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -30,8 +32,9 @@ namespace Sheaft.Mediatr.Batch.Commands
         public Guid ProducerId { get; set; }
         public string Number { get; set; }
         public DateTimeOffset? DLC { get; set; }
-        public DateTimeOffset? DLUO { get; set; }
-        public string Comment { get; set; }
+        public DateTimeOffset? DDM { get; set; }
+        public IEnumerable<BatchField> Fields { get; set; }
+        public Guid? DefinitionId { get; set; }
 
         public override void SetRequestUser(RequestUser user)
         {
@@ -53,20 +56,28 @@ namespace Sheaft.Mediatr.Batch.Commands
 
         public async Task<Result<Guid>> Handle(CreateBatchCommand request, CancellationToken token)
         {
-            var existingBatchWithNumber = await _context.Batches.SingleOrDefaultAsync(b => b.Number == request.Number && b.ProducerId == request.ProducerId, token);
-            if(existingBatchWithNumber != null)
+            var existingBatchWithNumber =
+                await _context.Batches.SingleOrDefaultAsync(
+                    b => b.Number == request.Number && b.ProducerId == request.ProducerId, token);
+            if (existingBatchWithNumber != null)
                 return Failure<Guid>("Un lot existe déjà avec ce numéro.");
-            
+
             var producer = await _context.Producers.SingleAsync(p => p.Id == request.ProducerId, token);
-            var entity = new Domain.Batch(Guid.NewGuid(), request.Number, producer);
-            
+            var batchDefinition = request.DefinitionId.HasValue ? await _context.BatchDefinitions.SingleOrDefaultAsync(b => b.Id == request.DefinitionId, token) : await _context.BatchDefinitions.SingleOrDefaultAsync(
+                b => b.IsDefault && b.ProducerId == producer.Id, token);
+
+            if (batchDefinition == null)
+                return Failure<Guid>("La définition est introuvable.");
+
+            var entity = new Domain.Batch(Guid.NewGuid(), request.Number, producer, batchDefinition);
+
             entity.SetDLC(request.DLC);
-            entity.SetDLUO(request.DLUO);
-            entity.SetComment(request.Comment);
-            
+            entity.SetDDM(request.DDM);
+            entity.SetValues(request.Fields);
+
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);
-            
+
             return Success(entity.Id);
         }
     }

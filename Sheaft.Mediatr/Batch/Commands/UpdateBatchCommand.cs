@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -14,6 +15,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 
 namespace Sheaft.Mediatr.Batch.Commands
 {
@@ -31,8 +33,8 @@ namespace Sheaft.Mediatr.Batch.Commands
         public Guid BatchId { get; set; }
         public string Number { get; set; }
         public DateTimeOffset? DLC { get; set; }
-        public DateTimeOffset? DLUO { get; set; }
-        public string Comment { get; set; }
+        public DateTimeOffset? DDM { get; set; }
+        public IEnumerable<BatchField> Fields { get; set; }
     }
 
     public class UpdateBatchCommandHandler : CommandsHandler,
@@ -64,8 +66,8 @@ namespace Sheaft.Mediatr.Batch.Commands
             
             entity.SetNumber(request.Number);
             entity.SetDLC(request.DLC);
-            entity.SetDLUO(request.DLUO);
-            entity.SetComment(request.Comment);
+            entity.SetDDM(request.DDM);
+            entity.SetValues(request.Fields);
 
             await _context.SaveChangesAsync(token);
             return Success();

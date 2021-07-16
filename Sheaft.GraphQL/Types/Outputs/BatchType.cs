@@ -26,16 +26,27 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("dlc");
             
             descriptor
-                .Field(c => c.DLUO)
-                .Name("dluo");
+                .Field(c => c.DDM)
+                .Name("ddm");
             
             descriptor
                 .Field(c => c.CreatedOn)
                 .Name("createdOn");
             
             descriptor
-                .Field(c => c.Comment)
-                .Name("comment");
+                .Field(c => c.Observations)
+                .Type<ListType<BatchObservationType>>()
+                .Name("observations");
+            
+            descriptor
+                .Field(c => c.Fields)
+                .Type<ListType<BatchFieldType>>()
+                .Name("fields");
+            
+            descriptor
+                .Field(c => c.Definition)
+                .Type<BatchDefinitionType>()
+                .Name("definition");
         }
     }
 }
