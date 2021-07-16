@@ -19,7 +19,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             
             descriptor
                 .Field(c => c.Comment)
-                .Name("name");
+                .Name("comment");
         }
     }
 }

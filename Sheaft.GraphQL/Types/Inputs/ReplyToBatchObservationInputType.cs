@@ -4,17 +4,17 @@ using Sheaft.Mediatr.BatchObservation.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class CreateBatchObservationInputType : SheaftInputType<CreateBatchObservationCommand>
+    public class ReplyToBatchObservationInputType : SheaftInputType<ReplyToBatchObservationCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<CreateBatchObservationCommand> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<ReplyToBatchObservationCommand> descriptor)
         {
             base.Configure(descriptor);
 
-            descriptor.Name("CreateBatchObservationInput");
+            descriptor.Name("ReplyToBatchObservationInput");
             
             descriptor
-                .Field(c => c.BatchId)
-                .ID(nameof(Batch))
+                .Field(c => c.BatchObservationId)
+                .ID(nameof(BatchObservation))
                 .Name("id");
             
             descriptor
