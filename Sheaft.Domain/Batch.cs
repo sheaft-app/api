@@ -4,11 +4,12 @@ using System.Linq;
 using Newtonsoft.Json;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
+using Sheaft.Domain.Events.Batch;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Batch : IEntity
+    public class Batch : IEntity, IHasDomainEvent
     {
         protected Batch()
         {
@@ -40,6 +41,7 @@ namespace Sheaft.Domain
         public virtual ICollection<BatchObservation> Observations { get; private set; }
         public byte[] RowVersion { get; private set; }
         public IEnumerable<BatchField> Fields => JsonConvert.DeserializeObject<IEnumerable<BatchField>>(JsonFields);
+        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         
         public void SetNumber(string number)
         {
@@ -75,8 +77,11 @@ namespace Sheaft.Domain
         {
             if (Observations == null)
                 Observations = new List<BatchObservation>();
+
+            var observation = new BatchObservation(Guid.NewGuid(), comment, user);
+            Observations.Add(observation);
             
-            Observations.Add(new BatchObservation(Guid.NewGuid(), comment, user));
+            DomainEvents.Add(new BatchObservationAddedEvent(Id, observation.Id));
         }
 
         public void UpdateObservation(Guid observationId, string comment)

@@ -31,20 +31,20 @@ namespace Sheaft.GraphQL.Catalogs
         }
 
         [GraphQLName("createBatchObservation")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(BatchObservationType))]
-        public async Task<BatchObservation> CreateBatchObservationAsync(
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLType(typeof(BatchType))]
+        public async Task<Batch> CreateBatchObservationAsync(
             [GraphQLType(typeof(CreateBatchObservationInputType))] [GraphQLName("input")]
             CreateBatchObservationCommand input, [Service] ISheaftMediatr mediatr,
-            BatchObservationsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
+            BatchesByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);
             return await catalogsDataLoader.LoadAsync(input.BatchId, token);
         }
 
         [GraphQLName("updateBatchObservation")]
-        [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(BatchType))]
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLType(typeof(BatchObservationType))]
         public async Task<BatchObservation> UpdateBatchObservationAsync(
             [GraphQLType(typeof(UpdateBatchObservationInputType))] [GraphQLName("input")]
             UpdateBatchObservationCommand input, [Service] ISheaftMediatr mediatr,
@@ -54,8 +54,20 @@ namespace Sheaft.GraphQL.Catalogs
             return await catalogsDataLoader.LoadAsync(input.BatchObservationId, token);
         }
 
+        [GraphQLName("replyToBatchObservation")]
+        [Authorize(Policy = Policies.REGISTERED)]
+        [GraphQLType(typeof(BatchObservationType))]
+        public async Task<BatchObservation> ReplyToBatchObservationAsync(
+            [GraphQLType(typeof(ReplyToBatchObservationInputType))] [GraphQLName("input")]
+            ReplyToBatchObservationCommand input, [Service] ISheaftMediatr mediatr,
+            BatchObservationsByIdBatchDataLoader catalogsDataLoader, CancellationToken token)
+        {
+            await ExecuteAsync(mediatr, input, token);
+            return await catalogsDataLoader.LoadAsync(input.BatchObservationId, token);
+        }
+
         [GraphQLName("deleteBatchObservation")]
-        [Authorize(Policy = Policies.PRODUCER)]
+        [Authorize(Policy = Policies.REGISTERED)]
         public async Task<bool> DeleteBatchObservationAsync(
             [GraphQLType(typeof(DeleteBatchObservationInputType))] [GraphQLName("input")]
             DeleteBatchObservationCommand input, [Service] ISheaftMediatr mediatr,

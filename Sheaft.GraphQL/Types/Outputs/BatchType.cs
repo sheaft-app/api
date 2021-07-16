@@ -1,7 +1,14 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -35,8 +42,10 @@ namespace Sheaft.GraphQL.Types.Outputs
             
             descriptor
                 .Field(c => c.Observations)
-                .Type<ListType<BatchObservationType>>()
-                .Name("observations");
+                .Name("observations")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.GetObservations(default, default, default, default))
+                .Type<ListType<BatchObservationType>>();
             
             descriptor
                 .Field(c => c.Fields)
@@ -44,9 +53,32 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("fields");
             
             descriptor
-                .Field(c => c.Definition)
-                .Type<BatchDefinitionType>()
-                .Name("definition");
+                .Field(c=> c.Definition)
+                .Name("name")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.GetDefinition(default, default, default))
+                .Type<BatchDefinitionType>();
+        }
+
+        private class BatchResolvers
+        {
+            public async Task<IEnumerable<BatchObservation>> GetObservations(Batch batch, [ScopedService] QueryDbContext context,
+                BatchObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var batchObservationIds = await context.Set<BatchObservation>()
+                    .Where(cp => cp.BatchId == batch.Id && !cp.ReplyToId.HasValue)
+                    .Select(cp => cp.Id)
+                    .ToListAsync(token);
+
+                var result = await dataLoader.LoadAsync(batchObservationIds, token);
+                return result.OrderBy(o => o.CreatedOn);
+            }
+            
+            public Task<BatchDefinition> GetDefinition(Batch batch, 
+                BatchDefinitionsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                return dataLoader.LoadAsync(batch.DefinitionId, token);
+            }
         }
     }
 }
