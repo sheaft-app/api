@@ -12,11 +12,6 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor.Name("PurchaseOrderUser");
             
             descriptor
-                .Field(c => c.Id)
-                .Name("id")
-                .Type<NonNullType<IdType>>();
-            
-            descriptor
                 .Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();

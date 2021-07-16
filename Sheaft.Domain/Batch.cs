@@ -42,12 +42,12 @@ namespace Sheaft.Domain
         public byte[] RowVersion { get; private set; }
         public IEnumerable<BatchField> Fields => JsonConvert.DeserializeObject<IEnumerable<BatchField>>(JsonFields);
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
-        
+
         public void SetNumber(string number)
         {
             Number = number;
         }
-        
+
         public void SetDLC(DateTimeOffset? dlc)
         {
             DLC = dlc;
@@ -60,11 +60,14 @@ namespace Sheaft.Domain
 
         public void SetValues(IEnumerable<BatchField> fields)
         {
-            foreach (var field in fields)
+            if (fields == null)
+                fields = new List<BatchField>();
+            
+            foreach (var fieldDefinition in Definition.FieldDefinitions)
             {
-                var fieldDefinition = Definition.FieldDefinitions.SingleOrDefault(f => f.Identifier == field.Identifier);
-                if(fieldDefinition == null)
-                    throw SheaftException.NotFound($"Le champs {field.Identifier} est introuvable.");
+                var field = fields.SingleOrDefault(f => f.Identifier == fieldDefinition.Identifier);
+                if (field == null)
+                    field = new BatchField {Identifier = fieldDefinition.Identifier, Value = fieldDefinition.Value};
 
                 field.Required = fieldDefinition.Required;
                 field.Type = fieldDefinition.Type;
@@ -80,7 +83,7 @@ namespace Sheaft.Domain
 
             var observation = new BatchObservation(Guid.NewGuid(), comment, user);
             Observations.Add(observation);
-            
+
             DomainEvents.Add(new BatchObservationAddedEvent(Id, observation.Id));
         }
 
@@ -104,7 +107,7 @@ namespace Sheaft.Domain
             var observation = Observations.SingleOrDefault(o => o.Id == observationId);
             if (observation == null)
                 throw SheaftException.NotFound("L'observation est introuvable.");
-            
+
             Observations.Remove(observation);
         }
     }
