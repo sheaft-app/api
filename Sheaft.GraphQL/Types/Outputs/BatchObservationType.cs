@@ -44,6 +44,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("updatedOn");
             
             descriptor
+                .Field(c => c.VisibleToAll)
+                .Name("visibleToAll");
+            
+            descriptor
                 .Field(c => c.Replies)
                 .Name("replies")
                 .UseDbContext<QueryDbContext>()

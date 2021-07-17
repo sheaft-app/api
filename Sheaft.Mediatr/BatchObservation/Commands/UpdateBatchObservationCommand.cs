@@ -31,6 +31,7 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
 
         public Guid BatchObservationId { get; set; }
         public string Comment { get; set; }
+        public bool VisibleToAll { get; set; }
     }
 
     public class UpdateBatchObservationCommandHandler : CommandsHandler,
@@ -50,7 +51,7 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
             if (batch == null)
                 return Failure("Le lot est introuvable.");
 
-            batch.UpdateObservation(request.BatchObservationId, request.Comment);
+            batch.UpdateObservation(request.BatchObservationId, request.Comment, request.VisibleToAll);
 
             await _context.SaveChangesAsync(token);
             return Success();

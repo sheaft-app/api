@@ -8,13 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
-using Sheaft.Domain.Common;
 
 namespace Sheaft.Mediatr.BatchObservation.Commands
 {
@@ -31,6 +27,7 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
 
         public Guid BatchId { get; set; }
         public string Comment { get; set; }
+        public bool VisibleToAll { get; set; }
     }
 
     public class CreateBatchObservationCommandHandler : CommandsHandler,
@@ -51,7 +48,7 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
                 return Failure("Le lot est introuvable.");
 
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == request.RequestUser.Id, token);
-            batch.AddObservation(request.Comment, user);
+            batch.AddObservation(request.Comment, user, user.Kind != Domain.Enum.ProfileKind.Producer ? false : request.VisibleToAll);
 
             await _context.SaveChangesAsync(token);
             return Success();

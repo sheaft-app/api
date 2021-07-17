@@ -20,6 +20,10 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.Comment)
                 .Name("comment");
+                
+            descriptor
+                .Field(c => c.VisibleToAll)
+                .Name("visibleToAll");
         }
     }
 }

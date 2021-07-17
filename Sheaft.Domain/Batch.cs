@@ -76,18 +76,19 @@ namespace Sheaft.Domain
             JsonFields = JsonConvert.SerializeObject(fields);
         }
 
-        public void AddObservation(string comment, User user)
+        public void AddObservation(string comment, User user, bool visibleToAll = false)
         {
             if (Observations == null)
                 Observations = new List<BatchObservation>();
 
             var observation = new BatchObservation(Guid.NewGuid(), comment, user);
+            observation.SetVisibility(visibleToAll);
+            
             Observations.Add(observation);
-
             DomainEvents.Add(new BatchObservationAddedEvent(Id, observation.Id));
         }
 
-        public void UpdateObservation(Guid observationId, string comment)
+        public void UpdateObservation(Guid observationId, string comment, bool visibleToAll = false)
         {
             if (Observations == null)
                 throw SheaftException.NotFound("L'observation est introuvable.");
@@ -96,6 +97,7 @@ namespace Sheaft.Domain
             if (observation == null)
                 throw SheaftException.NotFound("L'observation est introuvable.");
 
+            observation.SetVisibility(visibleToAll);
             observation.SetComment(comment);
         }
 
