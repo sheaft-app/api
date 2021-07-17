@@ -13,7 +13,7 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor.Name("DeleteObservationInput");
             
             descriptor
-                .Field(c => c.BatchObservationId)
+                .Field(c => c.ObservationId)
                 .ID(nameof(Observation))
                 .Name("id");
         }

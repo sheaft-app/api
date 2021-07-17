@@ -14,6 +14,7 @@ using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
+using Sheaft.Mediatr.Recall.Commands;
 using Sheaft.Mediatr.Transaction.Commands;
 using Sheaft.Mediatr.User.Commands;
 
@@ -72,6 +73,9 @@ namespace Sheaft.Mediatr.Job.Commands
                     break;
                 case JobKind.ExportUserDeliveries:
                     _mediatr.Post(entity.GetCommand<ExportDeliveriesCommand>());
+                    break;
+                case JobKind.SendRecalls:
+                    _mediatr.Post(entity.GetCommand<SendRecallCommand>());
                     break;
             }
             

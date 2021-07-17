@@ -159,6 +159,9 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ObservationConfiguration());
             modelBuilder.ApplyConfiguration(new ObservationBatchConfiguration());
             modelBuilder.ApplyConfiguration(new ObservationProductConfiguration());
+            modelBuilder.ApplyConfiguration(new RecallConfiguration());
+            modelBuilder.ApplyConfiguration(new RecallBatchConfiguration());
+            modelBuilder.ApplyConfiguration(new RecallProductConfiguration());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -7,59 +7,47 @@ using Sheaft.Domain.Events.Observation;
 
 namespace Sheaft.Domain
 {
-    public class Observation : Surveillance
+    public class Recall : Surveillance
     {
-        protected Observation()
+        protected Recall()
         {
         }
 
-        public Observation(Guid id, string comment, User user, Producer producer)
+        public Recall(Guid id, string name, DateTimeOffset saleStartedOn, DateTimeOffset saleEndedOn, string comment,
+            Producer producer, IEnumerable<Product> products)
             : base(id, comment, producer)
         {
-            UserId = user.Id;
-            User = user;
+            if (saleStartedOn > saleEndedOn)
+                throw SheaftException.Validation(
+                    "La date de fin de commercialisation ne peut pas être antérieure à la date de début de commercialisation.");
+
+            if (products == null || !products.Any())
+                throw SheaftException.Validation(
+                    "Vous devez spécifier au moins un produit pour une campagne de rappel.");
+            
+            SetName(name);
+            SetSaleStartedOn(saleStartedOn);
+            SetSaleEndedOn(saleEndedOn);
+            SetProducts(products);
+            Status = RecallStatus.Waiting;
         }
 
-        public bool VisibleToAll { get; private set; }
-        public Guid? ReplyToId { get; private set; }
-        public Guid UserId { get; private set; }
-        public virtual User User { get; private set; }
-        public virtual ICollection<Observation> Replies { get; private set; }
-        public virtual ICollection<ObservationBatch> Batches { get; private set; }
-        public virtual ICollection<ObservationProduct> Products { get; private set; }
-
-        public void AddReply(string comment, User user)
-        {
-            if (ReplyToId.HasValue)
-                throw SheaftException.Validation("Une réponse ne peut être ajoutée qu'à une observation.");
-
-            if (Replies == null)
-                Replies = new List<Observation>();
-
-            var reply = new Observation(Guid.NewGuid(), comment, user, Producer);
-            Replies.Add(reply);
-
-            DomainEvents.Add(new ObservationRepliedEvent(Id, reply.Id));
-        }
-
-        public void SetVisibility(bool visibleToAll)
-        {
-            if (ReplyToId.HasValue && visibleToAll)
-                throw SheaftException.Validation("Une réponse à une observation ne peut pas être publique.");
-
-            if (User.Kind != ProfileKind.Producer && visibleToAll)
-                throw SheaftException.Validation("Seule les observations d'un producteur peuvent être publique.");
-
-            VisibleToAll = visibleToAll;
-        }
+        public string Name { get; set; }
+        public RecallStatus Status { get; set; }
+        public DateTimeOffset SaleStartedOn { get; set; }
+        public DateTimeOffset SaleEndedOn { get; set; }
+        public DateTimeOffset? SendingStartedOn { get; set; }
+        public DateTimeOffset? SendCompletedOn { get; set; }
+        public virtual ICollection<RecallBatch> Batches { get; private set; }
+        public virtual ICollection<RecallProduct> Products { get; private set; }
 
         public void SetBatches(IEnumerable<Batch> batches)
         {
             if (batches == null || !batches.Any())
                 return;
-            
+
             if (batches.Any(p => p.ProducerId != ProducerId))
-                throw SheaftException.BadRequest("Une observation est liée au producteur, les lots doivent donc lui être liés.");
+                throw SheaftException.BadRequest("Une campagne de rappel est liée au producteur, les lots doivent donc lui être liés.");
 
             var existingBatchIds = Batches?.Select(b => b.BatchId).ToList() ?? new List<Guid>();
             var newBatchIds = batches.Select(b => b.Id);
@@ -81,7 +69,7 @@ namespace Sheaft.Domain
                 return;
 
             if (products.Any(p => p.ProducerId != ProducerId))
-                throw SheaftException.BadRequest("Une observation est liée au producteur, les produits doivent donc lui être liés.");
+                throw SheaftException.BadRequest("Une campagne de rappel est liée au producteur, les produits doivent donc lui être liés.");
 
             var existingProductIds = Products?.Select(b => b.ProductId).ToList() ?? new List<Guid>();
             var newProductIds = products.Select(b => b.Id);
@@ -101,22 +89,22 @@ namespace Sheaft.Domain
         private void AddBatches(IEnumerable<Batch> batches)
         {
             if (Batches == null)
-                Batches = new List<ObservationBatch>();
+                Batches = new List<RecallBatch>();
 
             foreach (var batch in batches)
-                Batches.Add(new ObservationBatch(batch));
+                Batches.Add(new RecallBatch(batch));
         }
 
         private void RemoveBatches(IEnumerable<Batch> batches)
         {
             if (Batches == null)
-                throw SheaftException.NotFound("Cette observation ne contient pas de lots.");
+                throw SheaftException.NotFound("Ce rappel ne contient pas de lots.");
 
             foreach (var batch in batches)
             {
                 var observationBatch = Batches.FirstOrDefault(b => b.BatchId == batch.Id);
                 if (observationBatch == null)
-                    throw SheaftException.NotFound("Cette observation ne contient pas ce lot.");
+                    throw SheaftException.NotFound("Ce rappel ne contient pas ce lot.");
 
                 Batches.Remove(observationBatch);
             }
@@ -125,25 +113,63 @@ namespace Sheaft.Domain
         private void AddProducts(IEnumerable<Product> products)
         {
             if (Products == null)
-                Products = new List<ObservationProduct>();
+                Products = new List<RecallProduct>();
 
             foreach (var product in products)
-                Products.Add(new ObservationProduct(product));
+                Products.Add(new RecallProduct(product));
         }
 
         private void RemoveProducts(IEnumerable<Product> products)
         {
             if (Products == null)
-                throw SheaftException.NotFound("Cette observation ne contient pas de produits.");
+                throw SheaftException.NotFound("Ce rappel ne contient pas de produits.");
 
             foreach (var product in products)
             {
                 var observationProduct = Products.FirstOrDefault(b => b.ProductId == product.Id);
                 if (observationProduct == null)
-                    throw SheaftException.NotFound("Cette observation ne contient pas ce produit.");
+                    throw SheaftException.NotFound("Ce rappel ne contient pas ce produit.");
 
                 Products.Remove(observationProduct);
             }
+        }
+
+        public void SetName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw SheaftException.Validation("Le nom est requis.");
+
+            Name = name;
+        }
+
+        public void SetSaleStartedOn(DateTimeOffset saleStartedOn)
+        {
+            SaleStartedOn = saleStartedOn;
+        }
+
+        public void SetSaleEndedOn(DateTimeOffset saleEndedOn)
+        {
+            SaleEndedOn = saleEndedOn;
+        }
+
+        public void StartSending()
+        {
+            if (SendingStartedOn.HasValue)
+                throw SheaftException.Validation("La campagne est déjà en cours d'envoi.");
+            
+            Status = RecallStatus.Sending;
+            SendingStartedOn = DateTimeOffset.UtcNow;
+        }
+
+        public void CompleteSending()
+        {
+            Status = RecallStatus.Sent;
+            SendCompletedOn = DateTimeOffset.UtcNow;
+        }
+
+        public void FailSending()
+        {
+            Status = RecallStatus.Failed;
         }
     }
 }

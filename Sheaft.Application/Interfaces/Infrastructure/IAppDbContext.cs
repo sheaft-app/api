@@ -48,6 +48,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.QuickOrder> QuickOrders { get; set; }
         DbSet<Refund> Refunds { get; set; }
         DbSet<Domain.Region> Regions { get; set; }
+        DbSet<Recall> Recalls { get; set; }
         DbSet<Domain.Reward> Rewards { get; set; }
         DbSet<Domain.Setting> Settings { get; set; }
         DbSet<Domain.Tag> Tags { get; set; }

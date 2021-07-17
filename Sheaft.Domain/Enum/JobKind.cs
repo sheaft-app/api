@@ -8,5 +8,6 @@ namespace Sheaft.Domain.Enum
         ExportUserTransactions,
         ExportUserPurchaseOrders,
         ExportUserDeliveries,
+        SendRecalls,
     }
 }

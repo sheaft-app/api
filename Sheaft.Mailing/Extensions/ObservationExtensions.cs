@@ -13,12 +13,12 @@ namespace Sheaft.Mailing.Extensions
             return new StringContent(JsonConvert.SerializeObject(observation.GetNotificationData(observationId, url, null, username)), Encoding.UTF8, "application/json");
         }
 
-        public static ObservationMailerModel GetNotificationData(this Domain.Observation observation, string observationId, string url, string comment,string username)
+        public static ObservationMailerModel GetNotificationData(this Domain.Observation observation, string observationId, string url, string comment, string username)
         {
             return new ObservationMailerModel
             { 
                 Producer = observation.Producer.Name,
-                User = observation.User.Name,
+                User = username,
                 Comment = comment,
                 Batches = observation.Batches?.Select(b => new BatchMailerModel
                 {

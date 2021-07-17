@@ -39,6 +39,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Picking> Pickings { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<QuickOrder> QuickOrders { get; set; }
+        public DbSet<Recall> Recalls { get; set; }
         public DbSet<Refund> Refunds { get; set; }
         public DbSet<Region> Regions { get; set; }
         public DbSet<Reward> Rewards { get; set; }

@@ -14,6 +14,7 @@ using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
+using Sheaft.Mediatr.Recall.Commands;
 using Sheaft.Mediatr.Transaction.Commands;
 using Sheaft.Mediatr.User.Commands;
 
@@ -97,6 +98,14 @@ namespace Sheaft.Mediatr.Job.Commands
                     {
                         JobId = exportDeliveriesCommand.JobId, From = exportDeliveriesCommand.From,
                         To = exportDeliveriesCommand.To, Kinds = exportDeliveriesCommand.Kinds
+                    });
+                    break;
+                case JobKind.SendRecalls:
+                    var sendRecallsCommand =
+                        JsonConvert.DeserializeObject<SendRecallCommand>(entity.Command);
+                    _mediatr.Post(new SendRecallCommand(request.RequestUser)
+                    {
+                        JobId = sendRecallsCommand.JobId, RecallId = sendRecallsCommand.RecallId
                     });
                     break;
             }
