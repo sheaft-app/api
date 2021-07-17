@@ -16,6 +16,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.Ratings;
@@ -225,10 +226,46 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetPictures(default!, default!, default, default))
                 .Type<ListType<ProductPictureType>>();
+            
+            descriptor
+                .Field("observations")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetObservations(default, default, default, default, default, default))
+                .Type<ListType<ObservationType>>();
         }
 
         private class ProductResolvers
         {
+            public async Task<IEnumerable<Observation>> GetObservations(Product product,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                ObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return null;
+
+                var observationIds = new List<Guid>();
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                {
+                    observationIds = await context.Observations
+                        .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.VisibleToAll && cp.Products.Any(b => b.ProductId == product.Id))
+                        .Select(cp => cp.Id)
+                        .ToListAsync(token);
+                }
+                else
+                {
+                    observationIds = await context.Observations
+                        .Where(cp => cp.UserId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Products.Any(b => b.ProductId == product.Id))
+                        .Select(cp => cp.Id)
+                        .ToListAsync(token);
+                }
+
+                var result = await dataLoader.LoadAsync(observationIds, token);
+                return result.OrderBy(o => o.CreatedOn);
+            }
+            
             public Task<bool> ProductIsRatedByUser(Product product, [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService, CancellationToken token)
             {

@@ -16,16 +16,16 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Mediatr.BatchObservation.Commands
+namespace Sheaft.Mediatr.Observation.Commands
 {
-    public class DeleteBatchObservationCommand : Command
+    public class DeleteObservationCommand : Command
     {
-        protected DeleteBatchObservationCommand()
+        protected DeleteObservationCommand()
         {
         }
 
         [JsonConstructor]
-        public DeleteBatchObservationCommand(RequestUser requestUser) : base(requestUser)
+        public DeleteObservationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -33,24 +33,24 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
         public string Comment { get; set; }
     }
 
-    public class DeleteBatchObservationCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteBatchObservationCommand, Result>
+    public class DeleteObservationCommandHandler : CommandsHandler,
+        IRequestHandler<DeleteObservationCommand, Result>
     {
-        public DeleteBatchObservationCommandHandler(
+        public DeleteObservationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<DeleteBatchObservationCommandHandler> logger)
+            ILogger<DeleteObservationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(DeleteBatchObservationCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteObservationCommand request, CancellationToken token)
         {
-            var batch = await _context.Batches.SingleOrDefaultAsync(b => b.Observations.Any(o => o.Id == request.BatchObservationId), token);
-            if (batch == null)
-                return Failure("Le lot est introuvable.");
+            var observation = await _context.Observations.SingleOrDefaultAsync(b => b.Id == request.BatchObservationId, token);
+            if (observation == null)
+                return Failure("L'observation est introuvable.");
 
-            batch.RemoveObservation(request.BatchObservationId);
+            _context.Remove(observation);
 
             await _context.SaveChangesAsync(token);
             return Success();

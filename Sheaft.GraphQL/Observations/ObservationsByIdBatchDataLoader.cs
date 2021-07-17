@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.GraphQL.Batches
+namespace Sheaft.GraphQL.Observations
 {
-    public class BatchObservationsByIdBatchDataLoader : BatchDataLoader<Guid, BatchObservation>
+    public class ObservationsByIdBatchDataLoader : BatchDataLoader<Guid, Observation>
     {
         private readonly IDbContextFactory<QueryDbContext> _contextFactory;
 
-        public BatchObservationsByIdBatchDataLoader(
+        public ObservationsByIdBatchDataLoader(
             IDbContextFactory<QueryDbContext> contextFactory,
             IBatchScheduler batchScheduler,
             DataLoaderOptions<Guid> options = null)
@@ -24,11 +24,11 @@ namespace Sheaft.GraphQL.Batches
             _contextFactory = contextFactory;
         }
 
-        protected override async Task<IReadOnlyDictionary<Guid, BatchObservation>> LoadBatchAsync(
+        protected override async Task<IReadOnlyDictionary<Guid, Observation>> LoadBatchAsync(
             IReadOnlyList<Guid> keys,
             CancellationToken token)
         {
-            return await _contextFactory.CreateDbContext().Set<BatchObservation>().Where(u => keys.Contains(u.Id))
+            return await _contextFactory.CreateDbContext().Set<Observation>().Where(u => keys.Contains(u.Id))
                 .ToDictionaryAsync(c => c.Id, token);
         }
     }

@@ -29,7 +29,6 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.NoAction).IsRequired();
             entity.HasOne(c => c.Definition).WithMany().HasForeignKey(c => c.DefinitionId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Observations).WithOne().HasForeignKey(c => c.BatchId).OnDelete(DeleteBehavior.Cascade);
             
             entity.HasKey(c => c.Id);
             entity.HasIndex(c => new {c.ProducerId, c.Number}).IsUnique();

@@ -9,14 +9,15 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
-    public class BatchObservationType : SheaftOutputType<BatchObservation>
+    public class ObservationType : SheaftOutputType<Observation>
     {
-        protected override void Configure(IObjectTypeDescriptor<BatchObservation> descriptor)
+        protected override void Configure(IObjectTypeDescriptor<Observation> descriptor)
         {
             base.Configure(descriptor);
 
@@ -24,7 +25,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ImplementsNode()
                 .IdField(c => c.Id)
                 .ResolveNode((ctx, id) => 
-                    ctx.DataLoader<BatchObservationsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                    ctx.DataLoader<ObservationsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
             descriptor
                 .Field(c => c.Comment)
@@ -52,16 +53,16 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("replies")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetReplies(default, default, default, default))
-                .Type<ListType<BatchObservationType>>();
+                .Type<ListType<ObservationType>>();
         }
 
         private class BatchObservationResolvers
         {
-            public async Task<IEnumerable<BatchObservation>> GetReplies(BatchObservation batchObservation, [ScopedService] QueryDbContext context,
-                BatchObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
+            public async Task<IEnumerable<Observation>> GetReplies(Observation observation, [ScopedService] QueryDbContext context,
+                ObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var batchObservationIds = await context.Set<BatchObservation>()
-                    .Where(cp => cp.BatchId == batchObservation.BatchId && cp.ReplyToId == batchObservation.Id)
+                var batchObservationIds = await context.Set<Observation>()
+                    .Where(cp => cp.ReplyToId == observation.Id)
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 

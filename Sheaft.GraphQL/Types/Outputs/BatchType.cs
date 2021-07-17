@@ -14,6 +14,7 @@ using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Deliveries;
+using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
@@ -50,11 +51,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("createdOn");
             
             descriptor
-                .Field(c => c.Observations)
-                .Name("observations")
+                .Field("observations")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetObservations(default, default, default, default, default, default))
-                .Type<ListType<BatchObservationType>>();
+                .Type<ListType<ObservationType>>();
             
             descriptor
                 .Field("purchaseOrders")
@@ -93,33 +93,33 @@ namespace Sheaft.GraphQL.Types.Outputs
 
         private class BatchResolvers
         {
-            public async Task<IEnumerable<BatchObservation>> GetObservations(Batch batch,
+            public async Task<IEnumerable<Observation>> GetObservations(Batch batch,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,
                 [Service] IOptionsSnapshot<RoleOptions> roleOptions,
-                BatchObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
+                ObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var currentUser = currentUserService.GetCurrentUserInfo();
                 if (!currentUser.Succeeded)
                     return null;
 
-                var batchObservationIds = new List<Guid>();
-                if (!currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                var observationIds = new List<Guid>();
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
-                    batchObservationIds = await context.Set<BatchObservation>()
-                            .Where(cp => cp.BatchId == batch.Id && !cp.ReplyToId.HasValue && cp.VisibleToAll)
+                    observationIds = await context.Observations
+                            .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.VisibleToAll && cp.Batches.Any(b => b.BatchId == batch.Id))
                             .Select(cp => cp.Id)
                             .ToListAsync(token);
                 }
                 else
                 {
-                    batchObservationIds = await context.Set<BatchObservation>()
-                    .Where(cp => cp.BatchId == batch.Id && !cp.ReplyToId.HasValue)
+                    observationIds = await context.Observations
+                    .Where(cp => cp.UserId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
                 }
 
-                var result = await dataLoader.LoadAsync(batchObservationIds, token);
+                var result = await dataLoader.LoadAsync(observationIds, token);
                 return result.OrderBy(o => o.CreatedOn);
             }
             
@@ -135,7 +135,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             }
             
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Batch batch,
-            [ScopedService] QueryDbContext context,
+                [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,
                 [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 PurchaseOrdersByIdBatchDataLoader dataLoader, CancellationToken token)
@@ -145,17 +145,17 @@ namespace Sheaft.GraphQL.Types.Outputs
                     return null;
 
                 var purchaseOrderIds = new List<Guid>();
-                if (!currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     purchaseOrderIds = await context.Deliveries
-                       .Where(cp => cp.PurchaseOrders.Any(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
+                       .Where(cp => cp.PurchaseOrders.Any(po => po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
                        .SelectMany(cp => cp.PurchaseOrders.Select(po => po.Id))
                        .ToListAsync(token);
                 }
                 else
                 {
                     purchaseOrderIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
+                    .Where(cp => cp.PurchaseOrders.Any(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
                     .SelectMany(cp => cp.PurchaseOrders.Select(po => po.Id))
                     .ToListAsync(token);
                 }

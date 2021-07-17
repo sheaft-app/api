@@ -36,6 +36,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         DbSet<Domain.Level> Levels { get; set; }
         DbSet<Domain.Nationality> Nationalities { get; set; }
         DbSet<Domain.Notification> Notifications { get; set; }
+        DbSet<Domain.Observation> Observations { get; set; }
         DbSet<Domain.Order> Orders { get; set; }
         DbSet<Domain.PurchaseOrder> PurchaseOrders { get; set; }
         DbSet<Domain.Returnable> Returnables { get; set; }

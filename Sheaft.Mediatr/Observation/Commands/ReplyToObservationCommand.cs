@@ -13,45 +13,45 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Options;
 
-namespace Sheaft.Mediatr.BatchObservation.Commands
+namespace Sheaft.Mediatr.Observation.Commands
 {
-    public class ReplyToBatchObservationCommand : Command
+    public class ReplyToObservationCommand : Command
     {
-        protected ReplyToBatchObservationCommand()
+        protected ReplyToObservationCommand()
         {
         }
 
         [JsonConstructor]
-        public ReplyToBatchObservationCommand(RequestUser requestUser) : base(requestUser)
+        public ReplyToObservationCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid BatchObservationId { get; set; }
+        public Guid ObservationId { get; set; }
         public string Comment { get; set; }
     }
 
-    public class ReplyToBatchObservationCommandHandler : CommandsHandler,
-        IRequestHandler<ReplyToBatchObservationCommand, Result>
+    public class ReplyToObservationCommandHandler : CommandsHandler,
+        IRequestHandler<ReplyToObservationCommand, Result>
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly RoleOptions _roleOptions;
 
-        public ReplyToBatchObservationCommandHandler(
+        public ReplyToObservationCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             ICurrentUserService currentUserService,
             IOptionsSnapshot<RoleOptions> roleOptions,
-            ILogger<ReplyToBatchObservationCommandHandler> logger)
+            ILogger<ReplyToObservationCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _currentUserService = currentUserService;
             _roleOptions = roleOptions.Value;
         }
 
-        public async Task<Result> Handle(ReplyToBatchObservationCommand request, CancellationToken token)
+        public async Task<Result> Handle(ReplyToObservationCommand request, CancellationToken token)
         {
-            var batchObservation = await _context.Set<Domain.BatchObservation>().SingleOrDefaultAsync(b => b.Id == request.BatchObservationId, token);
-            if (batchObservation == null)
+            var observation = await _context.Observations.SingleOrDefaultAsync(b => b.Id == request.ObservationId, token);
+            if (observation == null)
                 return Failure("L'observation à laquelle répondre est introuvable.");
 
             var currentUser = _currentUserService.GetCurrentUserInfo();
@@ -59,11 +59,11 @@ namespace Sheaft.Mediatr.BatchObservation.Commands
                 return Failure(currentUser);
 
             if (!currentUser.Data.IsInRole(_roleOptions.Producer.Value) &&
-                batchObservation.UserId != currentUser.Data.Id)
+                observation.UserId != currentUser.Data.Id)
                 return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
             
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == request.RequestUser.Id, token);
-            batchObservation.AddReply(request.Comment, user);
+            observation.AddReply(request.Comment, user);
 
             await _context.SaveChangesAsync(token);
             return Success();
