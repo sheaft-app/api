@@ -40,6 +40,7 @@ namespace Sheaft.Domain
         public DateTimeOffset? SendCompletedOn { get; set; }
         public virtual ICollection<RecallBatch> Batches { get; private set; }
         public virtual ICollection<RecallProduct> Products { get; private set; }
+        public virtual ICollection<RecallClient> Clients { get; private set; }
 
         public void SetBatches(IEnumerable<Batch> batches)
         {
@@ -84,6 +85,26 @@ namespace Sheaft.Domain
 
             if (productIdsToAdd.Any())
                 AddProducts(products.Where(b => productIdsToAdd.Contains(b.Id)).ToList());
+        }
+
+        public void SetClients(IEnumerable<User> clients)
+        {
+            if (clients == null || !clients.Any())
+                return;
+
+            var existingClientIds = Clients?.Select(b => b.ClientId).ToList() ?? new List<Guid>();
+            var newClientIds = clients.Select(b => b.Id);
+            var clientIdsToRemove = existingClientIds.Except(newClientIds);
+
+            if (clientIdsToRemove.Any())
+                RemoveClients(Clients?.Where(b => clientIdsToRemove.Contains(b.ClientId)).Select(b => b.Client)
+                    .ToList());
+
+            existingClientIds = Clients?.Select(b => b.ClientId).ToList() ?? new List<Guid>();
+            var clientIdsToAdd = newClientIds.Except(existingClientIds);
+
+            if (clientIdsToAdd.Any())
+                AddClients(clients.Where(b => clientIdsToAdd.Contains(b.Id)).ToList());
         }
 
         private void AddBatches(IEnumerable<Batch> batches)
@@ -133,6 +154,31 @@ namespace Sheaft.Domain
                 Products.Remove(observationProduct);
             }
         }
+        
+
+        private void AddClients(IEnumerable<User> clients)
+        {
+            if (Clients == null)
+                Clients = new List<RecallClient>();
+
+            foreach (var client in clients)
+                Clients.Add(new RecallClient(client));
+        }
+
+        private void RemoveClients(IEnumerable<User> clients)
+        {
+            if (Clients == null)
+                throw SheaftException.NotFound("Ce rappel ne contient pas de clients.");
+
+            foreach (var client in clients)
+            {
+                var observationClient = Clients.FirstOrDefault(b => b.ClientId == client.Id);
+                if (observationClient == null)
+                    throw SheaftException.NotFound("Ce rappel ne contient pas ce client.");
+
+                Clients.Remove(observationClient);
+            }
+        }
 
         public void SetName(string name)
         {
@@ -154,11 +200,11 @@ namespace Sheaft.Domain
 
         public void StartSending()
         {
-            if (SendingStartedOn.HasValue)
+            if (Status == RecallStatus.Sending)
                 throw SheaftException.Validation("La campagne est déjà en cours d'envoi.");
             
             Status = RecallStatus.Sending;
-            SendingStartedOn = DateTimeOffset.UtcNow;
+            SendingStartedOn ??= DateTimeOffset.UtcNow;
         }
 
         public void CompleteSending()

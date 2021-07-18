@@ -66,10 +66,22 @@ namespace Sheaft.Mediatr.Recall.Commands
                     .ToListAsync(token)
                 : new List<Domain.Product>();
 
+            var clientIds = await _context.PurchaseOrders
+                .Where(po =>
+                    po.Picking.PreparedProducts.Any(pp => request.ProductIds.Contains(pp.ProductId)) ||
+                    po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => request.BatchIds.Contains(b.BatchId))))
+                .Select(po => po.ClientId)
+                .ToListAsync(token);
+
+            var clients = await _context.Users
+                .Where(u => clientIds.Contains(u.Id))
+                .ToListAsync(token);
+            
             var producer = await _context.Producers.SingleOrDefaultAsync(p => p.Id == request.ProducerId, token);
 
             var entity = new Domain.Recall(Guid.NewGuid(), request.Name, request.SaleStartedOn, request.SaleEndedOn, request.Comment, producer, products);
             entity.SetBatches(batches);
+            entity.SetClients(clients);
             
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

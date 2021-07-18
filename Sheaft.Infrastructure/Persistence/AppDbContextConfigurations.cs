@@ -162,6 +162,7 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new RecallConfiguration());
             modelBuilder.ApplyConfiguration(new RecallBatchConfiguration());
             modelBuilder.ApplyConfiguration(new RecallProductConfiguration());
+            modelBuilder.ApplyConfiguration(new RecallClientConfiguration());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

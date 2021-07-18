@@ -10,6 +10,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Recalls;
+using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -73,6 +74,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetBatches(default, default, default, default))
                 .Type<ListType<BatchType>>();
+            
+            descriptor
+                .Field(c => c.Clients)
+                .Name("clients")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchObservationResolvers>(c => c.GetClients(default, default, default, default))
+                .Type<ListType<UserType>>();
         }
 
         private class BatchObservationResolvers
@@ -88,21 +96,32 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await dataLoader.LoadAsync(observationProductIds, token);
             }
             
-            public async Task<IEnumerable<Batch>> GetBatches(Recall observation, [ScopedService] QueryDbContext context,
+            public async Task<IEnumerable<Batch>> GetBatches(Recall recall, [ScopedService] QueryDbContext context,
                 BatchesByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var batchIds = await context.Set<RecallBatch>()
-                    .Where(ob => ob.RecallId == observation.Id)
+                    .Where(ob => ob.RecallId == recall.Id)
                     .Select(cp => cp.BatchId)
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(batchIds, token);
             }
             
-            public Task<Producer> GetProducer(Observation observation, 
+            public async Task<IEnumerable<User>> GetClients(Recall recall, [ScopedService] QueryDbContext context,
+                UsersByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var clientIds = await context.Set<RecallClient>()
+                    .Where(ob => ob.RecallId == recall.Id)
+                    .Select(cp => cp.ClientId)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(clientIds, token);
+            }
+            
+            public Task<Producer> GetProducer(Recall recall, 
                 ProducersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                return dataLoader.LoadAsync(observation.ProducerId, token);
+                return dataLoader.LoadAsync(recall.ProducerId, token);
             }
         }
     }

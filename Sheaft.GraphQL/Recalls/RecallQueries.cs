@@ -55,7 +55,7 @@ namespace Sheaft.GraphQL.Recalls
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public async Task<IQueryable<Recall>> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
+        public IQueryable<Recall> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
 
@@ -63,18 +63,8 @@ namespace Sheaft.GraphQL.Recalls
                 return context.Recalls
                     .Where(c => c.ProducerId == CurrentUser.Id);
 
-            var productIds = await context.PurchaseOrders
-                .SelectMany(po => po.Picking.PreparedProducts.Select(p => p.ProductId))
-                .Distinct()
-                .ToListAsync(token);
-            
-            var batchIds = await context.PurchaseOrders
-                .SelectMany(po => po.Picking.PreparedProducts.SelectMany(p => p.Batches.Select(b => b.BatchId)))
-                .Distinct()
-                .ToListAsync(token);
-            
             return context.Recalls
-                .Where(c => c.Batches.Any(b => batchIds.Contains(b.BatchId)) || c.Products.Any(p => productIds.Contains(p.Id)));
+                .Where(c => c.Clients.Any(b => b.ClientId == CurrentUser.Id));
         }
     }
 }

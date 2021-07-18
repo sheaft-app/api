@@ -63,24 +63,14 @@ namespace Sheaft.Mediatr.Recall.Commands
             try
             {
                 job.StartJob();
-                await _context.SaveChangesAsync(token);
-
-
                 recall.StartSending();
                 await _context.SaveChangesAsync(token);
 
-                var recallProductIds = recall.Products.Select(p => p.ProductId);
-                var recallBatchIds = recall.Batches.Select(p => p.BatchId);
-                
-                var clientIds = await _context.PurchaseOrders
-                    .Where(d => d.Picking.PreparedProducts.Any(p => recallProductIds.Contains(p.Id) || p.Batches.Any(b => recallBatchIds.Contains(b.BatchId))))
-                    .Select(po => po.ClientId)
-                    .ToListAsync(token);
-
-                foreach (var clientId in clientIds)
-                    _mediatr.Post(new RecallSentEvent(recall.Id, clientId));
+                foreach (var client in recall.Clients.Where(c => !c.RecallSent))
+                    _mediatr.Post(new RecallSentEvent(recall.Id, client.ClientId));
             
                 recall.CompleteSending();
+                job.CompleteJob();
                 await _context.SaveChangesAsync(token);
                 
                 return Success();

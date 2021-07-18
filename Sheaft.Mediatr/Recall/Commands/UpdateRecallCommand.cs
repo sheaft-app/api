@@ -71,10 +71,22 @@ namespace Sheaft.Mediatr.Recall.Commands
                     .ToListAsync(token)
                 : new List<Domain.Product>();
             
+            var clientIds = await _context.PurchaseOrders
+                .Where(po =>
+                    po.Picking.PreparedProducts.Any(pp => request.ProductIds.Contains(pp.ProductId)) ||
+                    po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => request.BatchIds.Contains(b.BatchId))))
+                .Select(po => po.ClientId)
+                .ToListAsync(token);
+
+            var clients = await _context.Users
+                .Where(u => clientIds.Contains(u.Id))
+                .ToListAsync(token);
+            
             recall.SetName(request.Name);
             recall.SetComment(request.Comment);
             recall.SetBatches(batches);
             recall.SetProducts(products);
+            recall.SetClients(clients);
             recall.SetSaleStartedOn(request.SaleStartedOn);
             recall.SetSaleEndedOn(request.SaleEndedOn);
 
