@@ -10,6 +10,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Observations;
+using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
@@ -34,7 +35,14 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.User)
                 .Type<UserType>()
-                .Name("user");
+                .Name("user")
+                .ResolveWith<BatchObservationResolvers>(c => c.GetUser(default, default, default));
+            
+            descriptor
+                .Field(c => c.Producer)
+                .Type<ProducerType>()
+                .Name("producer")
+                .ResolveWith<BatchObservationResolvers>(c => c.GetProducer(default, default, default));
             
             descriptor
                 .Field(c => c.CreatedOn)
@@ -54,6 +62,20 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetReplies(default, default, default, default))
                 .Type<ListType<ObservationType>>();
+            
+            descriptor
+                .Field(c => c.Products)
+                .Name("products")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchObservationResolvers>(c => c.GetProducts(default, default, default, default))
+                .Type<ListType<ObservationProductType>>();
+            
+            descriptor
+                .Field(c => c.Batches)
+                .Name("batches")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchObservationResolvers>(c => c.GetBatches(default, default, default, default))
+                .Type<ListType<BatchType>>();
         }
 
         private class BatchObservationResolvers
@@ -68,6 +90,40 @@ namespace Sheaft.GraphQL.Types.Outputs
 
                 var results = await dataLoader.LoadAsync(batchObservationIds, token);
                 return results.OrderBy(r => r.CreatedOn);
+            }
+            
+            public async Task<IEnumerable<ObservationProduct>> GetProducts(Observation observation, [ScopedService] QueryDbContext context,
+                ObservationProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var observationProductIds = await context.Set<ObservationProduct>()
+                    .Where(ob => ob.ObservationId == observation.Id)
+                    .Select(cp => cp.Id)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(observationProductIds, token);
+            }
+            
+            public async Task<IEnumerable<Batch>> GetBatches(Observation observation, [ScopedService] QueryDbContext context,
+                BatchesByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var batchIds = await context.Set<ObservationBatch>()
+                    .Where(ob => ob.ObservationId == observation.Id)
+                    .Select(cp => cp.BatchId)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(batchIds, token);
+            }
+            
+            public Task<Producer> GetProducer(Observation observation, 
+                ProducersByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                return dataLoader.LoadAsync(observation.ProducerId, token);
+            }
+            
+            public Task<User> GetUser(Observation observation, 
+                UsersByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                return dataLoader.LoadAsync(observation.UserId, token);
             }
         }
     }

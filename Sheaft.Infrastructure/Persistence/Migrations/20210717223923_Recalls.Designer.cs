@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Sheaft.Infrastructure.Persistence;
@@ -10,9 +11,10 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QueryDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210717223923_Recalls")]
+    partial class Recalls
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2914,27 +2916,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.ToTable("RecallBatches");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.RecallClient", b =>
-                {
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RecallId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("RecallSent")
-                        .HasColumnType("bit");
-
-                    b.HasKey("ClientId", "RecallId");
-
-                    b.HasIndex("RecallId");
-
-                    b.ToTable("RecallClients");
-                });
-
             modelBuilder.Entity("Sheaft.Domain.RecallProduct", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -5125,23 +5106,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Batch");
                 });
 
-            modelBuilder.Entity("Sheaft.Domain.RecallClient", b =>
-                {
-                    b.HasOne("Sheaft.Domain.User", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Sheaft.Domain.Recall", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("RecallId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-                });
-
             modelBuilder.Entity("Sheaft.Domain.RecallProduct", b =>
                 {
                     b.HasOne("Sheaft.Domain.Product", "Product")
@@ -5660,8 +5624,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Sheaft.Domain.Recall", b =>
                 {
                     b.Navigation("Batches");
-
-                    b.Navigation("Clients");
 
                     b.Navigation("Products");
                 });

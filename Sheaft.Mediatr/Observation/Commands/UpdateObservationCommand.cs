@@ -68,6 +68,12 @@ namespace Sheaft.Mediatr.Observation.Commands
                     .Where(b => request.ProductIds.Contains(b.Id))
                     .ToListAsync(token)
                 : new List<Domain.Product>();
+            
+            if(batches.Any(b => b.ProducerId != observation.ProducerId))
+                return Failure("Une observation est liée à un producteur, les lots doivent donc appartenir au même producteur.");
+            
+            if(products.Any(b => b.ProducerId != observation.ProducerId))
+                return Failure("Une observation est liée à un producteur, les produits doivent donc appartenir au même producteur.");
 
             observation.SetBatches(batches);
             observation.SetProducts(products);

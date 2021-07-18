@@ -2,57 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Core.Exceptions;
-using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Observation;
-using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {
-    public class Observation : IIdEntity, ITrackCreation, ITrackUpdate, ITrackRemove, IHasDomainEvent
+    public class Observation : Surveillance
     {
         protected Observation()
         {
         }
-        
-        public Observation(Guid id, string comment, User user)
+
+        public Observation(Guid id, string comment, User user, Producer producer)
+            : base(id, comment, producer)
         {
-            Id = id;
-            Comment = comment;
             UserId = user.Id;
             User = user;
         }
 
-        public Guid Id { get; private set; }
-        public string Comment { get; private set; }
-        public DateTimeOffset CreatedOn { get; private set; }
-        public DateTimeOffset? UpdatedOn { get; private set; }
-        public DateTimeOffset? RemovedOn { get; private set; }
         public bool VisibleToAll { get; private set; }
         public Guid? ReplyToId { get; private set; }
-        public Guid? UserId { get; private set; }
-        public Guid ProducerId { get; private set; }
+        public Guid UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual Producer Producer { get; private set; }
         public virtual ICollection<Observation> Replies { get; private set; }
         public virtual ICollection<ObservationBatch> Batches { get; private set; }
         public virtual ICollection<ObservationProduct> Products { get; private set; }
-        public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
 
-        public void SetComment(string comment)
-        {
-            Comment = comment;
-        }
-        
         public void AddReply(string comment, User user)
         {
-            if(ReplyToId.HasValue)
+            if (ReplyToId.HasValue)
                 throw SheaftException.Validation("Une réponse ne peut être ajoutée qu'à une observation.");
-            
+
             if (Replies == null)
                 Replies = new List<Observation>();
 
-            var reply = new Observation(Guid.NewGuid(), comment, user);
+            var reply = new Observation(Guid.NewGuid(), comment, user, Producer);
             Replies.Add(reply);
 
             DomainEvents.Add(new ObservationRepliedEvent(Id, reply.Id));
@@ -62,48 +46,55 @@ namespace Sheaft.Domain
         {
             if (ReplyToId.HasValue && visibleToAll)
                 throw SheaftException.Validation("Une réponse à une observation ne peut pas être publique.");
-            
-            if(User.Kind != ProfileKind.Producer && visibleToAll)
+
+            if (User.Kind != ProfileKind.Producer && visibleToAll)
                 throw SheaftException.Validation("Seule les observations d'un producteur peuvent être publique.");
-            
+
             VisibleToAll = visibleToAll;
         }
-        
+
         public void SetBatches(IEnumerable<Batch> batches)
         {
-            if(batches == null || !batches.Any())
+            if (batches == null || !batches.Any())
                 return;
             
+            if (batches.Any(p => p.ProducerId != ProducerId))
+                throw SheaftException.BadRequest("Une observation est liée au producteur, les lots doivent donc lui être liés.");
+
             var existingBatchIds = Batches?.Select(b => b.BatchId).ToList() ?? new List<Guid>();
             var newBatchIds = batches.Select(b => b.Id);
             var batchIdsToRemove = existingBatchIds.Except(newBatchIds);
-            
-            if(batchIdsToRemove.Any())
+
+            if (batchIdsToRemove.Any())
                 RemoveBatches(Batches?.Where(b => batchIdsToRemove.Contains(b.BatchId)).Select(b => b.Batch).ToList());
-            
+
             existingBatchIds = Batches?.Select(b => b.BatchId).ToList() ?? new List<Guid>();
             var batchIdsToAdd = newBatchIds.Except(existingBatchIds);
-            
-            if(batchIdsToAdd.Any())
+
+            if (batchIdsToAdd.Any())
                 AddBatches(batches.Where(b => batchIdsToAdd.Contains(b.Id)).ToList());
         }
-        
+
         public void SetProducts(IEnumerable<Product> products)
         {
-            if(products == null || !products.Any())
+            if (products == null || !products.Any())
                 return;
-            
+
+            if (products.Any(p => p.ProducerId != ProducerId))
+                throw SheaftException.BadRequest("Une observation est liée au producteur, les produits doivent donc lui être liés.");
+
             var existingProductIds = Products?.Select(b => b.ProductId).ToList() ?? new List<Guid>();
             var newProductIds = products.Select(b => b.Id);
             var productIdsToRemove = existingProductIds.Except(newProductIds);
-            
-            if(productIdsToRemove.Any())
-                RemoveProducts(Products?.Where(b => productIdsToRemove.Contains(b.ProductId)).Select(b => b.Product).ToList());
-            
+
+            if (productIdsToRemove.Any())
+                RemoveProducts(Products?.Where(b => productIdsToRemove.Contains(b.ProductId)).Select(b => b.Product)
+                    .ToList());
+
             existingProductIds = Products?.Select(b => b.ProductId).ToList() ?? new List<Guid>();
             var productIdsToAdd = newProductIds.Except(existingProductIds);
-            
-            if(productIdsToAdd.Any())
+
+            if (productIdsToAdd.Any())
                 AddProducts(products.Where(b => productIdsToAdd.Contains(b.Id)).ToList());
         }
 
