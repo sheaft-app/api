@@ -40,6 +40,7 @@ namespace Sheaft.Domain
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
         public string Client { get; private set; }
+        public DateTimeOffset? BilledOn { get; private set; }
         public string Producer { get; private set; }
         public DeliveryKind Kind { get; private set; }
         public DeliveryStatus Status { get; private set; }
@@ -198,6 +199,14 @@ namespace Sheaft.Domain
             }
 
             Refresh();
+        }
+
+        public void SetAsBilled()
+        {
+            if (Status != DeliveryStatus.Delivered)
+                throw SheaftException.Validation("La livraison n'a pas encore été validée.");
+
+            BilledOn = DateTimeOffset.UtcNow;
         }
 
         public void SetAsReady()

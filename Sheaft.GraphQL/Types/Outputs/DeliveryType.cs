@@ -37,6 +37,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("deliveredOn");
             
             descriptor
+                .Field(c => c.BilledOn)
+                .Name("billedOn");
+            
+            descriptor
                 .Field(c => c.Status)
                 .Name("status");
                 
