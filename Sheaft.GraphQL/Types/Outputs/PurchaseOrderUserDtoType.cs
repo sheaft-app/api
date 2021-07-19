@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Application.Models;
+using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {
@@ -10,6 +11,11 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
             
             descriptor.Name("PurchaseOrderUser");
+
+            descriptor
+                .Field(c => c.Id)
+                .ID(nameof(User))
+                .Name("id");
             
             descriptor
                 .Field(c => c.Name)
