@@ -142,6 +142,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetProducts(default, default, default, default))
                 .Type<ListType<DeliveryProductType>>();
+
+            descriptor
+                .Field(c => c.ReturnedReturnables)
+                .Name("returnedReturnables")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<DeliveryResolvers>(c => c.GetReturnedReturnables(default, default, default, default))
+                .Type<ListType<DeliveryReturnableType>>();
         }
 
         private class DeliveryResolvers
@@ -167,6 +174,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await deliveryProductsDataLoader.LoadAsync(productsId, token);
+            }
+
+            public async Task<IEnumerable<DeliveryReturnable>> GetReturnedReturnables(Delivery delivery,
+                [ScopedService] QueryDbContext context,
+                DeliveryReturnablesByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var returnableIds = await context.Set<DeliveryReturnable>()
+                    .Where(p => p.DeliveryId == delivery.Id)
+                    .Select(p => p.Id)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(returnableIds, token);
             }
         }
     }
