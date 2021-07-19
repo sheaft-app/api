@@ -15,6 +15,18 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Quantity)
                 .Name("quantity");
+            
+            descriptor
+                .Field(c => c.Conditioning)
+                .Name("conditioning");
+            
+            descriptor
+                .Field(c => c.QuantityPerUnit)
+                .Name("quantityPerUnit");
+            
+            descriptor
+                .Field(c => c.Unit)
+                .Name("unit");
                 
             descriptor
                 .Field(c => c.Vat)
@@ -55,6 +67,22 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.TotalOnSalePrice)
                 .Name("totalOnSalePrice");
+            
+            descriptor
+                .Field(c => c.ReturnableWholeSalePrice)
+                .Name("returnableWholeSalePrice");
+
+            descriptor
+                .Field(c => c.ReturnableOnSalePrice)
+                .Name("returnableOnSalePrice");
+                
+            descriptor
+                .Field(c => c.ReturnableVatPrice)
+                .Name("returnableVatPrice");
+                
+            descriptor
+                .Field(c => c.ReturnableVat)
+                .Name("returnableVat");
                 
             descriptor
                 .Field(c => c.TotalReturnableWholeSalePrice)
@@ -81,26 +109,14 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("totalProductOnSalePrice");
             
             descriptor
-                .Field(c => c.QuantityPerUnit)
-                .Name("quantityPerUnit");
-                
-            descriptor
-                .Field(c => c.Conditioning)
-                .Name("conditioning");
-                
-            descriptor
-                .Field(c => c.Unit)
-                .Name("unit");
-
+                .Field(c => c.HasReturnable)
+                .Name("isReturnable");
+            
             descriptor
                 .Field(c => c.Name)
                 .Name("name")
                 .Type<NonNullType<StringType>>();
-            
-            descriptor
-                .Field(c => c.HasReturnable)
-                .Name("isReturnable");
-            
+
             descriptor
                 .Field(c => c.Reference)
                 .Name("reference")
