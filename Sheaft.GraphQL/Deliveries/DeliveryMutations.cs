@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -72,16 +74,16 @@ namespace Sheaft.GraphQL.Deliveries
             return await dataLoader.LoadAsync(input.DeliveryId, token);
         }
 
-        [GraphQLName("markDeliveryAsBilled")]
+        [GraphQLName("markDeliveriesAsBilled")]
         [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(DeliveryType))]
-        public async Task<Delivery> MarkDeliveryAsBilled(
-            [GraphQLType(typeof(MarkDeliveryAsBilledInputType))] [GraphQLName("input")]
-            MarkDeliveryAsBilledCommand input, [Service] ISheaftMediatr mediatr,
+        [GraphQLType(typeof(ListType<DeliveryType>))]
+        public async Task<IEnumerable<Delivery>> MarkDeliveriesAsBilled(
+            [GraphQLType(typeof(MarkDeliveriesAsBilledInputType))] [GraphQLName("input")]
+            MarkDeliveriesAsBilledCommand input, [Service] ISheaftMediatr mediatr,
             DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
         {
             await ExecuteAsync(mediatr, input, token);
-            return await dataLoader.LoadAsync(input.DeliveryId, token);
+            return await dataLoader.LoadAsync(input.DeliveryIds.ToList(), token);
         }
     }
 }
