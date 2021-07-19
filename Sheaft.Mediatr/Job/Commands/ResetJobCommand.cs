@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Accounting.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
@@ -91,13 +92,13 @@ namespace Sheaft.Mediatr.Job.Commands
                         To = exportPurchaseOrdersCommand.To
                     });
                     break;
-                case JobKind.ExportUserDeliveries:
-                    var exportDeliveriesCommand =
-                        JsonConvert.DeserializeObject<ExportDeliveriesCommand>(entity.Command);
-                    _mediatr.Post(new ExportDeliveriesCommand(request.RequestUser)
+                case JobKind.ExportUserAccounting:
+                    var exportAccountingCommand =
+                        JsonConvert.DeserializeObject<ExportAccountingCommand>(entity.Command);
+                    _mediatr.Post(new ExportAccountingCommand(request.RequestUser)
                     {
-                        JobId = exportDeliveriesCommand.JobId, From = exportDeliveriesCommand.From,
-                        To = exportDeliveriesCommand.To, Kinds = exportDeliveriesCommand.Kinds
+                        JobId = exportAccountingCommand.JobId, From = exportAccountingCommand.From,
+                        To = exportAccountingCommand.To, Kinds = exportAccountingCommand.Kinds
                     });
                     break;
                 case JobKind.SendRecalls:

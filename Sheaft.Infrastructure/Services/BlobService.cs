@@ -144,6 +144,12 @@ namespace Sheaft.Infrastructure.Services
             
             if (!response.Succeeded)
                 return response;
+            
+            response = await CleanContainerFolderStorageAsync(_storageOptions.Containers.Accounting, $"users/{userId:N}",
+                token);
+            
+            if (!response.Succeeded)
+                return response;
 
             return Success();
         }
@@ -316,14 +322,14 @@ namespace Sheaft.Infrastructure.Services
             return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.PurchaseOrders));
         }
 
-        public async Task<Result<string>> UploadUserDeliveriesFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
+        public async Task<Result<string>> UploadUserAccountingFileAsync(Guid userId, Guid jobId, string filename, byte[] data,
             CancellationToken token)
         {
             var containerClient =
-                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Accounting);
             await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/exports/{jobId:N}/{SanitizeFileName(filename)}");
+            var blobClient = containerClient.GetBlobClient($"users/{userId:N}/{jobId:N}/{SanitizeFileName(filename)}");
             await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
             using (var ms = new MemoryStream(data))
@@ -331,7 +337,7 @@ namespace Sheaft.Infrastructure.Services
 
             var sasBuilder = new BlobSasBuilder()
             {
-                BlobContainerName = _storageOptions.Containers.Deliveries,
+                BlobContainerName = _storageOptions.Containers.Accounting,
                 BlobName = blobClient.Name,
                 Resource = "b",
                 StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
@@ -340,7 +346,7 @@ namespace Sheaft.Infrastructure.Services
 
             sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Deliveries));
+            return Success<string>(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Accounting));
         }
 
         public async Task<Result<string>> UploadProducerDeliveryReceiptAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token)

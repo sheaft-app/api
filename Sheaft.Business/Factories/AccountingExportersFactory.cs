@@ -14,13 +14,13 @@ using Sheaft.Options;
 
 namespace Sheaft.Business.Factories
 {
-    public class DeliveriesExportersFactory : IDeliveriesExportersFactory
+    public class AccountingExportersFactory : IAccountingExportersFactory
     {
         private readonly IAppDbContext _context;
         private readonly Func<string, IDeliveriesFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public DeliveriesExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IDeliveriesFileExporter> resolver)
+        public AccountingExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IDeliveriesFileExporter> resolver)
         {
             _context = context;
             _resolver = resolver;

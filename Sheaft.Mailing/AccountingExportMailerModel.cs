@@ -2,7 +2,7 @@ using System;
 
 namespace Sheaft.Mailing
 {
-    public class DeliveriesExportMailerModel
+    public class AccountingExportMailerModel
     {
         public string UserName { get; set; }
         public string Name { get; set; }

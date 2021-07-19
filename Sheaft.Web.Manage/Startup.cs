@@ -264,7 +264,7 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
-            services.AddScoped<IDeliveriesExportersFactory, DeliveriesExportersFactory>();
+            services.AddScoped<IAccountingExportersFactory, AccountingExportersFactory>();
             
             var storageConfig = storageSettings.Get<StorageOptions>();
             services.AddSingleton<CloudStorageAccount>(CloudStorageAccount.Parse(storageConfig.ConnectionString));

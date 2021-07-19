@@ -10,12 +10,12 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Mediatr.Delivery.EventHandlers
+namespace Sheaft.Mediatr.Accounting.EventHandlers
 {
-    public class DeliveriesExportProcessingEventHandler : EventsHandler,
-        INotificationHandler<DomainEventNotification<DeliveriesExportProcessingEvent>>
+    public class AccountingExportProcessingEventHandler : EventsHandler,
+        INotificationHandler<DomainEventNotification<AccountingExportProcessingEvent>>
     {
-        public DeliveriesExportProcessingEventHandler(
+        public AccountingExportProcessingEventHandler(
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
@@ -23,12 +23,12 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
         {
         }
 
-        public async Task Handle(DomainEventNotification<DeliveriesExportProcessingEvent> notification,
+        public async Task Handle(DomainEventNotification<AccountingExportProcessingEvent> notification,
             CancellationToken token)
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(DeliveriesExportProcessingEvent),
+            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(AccountingExportProcessingEvent),
                 new {JobId = job.Id, Name = job.Name, UserId = job.UserId});
         }
     }

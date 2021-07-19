@@ -11,12 +11,12 @@ using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Events.PurchaseOrder;
 using Sheaft.Mailing;
 
-namespace Sheaft.Mediatr.Delivery.EventHandlers
+namespace Sheaft.Mediatr.Accounting.EventHandlers
 {
-    public class DeliveriesExportSucceededEventHandler : EventsHandler,
-        INotificationHandler<DomainEventNotification<DeliveriesExportSucceededEvent>>
+    public class AccountingExportSucceededEventHandler : EventsHandler,
+        INotificationHandler<DomainEventNotification<AccountingExportSucceededEvent>>
     {
-        public DeliveriesExportSucceededEventHandler(
+        public AccountingExportSucceededEventHandler(
             IAppDbContext context,
             IEmailService emailService,
             ISignalrService signalrService)
@@ -24,21 +24,21 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
         {
         }
 
-        public async Task Handle(DomainEventNotification<DeliveriesExportSucceededEvent> notification,
+        public async Task Handle(DomainEventNotification<AccountingExportSucceededEvent> notification,
             CancellationToken token)
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
             
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(DeliveriesExportSucceededEvent),
+            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(AccountingExportSucceededEvent),
                 new {JobId = job.Id, Name = job.Name, UserId = job.UserId, Url = job.File});
 
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"Votre export de livraisons est prêt",
-                nameof(DeliveriesExportSucceededEvent),
-                new DeliveriesExportMailerModel
+                $"Votre export de comptabilité est prêt",
+                nameof(AccountingExportSucceededEvent),
+                new AccountingExportMailerModel
                     {UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},
                 true,
                 token);

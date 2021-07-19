@@ -245,7 +245,7 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
-            services.AddScoped<IDeliveriesExportersFactory, DeliveriesExportersFactory>();
+            services.AddScoped<IAccountingExportersFactory, AccountingExportersFactory>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

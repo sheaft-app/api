@@ -19,16 +19,16 @@ using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Mediatr.Transaction.Commands;
 
-namespace Sheaft.Mediatr.Delivery.Commands
+namespace Sheaft.Mediatr.Accounting.Commands
 {
-    public class QueueExportDeliveriesCommand : Command<Guid>
+    public class QueueExportAccountingCommand : Command<Guid>
     {
-        protected QueueExportDeliveriesCommand()
+        protected QueueExportAccountingCommand()
         {
             
         }
         [JsonConstructor]
-        public QueueExportDeliveriesCommand(RequestUser requestUser) : base(requestUser)
+        public QueueExportAccountingCommand(RequestUser requestUser) : base(requestUser)
         {
             UserId = RequestUser.Id;
         }
@@ -46,27 +46,27 @@ namespace Sheaft.Mediatr.Delivery.Commands
         }
     }
 
-    public class QueueExportDeliveriesCommandHandler : CommandsHandler,
-        IRequestHandler<QueueExportDeliveriesCommand, Result<Guid>>
+    public class QueueExportAccountingCommandHandler : CommandsHandler,
+        IRequestHandler<QueueExportAccountingCommand, Result<Guid>>
     {
-        public QueueExportDeliveriesCommandHandler(
+        public QueueExportAccountingCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<QueueExportDeliveriesCommandHandler> logger)
+            ILogger<QueueExportAccountingCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<Guid>> Handle(QueueExportDeliveriesCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportAccountingCommand request, CancellationToken token)
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
             if(sender.Id != request.RequestUser.Id)
                 return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
-            var command = new ExportDeliveriesCommand(request.RequestUser)
+            var command = new ExportAccountingCommand(request.RequestUser)
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To, Kinds = request.Kinds};
             
-            var entity = new Domain.Job(command.JobId, JobKind.ExportUserDeliveries, request.Name ?? $"Export du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}", sender, command);
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserAccounting, request.Name ?? $"Export comptabilité du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

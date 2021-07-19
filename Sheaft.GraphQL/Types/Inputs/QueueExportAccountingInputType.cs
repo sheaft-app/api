@@ -1,15 +1,16 @@
 using HotChocolate.Types;
+using Sheaft.Mediatr.Accounting.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class QueueExportDeliveriesInputType : SheaftInputType<QueueExportDeliveriesCommand>
+    public class QueueExportAccountingInputType : SheaftInputType<QueueExportAccountingCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<QueueExportDeliveriesCommand> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<QueueExportAccountingCommand> descriptor)
         {
             base.Configure(descriptor);
 
-            descriptor.Name("QueueExportDeliveriesInput");
+            descriptor.Name("QueueExportAccountingInput");
             
             descriptor
                 .Field(c => c.From)

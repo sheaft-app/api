@@ -32,6 +32,7 @@
         public string PurchaseOrders { get; set; } = "purchaseorders";
         public string Deliveries { get; set; } = "deliveries";
         public string DeliveryBatches { get; set; } = "deliverybatches";
+        public string Accounting { get; set; } = "accounting";
     }
     public class StorageTables
     {

@@ -16,16 +16,16 @@ using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Mediatr.Delivery.Commands
+namespace Sheaft.Mediatr.Accounting.Commands
 {
-    public class ExportDeliveriesCommand : Command
+    public class ExportAccountingCommand : Command
     {
-        protected ExportDeliveriesCommand()
+        protected ExportAccountingCommand()
         {
             
         }
         [JsonConstructor]
-        public ExportDeliveriesCommand(RequestUser requestUser) : base(requestUser)
+        public ExportAccountingCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
@@ -35,25 +35,25 @@ namespace Sheaft.Mediatr.Delivery.Commands
         public IEnumerable<DeliveryKind> Kinds { get; set; }
     }
 
-    public class ExportDeliveriesCommandHandler : CommandsHandler,
-        IRequestHandler<ExportDeliveriesCommand, Result>
+    public class ExportAccountingCommandHandler : CommandsHandler,
+        IRequestHandler<ExportAccountingCommand, Result>
     {
         private readonly IBlobService _blobService;
-        private readonly IDeliveriesExportersFactory _deliveriesExportersFactory;
+        private readonly IAccountingExportersFactory _accountingExportersFactory;
 
-        public ExportDeliveriesCommandHandler(
+        public ExportAccountingCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
-            IDeliveriesExportersFactory deliveriesExportersFactory,
-            ILogger<ExportDeliveriesCommandHandler> logger)
+            IAccountingExportersFactory accountingExportersFactory,
+            ILogger<ExportAccountingCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
-            _deliveriesExportersFactory = deliveriesExportersFactory;
+            _accountingExportersFactory = accountingExportersFactory;
         }
 
-        public async Task<Result> Handle(ExportDeliveriesCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportAccountingCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if (job.UserId != request.RequestUser.Id)
@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.Delivery.Commands
 
             try
             {
-                job.StartJob(new DeliveriesExportProcessingEvent(job.Id));
+                job.StartJob(new AccountingExportProcessingEvent(job.Id));
                 await _context.SaveChangesAsync(token);
 
                 var deliveriesQuery = _context.Set<Domain.Delivery>().Where(o =>
@@ -71,30 +71,30 @@ namespace Sheaft.Mediatr.Delivery.Commands
                     && o.DeliveredOn >= request.From
                     && o.DeliveredOn <= request.To);
 
-                var exporter = await _deliveriesExportersFactory.GetExporterAsync(request.RequestUser, token);
+                var exporter = await _accountingExportersFactory.GetExporterAsync(request.RequestUser, token);
                 var deliveriesExportResult = await exporter.ExportAsync(request.RequestUser, request.From, request.To,
                     deliveriesQuery, token);
 
                 if (!deliveriesExportResult.Succeeded)
                     throw deliveriesExportResult.Exception;
 
-                var response = await _blobService.UploadUserDeliveriesFileAsync(job.UserId, job.Id,
-                    $"Ventes_Magasins_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}", deliveriesExportResult.Data.Data, token);
+                var response = await _blobService.UploadUserAccountingFileAsync(job.UserId, job.Id,
+                    $"Comptabilité_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}", deliveriesExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 
                 job.SetDownloadUrl(response.Data);
-                job.CompleteJob(new DeliveriesExportSucceededEvent(job.Id));
+                job.CompleteJob(new AccountingExportSucceededEvent(job.Id));
 
                 await _context.SaveChangesAsync(token);
                 return Success();
             }
             catch (Exception e)
             {
-                job.FailJob(e.Message, new DeliveriesExportFailedEvent(job.Id));
+                job.FailJob(e.Message, new AccountingExportFailedEvent(job.Id));
                 await _context.SaveChangesAsync(token);
                 
-                return Failure("Une erreur est survenue pendant l'export des livraisons.");
+                return Failure("Une erreur est survenue pendant l'export de comptabilité.");
             }
         }
     }

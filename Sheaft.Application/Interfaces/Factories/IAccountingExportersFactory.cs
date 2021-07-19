@@ -5,7 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.Interfaces.Factories
 {
-    public interface IDeliveriesExportersFactory
+    public interface IAccountingExportersFactory
     {
         IDeliveriesFileExporter GetExporter(RequestUser requestUser, string typename);
         Task<IDeliveriesFileExporter> GetExporterAsync(RequestUser requestUser, CancellationToken token);

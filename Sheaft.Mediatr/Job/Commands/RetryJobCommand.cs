@@ -10,6 +10,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.Accounting.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
@@ -71,8 +72,8 @@ namespace Sheaft.Mediatr.Job.Commands
                 case JobKind.ExportUserPurchaseOrders:
                     _mediatr.Post(entity.GetCommand<ExportPurchaseOrdersCommand>());
                     break;
-                case JobKind.ExportUserDeliveries:
-                    _mediatr.Post(entity.GetCommand<ExportDeliveriesCommand>());
+                case JobKind.ExportUserAccounting:
+                    _mediatr.Post(entity.GetCommand<ExportAccountingCommand>());
                     break;
                 case JobKind.SendRecalls:
                     _mediatr.Post(entity.GetCommand<SendRecallCommand>());
