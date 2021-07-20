@@ -15,6 +15,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.Observations;
+using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
@@ -89,6 +90,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetClients(default, default, default, default))
                 .Type<ListType<UserType>>();
+            
+            descriptor
+                .Field("products")
+                .Authorize(Policies.PRODUCER)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.GetProducts(default, default, default, default))
+                .Type<ListType<ProductType>>();
         }
 
         private class BatchResolvers
@@ -132,6 +140,17 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(deliveryIds, token);
+            }
+            
+            public async Task<IEnumerable<Product>> GetProducts(Batch batch, [ScopedService] QueryDbContext context,
+                ProductsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var productIds = await context.Deliveries
+                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
+                    .SelectMany(cp => cp.PurchaseOrders.SelectMany(po => po.Picking.PreparedProducts.Select(pp => pp.ProductId)))
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(productIds, token);
             }
             
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Batch batch,
