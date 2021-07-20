@@ -5,6 +5,7 @@ using HotChocolate.Types.Relay;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Users;
 using Sheaft.Options;
@@ -63,6 +64,16 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Address)
                 .Name("address")
                 .Type<NonNullType<UserAddressType>>();
+
+            descriptor
+                .Authorize(Policies.STORE_OR_PRODUCER)
+                .Field(c => c.Email)
+                .Name("email");
+
+            descriptor
+                .Authorize(Policies.STORE_OR_PRODUCER)
+                .Field(c => c.Phone)
+                .Name("phone");
         }
 
         private class UserResolvers
