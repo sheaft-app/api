@@ -169,7 +169,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .Select(p => p.Id)
                     .ToListAsync(token);
 
-                return await deliveryProductsDataLoader.LoadAsync(productsId, token);
+                return await deliveryProductsDataLoader.LoadAsync(productsId.Distinct().ToList(), token);
             }
 
             public async Task<IEnumerable<DeliveryReturnable>> GetReturnedReturnables(Delivery delivery,
