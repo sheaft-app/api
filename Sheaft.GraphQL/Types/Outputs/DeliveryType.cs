@@ -193,7 +193,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             public Task<User> GetClient(Delivery delivery,
                 UsersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                return dataLoader.LoadAsync(delivery.ProducerId, token);
+                return dataLoader.LoadAsync(delivery.ClientId, token);
             }
         }
     }
