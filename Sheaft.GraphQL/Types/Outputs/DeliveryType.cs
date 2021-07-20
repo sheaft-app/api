@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Deliveries;
+using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.PurchaseOrders;
+using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
@@ -49,27 +51,9 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("kind");
             
             descriptor
-                .Field(c => c.Client)
-                .Name("client");
-            
-            descriptor
-                .Field(c => c.Producer)
-                .Name("producer");
-            
-            descriptor
                 .Field("reference")
                 .Resolve((ctx, token) => ctx.Parent<Delivery>().Reference.AsDeliveryIdentifier());
             
-            descriptor
-                .Field(c => c.ClientId)
-                .ID(nameof(User))
-                .Name("clientId");
-            
-            descriptor
-                .Field(c => c.ProducerId)
-                .ID(nameof(User))
-                .Name("producerId");
-
             descriptor
                 .Field(c => c.Address)
                 .Name("address");
@@ -149,6 +133,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<DeliveryResolvers>(c => c.GetReturnedReturnables(default, default, default, default))
                 .Type<ListType<DeliveryReturnableType>>();
+            
+            descriptor
+                .Field(c => c.Client)
+                .ResolveWith<DeliveryResolvers>(c => c.GetClient(default, default, default))
+                .Name("client")
+                .Type<UserType>();
+            
+            descriptor
+                .Field(c => c.Producer)
+                .ResolveWith<DeliveryResolvers>(c => c.GetProducer(default, default, default))
+                .Name("producer")
+                .Type<ProducerType>();
         }
 
         private class DeliveryResolvers
@@ -186,6 +182,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(returnableIds, token);
+            }
+
+            public Task<Producer> GetProducer(Delivery delivery,
+                ProducersByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                return dataLoader.LoadAsync(delivery.ProducerId, token);
+            }
+
+            public Task<User> GetClient(Delivery delivery,
+                UsersByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                return dataLoader.LoadAsync(delivery.ProducerId, token);
             }
         }
     }
