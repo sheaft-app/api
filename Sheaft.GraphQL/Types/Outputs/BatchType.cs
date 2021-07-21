@@ -115,19 +115,19 @@ namespace Sheaft.GraphQL.Types.Outputs
                 if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     observationIds = await context.Observations
-                            .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.VisibleToAll && cp.Batches.Any(b => b.BatchId == batch.Id))
+                            .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
                             .Select(cp => cp.Id)
                             .ToListAsync(token);
                 }
                 else
                 {
                     observationIds = await context.Observations
-                    .Where(cp => cp.UserId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
+                    .Where(cp =>  (cp.VisibleToAll || cp.UserId == currentUser.Data.Id) && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
                 }
 
-                var result = await dataLoader.LoadAsync(observationIds, token);
+                var result = await dataLoader.LoadAsync(observationIds.Distinct().ToList(), token);
                 return result.OrderBy(o => o.CreatedOn);
             }
             
@@ -139,7 +139,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 
-                return await dataLoader.LoadAsync(deliveryIds, token);
+                return await dataLoader.LoadAsync(deliveryIds.Distinct().ToList(), token);
             }
             
             public async Task<IEnumerable<Product>> GetProducts(Batch batch, [ScopedService] QueryDbContext context,
@@ -150,7 +150,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .SelectMany(cp => cp.PurchaseOrders.SelectMany(po => po.Picking.PreparedProducts.Select(pp => pp.ProductId)))
                     .ToListAsync(token);
 
-                return await dataLoader.LoadAsync(productIds, token);
+                return await dataLoader.LoadAsync(productIds.Distinct().ToList(), token);
             }
             
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Batch batch,

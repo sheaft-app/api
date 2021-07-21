@@ -250,19 +250,19 @@ namespace Sheaft.GraphQL.Types.Outputs
                 if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     observationIds = await context.Observations
-                        .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.VisibleToAll && cp.Products.Any(b => b.ProductId == product.Id))
+                        .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Products.Any(b => b.ProductId == product.Id))
                         .Select(cp => cp.Id)
                         .ToListAsync(token);
                 }
                 else
                 {
                     observationIds = await context.Observations
-                        .Where(cp => cp.UserId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Products.Any(b => b.ProductId == product.Id))
+                        .Where(cp => (cp.VisibleToAll || cp.UserId == currentUser.Data.Id) && !cp.ReplyToId.HasValue && cp.Products.Any(b => b.ProductId == product.Id))
                         .Select(cp => cp.Id)
                         .ToListAsync(token);
                 }
 
-                var result = await dataLoader.LoadAsync(observationIds, token);
+                var result = await dataLoader.LoadAsync(observationIds.Distinct().ToList(), token);
                 return result.OrderBy(o => o.CreatedOn);
             }
             
