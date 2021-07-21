@@ -12,7 +12,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 
             entity.HasOne(c => c.Product).WithMany().HasForeignKey(c => c.ProductId).OnDelete(DeleteBehavior.NoAction);
 
-            entity.HasKey(c => new {c.ProductId, c.ObservationId});
+            entity.HasKey(c => c.Id);
             entity.ToTable("ObservationProducts");
         }
     }

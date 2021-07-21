@@ -13,6 +13,7 @@ namespace Sheaft.Domain
         protected SurveillanceProduct(Product product)
         {
             Id = Guid.NewGuid();
+            Product = product;
             ProductId = product.Id;
             Name = product.Name;
             Reference = product.Reference;
@@ -33,6 +34,6 @@ namespace Sheaft.Domain
         public ConditioningKind Conditioning { get; private set; }
         public string Picture { get; private set; }
         public Guid ProductId { get; private set; }
-        public virtual Product Product { get; set; }
+        public virtual Product Product { get; private set; }
     }
 }

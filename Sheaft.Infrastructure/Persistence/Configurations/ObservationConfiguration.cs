@@ -16,7 +16,7 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Replies).WithOne().HasForeignKey(c => c.ReplyToId).OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Batches).WithOne().HasForeignKey(c => c.ObservationId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasMany(c => c.Products).WithOne().HasForeignKey(c => c.ProductId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Products).WithOne().HasForeignKey(c => c.ObservationId).OnDelete(DeleteBehavior.Cascade);
 
             entity.HasKey(c => c.Id);
             entity.ToTable("Observations");
