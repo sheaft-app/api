@@ -18,42 +18,40 @@ using Sheaft.Domain.Events.PurchaseOrder;
 
 namespace Sheaft.Mediatr.Accounting.Commands
 {
-    public class ExportAccountingCommand : Command
+    public class ExportAccountingDeliveriesCommand : Command
     {
-        protected ExportAccountingCommand()
+        protected ExportAccountingDeliveriesCommand()
         {
             
         }
         [JsonConstructor]
-        public ExportAccountingCommand(RequestUser requestUser) : base(requestUser)
+        public ExportAccountingDeliveriesCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid JobId { get; set; }
-        public DateTimeOffset From { get; set; }
-        public DateTimeOffset To { get; set; }
-        public IEnumerable<DeliveryKind> Kinds { get; set; }
+        public IEnumerable<Guid> DeliveryIds { get; set; }
     }
 
-    public class ExportAccountingCommandHandler : CommandsHandler,
-        IRequestHandler<ExportAccountingCommand, Result>
+    public class ExportAccountingDeliveriesCommandHandler : CommandsHandler,
+        IRequestHandler<ExportAccountingDeliveriesCommand, Result>
     {
         private readonly IBlobService _blobService;
         private readonly IAccountingExportersFactory _accountingExportersFactory;
 
-        public ExportAccountingCommandHandler(
+        public ExportAccountingDeliveriesCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
             IAccountingExportersFactory accountingExportersFactory,
-            ILogger<ExportAccountingCommandHandler> logger)
+            ILogger<ExportAccountingDeliveriesCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
             _accountingExportersFactory = accountingExportersFactory;
         }
 
-        public async Task<Result> Handle(ExportAccountingCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportAccountingDeliveriesCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if (job.UserId != request.RequestUser.Id)
@@ -67,19 +65,16 @@ namespace Sheaft.Mediatr.Accounting.Commands
                 var deliveriesQuery = _context.Set<Domain.Delivery>().Where(o =>
                     o.ProducerId == request.RequestUser.Id
                     && o.Status == DeliveryStatus.Delivered
-                    && request.Kinds.Contains(o.Kind)
-                    && o.DeliveredOn >= request.From
-                    && o.DeliveredOn <= request.To);
+                    && request.DeliveryIds.Contains(o.Id));
 
                 var exporter = await _accountingExportersFactory.GetExporterAsync(request.RequestUser, token);
-                var deliveriesExportResult = await exporter.ExportAsync(request.RequestUser, request.From, request.To,
-                    deliveriesQuery, token);
-
+                
+                var deliveriesExportResult = await exporter.ExportAsync(request.RequestUser, deliveriesQuery, token);
                 if (!deliveriesExportResult.Succeeded)
                     throw deliveriesExportResult.Exception;
 
                 var response = await _blobService.UploadUserAccountingFileAsync(job.UserId, job.Id,
-                    $"Comptabilité_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}", deliveriesExportResult.Data.Data, token);
+                    $"Comptabilité_du_spécifique_du_{DateTimeOffset.UtcNow:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}", deliveriesExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 

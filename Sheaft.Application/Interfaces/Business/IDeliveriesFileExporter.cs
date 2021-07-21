@@ -11,7 +11,7 @@ namespace Sheaft.Application.Interfaces.Business
 {
     public interface IDeliveriesFileExporter
     {
-        Task<Result<ResourceExportDto>> ExportAsync(RequestUser user, DateTimeOffset @from, DateTimeOffset to,
-            IQueryable<Delivery> deliveriesQuery, CancellationToken token);
+        Task<Result<ResourceExportDto>> ExportAsync(RequestUser user, IQueryable<Delivery> deliveriesQuery,
+            CancellationToken token, DateTimeOffset? from = null, DateTimeOffset? to = null);
     }
 }

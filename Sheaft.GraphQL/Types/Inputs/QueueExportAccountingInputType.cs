@@ -4,9 +4,9 @@ using Sheaft.Mediatr.Delivery.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class QueueExportAccountingInputType : SheaftInputType<QueueExportAccountingCommand>
+    public class QueueExportAccountingInputType : SheaftInputType<QueueExportAccountingTimeRangeCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<QueueExportAccountingCommand> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<QueueExportAccountingTimeRangeCommand> descriptor)
         {
             base.Configure(descriptor);
 

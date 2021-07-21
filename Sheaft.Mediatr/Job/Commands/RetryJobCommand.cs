@@ -72,8 +72,11 @@ namespace Sheaft.Mediatr.Job.Commands
                 case JobKind.ExportUserPurchaseOrders:
                     _mediatr.Post(entity.GetCommand<ExportPurchaseOrdersCommand>());
                     break;
-                case JobKind.ExportUserAccounting:
-                    _mediatr.Post(entity.GetCommand<ExportAccountingCommand>());
+                case JobKind.ExportUserAccountingTimeRange:
+                    _mediatr.Post(entity.GetCommand<ExportAccountingTimeRangeCommand>());
+                    break;
+                case JobKind.ExportUserAccountingDeliveries:
+                    _mediatr.Post(entity.GetCommand<ExportAccountingDeliveriesCommand>());
                     break;
                 case JobKind.SendRecalls:
                     _mediatr.Post(entity.GetCommand<SendRecallCommand>());

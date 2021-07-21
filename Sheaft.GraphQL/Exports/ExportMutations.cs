@@ -56,16 +56,29 @@ namespace Sheaft.GraphQL.Exports
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("exportAccounting")]
+        [GraphQLName("exportAccountingTimeRange")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(JobType))]
-        public async Task<Job> ExportAccountingAsync(
+        public async Task<Job> ExportAccountingTimeRangeAsync(
             [GraphQLType(typeof(QueueExportAccountingInputType))] [GraphQLName("input")]
-            QueueExportAccountingCommand input, [Service] ISheaftMediatr mediatr,
+            QueueExportAccountingTimeRangeCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<QueueExportAccountingCommand, Guid>(mediatr, input, token);
+                await ExecuteAsync<QueueExportAccountingTimeRangeCommand, Guid>(mediatr, input, token);
+            return await jobsDataLoader.LoadAsync(result, token);
+        }
+
+        [GraphQLName("exportAccountingDeliveries")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(JobType))]
+        public async Task<Job> ExportAccountingDeliveriesAsync(
+            [GraphQLType(typeof(QueueExportAccountingInputType))] [GraphQLName("input")]
+            QueueExportAccountingDeliveriesCommand input, [Service] ISheaftMediatr mediatr,
+            JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
+        {
+            var result =
+                await ExecuteAsync<QueueExportAccountingDeliveriesCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 

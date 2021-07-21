@@ -92,13 +92,21 @@ namespace Sheaft.Mediatr.Job.Commands
                         To = exportPurchaseOrdersCommand.To
                     });
                     break;
-                case JobKind.ExportUserAccounting:
-                    var exportAccountingCommand =
-                        JsonConvert.DeserializeObject<ExportAccountingCommand>(entity.Command);
-                    _mediatr.Post(new ExportAccountingCommand(request.RequestUser)
+                case JobKind.ExportUserAccountingTimeRange:
+                    var exportAccountingTimeRangeCommand =
+                        JsonConvert.DeserializeObject<ExportAccountingTimeRangeCommand>(entity.Command);
+                    _mediatr.Post(new ExportAccountingTimeRangeCommand(request.RequestUser)
                     {
-                        JobId = exportAccountingCommand.JobId, From = exportAccountingCommand.From,
-                        To = exportAccountingCommand.To, Kinds = exportAccountingCommand.Kinds
+                        JobId = exportAccountingTimeRangeCommand.JobId, From = exportAccountingTimeRangeCommand.From,
+                        To = exportAccountingTimeRangeCommand.To, Kinds = exportAccountingTimeRangeCommand.Kinds
+                    });
+                    break;
+                case JobKind.ExportUserAccountingDeliveries:
+                    var exportAccountingDeliveriesCommand =
+                        JsonConvert.DeserializeObject<ExportAccountingDeliveriesCommand>(entity.Command);
+                    _mediatr.Post(new ExportAccountingDeliveriesCommand(request.RequestUser)
+                    {
+                        JobId = exportAccountingDeliveriesCommand.JobId, DeliveryIds = exportAccountingDeliveriesCommand.DeliveryIds
                     });
                     break;
                 case JobKind.SendRecalls:

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -21,22 +22,20 @@ using Sheaft.Mediatr.Transaction.Commands;
 
 namespace Sheaft.Mediatr.Accounting.Commands
 {
-    public class QueueExportAccountingCommand : Command<Guid>
+    public class QueueExportAccountingDeliveriesCommand : Command<Guid>
     {
-        protected QueueExportAccountingCommand()
+        protected QueueExportAccountingDeliveriesCommand()
         {
-            
         }
+
         [JsonConstructor]
-        public QueueExportAccountingCommand(RequestUser requestUser) : base(requestUser)
+        public QueueExportAccountingDeliveriesCommand(RequestUser requestUser) : base(requestUser)
         {
             UserId = RequestUser.Id;
         }
 
         public Guid UserId { get; set; }
-        public DateTimeOffset From { get; set; }
-        public DateTimeOffset To { get; set; }
-        public IEnumerable<DeliveryKind> Kinds { get; set; }
+        public IEnumerable<Guid> DeliveryIds { get; set; }
         public string Name { get; set; }
 
         public override void SetRequestUser(RequestUser user)
@@ -46,27 +45,31 @@ namespace Sheaft.Mediatr.Accounting.Commands
         }
     }
 
-    public class QueueExportAccountingCommandHandler : CommandsHandler,
-        IRequestHandler<QueueExportAccountingCommand, Result<Guid>>
+    public class QueueExportAccountingDeliveriesCommandHandler : CommandsHandler,
+        IRequestHandler<QueueExportAccountingDeliveriesCommand, Result<Guid>>
     {
-        public QueueExportAccountingCommandHandler(
+        public QueueExportAccountingDeliveriesCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<QueueExportAccountingCommandHandler> logger)
+            ILogger<QueueExportAccountingDeliveriesCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result<Guid>> Handle(QueueExportAccountingCommand request, CancellationToken token)
+        public async Task<Result<Guid>> Handle(QueueExportAccountingDeliveriesCommand request, CancellationToken token)
         {
             var sender = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
-            if(sender.Id != request.RequestUser.Id)
+            if (sender.Id != request.RequestUser.Id)
                 return Failure<Guid>("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
-            var command = new ExportAccountingCommand(request.RequestUser)
-                {JobId = Guid.NewGuid(), From = request.From, To = request.To, Kinds = request.Kinds};
-            
-            var entity = new Domain.Job(command.JobId, JobKind.ExportUserAccounting, request.Name ?? $"Export comptabilité du {DateTimeOffset.UtcNow:dd/MM/yyyy} à {DateTimeOffset.UtcNow:HH:mm}", sender, command);
+            if (request.DeliveryIds == null || !request.DeliveryIds.Any())
+                return Failure<Guid>("Vous devez selectionner les livraisons à exporter.");
+
+            var command = new ExportAccountingDeliveriesCommand(request.RequestUser)
+                {JobId = Guid.NewGuid(), DeliveryIds = request.DeliveryIds};
+
+            var entity = new Domain.Job(command.JobId, JobKind.ExportUserAccountingDeliveries,
+                request.Name ?? $"Export comptabilité spécifique", sender, command);
 
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

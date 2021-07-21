@@ -24,16 +24,15 @@ namespace Sheaft.Business.DeliveriesExporters
         {
         }
 
-        public async Task<Result<ResourceExportDto>> ExportAsync(RequestUser requestUser, DateTimeOffset @from,
-            DateTimeOffset to, IQueryable<Delivery> deliveriesQuery,
-            CancellationToken token)
+        public async Task<Result<ResourceExportDto>> ExportAsync(RequestUser user, IQueryable<Delivery> deliveriesQuery,
+            CancellationToken token, DateTimeOffset? from = null, DateTimeOffset? to = null)
         {
             using (var stream = new MemoryStream())
             {
                 using (var package = new ExcelPackage(stream))
                 {
                     var deliveries = await deliveriesQuery.ToListAsync(token);
-                    var data = CreateExcelDeliveriesFile(package, requestUser, from, to, deliveries, token);
+                    var data = CreateExcelDeliveriesFile(package, user, from, to, deliveries, token);
 
                     return Success(new ResourceExportDto
                         {Data = data, Extension = "xlsx", MimeType = "application/ms-excel"});
@@ -42,10 +41,10 @@ namespace Sheaft.Business.DeliveriesExporters
         }
 
         private byte[] CreateExcelDeliveriesFile(ExcelPackage package,
-            RequestUser user, DateTimeOffset from, DateTimeOffset to, IEnumerable<Delivery> deliveries,
+            RequestUser user, DateTimeOffset? from, DateTimeOffset? to, IEnumerable<Delivery> deliveries,
             CancellationToken token)
         {
-            var worksheet = package.Workbook.Worksheets.Add($"Ventes {from:dd-MM-yyyy} au {to:dd-MM-yyyy}");
+            var worksheet = package.Workbook.Worksheets.Add(from.HasValue && to.HasValue ? $"Ventes {from:dd-MM-yyyy} au {to:dd-MM-yyyy}" : "Ventes spécifique");
 
             worksheet.Cells[1, 1].Value = "Client";
             worksheet.Cells[1, 2].Value = "Livraisons";
