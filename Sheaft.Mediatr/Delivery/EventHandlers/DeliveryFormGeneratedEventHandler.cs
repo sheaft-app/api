@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
                 nameof(DeliveryFormGeneratedEvent),
                 new DeliveryMailerModel
                 {
-                    Firstname = producer.FirstName,
+                    Firstname = client.FirstName,
                     Url = delivery.DeliveryFormUrl, DeliveredOn = delivery.DeliveredOn,
                     ProducerName = producer.Name, ScheduledOn = delivery.ScheduledOn
                 },
