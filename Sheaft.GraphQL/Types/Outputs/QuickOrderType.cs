@@ -63,7 +63,8 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Field(c => c.Products)
                 .Name("products")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<QuickOrderResolvers>(c => c.GetProducts(default, default, default, default));
+                .ResolveWith<QuickOrderResolvers>(c => c.GetProducts(default, default, default, default))
+                .Type<ListType<QuickOrderProductType>>();
         }
 
         private class QuickOrderResolvers

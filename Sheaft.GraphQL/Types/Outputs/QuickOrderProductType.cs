@@ -23,10 +23,9 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
 
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.CatalogProduct.ProductId)
-                .ResolveNode((ctx, id) =>
-                    ctx.DataLoader<QuickOrderProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
+                .Field("id")
+                .ID(nameof(Product))
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.ProductId);
             
             descriptor
                 .Field(c => c.Quantity)
@@ -49,16 +48,28 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Vat);
             
             descriptor
-                .Field("unitOnSalePrice")
+                .Field("onSalePricePerUnit")
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.OnSalePricePerUnit);
             
             descriptor
-                .Field("unitWholeSalePrice")
+                .Field("wholeSalePricePerUnit")
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.WholeSalePricePerUnit);
 
             descriptor
-                .Field("unitVatPrice")
+                .Field("vatPricePerUnit")
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.VatPricePerUnit);
+            
+            descriptor
+                .Field("onSalePrice")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.OnSalePrice);
+            
+            descriptor
+                .Field("wholeSalePrice")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.WholeSalePrice);
+
+            descriptor
+                .Field("vatPrice")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.VatPrice);
 
             descriptor
                 .Field("unitWeight")
