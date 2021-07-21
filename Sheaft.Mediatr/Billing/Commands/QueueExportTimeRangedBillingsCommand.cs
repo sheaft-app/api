@@ -68,7 +68,7 @@ namespace Sheaft.Mediatr.Billing.Commands
                 {JobId = Guid.NewGuid(), From = request.From, To = request.To, Kinds = request.Kinds};
 
             var entity = new Domain.Job(command.JobId, JobKind.ExportUserBillingsTimeRange,
-                request.Name ?? $"Export comptabilité du {request.From:dd/MM/yyyy} à {request.To:HH:mm}", sender,
+                request.Name ?? $"Export comptabilité du {request.From:dd/MM/yyyy} au {request.To:dd/MM/yyyy}", sender,
                 command);
 
             await _context.AddAsync(entity, token);

@@ -69,6 +69,7 @@ namespace Sheaft.Mediatr.Billing.Commands
 
                 var deliveriesQuery = _context.Set<Domain.Delivery>().Where(o =>
                     o.ProducerId == request.RequestUser.Id
+                    & !o.BilledOn.HasValue
                     && o.Status == DeliveryStatus.Delivered
                     && request.Kinds.Contains(o.Kind)
                     && o.DeliveredOn >= request.From

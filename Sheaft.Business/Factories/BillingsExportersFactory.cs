@@ -37,7 +37,7 @@ namespace Sheaft.Business.Factories
             var user = await _context.Users.SingleAsync(e => e.Id == requestUser.Id, token);
             var setting = user.GetSetting(SettingKind.DeliveriesExporter);
             
-            return InstanciateExporter(requestUser, setting?.Value ?? _options.DeliveriesExporter);
+            return InstanciateExporter(requestUser, setting?.Value ?? _options.BillingsExporter);
         }
 
         private IBillingsFileExporter InstanciateExporter(RequestUser requestUser, string typename)

@@ -15,8 +15,7 @@ namespace Sheaft.Web.Common
             services.AddScoped<Func<string, TInterface>>(serviceProvider => processor =>
             {
                 var type = types
-                    .Where(x => x.FullName == processor)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.FullName == processor);
 
                 if (null == type)
                     throw new KeyNotFoundException("No instance found for the given processor.");
