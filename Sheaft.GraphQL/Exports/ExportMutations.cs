@@ -12,8 +12,7 @@ using Sheaft.Domain;
 using Sheaft.GraphQL.Jobs;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.Accounting.Commands;
-using Sheaft.Mediatr.Delivery.Commands;
+using Sheaft.Mediatr.Billing.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.Transaction.Commands;
@@ -56,29 +55,29 @@ namespace Sheaft.GraphQL.Exports
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("exportAccountingTimeRange")]
+        [GraphQLName("exportTimeRangedBillings")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(JobType))]
-        public async Task<Job> ExportAccountingTimeRangeAsync(
-            [GraphQLType(typeof(QueueExportAccountingInputType))] [GraphQLName("input")]
-            QueueExportAccountingTimeRangeCommand input, [Service] ISheaftMediatr mediatr,
+        public async Task<Job> ExportTimeRangedBillingsAsync(
+            [GraphQLType(typeof(QueueExportTimeRangedBillingsInputType))] [GraphQLName("input")]
+            QueueExportTimeRangedBillingsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<QueueExportAccountingTimeRangeCommand, Guid>(mediatr, input, token);
+                await ExecuteAsync<QueueExportTimeRangedBillingsCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("exportAccountingDeliveries")]
+        [GraphQLName("exportBillings")]
         [Authorize(Policy = Policies.PRODUCER)]
         [GraphQLType(typeof(JobType))]
-        public async Task<Job> ExportAccountingDeliveriesAsync(
-            [GraphQLType(typeof(QueueExportAccountingInputType))] [GraphQLName("input")]
-            QueueExportAccountingDeliveriesCommand input, [Service] ISheaftMediatr mediatr,
+        public async Task<Job> ExportBillingsAsync(
+            [GraphQLType(typeof(QueueExportBillingsInputType))] [GraphQLName("input")]
+            QueueExportBillingsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader jobsDataLoader, CancellationToken token)
         {
             var result =
-                await ExecuteAsync<QueueExportAccountingDeliveriesCommand, Guid>(mediatr, input, token);
+                await ExecuteAsync<QueueExportBillingsCommand, Guid>(mediatr, input, token);
             return await jobsDataLoader.LoadAsync(result, token);
         }
 

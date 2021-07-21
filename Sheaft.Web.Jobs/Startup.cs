@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading;
@@ -36,7 +35,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Mappings;
 using Sheaft.Business;
-using Sheaft.Business.DeliveriesExporters;
+using Sheaft.Business.BillingsExporters;
 using Sheaft.Business.Factories;
 using Sheaft.Business.PickingOrdersExporters;
 using Sheaft.Business.ProductsImporters;
@@ -239,13 +238,13 @@ namespace Sheaft.Web.Jobs
             services.AddScopedDynamic<IPickingOrdersFileExporter>(typeof(ExcelPickingOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPickingOrdersFileExporter))));
             services.AddScopedDynamic<IPurchaseOrdersFileExporter>(typeof(ExcelPurchaseOrdersExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IPurchaseOrdersFileExporter))));
             services.AddScopedDynamic<ITransactionsFileExporter>(typeof(ExcelTransactionsExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(ITransactionsFileExporter))));
-            services.AddScopedDynamic<IDeliveriesFileExporter>(typeof(ExcelDeliveriesExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IDeliveriesFileExporter))));
+            services.AddScopedDynamic<IBillingsFileExporter>(typeof(ExcelBillingsExporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IBillingsFileExporter))));
 
             services.AddScoped<IProductsImporterFactory, ProductsImporterFactory>();
             services.AddScoped<IPickingOrdersExportersFactory, PickingOrdersExportersFactory>();
             services.AddScoped<IPurchaseOrdersExportersFactory, PurchaseOrdersExportersFactory>();
             services.AddScoped<ITransactionsExportersFactory, TransactionsExportersFactory>();
-            services.AddScoped<IAccountingExportersFactory, AccountingExportersFactory>();
+            services.AddScoped<IBillingsExportersFactory, BillingsExportersFactory>();
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));

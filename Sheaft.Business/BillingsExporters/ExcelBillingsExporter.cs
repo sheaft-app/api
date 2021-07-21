@@ -16,11 +16,11 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Extensions;
 
-namespace Sheaft.Business.DeliveriesExporters
+namespace Sheaft.Business.BillingsExporters
 {
-    public class ExcelDeliveriesExporter : SheaftService, IDeliveriesFileExporter
+    public class ExcelBillingsExporter : SheaftService, IBillingsFileExporter
     {
-        public ExcelDeliveriesExporter(ILogger<ExcelDeliveriesExporter> logger) : base(logger)
+        public ExcelBillingsExporter(ILogger<ExcelBillingsExporter> logger) : base(logger)
         {
         }
 

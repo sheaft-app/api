@@ -4,10 +4,10 @@ using Sheaft.Domain.Common;
 
 namespace Sheaft.Domain.Events.Delivery
 {
-    public class AccountingExportProcessingEvent : DomainEvent
+    public class BillingExportFailedEvent : DomainEvent
     {
         [JsonConstructor]
-        public AccountingExportProcessingEvent(Guid jobId)
+        public BillingExportFailedEvent(Guid jobId)
         {
             JobId = jobId;
         }

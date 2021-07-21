@@ -10,8 +10,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Mediatr.Accounting.Commands;
-using Sheaft.Mediatr.Delivery.Commands;
+using Sheaft.Mediatr.Billing.Commands;
 using Sheaft.Mediatr.PickingOrder.Commands;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.PurchaseOrder.Commands;
@@ -92,19 +91,19 @@ namespace Sheaft.Mediatr.Job.Commands
                         To = exportPurchaseOrdersCommand.To
                     });
                     break;
-                case JobKind.ExportUserAccountingTimeRange:
+                case JobKind.ExportUserBillingsTimeRange:
                     var exportAccountingTimeRangeCommand =
-                        JsonConvert.DeserializeObject<ExportAccountingTimeRangeCommand>(entity.Command);
-                    _mediatr.Post(new ExportAccountingTimeRangeCommand(request.RequestUser)
+                        JsonConvert.DeserializeObject<ExportTimeRangedBillingsCommand>(entity.Command);
+                    _mediatr.Post(new ExportTimeRangedBillingsCommand(request.RequestUser)
                     {
                         JobId = exportAccountingTimeRangeCommand.JobId, From = exportAccountingTimeRangeCommand.From,
                         To = exportAccountingTimeRangeCommand.To, Kinds = exportAccountingTimeRangeCommand.Kinds
                     });
                     break;
-                case JobKind.ExportUserAccountingDeliveries:
+                case JobKind.ExportUserBillings:
                     var exportAccountingDeliveriesCommand =
-                        JsonConvert.DeserializeObject<ExportAccountingDeliveriesCommand>(entity.Command);
-                    _mediatr.Post(new ExportAccountingDeliveriesCommand(request.RequestUser)
+                        JsonConvert.DeserializeObject<ExportBillingsCommand>(entity.Command);
+                    _mediatr.Post(new ExportBillingsCommand(request.RequestUser)
                     {
                         JobId = exportAccountingDeliveriesCommand.JobId, DeliveryIds = exportAccountingDeliveriesCommand.DeliveryIds
                     });

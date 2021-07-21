@@ -1,16 +1,15 @@
 using HotChocolate.Types;
-using Sheaft.Mediatr.Accounting.Commands;
-using Sheaft.Mediatr.Delivery.Commands;
+using Sheaft.Mediatr.Billing.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {
-    public class QueueExportAccountingInputType : SheaftInputType<QueueExportAccountingTimeRangeCommand>
+    public class QueueExportTimeRangedBillingsInputType : SheaftInputType<QueueExportTimeRangedBillingsCommand>
     {
-        protected override void Configure(IInputObjectTypeDescriptor<QueueExportAccountingTimeRangeCommand> descriptor)
+        protected override void Configure(IInputObjectTypeDescriptor<QueueExportTimeRangedBillingsCommand> descriptor)
         {
             base.Configure(descriptor);
 
-            descriptor.Name("QueueExportAccountingInput");
+            descriptor.Name("QueueExportTimeRangedBillingsInput");
             
             descriptor
                 .Field(c => c.From)

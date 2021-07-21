@@ -14,25 +14,25 @@ using Sheaft.Options;
 
 namespace Sheaft.Business.Factories
 {
-    public class AccountingExportersFactory : IAccountingExportersFactory
+    public class BillingsExportersFactory : IBillingsExportersFactory
     {
         private readonly IAppDbContext _context;
-        private readonly Func<string, IDeliveriesFileExporter> _resolver;
+        private readonly Func<string, IBillingsFileExporter> _resolver;
         private readonly ExportersOptions _options;
 
-        public AccountingExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IDeliveriesFileExporter> resolver)
+        public BillingsExportersFactory(IAppDbContext context, IOptions<ExportersOptions> options, Func<string, IBillingsFileExporter> resolver)
         {
             _context = context;
             _resolver = resolver;
             _options = options.Value;
         }
 
-        public IDeliveriesFileExporter GetExporter(RequestUser requestUser, string typename)
+        public IBillingsFileExporter GetExporter(RequestUser requestUser, string typename)
         {
             return InstanciateExporter(requestUser, typename);
         }
         
-        public async Task<IDeliveriesFileExporter> GetExporterAsync(RequestUser requestUser, CancellationToken token)
+        public async Task<IBillingsFileExporter> GetExporterAsync(RequestUser requestUser, CancellationToken token)
         {
             var user = await _context.Users.SingleAsync(e => e.Id == requestUser.Id, token);
             var setting = user.GetSetting(SettingKind.DeliveriesExporter);
@@ -40,7 +40,7 @@ namespace Sheaft.Business.Factories
             return InstanciateExporter(requestUser, setting?.Value ?? _options.DeliveriesExporter);
         }
 
-        private IDeliveriesFileExporter InstanciateExporter(RequestUser requestUser, string typename)
+        private IBillingsFileExporter InstanciateExporter(RequestUser requestUser, string typename)
         {
             return _resolver.Invoke(typename);
         }

@@ -16,44 +16,42 @@ using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Events.PurchaseOrder;
 
-namespace Sheaft.Mediatr.Accounting.Commands
+namespace Sheaft.Mediatr.Billing.Commands
 {
-    public class ExportAccountingTimeRangeCommand : Command
+    public class ExportBillingsCommand : Command
     {
-        protected ExportAccountingTimeRangeCommand()
+        protected ExportBillingsCommand()
         {
+            
         }
-
         [JsonConstructor]
-        public ExportAccountingTimeRangeCommand(RequestUser requestUser) : base(requestUser)
+        public ExportBillingsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
         public Guid JobId { get; set; }
-        public DateTimeOffset From { get; set; }
-        public DateTimeOffset To { get; set; }
-        public IEnumerable<DeliveryKind> Kinds { get; set; }
+        public IEnumerable<Guid> DeliveryIds { get; set; }
     }
 
-    public class ExportAccountingTimeRangeCommandHandler : CommandsHandler,
-        IRequestHandler<ExportAccountingTimeRangeCommand, Result>
+    public class ExportBillingsCommandHandler : CommandsHandler,
+        IRequestHandler<ExportBillingsCommand, Result>
     {
         private readonly IBlobService _blobService;
-        private readonly IAccountingExportersFactory _accountingExportersFactory;
+        private readonly IBillingsExportersFactory _billingsExportersFactory;
 
-        public ExportAccountingTimeRangeCommandHandler(
+        public ExportBillingsCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
             IBlobService blobService,
-            IAccountingExportersFactory accountingExportersFactory,
-            ILogger<ExportAccountingTimeRangeCommandHandler> logger)
+            IBillingsExportersFactory billingsExportersFactory,
+            ILogger<ExportBillingsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _blobService = blobService;
-            _accountingExportersFactory = accountingExportersFactory;
+            _billingsExportersFactory = billingsExportersFactory;
         }
 
-        public async Task<Result> Handle(ExportAccountingTimeRangeCommand request, CancellationToken token)
+        public async Task<Result> Handle(ExportBillingsCommand request, CancellationToken token)
         {
             var job = await _context.Jobs.SingleAsync(e => e.Id == request.JobId, token);
             if (job.UserId != request.RequestUser.Id)
@@ -61,43 +59,36 @@ namespace Sheaft.Mediatr.Accounting.Commands
 
             try
             {
-                job.StartJob(new AccountingExportProcessingEvent(job.Id));
+                job.StartJob(new BillingExportProcessingEvent(job.Id));
                 await _context.SaveChangesAsync(token);
-
-                if (request.Kinds == null || !request.Kinds.Any())
-                    request.Kinds = new List<DeliveryKind> {DeliveryKind.ProducerToStore};
 
                 var deliveriesQuery = _context.Set<Domain.Delivery>().Where(o =>
                     o.ProducerId == request.RequestUser.Id
                     && o.Status == DeliveryStatus.Delivered
-                    && request.Kinds.Contains(o.Kind)
-                    && o.DeliveredOn >= request.From
-                    && o.DeliveredOn <= request.To);
+                    && request.DeliveryIds.Contains(o.Id));
 
-                var exporter = await _accountingExportersFactory.GetExporterAsync(request.RequestUser, token);
-                var deliveriesExportResult = await exporter.ExportAsync(request.RequestUser, deliveriesQuery, token,
-                    request.From, request.To);
-
+                var exporter = await _billingsExportersFactory.GetExporterAsync(request.RequestUser, token);
+                
+                var deliveriesExportResult = await exporter.ExportAsync(request.RequestUser, deliveriesQuery, token);
                 if (!deliveriesExportResult.Succeeded)
                     throw deliveriesExportResult.Exception;
 
                 var response = await _blobService.UploadUserAccountingFileAsync(job.UserId, job.Id,
-                    $"Comptabilité_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}",
-                    deliveriesExportResult.Data.Data, token);
+                    $"Comptabilité_du_spécifique_du_{DateTimeOffset.UtcNow:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}", deliveriesExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;
 
                 job.SetDownloadUrl(response.Data);
-                job.CompleteJob(new AccountingExportSucceededEvent(job.Id));
+                job.CompleteJob(new BillingExportSucceededEvent(job.Id));
 
                 await _context.SaveChangesAsync(token);
                 return Success();
             }
             catch (Exception e)
             {
-                job.FailJob(e.Message, new AccountingExportFailedEvent(job.Id));
+                job.FailJob(e.Message, new BillingExportFailedEvent(job.Id));
                 await _context.SaveChangesAsync(token);
-
+                
                 return Failure("Une erreur est survenue pendant l'export de comptabilité.");
             }
         }
