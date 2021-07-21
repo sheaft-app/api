@@ -1,4 +1,5 @@
 using HotChocolate.Types;
+using Sheaft.Domain;
 using Sheaft.Mediatr.Billing.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
@@ -13,6 +14,7 @@ namespace Sheaft.GraphQL.Types.Inputs
 
             descriptor
                 .Field(c => c.DeliveryIds)
+                .ID(nameof(Delivery))
                 .Name("ids");
             
             descriptor
