@@ -62,11 +62,11 @@ namespace Sheaft.GraphQL.Recalls
             return await dataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("deleteRecall")]
+        [GraphQLName("deleteRecalls")]
         [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<bool> DeleteRecallAsync(
-            [GraphQLType(typeof(DeleteRecallInputType))] [GraphQLName("input")]
-            DeleteRecallCommand input, [Service] ISheaftMediatr mediatr,
+        public async Task<bool> DeleteRecallsAsync(
+            [GraphQLType(typeof(DeleteRecallsInputType))] [GraphQLName("input")]
+            DeleteRecallsCommand input, [Service] ISheaftMediatr mediatr,
             CancellationToken token)
         {
             return await ExecuteAsync(mediatr, input, token);

@@ -18,38 +18,42 @@ using Sheaft.Domain.Common;
 
 namespace Sheaft.Mediatr.Recall.Commands
 {
-    public class DeleteRecallCommand : Command
+    public class DeleteRecallsCommand : Command
     {
-        protected DeleteRecallCommand()
+        protected DeleteRecallsCommand()
         {
         }
 
         [JsonConstructor]
-        public DeleteRecallCommand(RequestUser requestUser) : base(requestUser)
+        public DeleteRecallsCommand(RequestUser requestUser) : base(requestUser)
         {
         }
 
-        public Guid RecallId { get; set; }
+        public IEnumerable<Guid> RecallIds { get; set; }
     }
 
-    public class DeleteRecallCommandHandler : CommandsHandler,
-        IRequestHandler<DeleteRecallCommand, Result>
+    public class DeleteRecallsCommandHandler : CommandsHandler,
+        IRequestHandler<DeleteRecallsCommand, Result>
     {
-        public DeleteRecallCommandHandler(
+        public DeleteRecallsCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
-            ILogger<DeleteRecallCommandHandler> logger)
+            ILogger<DeleteRecallsCommandHandler> logger)
             : base(mediatr, context, logger)
         {
         }
 
-        public async Task<Result> Handle(DeleteRecallCommand request, CancellationToken token)
+        public async Task<Result> Handle(DeleteRecallsCommand request, CancellationToken token)
         {
-            var recall = await _context.Recalls.SingleOrDefaultAsync(b => b.Id == request.RecallId, token);
-            if (recall == null)
-                return Failure("La campagne de rappel est introuvable.");
+            var recalls = await _context.Recalls
+                .Where(b => request.RecallIds.Contains(b.Id))
+                .ToListAsync(token);
+            
+            if (recalls == null || !recalls.Any())
+                return Failure("Les campagnes de rappel sont introuvables.");
 
-            _context.Remove(recall);
+            foreach (var recall in recalls)
+                _context.Remove(recall);
 
             await _context.SaveChangesAsync(token);
             return Success();

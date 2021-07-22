@@ -6,6 +6,7 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Producers;
@@ -78,6 +79,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Clients)
                 .Name("clients")
+                .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetClients(default, default, default, default))
                 .Type<ListType<UserType>>();
