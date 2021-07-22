@@ -36,6 +36,14 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.QuantityPerUnit);
                 
             descriptor
+                .Field("available")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Available);
+            
+            descriptor
+                .Field("weight")
+                .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Weight);
+            
+            descriptor
                 .Field("conditioning")
                 .Resolve(c => c.Parent<QuickOrderProduct>().CatalogProduct.Product.Conditioning);
                 
@@ -93,7 +101,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                     c.GetReturnable(default, default, default));
 
             descriptor.Field("producer")
-                .Type<NonNullType<UserType>>()
+                .Type<NonNullType<ProducerType>>()
                 .ResolveWith<QuickOrderProductResolvers>(c => 
                     c.GetProducer(default, default, default));
         }
@@ -109,10 +117,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return returnablesDataLoader.LoadAsync(quickOrderProduct.CatalogProduct.Product.ReturnableId.Value, token);
             }
             
-            public Task<User> GetProducer(QuickOrderProduct quickOrderProduct,
-                UsersByIdBatchDataLoader usersDataLoader, CancellationToken token)
+            public Task<Producer> GetProducer(QuickOrderProduct quickOrderProduct,
+                ProducersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                return usersDataLoader.LoadAsync(quickOrderProduct.CatalogProduct.Product.ProducerId, token);
+                return dataLoader.LoadAsync(quickOrderProduct.CatalogProduct.Product.ProducerId, token);
             }
         }
     }

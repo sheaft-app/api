@@ -98,7 +98,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             foreach (var product in products)
             {
                 var quantity = request.Products.Where(p => p.Id == product.Id).Sum(p => p.Quantity);
-                productsQuantity.Add(new KeyValuePair<Domain.Product, int>(product, quantity));
+                productsQuantity.Add(new KeyValuePair<Domain.Product, int>(product, quantity ?? 0));
             }
 
             var resultIdentifier =

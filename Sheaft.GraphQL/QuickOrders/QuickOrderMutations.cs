@@ -37,18 +37,6 @@ namespace Sheaft.GraphQL.QuickOrders
             return await quickOrdersDataLoader.LoadAsync(result, token);
         }
 
-        [GraphQLName("setQuickOrderAsDefault")]
-        [Authorize(Policy = Policies.STORE)]
-        [GraphQLType(typeof(QuickOrderType))]
-        public async Task<QuickOrder> SetDefaultQuickOrderAsync(
-            [GraphQLType(typeof(SetQuickOrderAsDefaultInputType))] [GraphQLName("input")]
-            SetQuickOrderAsDefaultCommand input, [Service] ISheaftMediatr mediatr,
-            QuickOrdersByIdBatchDataLoader quickOrdersDataLoader, CancellationToken token)
-        {
-            await ExecuteAsync(mediatr, input, token);
-            return await quickOrdersDataLoader.LoadAsync(input.QuickOrderId, token);
-        }
-
         [GraphQLName("updateQuickOrder")]
         [Authorize(Policy = Policies.STORE)]
         [GraphQLType(typeof(QuickOrderType))]

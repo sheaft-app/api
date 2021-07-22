@@ -9,7 +9,7 @@ namespace Sheaft.Domain
     {
         protected QuickOrderProduct() { }
 
-        public QuickOrderProduct(CatalogProduct catalogProduct, int quantity = 0)
+        public QuickOrderProduct(CatalogProduct catalogProduct, int? quantity = null)
         {
             CatalogProduct = catalogProduct;
             CatalogProductId = catalogProduct.Id;
@@ -28,7 +28,10 @@ namespace Sheaft.Domain
         public void SetQuantity(int? quantity)
         {
             if (quantity is < 0)
-                throw SheaftException.Validation("La quantité du produit doit être supérieur ou égale à 0.");
+                throw SheaftException.Validation("La quantité du produit doit être supérieure ou égale à 0.");
+
+            if (quantity == 0)
+                quantity = null;
 
             Quantity = quantity;
         }

@@ -151,7 +151,7 @@ namespace Sheaft.Business
                 }
 
                 cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, catalog.Id,
-                    productsQuantities.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
+                    productsQuantities.Where(p => p.Id == product.Id).Sum(c => c.Quantity ?? 0)));
             }
 
             if (result is {Succeeded: false})

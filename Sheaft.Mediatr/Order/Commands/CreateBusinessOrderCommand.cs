@@ -119,7 +119,7 @@ namespace Sheaft.Mediatr.Order.Commands
                         invalidProductIds.Add(product.Id.ToString("N"));
 
                     cartProducts.Add(new Tuple<Domain.Product, Guid, int>(product, agreement.CatalogId.Value,
-                        request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity)));
+                        request.Products.Where(p => p.Id == product.Id).Sum(c => c.Quantity ?? 0)));
                 }
 
                 if (catalogResult is {Succeeded: false})

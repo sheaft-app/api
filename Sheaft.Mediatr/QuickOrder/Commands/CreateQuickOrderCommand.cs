@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
         {
             UserId = RequestUser.Id;
         }
-
+ 
         public Guid UserId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -67,7 +67,7 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                         .ThenInclude(c => c.Product)
                 .ToListAsync(token);
 
-            var catalogProducts = new Dictionary<CatalogProduct, int>();
+            var catalogProducts = new Dictionary<CatalogProduct, int?>();
             Result<Guid> result = null;
             foreach (var productId in productIds)
             {
@@ -92,6 +92,8 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
                 return result;
             
             var quickOrder = new Domain.QuickOrder(Guid.NewGuid(), request.Name, catalogProducts, store);
+            if(!await _context.QuickOrders.AnyAsync(qo => qo.UserId == store.Id, token))
+                quickOrder.SetIsDefault(true);
 
             await _context.AddAsync(quickOrder, token);
             await _context.SaveChangesAsync(token);

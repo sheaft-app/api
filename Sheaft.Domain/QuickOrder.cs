@@ -12,15 +12,14 @@ namespace Sheaft.Domain
     {
         protected QuickOrder() { }
 
-        public QuickOrder(Guid id, string name, IDictionary<CatalogProduct, int> products, User user)
+        public QuickOrder(Guid id, string name, IDictionary<CatalogProduct, int?> products, User user)
         {
             if (user == null)
-                SheaftException.Validation("Impossible de créer la commande rapide, l'utilisateur est requis.");
+                SheaftException.Validation("Impossible de créer le modèle de commande, l'utilisateur est requis.");
 
             Id = id;
 
             SetName(name);
-            SetAsDefault();
             User = user;
             UserId = user.Id;
 
@@ -57,17 +56,12 @@ namespace Sheaft.Domain
             Description = description;
         }
 
-        public void SetAsDefault()
+        public void SetIsDefault(bool isDefault)
         {
-            IsDefault = true;
+            IsDefault = isDefault;
         }
 
-        public void UnsetAsDefault()
-        {
-            IsDefault = false;
-        }
-
-        public void AddProducts(IDictionary<CatalogProduct, int> products)
+        public void AddProducts(IDictionary<CatalogProduct, int?> products)
         {
             if (products == null)
                 return;
@@ -76,7 +70,7 @@ namespace Sheaft.Domain
                 AddOrUpdateProduct(product.Key, product.Value);
         }
 
-        public void AddOrUpdateProduct(CatalogProduct catalogProduct, int quantity)
+        public void AddOrUpdateProduct(CatalogProduct catalogProduct, int? quantity)
         {
             if (Products == null)
                 Products = new List<QuickOrderProduct>();
@@ -92,17 +86,19 @@ namespace Sheaft.Domain
             ProductsCount = Products?.Count ?? 0;
         }
 
-        public void RemoveProduct(Guid productId)
+        public QuickOrderProduct RemoveProduct(Guid productId)
         {
             if (Products == null)
-                throw SheaftException.NotFound("Cette commande rapide ne contient aucun produits.");
+                throw SheaftException.NotFound("Ce modèle de commande ne contient aucun produits.");
             
             var productLine = Products.SingleOrDefault(p => p.CatalogProduct.ProductId == productId);
             if (productLine == null)
-                throw SheaftException.Validation("Impossible de supprimer le produit de la commande rapide, il est introuvable.");
+                throw SheaftException.Validation("Impossible de supprimer le produit du modèle de commande, il est introuvable.");
 
             Products.Remove(productLine);
             ProductsCount = Products?.Count ?? 0;
+
+            return productLine;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
