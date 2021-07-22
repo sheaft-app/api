@@ -4,6 +4,6 @@ namespace Sheaft.Domain.Enum
     {
         RCS,
         RM,
-        RSEIRL
+        NotSpecified
     }
 }

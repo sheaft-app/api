@@ -42,7 +42,7 @@ namespace Sheaft.Domain
             if (siret.IsNotNullAndIsEmptyOrWhiteSpace())
                 throw SheaftException.Validation("Le numéro de SIRET est requis.");
 
-            Siret = siret;
+            Siret = siret.Trim();
         }
 
         public void SetVatIdentifier(string vatNumber)
@@ -85,13 +85,10 @@ namespace Sheaft.Domain
         public void SetRegistrationKind(RegistrationKind kind, string city, string code)
         {
             if(kind == RegistrationKind.RCS)
-                Identifier = $"{kind:G} {city} {code} {Siret.Substring(0, 9)} ";
+                Identifier = $"{kind:G} {city.Trim()} {Siret.Substring(0, 9)} ";
             
             if(kind == RegistrationKind.RM)
-                Identifier = $"{kind:G} {Siret.Substring(0, 9)} {code}";
-            
-            if(kind == RegistrationKind.RSEIRL)
-                Identifier = $"{kind:G} {Siret.Substring(0, 9)}";
+                Identifier = $"{kind:G} {Siret.Substring(0, 9)} {code.Trim()}";
         }
     }
 }
