@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GreenDonut;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
@@ -50,16 +53,16 @@ namespace Sheaft.GraphQL.Recalls
             return await dataLoader.LoadAsync(input.RecallId, token);
         }
 
-        [GraphQLName("sendRecall")]
+        [GraphQLName("sendRecalls")]
         [Authorize(Policy = Policies.PRODUCER)]
-        [GraphQLType(typeof(JobType))]
-        public async Task<Job> QueueSendRecallAsync(
-            [GraphQLType(typeof(QueueSendRecallInputType))] [GraphQLName("input")]
-            QueueSendRecallCommand input, [Service] ISheaftMediatr mediatr,
+        [GraphQLType(typeof(ListType<JobType>))]
+        public async Task<IEnumerable<Job>> QueueSendRecallsAsync(
+            [GraphQLType(typeof(QueueSendRecallsInputType))] [GraphQLName("input")]
+            QueueSendRecallsCommand input, [Service] ISheaftMediatr mediatr,
             JobsByIdBatchDataLoader dataLoader, CancellationToken token)
         {
-            var result = await ExecuteAsync<QueueSendRecallCommand, Guid>(mediatr, input, token);
-            return await dataLoader.LoadAsync(result, token);
+            var result = await ExecuteAsync<QueueSendRecallsCommand, IEnumerable<Guid>>(mediatr, input, token);
+            return await dataLoader.LoadAsync(result.ToList(), token);
         }
 
         [GraphQLName("deleteRecalls")]

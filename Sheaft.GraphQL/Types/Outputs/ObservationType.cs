@@ -57,6 +57,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("visibleToAll");
             
             descriptor
+                .Field(c => c.RepliesCount)
+                .Name("repliesCount");
+            
+            descriptor
+                .Field(c => c.BatchesCount)
+                .Name("batchesCount");
+            
+            descriptor
+                .Field(c => c.ProductsCount)
+                .Name("productsCount");
+            
+            descriptor
                 .Field(c => c.Replies)
                 .Name("replies")
                 .UseDbContext<QueryDbContext>()

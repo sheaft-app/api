@@ -6,14 +6,20 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class PickingConfiguration : IEntityTypeConfiguration<Picking>
     {
-        public PickingConfiguration()
+        private readonly bool _isAdmin;
+
+        public PickingConfiguration(bool isAdmin)
         {
+            _isAdmin = isAdmin;
         }
 
         public void Configure(EntityTypeBuilder<Picking> entity)
         {
             entity.Property(c => c.RowVersion).IsRowVersion();
             entity.Ignore(c => c.DomainEvents);
+            
+            if (!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
             
             entity.HasMany(c => c.PurchaseOrders).WithOne(c => c.Picking)
                 .HasForeignKey(c => c.PickingId).OnDelete(DeleteBehavior.SetNull);

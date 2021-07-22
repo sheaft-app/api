@@ -13,15 +13,9 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
 
             descriptor
-                .ImplementsNode()
-                .IdField(c => c.Id)
-                .ResolveNode((ctx, id) => 
-                    ctx.DataLoader<RecallProductsByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
-
-            descriptor
                 .Field(c => c.ProductId)
                 .ID(nameof(Product))
-                .Name("productId");
+                .Name("id");
             
             descriptor
                 .Field(c => c.CreatedOn)

@@ -63,6 +63,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("updatedOn");
             
             descriptor
+                .Field(c => c.ProductsCount)
+                .Name("productsCount");
+            
+            descriptor
                 .Field(c => c.Products)
                 .Name("products")
                 .UseDbContext<QueryDbContext>()
@@ -70,11 +74,20 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<RecallProductType>>();
             
             descriptor
+                .Field(c => c.BatchesCount)
+                .Name("batchesCount");
+            
+            descriptor
                 .Field(c => c.Batches)
                 .Name("batches")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetBatches(default, default, default, default))
                 .Type<ListType<BatchType>>();
+            
+            descriptor
+                .Field(c => c.ClientsCount)
+                .Authorize(Policies.PRODUCER)
+                .Name("clientsCount");
             
             descriptor
                 .Field(c => c.Clients)

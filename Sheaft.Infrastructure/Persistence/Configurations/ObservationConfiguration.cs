@@ -6,12 +6,22 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
 {
     public class ObservationConfiguration : IEntityTypeConfiguration<Observation>
     {
+        private readonly bool _isAdmin;
+
+        public ObservationConfiguration(bool isAdmin)
+        {
+            _isAdmin = isAdmin;
+        }
+        
         public void Configure(EntityTypeBuilder<Observation> entity)
         {
             entity.Property(c => c.CreatedOn);
             entity.Property(c => c.UpdatedOn);
             entity.Ignore(c => c.DomainEvents);
 
+            if (!_isAdmin)
+                entity.HasQueryFilter(p => !p.RemovedOn.HasValue);
+            
             entity.HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.NoAction);
             entity.HasOne(c => c.Producer).WithMany().HasForeignKey(c => c.ProducerId).OnDelete(DeleteBehavior.Cascade);
             entity.HasMany(c => c.Replies).WithOne().HasForeignKey(c => c.ReplyToId).OnDelete(DeleteBehavior.NoAction);

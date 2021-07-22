@@ -32,16 +32,26 @@ namespace Sheaft.Domain
             Status = RecallStatus.Waiting;
         }
 
-        public string Name { get; set; }
-        public RecallStatus Status { get; set; }
-        public DateTimeOffset SaleStartedOn { get; set; }
-        public DateTimeOffset SaleEndedOn { get; set; }
-        public DateTimeOffset? SendingStartedOn { get; set; }
-        public DateTimeOffset? SendCompletedOn { get; set; }
+        public string Name { get;private set; }
+        public RecallStatus Status { get;private set; }
+        public DateTimeOffset SaleStartedOn { get;private set; }
+        public DateTimeOffset SaleEndedOn { get;private set; }
+        public DateTimeOffset? SendingStartedOn { get;private set; }
+        public DateTimeOffset? SendCompletedOn { get;private set; }
+        public int BatchesCount { get;private set; }
+        public int ProductsCount { get;private set; }
+        public int ClientsCount { get;private set; }
         public virtual ICollection<RecallBatch> Batches { get; private set; }
         public virtual ICollection<RecallProduct> Products { get; private set; }
         public virtual ICollection<RecallClient> Clients { get; private set; }
 
+        private void Refresh()
+        {
+            ClientsCount = Clients.Count;
+            BatchesCount = Batches.Count;
+            ProductsCount = Products.Count;
+        }
+        
         public void SetBatches(IEnumerable<Batch> batches)
         {
             if (batches == null || !batches.Any())
@@ -62,6 +72,8 @@ namespace Sheaft.Domain
 
             if (batchIdsToAdd.Any())
                 AddBatches(batches.Where(b => batchIdsToAdd.Contains(b.Id)).ToList());
+
+            Refresh();
         }
 
         public void SetProducts(IEnumerable<Product> products)
@@ -85,6 +97,8 @@ namespace Sheaft.Domain
 
             if (productIdsToAdd.Any())
                 AddProducts(products.Where(b => productIdsToAdd.Contains(b.Id)).ToList());
+            
+            Refresh();
         }
 
         public void SetClients(IEnumerable<User> clients)
@@ -105,6 +119,8 @@ namespace Sheaft.Domain
 
             if (clientIdsToAdd.Any())
                 AddClients(clients.Where(b => clientIdsToAdd.Contains(b.Id)).ToList());
+            
+            Refresh();
         }
 
         private void AddBatches(IEnumerable<Batch> batches)
@@ -154,7 +170,6 @@ namespace Sheaft.Domain
                 Products.Remove(observationProduct);
             }
         }
-        
 
         private void AddClients(IEnumerable<User> clients)
         {
@@ -200,11 +215,19 @@ namespace Sheaft.Domain
 
         public void StartSending()
         {
-            if (Status == RecallStatus.Sending)
-                throw SheaftException.Validation("La campagne est déjà en cours d'envoi.");
+            if (Status != RecallStatus.Ready)
+                throw SheaftException.Validation("La campagne n'est pas prête pour l'envoi.");
             
             Status = RecallStatus.Sending;
             SendingStartedOn ??= DateTimeOffset.UtcNow;
+        }
+
+        public void SetAsReady()
+        {
+            if (Status != RecallStatus.Waiting)
+                throw SheaftException.Validation("La campagne n'est pas en attente.");
+            
+            Status = RecallStatus.Ready;
         }
 
         public void CompleteSending()

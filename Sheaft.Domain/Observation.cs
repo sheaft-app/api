@@ -23,11 +23,21 @@ namespace Sheaft.Domain
         public bool VisibleToAll { get; private set; }
         public Guid? ReplyToId { get; private set; }
         public Guid UserId { get; private set; }
+        public int RepliesCount { get; private set; }
+        public int BatchesCount { get; private set; }
+        public int ProductsCount { get; private set; }
         public virtual User User { get; private set; }
         public virtual ICollection<Observation> Replies { get; private set; }
         public virtual ICollection<ObservationBatch> Batches { get; private set; }
         public virtual ICollection<ObservationProduct> Products { get; private set; }
 
+        private void Refresh()
+        {
+            RepliesCount = Replies.Count;
+            BatchesCount = Batches.Count;
+            ProductsCount = Products.Count;
+        }
+        
         public void AddReply(string comment, User user)
         {
             if (ReplyToId.HasValue)
@@ -40,6 +50,7 @@ namespace Sheaft.Domain
             Replies.Add(reply);
 
             DomainEvents.Add(new ObservationRepliedEvent(Id, reply.Id));
+            Refresh();
         }
 
         public void SetVisibility(bool visibleToAll)
@@ -73,6 +84,8 @@ namespace Sheaft.Domain
 
             if (batchIdsToAdd.Any())
                 AddBatches(batches.Where(b => batchIdsToAdd.Contains(b.Id)).ToList());
+            
+            Refresh();
         }
 
         public void SetProducts(IEnumerable<Product> products)
@@ -96,6 +109,8 @@ namespace Sheaft.Domain
 
             if (productIdsToAdd.Any())
                 AddProducts(products.Where(b => productIdsToAdd.Contains(b.Id)).ToList());
+            
+            Refresh();
         }
 
         private void AddBatches(IEnumerable<Batch> batches)
