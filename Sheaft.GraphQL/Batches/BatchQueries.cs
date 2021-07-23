@@ -20,12 +20,12 @@ namespace Sheaft.GraphQL.Batches
     public class BatchQueries : SheaftQuery
     {
         private readonly RoleOptions _roleOptions;
-        
+
         public BatchQueries(
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor,
             IOptionsSnapshot<RoleOptions> roleOptions)
-            :base(currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
             _roleOptions = roleOptions.Value;
         }
@@ -41,7 +41,7 @@ namespace Sheaft.GraphQL.Batches
             return context.Batches
                 .Where(c => c.Id == id);
         }
-        
+
         [GraphQLName("batches")]
         [GraphQLType(typeof(ListType<BatchType>))]
         [UseDbContext(typeof(QueryDbContext))]
@@ -49,9 +49,15 @@ namespace Sheaft.GraphQL.Batches
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Batch> GetAll([ScopedService] QueryDbContext context)
+        public IQueryable<Batch> GetAll([ScopedService] QueryDbContext context, bool validOnly = false)
         {
             SetLogTransaction();
+
+            if (validOnly)
+                return context.Batches
+                    .Where(c => c.ProducerId == CurrentUser.Id && ((c.DLC.HasValue && c.DLC > DateTime.UtcNow) ||
+                                                                   (c.DDM.HasValue && c.DDM > DateTime.UtcNow)));
+
             return context.Batches
                 .Where(c => c.ProducerId == CurrentUser.Id);
         }
