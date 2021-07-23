@@ -12,11 +12,13 @@ using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.PurchaseOrders;
+using Sheaft.GraphQL.Recalls;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
@@ -97,10 +99,29 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetProducts(default, default, default, default))
                 .Type<ListType<ProductType>>();
+
+            descriptor
+                .Field("recalls")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetRecalls(default!, default!, default!, default))
+                .Type<ListType<RecallType>>();
         }
 
         private class BatchResolvers
         {
+            public async Task<IEnumerable<Recall>> GetRecalls(Batch batch,
+                [ScopedService] QueryDbContext context,
+                RecallsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var recallIds = await context.Recalls
+                    .Where(c => c.Batches.Any(p => p.BatchId == batch.Id)&& (int)c.Status >= (int)RecallStatus.Ready)
+                    .Select(a => a.Id)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(recallIds, token);
+            }
+            
             public async Task<IEnumerable<Observation>> GetObservations(Batch batch,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,

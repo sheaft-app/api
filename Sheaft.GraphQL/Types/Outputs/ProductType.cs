@@ -20,6 +20,7 @@ using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.Ratings;
+using Sheaft.GraphQL.Recalls;
 using Sheaft.GraphQL.Returnables;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
@@ -232,10 +233,29 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProductResolvers>(c => c.GetObservations(default, default, default, default, default, default))
                 .Type<ListType<ObservationType>>();
+            
+            descriptor
+                .Field("recalls")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c =>
+                    c.GetRecalls(default!, default!, default!, default))
+                .Type<ListType<RecallType>>();
         }
 
         private class ProductResolvers
         {
+            public async Task<IEnumerable<Recall>> GetRecalls(Product product,
+                [ScopedService] QueryDbContext context,
+                RecallsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var recallIds = await context.Recalls
+                    .Where(c => c.Products.Any(p => p.ProductId == product.Id) && (int)c.Status >= (int)RecallStatus.Ready)
+                    .Select(a => a.Id)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(recallIds, token);
+            }
+            
             public async Task<IEnumerable<Observation>> GetObservations(Product product,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,

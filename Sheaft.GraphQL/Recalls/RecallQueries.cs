@@ -36,7 +36,6 @@ namespace Sheaft.GraphQL.Recalls
 
         [GraphQLName("recall")]
         [GraphQLType(typeof(RecallType))]
-        [Authorize(Policy = Policies.REGISTERED)]
         [UseDbContext(typeof(QueryDbContext))]
         [UseSingleOrDefault]
         public IQueryable<Recall> GetRecall([ID] Guid id,

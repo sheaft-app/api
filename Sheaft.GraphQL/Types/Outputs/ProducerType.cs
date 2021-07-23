@@ -18,6 +18,7 @@ using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
+using Sheaft.GraphQL.Recalls;
 using Sheaft.GraphQL.Stores;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
@@ -177,6 +178,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetStores(default!, default!, default!, default))
                 .Type<ListType<StoreType>>();
+                
+            descriptor
+                .Field("recalls")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetRecalls(default!, default!, default!, default))
+                .Type<ListType<RecallType>>();
         }
 
         private class ProducerResolvers
@@ -237,6 +245,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await storesDataLoader.LoadAsync(storeIds, token);
+            }
+            
+            public async Task<IEnumerable<Recall>> GetRecalls(Producer producer,
+                [ScopedService] QueryDbContext context,
+                RecallsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var recallIds = await context.Recalls
+                    .Where(c => c.ProducerId == producer.Id && (int)c.Status >= (int)RecallStatus.Ready)
+                    .Select(a => a.Id)
+                    .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(recallIds, token);
             }
 
             public async Task<int> GetProductsCount(Producer producer,
