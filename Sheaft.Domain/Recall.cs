@@ -47,9 +47,9 @@ namespace Sheaft.Domain
 
         private void Refresh()
         {
-            ClientsCount = Clients.Count;
-            BatchesCount = Batches.Count;
-            ProductsCount = Products.Count;
+            ClientsCount = Clients?.Count ?? 0;
+            BatchesCount = Batches?.Count ?? 0;
+            ProductsCount = Products?.Count ?? 0;
         }
         
         public void SetBatches(IEnumerable<Batch> batches)

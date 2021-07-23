@@ -33,9 +33,9 @@ namespace Sheaft.Domain
 
         private void Refresh()
         {
-            RepliesCount = Replies.Count;
-            BatchesCount = Batches.Count;
-            ProductsCount = Products.Count;
+            RepliesCount = Replies?.Count ?? 0;
+            BatchesCount = Batches?.Count ?? 0;
+            ProductsCount = Products?.Count ?? 0;
         }
         
         public void AddReply(string comment, User user)

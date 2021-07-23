@@ -13,8 +13,10 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Models;
 using Sheaft.Core;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Recall.Commands
 {
@@ -53,7 +55,12 @@ namespace Sheaft.Mediatr.Recall.Commands
                 return Failure("Les campagnes de rappel sont introuvables.");
 
             foreach (var recall in recalls)
+            {
+                if(recall.Status != RecallStatus.Waiting && recall.Status != RecallStatus.Ready)
+                    throw SheaftException.BadRequest("Impossible de supprimer une campagne qui a été envoyée.");
+                
                 _context.Remove(recall);
+            }
 
             await _context.SaveChangesAsync(token);
             return Success();

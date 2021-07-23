@@ -51,13 +51,20 @@ namespace Sheaft.Mediatr.Recall.Commands
                 return Failure<IEnumerable<Guid>>("La campagne de rappel est introuvable.");
 
             var jobIds = new List<Guid>();
+            string error = null;
             foreach (var recall in recalls)
             {
                 if (recall.Status != RecallStatus.Waiting)
-                    return Failure<IEnumerable<Guid>>("La campagne de rappel n'est pas en attente.");
-                
+                {
+                    error = "La campagne de rappel n'est pas en attente.";
+                    break;
+                }
+
                 if (recall.ProducerId != request.RequestUser.Id)
-                    return Failure<IEnumerable<Guid>>("Vous n'êtes pas autorisé à accéder à cette ressource.");
+                {
+                    error = "Vous n'êtes pas autorisé à accéder à cette ressource.";
+                    break;
+                }
 
                 var command = new SendRecallCommand(request.RequestUser) {JobId = Guid.NewGuid(), RecallId = recall.Id};
                 var entity = new Domain.Job(command.JobId, JobKind.SendRecalls, $"Envoi campagne de rappel",
@@ -71,6 +78,9 @@ namespace Sheaft.Mediatr.Recall.Commands
                 _mediatr.Post(command);
                 jobIds.Add(entity.Id);
             }
+
+            if (!string.IsNullOrEmpty(error))
+                return Failure<IEnumerable<Guid>>(error);
 
             return Success<IEnumerable<Guid>>(jobIds);
         }
