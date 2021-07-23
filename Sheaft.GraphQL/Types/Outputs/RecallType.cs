@@ -6,6 +6,7 @@ using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
+using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
@@ -96,6 +97,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchObservationResolvers>(c => c.GetClients(default, default, default, default))
                 .Type<ListType<UserType>>();
+
+            descriptor
+                .Field("userAffected")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchObservationResolvers>(c => c.UserIsAffected(default, default, default, default))
+                .Type<BooleanType>();
         }
 
         private class BatchObservationResolvers
@@ -110,7 +117,17 @@ namespace Sheaft.GraphQL.Types.Outputs
 
                 return await dataLoader.LoadAsync(observationProductIds, token);
             }
-            
+
+            public async Task<bool> UserIsAffected(Recall recall, [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService, CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return false;
+                
+                return await context.Set<RecallClient>().AnyAsync(rc => rc.ClientId == currentUser.Data.Id && rc.RecallId == recall.Id, token);
+            }
+
             public async Task<IEnumerable<Batch>> GetBatches(Recall recall, [ScopedService] QueryDbContext context,
                 BatchesByIdBatchDataLoader dataLoader, CancellationToken token)
             {
