@@ -44,8 +44,7 @@ namespace Sheaft.Mediatr.Observation.Commands
 
         public async Task<Result<Guid>> Handle(CreateObservationCommand request, CancellationToken token)
         {
-            if (request.BatchIds == null || !request.BatchIds.Any() && request.ProductIds == null ||
-                !request.ProductIds.Any())
+            if ((request.BatchIds == null || !request.BatchIds.Any()) && (request.ProductIds == null || !request.ProductIds.Any()))
                 return Failure<Guid>("Vous devez préciser au moins un produit ou un lot pour faire une observation.");
             
             var batches = request.BatchIds != null
@@ -60,16 +59,13 @@ namespace Sheaft.Mediatr.Observation.Commands
                     .ToListAsync(token)
                 : new List<Domain.Product>();
 
-            var batchProducerIds = batches.Select(b => b.ProducerId).Distinct();
-            if (batchProducerIds.Count() > 1)
+            var batchProducerIds = batches.Select(b => b.ProducerId).Distinct().ToList();
+            if (batchProducerIds.Count > 1)
                 return Failure<Guid>("Une observation est liée à un producteur, les lots doivent donc appartenir au même producteur.");
 
-            var productProducerIds = products.Select(b => b.ProducerId).Distinct();
-            if (productProducerIds.Count() > 1)
+            var productProducerIds = products.Select(b => b.ProducerId).Distinct().ToList();
+            if (productProducerIds.Count > 1)
                 return Failure<Guid>("Une observation est liée à un producteur, les produits doivent donc appartenir au même producteur.");
-
-            if(batchProducerIds.FirstOrDefault() != null && productProducerIds.FirstOrDefault() != null && batchProducerIds.First() != productProducerIds.First())
-                return Failure<Guid>("Une observation est liée à un producteur, les produits et les lots doivent donc appartenir au même producteur.");
 
             var producerId = productProducerIds.Any() ? productProducerIds.First() : batchProducerIds.First();
             var producer = await _context.Producers.SingleOrDefaultAsync(p => p.Id == producerId, token);

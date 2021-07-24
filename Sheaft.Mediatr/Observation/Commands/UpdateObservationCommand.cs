@@ -49,8 +49,7 @@ namespace Sheaft.Mediatr.Observation.Commands
 
         public async Task<Result> Handle(UpdateObservationCommand request, CancellationToken token)
         {
-            if (request.BatchIds == null || !request.BatchIds.Any() && request.ProductIds == null ||
-                !request.ProductIds.Any())
+            if ((request.BatchIds == null || !request.BatchIds.Any()) && (request.ProductIds == null || !request.ProductIds.Any()))
                 return Failure<Guid>("Vous devez préciser au moins un produit ou un lot pour faire une observation.");
             
             var observation = await _context.Observations.SingleOrDefaultAsync(b => b.Id == request.ObservationId, token);
