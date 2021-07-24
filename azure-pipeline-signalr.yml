@@ -1,0 +1,27 @@
+trigger:
+  batch: true
+stages:
+- stage: __default
+  jobs:
+  - job: Job
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
+          dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
+          dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Signalr/   
+    - task: ArchiveFiles@2
+      displayName: "Archive SIGNALR"
+      inputs:
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr"
+        includeRootFolder: false
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish SIGNALR"
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
+        artifactName: 'sheaft-SIGNALR'
