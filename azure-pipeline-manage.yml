@@ -24,4 +24,4 @@ stages:
       displayName: "Publish MANAGE"
       inputs:
         PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Manage/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-MANAGE'
+        artifactName: 'sheaft-manage'
