@@ -22,6 +22,7 @@ using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Mediatr.DeliveryBatch.Commands;
 using Sheaft.Mediatr.Producer.Commands;
+using Sheaft.Mediatr.PurchaseOrder.Commands;
 
 namespace Sheaft.Mediatr.Picking.Commands
 {
@@ -52,20 +53,40 @@ namespace Sheaft.Mediatr.Picking.Commands
 
         public async Task<Result> Handle(CompletePickingCommand request, CancellationToken token)
         {
-            var picking = await _context.Pickings
-                .SingleOrDefaultAsync(c => c.Id == request.PickingId, token);
-            if (picking == null)
-                return Failure("La préparation est introuvable.");
-            
-            if (picking.ProductsToPrepare.Select(pp => pp.ProductId).Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
-                return Failure("Certain produits n'ont pas été préparés.");
-            
-            if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
-                return Failure("Certaines quantités de produits n'ont pas été validées.");
-            
-            picking.Complete();
-            await _context.SaveChangesAsync(token);
-            
+            using (var transaction = await _context.BeginTransactionAsync(token))
+            {
+                var picking = await _context.Pickings
+                    .SingleOrDefaultAsync(c => c.Id == request.PickingId, token);
+                if (picking == null)
+                    return Failure("La préparation est introuvable.");
+
+                if (picking.ProductsToPrepare.Select(pp => pp.ProductId)
+                    .Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
+                    return Failure("Certain produits n'ont pas été préparés.");
+
+                if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
+                    return Failure("Certaines quantités de produits n'ont pas été validées.");
+
+                picking.Complete();
+
+                Result result = null;
+                foreach (var purchaseOrder in picking.PurchaseOrders)
+                {
+                    result = await _mediatr.Process(
+                        new CompletePurchaseOrderCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
+                        token);
+
+                    if (!result.Succeeded)
+                        break;
+                }
+
+                if (!result.Succeeded)
+                    return result;
+
+                await _context.SaveChangesAsync(token);
+                await transaction.CommitAsync(token);
+            }
+
             return Success();
         }
     }

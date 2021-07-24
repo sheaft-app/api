@@ -167,9 +167,6 @@ namespace Sheaft.Domain
             StartedOn ??= DateTimeOffset.UtcNow;
             CompletedOn = DateTimeOffset.UtcNow;
             Status = PickingStatus.Completed;
-
-            foreach (var purchaseOrder in PurchaseOrders)
-                purchaseOrder.SetStatus(PurchaseOrderStatus.Completed, false);
         }
 
         public void SetProductPreparedQuantity(Guid productId, Guid purchaseOrderId, int quantity, string preparedBy,
@@ -198,7 +195,7 @@ namespace Sheaft.Domain
                 existingPreparedProduct.CompleteProduct(preparedBy);
 
             Refresh();
-
+            
             if (PreparedProducts.Count == ProductsToPrepare.Count && PreparedProducts.All(p => p.PreparedOn.HasValue))
                 Complete();
         }

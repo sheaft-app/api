@@ -14,6 +14,7 @@ using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Core.Enums;
 using Sheaft.Domain.Enum;
+using Sheaft.Mediatr.PurchaseOrder.Commands;
 
 namespace Sheaft.Mediatr.Picking.Commands
 {
@@ -64,14 +65,38 @@ namespace Sheaft.Mediatr.Picking.Commands
 
             if (request.Quantities == null || !request.Quantities.Any())
                 return Failure("Les quantités préparées pour le produit sont requises.");
-            
-            var batches = request.Batches != null && request.Batches.Any() ? await _context.Batches
-                .Where(b => request.Batches.Contains(b.Id))
-                .ToListAsync(token) : new List<Domain.Batch>();
-            
+
+            var batches = request.Batches != null && request.Batches.Any()
+                ? await _context.Batches
+                    .Where(b => request.Batches.Contains(b.Id))
+                    .ToListAsync(token)
+                : new List<Domain.Batch>();
+
             foreach (var quantity in request.Quantities)
                 picking.SetProductPreparedQuantity(request.ProductId, quantity.PurchaseOrderId,
                     quantity.PreparedQuantity, preparedBy, request.Completed, batches);
+
+            if (picking.Status == PickingStatus.Completed)
+            {
+                using (var transaction = await _context.BeginTransactionAsync(token))
+                {
+                    Result result = null;
+                    foreach (var purchaseOrder in picking.PurchaseOrders)
+                    {
+                        result = await _mediatr.Process(
+                            new CompletePurchaseOrderCommand(request.RequestUser) {PurchaseOrderId = purchaseOrder.Id},
+                            token);
+
+                        if (!result.Succeeded)
+                            break;
+                    }
+
+                    if (!result.Succeeded)
+                        return result;
+
+                    await transaction.CommitAsync(token);
+                }
+            }
 
             await _context.SaveChangesAsync(token);
             return Success();
