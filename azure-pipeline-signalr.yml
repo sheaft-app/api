@@ -24,4 +24,4 @@ stages:
       displayName: "Publish SIGNALR"
       inputs:
         PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Signalr/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-SIGNALR'
+        artifactName: 'sheaft-signalr'
