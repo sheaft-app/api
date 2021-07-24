@@ -16,6 +16,7 @@ using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.Types;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
@@ -31,7 +32,7 @@ namespace Sheaft.GraphQL.Observations
             IOptionsSnapshot<RoleOptions> roleOptions,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
-            :base(currentUserService, httpContextAccessor)
+            : base(currentUserService, httpContextAccessor)
         {
             _roleOptions = roleOptions.Value;
         }
@@ -45,7 +46,7 @@ namespace Sheaft.GraphQL.Observations
             [ScopedService] QueryDbContext context)
         {
             SetLogTransaction(id);
-            
+
             return context.Observations
                 .Where(c => c.Id == id);
         }
@@ -57,16 +58,22 @@ namespace Sheaft.GraphQL.Observations
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Observation> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
+        public IQueryable<Observation> GetAll([ID] Guid? producerId, [ScopedService] QueryDbContext context,
+            CancellationToken token)
         {
             SetLogTransaction();
 
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
                 return context.Observations
                     .Where(c => c.ProducerId == CurrentUser.Id && !c.ReplyToId.HasValue);
-            
+
+            if (producerId.HasValue)
+                return context.Observations
+                    .Where(c => ((c.ProducerId == producerId && c.VisibleToAll) ||
+                                 (c.ProducerId == producerId && c.UserId == CurrentUser.Id)) && !c.ReplyToId.HasValue);
+
             return context.Observations
-                .Where(c => c.UserId == CurrentUser.Id && !c.ReplyToId.HasValue);
+                .Where(c => (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue);
         }
     }
 }
