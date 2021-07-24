@@ -66,13 +66,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<NonNullType<UserAddressType>>();
 
             descriptor
-                .Authorize(Policies.STORE_OR_PRODUCER)
                 .Field(c => c.Email)
+                .Authorize(Policies.STORE_OR_PRODUCER)
                 .Name("email");
 
             descriptor
-                .Authorize(Policies.STORE_OR_PRODUCER)
                 .Field(c => c.Phone)
+                .Authorize(Policies.STORE_OR_PRODUCER)
                 .Name("phone");
         }
 
