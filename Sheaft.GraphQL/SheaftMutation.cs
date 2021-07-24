@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types;
@@ -55,15 +56,18 @@ namespace Sheaft.GraphQL
         private void SetLogTransaction(object input, string name)
         {
             NewRelic.Api.Agent.NewRelic.SetTransactionName("GraphQL", name);
-        
             var currentTransaction = NewRelic.Api.Agent.NewRelic.GetAgent().CurrentTransaction;
-            currentTransaction.AddCustomAttribute("RequestId", _httpContextAccessor.HttpContext.TraceIdentifier);
-            currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
-            currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated().ToString());
-            currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
             currentTransaction.AddCustomAttribute("GraphQL", name);
-        
-            if (input != null)
+            
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                currentTransaction.AddCustomAttribute("RequestId", _httpContextAccessor.HttpContext.TraceIdentifier);
+                currentTransaction.AddCustomAttribute("UserIdentifier", CurrentUser.Id.ToString("N"));
+                currentTransaction.AddCustomAttribute("IsAuthenticated", CurrentUser.IsAuthenticated().ToString());
+                currentTransaction.AddCustomAttribute("Roles", string.Join(";", CurrentUser.Roles));
+            }
+
+            if(input != null)
                 currentTransaction.AddCustomAttribute("Input", JsonConvert.SerializeObject(input));
         }
     }

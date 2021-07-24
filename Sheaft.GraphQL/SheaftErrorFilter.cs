@@ -22,7 +22,7 @@ namespace Sheaft.GraphQL
             var message = "Une erreur inattendue est survenue.";
             var extensions = error.Extensions?.ToDictionary(pair => pair.Key, pair => pair.Value) ?? new Dictionary<string, object?>();
             
-            extensions.Add("RequestIdentifier", _httpContextAccessor.HttpContext.TraceIdentifier);
+            extensions.Add("RequestIdentifier", _httpContextAccessor.HttpContext?.TraceIdentifier);
 
             var kind = ExceptionKind.Unexpected;
             var exception = error.Exception;
@@ -113,7 +113,7 @@ namespace Sheaft.GraphQL
 
             var parameters = new Dictionary<string, object>
             {
-                {"RequestId", _httpContextAccessor.HttpContext.TraceIdentifier},
+                {"RequestId", _httpContextAccessor.HttpContext?.TraceIdentifier},
                 {"StatusCode", statusCode},
                 {"ExceptionKind", kind},
                 {"ExceptionMessage", message},
