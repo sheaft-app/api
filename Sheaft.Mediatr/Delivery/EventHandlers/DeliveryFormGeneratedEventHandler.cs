@@ -47,6 +47,9 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
                 return;
 
             var client = await _context.Users.SingleAsync(u => u.Id == delivery.ClientId, token);
+            if (client.Kind != ProfileKind.Store)
+                return;
+            
             var producer = await _context.Producers.SingleAsync(u => u.Id == delivery.ProducerId, token);
 
             var blobResult = await _blobService.DownloadDeliveryAsync(delivery.DeliveryFormUrl, token);

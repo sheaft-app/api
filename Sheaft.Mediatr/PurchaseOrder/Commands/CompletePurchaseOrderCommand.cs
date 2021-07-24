@@ -15,6 +15,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.Donation.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
@@ -78,8 +79,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 
                 var delivery = new Domain.Delivery(identifier.Data, producer, purchaseOrder.ExpectedDelivery.Kind, purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate, purchaseOrder.ExpectedDelivery.Address, user.Id, user.Name, new []{purchaseOrder}, 0);
                 delivery.SetAsReady();
-            
+                
                 await _context.AddAsync(delivery, token);
+                _mediatr.Post(new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id});
             }
 
             await _context.SaveChangesAsync(token);
