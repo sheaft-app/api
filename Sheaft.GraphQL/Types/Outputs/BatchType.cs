@@ -34,43 +34,45 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .ImplementsNode()
                 .IdField(c => c.Id)
-                .ResolveNode((ctx, id) => 
+                .ResolveNode((ctx, id) =>
                     ctx.DataLoader<BatchesByIdBatchDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
             descriptor
                 .Field(c => c.Number)
                 .Name("number");
-            
+
             descriptor
                 .Field(c => c.DLC)
                 .Name("dlc");
-            
+
             descriptor
                 .Field(c => c.DDM)
                 .Name("ddm");
-            
+
             descriptor
                 .Field(c => c.CreatedOn)
                 .Name("createdOn");
-            
+
             descriptor
                 .Field("observations")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<BatchResolvers>(c => c.GetObservations(default, default, default, default, default, default))
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetObservations(default, default, default, default, default, default))
                 .Type<ListType<ObservationType>>();
-            
+
             descriptor
                 .Field("purchaseOrders")
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<BatchResolvers>(c => c.GetPurchaseOrders(default, default, default, default, default, default))
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetPurchaseOrders(default, default, default, default, default, default))
                 .Type<ListType<PurchaseOrderType>>();
-            
+
             descriptor
                 .Field(c => c.Fields)
                 .Authorize(Policies.PRODUCER)
                 .Type<ListType<BatchFieldType>>()
                 .Name("fields");
-            
+
             descriptor
                 .Field(c => c.Definition)
                 .Authorize(Policies.PRODUCER)
@@ -78,26 +80,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetDefinition(default, default, default))
                 .Type<BatchDefinitionType>();
-            
+
             descriptor
                 .Field("deliveries")
                 .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetDeliveries(default, default, default, default))
                 .Type<ListType<DeliveryType>>();
-            
+
             descriptor
                 .Field("clients")
                 .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetClients(default, default, default, default))
                 .Type<ListType<UserType>>();
-            
+
             descriptor
                 .Field("products")
-                .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
-                .ResolveWith<BatchResolvers>(c => c.GetProducts(default, default, default, default))
+                .ResolveWith<BatchResolvers>(c => c.GetProducts(default, default, default, default, default, default))
                 .Type<ListType<ProductType>>();
 
             descriptor
@@ -115,13 +116,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 RecallsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var recallIds = await context.Recalls
-                    .Where(c => c.Batches.Any(p => p.BatchId == batch.Id)&& (int)c.Status >= (int)RecallStatus.Ready)
+                    .Where(c => c.Batches.Any(p => p.BatchId == batch.Id) && (int) c.Status >= (int) RecallStatus.Ready)
                     .Select(a => a.Id)
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(recallIds, token);
             }
-            
+
             public async Task<IEnumerable<Observation>> GetObservations(Batch batch,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,
@@ -136,46 +137,71 @@ namespace Sheaft.GraphQL.Types.Outputs
                 if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     observationIds = await context.Observations
-                            .Where(cp => cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
-                            .Select(cp => cp.Id)
-                            .ToListAsync(token);
+                        .Where(cp =>
+                            cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue &&
+                            cp.Batches.Any(b => b.BatchId == batch.Id))
+                        .Select(cp => cp.Id)
+                        .ToListAsync(token);
                 }
                 else
                 {
                     observationIds = await context.Observations
-                    .Where(cp =>  (cp.VisibleToAll || cp.UserId == currentUser.Data.Id) && !cp.ReplyToId.HasValue && cp.Batches.Any(b => b.BatchId == batch.Id))
-                    .Select(cp => cp.Id)
-                    .ToListAsync(token);
+                        .Where(cp =>
+                            (cp.VisibleToAll || cp.UserId == currentUser.Data.Id) && !cp.ReplyToId.HasValue &&
+                            cp.Batches.Any(b => b.BatchId == batch.Id))
+                        .Select(cp => cp.Id)
+                        .ToListAsync(token);
                 }
 
                 var result = await dataLoader.LoadAsync(observationIds.Distinct().ToList(), token);
                 return result.OrderBy(o => o.CreatedOn);
             }
-            
+
             public async Task<IEnumerable<Delivery>> GetDeliveries(Batch batch, [ScopedService] QueryDbContext context,
                 DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var deliveryIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))))
+                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp =>
+                        pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))))
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(deliveryIds.Distinct().ToList(), token);
             }
-            
-            public async Task<IEnumerable<Product>> GetProducts(Batch batch, [ScopedService] QueryDbContext context,
+
+            public async Task<IEnumerable<Product>> GetProducts(Batch batch, 
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
                 ProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
-                var productIds = await context.Deliveries
-                    .SelectMany(cp => cp.PurchaseOrders
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return null;
+
+                var productIds = new List<Guid>();
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                {
+                    productIds = await context.PurchaseOrders
+                        .Where(p => p.ProducerId == currentUser.Data.Id)
                         .SelectMany(po => po.Picking.PreparedProducts
                             .Where(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))
-                            .Select(pp => pp.ProductId)))
-                    .ToListAsync(token);
+                            .Select(pp => pp.ProductId))
+                        .ToListAsync(token);
+                }
+                else
+                {
+                    productIds = await context.PurchaseOrders
+                        .Where(p => p.ClientId == currentUser.Data.Id)
+                        .SelectMany(po => po.Picking.PreparedProducts
+                            .Where(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))
+                            .Select(pp => pp.ProductId))
+                        .ToListAsync(token);
+                }
 
                 return await dataLoader.LoadAsync(productIds.Distinct().ToList(), token);
             }
-            
+
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Batch batch,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,
@@ -190,30 +216,39 @@ namespace Sheaft.GraphQL.Types.Outputs
                 if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     purchaseOrderIds = await context.Deliveries
-                       .SelectMany(cp => cp.PurchaseOrders.Where(po => po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.Id))
-                       .ToListAsync(token);
+                        .SelectMany(cp =>
+                            cp.PurchaseOrders.Where(po =>
+                                    po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp =>
+                                        pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                                .Select(po => po.Id))
+                        .ToListAsync(token);
                 }
                 else
                 {
-                    purchaseOrderIds = await context.Deliveries
-                    .SelectMany(cp => cp.PurchaseOrders.Where(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.Id))
-                    .ToListAsync(token);
+                    purchaseOrderIds = await context.PurchaseOrders
+                        .Where(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp =>
+                            pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                        .Select(po => po.Id)
+                        .ToListAsync(token);
                 }
 
                 return await dataLoader.LoadAsync(purchaseOrderIds.Distinct().ToList(), token);
             }
-            
+
             public async Task<IEnumerable<User>> GetClients(Batch batch, [ScopedService] QueryDbContext context,
                 UsersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var clientIds = await context.Deliveries
-                    .SelectMany(cp => cp.PurchaseOrders.Where(po => po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.ClientId))
+                    .SelectMany(cp =>
+                        cp.PurchaseOrders.Where(po => po.Picking.PreparedProducts.Any(pp =>
+                                pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                            .Select(po => po.ClientId))
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(clientIds.Distinct().ToList(), token);
             }
-            
-            public Task<BatchDefinition> GetDefinition(Batch batch, 
+
+            public Task<BatchDefinition> GetDefinition(Batch batch,
                 BatchDefinitionsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 return dataLoader.LoadAsync(batch.DefinitionId, token);
