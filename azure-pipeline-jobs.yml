@@ -24,4 +24,4 @@ stages:
       displayName: "Publish JOBS"
       inputs:
         PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Jobs/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-JOBS'
+        artifactName: 'sheaft-jobs'
