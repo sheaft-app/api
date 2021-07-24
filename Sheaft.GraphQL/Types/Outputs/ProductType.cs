@@ -15,6 +15,7 @@ using Sheaft.Application.Security;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
@@ -240,6 +241,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<ProductResolvers>(c =>
                     c.GetRecalls(default!, default!, default!, default))
                 .Type<ListType<RecallType>>();
+                
+            descriptor
+                .Field("batches")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProductResolvers>(c => c.GetBatches(default, default, default, default, default, default))
+                .Type<ListType<BatchType>>();
         }
 
         private class ProductResolvers
@@ -283,6 +290,36 @@ namespace Sheaft.GraphQL.Types.Outputs
                 }
 
                 var result = await dataLoader.LoadAsync(observationIds.Distinct().ToList(), token);
+                return result.OrderBy(o => o.CreatedOn);
+            }
+            
+            public async Task<IEnumerable<Batch>> GetBatches(Product product,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                BatchesByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return null;
+
+                var batchIds = new List<Guid>();
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                {
+                    batchIds = await context.Set<PreparedProduct>()
+                        .Where(cp => cp.ProductId == product.Id)
+                        .SelectMany(cp => cp.Batches.Select(b => b.BatchId))
+                        .ToListAsync(token);
+                }
+                else
+                {
+                    batchIds = await context.PurchaseOrders
+                        .Where(po => po.ClientId == currentUser.Data.Id)
+                        .SelectMany(cp => cp.Picking.PreparedProducts.Where(po => po.ProductId == product.Id).Where(po => po.PurchaseOrderId == cp.Id).SelectMany(po => po.Batches.Select(b => b.BatchId)))
+                        .ToListAsync(token);
+                }
+
+                var result = await dataLoader.LoadAsync(batchIds.Distinct().ToList(), token);
                 return result.OrderBy(o => o.CreatedOn);
             }
             

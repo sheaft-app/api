@@ -108,12 +108,12 @@ namespace Sheaft.Business
 
                         if (purchaseOrder.PickingId.HasValue)
                         {
-                            po.LinesCount = purchaseOrder.Picking.PreparedProducts.Select(p => p.ProductId).Distinct().Count();
-                            po.ProductsCount = purchaseOrder.Picking.PreparedProducts.Sum(p => p.Quantity);
-                            po.TotalOnSalePrice = purchaseOrder.Picking.PreparedProducts.Sum(p => p.TotalOnSalePrice);
-                            po.TotalWholeSalePrice = purchaseOrder.Picking.PreparedProducts.Sum(p => p.TotalWholeSalePrice);
-                            po.ReturnablesCount = purchaseOrder.Picking.PreparedProducts.Where(p => p.HasReturnable).Sum(p => p.Quantity);
-                            po.TotalWeight = purchaseOrder.Picking.PreparedProducts.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight.Value);
+                            po.LinesCount = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Select(p => p.ProductId).Distinct().Count();
+                            po.ProductsCount = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Sum(p => p.Quantity);
+                            po.TotalOnSalePrice = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Sum(p => p.TotalOnSalePrice);
+                            po.TotalWholeSalePrice = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Sum(p => p.TotalWholeSalePrice);
+                            po.ReturnablesCount = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Where(p => p.HasReturnable).Sum(p => p.Quantity);
+                            po.TotalWeight = purchaseOrder.Picking.PreparedProducts.Where(pp => pp.PurchaseOrderId == po.Id).Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight.Value);
                         }
                         else
                         {

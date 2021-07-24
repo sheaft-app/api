@@ -118,6 +118,40 @@ namespace Sheaft.GraphQL.Products
             return new List<CatalogProduct>().AsQueryable();
         }
 
+        [GraphQLName("productsBatches")]
+        [GraphQLType(typeof(ListType<BatchType>))]
+        [UseDbContext(typeof(QueryDbContext))]
+        [Authorize(Policy = Policies.REGISTERED)]
+        [UsePaging]
+        [UseFiltering]
+        [UseSorting]
+        public async Task<IQueryable<Batch>> GetProductsBatches([ID(nameof(Product))] IEnumerable<Guid> ids, 
+            [ScopedService] QueryDbContext context, CancellationToken token)
+        {
+            SetLogTransaction();
+
+            var batchIds = new List<Guid>();
+            if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
+            {
+                batchIds = await context.Set<PreparedProduct>()
+                    .Where(cp => ids.Contains(cp.ProductId))
+                    .SelectMany(cp => cp.Batches.Select(b => b.BatchId))
+                    .ToListAsync(token);
+            }
+            else
+            {
+                batchIds = await context.PurchaseOrders
+                    .Where(po => po.ClientId == CurrentUser.Id)
+                    .SelectMany(cp => cp.Picking.PreparedProducts.Where(po => ids.Contains(po.ProductId)).Where(po => po.PurchaseOrderId == cp.Id).SelectMany(po => po.Batches.Select(b => b.BatchId)))
+                    .ToListAsync(token);
+            }
+
+            batchIds = batchIds.Distinct().ToList();
+            
+            return context.Batches
+                .Where(c => batchIds.Contains(c.Id));
+        }
+
         [GraphQLName("searchProducts")]
         [UseDbContext(typeof(QueryDbContext))]
         [GraphQLType(typeof(ProductsSearchDtoType))]

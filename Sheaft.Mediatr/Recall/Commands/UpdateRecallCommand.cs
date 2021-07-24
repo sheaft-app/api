@@ -73,8 +73,8 @@ namespace Sheaft.Mediatr.Recall.Commands
             
             var clientIds = await _context.PurchaseOrders
                 .Where(po =>
-                    po.Picking.PreparedProducts.Any(pp => request.ProductIds.Contains(pp.ProductId)) ||
-                    po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => request.BatchIds.Contains(b.BatchId))))
+                    po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && request.ProductIds.Contains(pp.ProductId)) ||
+                    po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => request.BatchIds.Contains(b.BatchId))))
                 .Select(po => po.ClientId)
                 .ToListAsync(token);
 

@@ -156,7 +156,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var deliveryIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
+                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))))
                     .Select(cp => cp.Id)
                     .ToListAsync(token);
 
@@ -167,8 +167,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 ProductsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var productIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
-                    .SelectMany(cp => cp.PurchaseOrders.SelectMany(po => po.Picking.PreparedProducts.Select(pp => pp.ProductId)))
+                    .SelectMany(cp => cp.PurchaseOrders
+                        .SelectMany(po => po.Picking.PreparedProducts
+                            .Where(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))
+                            .Select(pp => pp.ProductId)))
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(productIds.Distinct().ToList(), token);
@@ -188,15 +190,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
                 {
                     purchaseOrderIds = await context.Deliveries
-                       .Where(cp => cp.PurchaseOrders.Any(po => po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
-                       .SelectMany(cp => cp.PurchaseOrders.Select(po => po.Id))
+                       .SelectMany(cp => cp.PurchaseOrders.Where(po => po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.Id))
                        .ToListAsync(token);
                 }
                 else
                 {
                     purchaseOrderIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
-                    .SelectMany(cp => cp.PurchaseOrders.Select(po => po.Id))
+                    .SelectMany(cp => cp.PurchaseOrders.Where(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.Id))
                     .ToListAsync(token);
                 }
 
@@ -207,8 +207,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 UsersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var clientIds = await context.Deliveries
-                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp => pp.Batches.Any(b => b.BatchId == batch.Id))))
-                    .SelectMany(cp => cp.PurchaseOrders.Select(po => po.ClientId))
+                    .SelectMany(cp => cp.PurchaseOrders.Where(po => po.Picking.PreparedProducts.Any(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))).Select(po => po.ClientId))
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(clientIds.Distinct().ToList(), token);
