@@ -24,4 +24,4 @@ stages:
       displayName: "Publish PAYMENT"
       inputs:
         PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.PAYMENT/build$(Build.BuildId).zip'
-        artifactName: 'sheaft-PAYMENT'
+        artifactName: 'sheaft-payment'
