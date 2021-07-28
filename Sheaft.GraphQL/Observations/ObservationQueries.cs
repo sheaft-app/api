@@ -69,8 +69,7 @@ namespace Sheaft.GraphQL.Observations
 
             if (producerId.HasValue)
                 return context.Observations
-                    .Where(c => ((c.ProducerId == producerId && c.VisibleToAll) ||
-                                 (c.ProducerId == producerId && c.UserId == CurrentUser.Id)) && !c.ReplyToId.HasValue);
+                    .Where(c => c.ProducerId == producerId && (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue);
 
             return context.Observations
                 .Where(c => (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue);

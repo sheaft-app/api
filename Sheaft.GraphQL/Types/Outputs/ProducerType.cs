@@ -16,6 +16,7 @@ using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
 using Sheaft.GraphQL.Catalogs;
+using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
 using Sheaft.GraphQL.Recalls;
@@ -34,7 +35,7 @@ namespace Sheaft.GraphQL.Types.Outputs
             base.Configure(descriptor);
 
             descriptor.Name("Producer");
-            
+
             descriptor
                 .ImplementsNode()
                 .IdField(c => c.Id)
@@ -171,20 +172,48 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetProducts(default!, default!, default!, default, default!, default))
                 .Type<ListType<ProductType>>();
-            
+
             descriptor
                 .Field("stores")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetStores(default!, default!, default!, default))
                 .Type<ListType<StoreType>>();
-                
+
+            descriptor
+                .Field("storesCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetStoresCount(default!, default!, default!))
+                .Type<IntType>();
+
             descriptor
                 .Field("recalls")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerResolvers>(c =>
                     c.GetRecalls(default!, default!, default!, default))
                 .Type<ListType<RecallType>>();
+
+            descriptor
+                .Field("recallsCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetRecallsCount(default!, default!, default!))
+                .Type<IntType>();
+
+            descriptor
+                .Field("observations")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetObservations(default!, default!, default!, default, default))
+                .Type<ListType<ObservationType>>();
+
+            descriptor
+                .Field("observationsCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<ProducerResolvers>(c =>
+                    c.GetObservationsCount(default!, default!, default!, default))
+                .Type<IntType>();
         }
 
         private class ProducerResolvers
@@ -233,7 +262,7 @@ namespace Sheaft.GraphQL.Types.Outputs
 
                 return await productsDataLoader.LoadAsync(productsId, token);
             }
-            
+
             public async Task<IEnumerable<Store>> GetStores(Producer producer,
                 [ScopedService] QueryDbContext context,
                 StoresByIdBatchDataLoader storesDataLoader, CancellationToken token)
@@ -244,7 +273,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .Select(a => a.StoreId)
                     .ToListAsync(token);
 
-                return await storesDataLoader.LoadAsync(storeIds, token);
+                return await storesDataLoader.LoadAsync(storeIds.Distinct().ToList(), token);
+            }
+
+
+            public async Task<int> GetStoresCount(Producer producer,
+                [ScopedService] QueryDbContext context,
+                CancellationToken token)
+            {
+                return await context.Agreements
+                    .Where(c => c.ProducerId == producer.Id &&
+                                c.Status == AgreementStatus.Accepted)
+                    .CountAsync(token);
             }
             
             public async Task<IEnumerable<Recall>> GetRecalls(Producer producer,
@@ -252,11 +292,58 @@ namespace Sheaft.GraphQL.Types.Outputs
                 RecallsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 var recallIds = await context.Recalls
-                    .Where(c => c.ProducerId == producer.Id && (int)c.Status >= (int)RecallStatus.Ready)
+                    .Where(c => c.ProducerId == producer.Id && (int) c.Status >= (int) RecallStatus.Ready)
                     .Select(a => a.Id)
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(recallIds, token);
+            }
+            
+            public async Task<int> GetRecallsCount(Producer producer,
+                [ScopedService] QueryDbContext context, CancellationToken token)
+            {
+                return await context.Recalls
+                    .Where(c => c.ProducerId == producer.Id && (int) c.Status >= (int) RecallStatus.Ready)
+                    .CountAsync(token);
+            }
+
+            public async Task<IEnumerable<Observation>> GetObservations(Producer producer,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                ObservationsByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                var observationIds = new List<Guid>();
+                if (!currentUser.Succeeded)
+                    observationIds = await context.Observations.Where(c =>
+                            c.ProducerId == producer.Id && c.VisibleToAll && !c.ReplyToId.HasValue)
+                        .Select(o => o.Id)
+                        .ToListAsync(token);
+                else
+                    observationIds = await context.Observations
+                        .Where(c => c.ProducerId == producer.Id &&
+                                    (c.VisibleToAll || c.UserId == currentUser.Data.Id) && !c.ReplyToId.HasValue)
+                        .Select(a => a.Id)
+                        .ToListAsync(token);
+
+                return await dataLoader.LoadAsync(observationIds, token);
+            }
+
+            public async Task<int> GetObservationsCount(Producer producer,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return await context.Observations.Where(c =>
+                            c.ProducerId == producer.Id && c.VisibleToAll && !c.ReplyToId.HasValue)
+                        .CountAsync(token);
+
+                return await context.Observations
+                    .Where(c => c.ProducerId == producer.Id &&
+                                (c.VisibleToAll || c.UserId == currentUser.Data.Id) && !c.ReplyToId.HasValue)
+                    .CountAsync(token);
             }
 
             public async Task<int> GetProductsCount(Producer producer,
