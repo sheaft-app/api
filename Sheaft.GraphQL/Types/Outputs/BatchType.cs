@@ -61,11 +61,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<ObservationType>>();
 
             descriptor
+                .Field("observationsCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetObservationsCount(default, default, default, default, default))
+                .Type<IntType>();
+
+            descriptor
                 .Field("purchaseOrders")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c =>
                     c.GetPurchaseOrders(default, default, default, default, default, default))
                 .Type<ListType<PurchaseOrderType>>();
+
+            descriptor
+                .Field("purchaseOrdersCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetPurchaseOrdersCount(default, default, default, default, default))
+                .Type<IntType>();
 
             descriptor
                 .Field(c => c.Fields)
@@ -89,11 +103,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<DeliveryType>>();
 
             descriptor
+                .Field("deliveriesCount")
+                .Authorize(Policies.PRODUCER)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.GetDeliveriesCount(default, default, default))
+                .Type<IntType>();
+
+            descriptor
                 .Field("clients")
                 .Authorize(Policies.PRODUCER)
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetClients(default, default, default, default))
                 .Type<ListType<UserType>>();
+
+            descriptor
+                .Field("clientsCount")
+                .Authorize(Policies.PRODUCER)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.GetClientsCount(default, default, default))
+                .Type<IntType>();
 
             descriptor
                 .Field("products")
@@ -102,11 +130,25 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Type<ListType<ProductType>>();
 
             descriptor
+                .Field("productsCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetProductsCount(default, default, default, default, default))
+                .Type<IntType>();
+
+            descriptor
                 .Field("recalls")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c =>
                     c.GetRecalls(default!, default!, default!, default))
                 .Type<ListType<RecallType>>();
+
+            descriptor
+                .Field("recallsCount")
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c =>
+                    c.GetRecallsCount(default!, default!, default!))
+                .Type<IntType>();
         }
 
         private class BatchResolvers
@@ -121,6 +163,15 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(recallIds, token);
+            }
+
+            public async Task<int> GetRecallsCount(Batch batch,
+                [ScopedService] QueryDbContext context,
+                CancellationToken token)
+            {
+                return await context.Recalls
+                    .Where(c => c.Batches.Any(p => p.BatchId == batch.Id) && (int) c.Status >= (int) RecallStatus.Ready)
+                    .CountAsync(token);
             }
 
             public async Task<IEnumerable<Observation>> GetObservations(Batch batch,
@@ -157,6 +208,34 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return result.OrderBy(o => o.CreatedOn);
             }
 
+            public async Task<int> GetObservationsCount(Batch batch,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return await context.Observations
+                        .Where(cp =>
+                            cp.VisibleToAll && !cp.ReplyToId.HasValue &&
+                            cp.Batches.Any(b => b.BatchId == batch.Id))
+                        .CountAsync(token);
+
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                    return await context.Observations
+                        .Where(cp =>
+                            cp.ProducerId == currentUser.Data.Id && !cp.ReplyToId.HasValue &&
+                            cp.Batches.Any(b => b.BatchId == batch.Id))
+                        .CountAsync(token);
+
+                return await context.Observations
+                    .Where(cp =>
+                        (cp.VisibleToAll || cp.UserId == currentUser.Data.Id) && !cp.ReplyToId.HasValue &&
+                        cp.Batches.Any(b => b.BatchId == batch.Id))
+                    .CountAsync(token);
+            }
+
             public async Task<IEnumerable<Delivery>> GetDeliveries(Batch batch, [ScopedService] QueryDbContext context,
                 DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
             {
@@ -169,7 +248,16 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await dataLoader.LoadAsync(deliveryIds.Distinct().ToList(), token);
             }
 
-            public async Task<IEnumerable<Product>> GetProducts(Batch batch, 
+            public async Task<int> GetDeliveriesCount(Batch batch, [ScopedService] QueryDbContext context,
+                CancellationToken token)
+            {
+                return await context.Deliveries
+                    .Where(cp => cp.PurchaseOrders.Any(po => po.Picking.PreparedProducts.Any(pp =>
+                        pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))))
+                    .CountAsync(token);
+            }
+
+            public async Task<IEnumerable<Product>> GetProducts(Batch batch,
                 [ScopedService] QueryDbContext context,
                 [Service] ICurrentUserService currentUserService,
                 [Service] IOptionsSnapshot<RoleOptions> roleOptions,
@@ -200,6 +288,34 @@ namespace Sheaft.GraphQL.Types.Outputs
                 }
 
                 return await dataLoader.LoadAsync(productIds.Distinct().ToList(), token);
+            }
+
+            public async Task<int> GetProductsCount(Batch batch,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return 0;
+
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                    return await context.PurchaseOrders
+                        .Where(p => p.ProducerId == currentUser.Data.Id)
+                        .SelectMany(po => po.Picking.PreparedProducts
+                            .Where(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))
+                            .Select(pp => pp.ProductId))
+                        .Distinct()
+                        .CountAsync(token);
+
+                return await context.PurchaseOrders
+                    .Where(p => p.ClientId == currentUser.Data.Id)
+                    .SelectMany(po => po.Picking.PreparedProducts
+                        .Where(pp => pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id))
+                        .Select(pp => pp.ProductId))
+                    .Distinct()
+                    .CountAsync(token);
             }
 
             public async Task<IEnumerable<PurchaseOrder>> GetPurchaseOrders(Batch batch,
@@ -235,6 +351,33 @@ namespace Sheaft.GraphQL.Types.Outputs
                 return await dataLoader.LoadAsync(purchaseOrderIds.Distinct().ToList(), token);
             }
 
+            public async Task<int> GetPurchaseOrdersCount(Batch batch,
+                [ScopedService] QueryDbContext context,
+                [Service] ICurrentUserService currentUserService,
+                [Service] IOptionsSnapshot<RoleOptions> roleOptions,
+                CancellationToken token)
+            {
+                var currentUser = currentUserService.GetCurrentUserInfo();
+                if (!currentUser.Succeeded)
+                    return 0;
+
+                if (currentUser.Data.IsInRole(roleOptions.Value.Producer.Value))
+                    return await context.Deliveries
+                        .SelectMany(cp =>
+                            cp.PurchaseOrders.Where(po =>
+                                    po.ProducerId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp =>
+                                        pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                                .Select(po => po.Id))
+                        .Distinct()
+                        .CountAsync(token);
+                return await context.PurchaseOrders
+                    .Where(po => po.ClientId == currentUser.Data.Id && po.Picking.PreparedProducts.Any(pp =>
+                        pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                    .Select(po => po.Id)
+                    .Distinct()
+                    .CountAsync(token);
+            }
+
             public async Task<IEnumerable<User>> GetClients(Batch batch, [ScopedService] QueryDbContext context,
                 UsersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
@@ -246,6 +389,17 @@ namespace Sheaft.GraphQL.Types.Outputs
                     .ToListAsync(token);
 
                 return await dataLoader.LoadAsync(clientIds.Distinct().ToList(), token);
+            }
+
+            public async Task<int> GetClientsCount(Batch batch, [ScopedService] QueryDbContext context, CancellationToken token)
+            {
+                return await context.Deliveries
+                    .SelectMany(cp =>
+                        cp.PurchaseOrders.Where(po => po.Picking.PreparedProducts.Any(pp =>
+                                pp.PurchaseOrderId == po.Id && pp.Batches.Any(b => b.BatchId == batch.Id)))
+                            .Select(po => po.ClientId))
+                    .Distinct()
+                    .CountAsync(token);
             }
 
             public Task<BatchDefinition> GetDefinition(Batch batch,
