@@ -58,21 +58,21 @@ namespace Sheaft.GraphQL.Observations
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Observation> GetAll([ID] Guid? producerId, [ScopedService] QueryDbContext context,
+        public IQueryable<Observation> GetAll([ID] Guid? producerId, [ID] Guid? batchId, [ScopedService] QueryDbContext context,
             CancellationToken token)
         {
             SetLogTransaction();
 
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
                 return context.Observations
-                    .Where(c => c.ProducerId == CurrentUser.Id && !c.ReplyToId.HasValue);
+                    .Where(c => c.ProducerId == CurrentUser.Id && !c.ReplyToId.HasValue && (!batchId.HasValue || c.Batches.Any(b => b.BatchId == batchId.Value)));
 
             if (producerId.HasValue)
                 return context.Observations
-                    .Where(c => c.ProducerId == producerId && (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue);
+                    .Where(c => c.ProducerId == producerId && (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue && (!batchId.HasValue || c.Batches.Any(b => b.BatchId == batchId.Value)));
 
             return context.Observations
-                .Where(c => (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue);
+                .Where(c => (c.VisibleToAll || c.UserId == CurrentUser.Id) && !c.ReplyToId.HasValue && (!batchId.HasValue || c.Batches.Any(b => b.BatchId == batchId.Value)));
         }
     }
 }
