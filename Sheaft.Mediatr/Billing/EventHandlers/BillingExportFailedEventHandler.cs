@@ -39,7 +39,7 @@ namespace Sheaft.Mediatr.Billing.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"La création de votre export de livraisons a échouée",
+                $"La création de votre export de facturation a échouée",
                 nameof(BillingExportFailedEvent),
                 new BillingExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
                 true,

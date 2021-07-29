@@ -36,7 +36,7 @@ namespace Sheaft.Mediatr.Billing.EventHandlers
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
-                $"Votre export de comptabilité est prêt",
+                $"Votre export de facturation est prêt",
                 nameof(BillingExportSucceededEvent),
                 new BillingExportMailerModel
                     {UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},

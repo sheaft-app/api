@@ -44,7 +44,7 @@ namespace Sheaft.Business.BillingsExporters
             RequestUser user, DateTimeOffset? from, DateTimeOffset? to, IEnumerable<Delivery> deliveries,
             CancellationToken token)
         {
-            var worksheet = package.Workbook.Worksheets.Add(from.HasValue && to.HasValue ? $"Ventes {from:dd-MM-yyyy} au {to:dd-MM-yyyy}" : "Ventes spécifique");
+            var worksheet = package.Workbook.Worksheets.Add(from.HasValue && to.HasValue ? $"A Facturer {from:ddMMyyyy} au {to:ddMMyyyy}" : "A Facturer");
 
             worksheet.Cells[1, 1].Value = "Client";
             worksheet.Cells[1, 2].Value = "Livraisons";

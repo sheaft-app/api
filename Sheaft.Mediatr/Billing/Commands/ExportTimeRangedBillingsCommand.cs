@@ -83,7 +83,7 @@ namespace Sheaft.Mediatr.Billing.Commands
                     throw deliveriesExportResult.Exception;
 
                 var response = await _blobService.UploadUserAccountingFileAsync(job.UserId, job.Id,
-                    $"Comptabilité_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}",
+                    $"A_Facturer_du_{request.From:dd-MM-yyyy}_au_{request.To:dd-MM-yyyy}.{deliveriesExportResult.Data.Extension}",
                     deliveriesExportResult.Data.Data, token);
                 if (!response.Succeeded)
                     throw response.Exception;

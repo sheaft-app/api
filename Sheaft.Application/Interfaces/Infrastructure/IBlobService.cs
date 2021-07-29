@@ -31,6 +31,7 @@ namespace Sheaft.Application.Interfaces.Infrastructure
         Task<Result<string>> UploadProducerDeliveryFormAsync(Guid producerId, Guid deliveryId, string filenameWithExtension, byte[] data, CancellationToken token);
         Task<Result<byte[]>> DownloadDeliveryAsync(string deliveryUrl, CancellationToken token);
         Task<Result<string>> UploadProducerDeliveryBatchAsync(Guid producerId, Guid deliveryBatchId, string filenameWithExtension, byte[] data, CancellationToken token);
-        Task<Result<byte[]>> DownloadDeliveryBatchFormsAsync(string deliveryDeliveryFormsUrl, CancellationToken token);
+        Task<Result<byte[]>> DownloadDeliveryBatchFormsAsync(string deliveryormsUrl, CancellationToken token);
+        Task<Result<byte[]>> DownloadPickingAsync(string pickingFormUrl, CancellationToken token);
     }
 }

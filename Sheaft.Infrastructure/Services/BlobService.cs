@@ -423,31 +423,6 @@ namespace Sheaft.Infrastructure.Services
             }
         }
 
-        public async Task<Result<byte[]>> DownloadDeliveryFormAsync(string deliveryFormUrl, CancellationToken token)
-        {
-            var containerClient =
-                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Deliveries);
-            
-            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
-
-            var uri = new UriBuilder
-            {
-                Scheme = _storageOptions.ContentScheme,
-                Host = _storageOptions.ContentHostname,
-                Path = _storageOptions.Containers.Deliveries
-            }.ToString();
-            
-            var blobName = HttpUtility.UrlDecode(deliveryFormUrl.Replace(uri, "").Split('?')[0].Substring(1));
-            var blobClient = containerClient.GetBlobClient(blobName);
-            using (var stream = new MemoryStream())
-            {
-                await blobClient.DownloadToAsync(stream, token);
-                stream.Position = 0;
-                return Success(stream.ToArray());
-            }
-        }
-
-
         public async Task<Result<byte[]>> DownloadDeliveryBatchFormsAsync(string deliveryFormUrl, CancellationToken token)
         {
             var containerClient =
@@ -463,6 +438,30 @@ namespace Sheaft.Infrastructure.Services
             }.ToString();
 
             var blobName = HttpUtility.UrlDecode(deliveryFormUrl.Replace(uri, "").Split('?')[0].Substring(1));
+            var blobClient = containerClient.GetBlobClient(blobName);
+            using (var stream = new MemoryStream())
+            {
+                await blobClient.DownloadToAsync(stream, token);
+                stream.Position = 0;
+                return Success(stream.ToArray());
+            }
+        }
+
+        public async Task<Result<byte[]>> DownloadPickingAsync(string pickingFormUrl, CancellationToken token)
+        {
+            var containerClient =
+                new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.PickingOrders);
+            
+            await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+            var uri = new UriBuilder
+            {
+                Scheme = _storageOptions.ContentScheme,
+                Host = _storageOptions.ContentHostname,
+                Path = _storageOptions.Containers.PickingOrders
+            }.ToString();
+
+            var blobName = HttpUtility.UrlDecode(pickingFormUrl.Replace(uri, "").Split('?')[0].Substring(1));
             var blobClient = containerClient.GetBlobClient(blobName);
             using (var stream = new MemoryStream())
             {

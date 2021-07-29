@@ -41,7 +41,7 @@ namespace Sheaft.Mediatr.Picking.EventHandlers
 
             var producer = await _context.Producers.SingleAsync(u => u.Id == picking.ProducerId, token);
             
-            var blobResult = await _blobService.DownloadDeliveryAsync(picking.PickingFormUrl, token);
+            var blobResult = await _blobService.DownloadPickingAsync(picking.PickingFormUrl, token);
             if (!blobResult.Succeeded)
                 throw SheaftException.BadRequest(blobResult.Exception);
             
