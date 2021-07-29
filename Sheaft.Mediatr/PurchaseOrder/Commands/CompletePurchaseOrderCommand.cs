@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
             var order = await _context.Orders.SingleOrDefaultAsync(
                 o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id), token);
 
-            if (order.Donation > 0)
+            if (order is {Donation: > 0})
             {
                 var dateDiff = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate.AddDays(7) - DateTime.UtcNow;
                 _mediatr.Schedule(new CreateDonationCommand(request.RequestUser) {OrderId = order.Id},
