@@ -71,6 +71,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("startedOn");
             
             descriptor
+                .Field(c => c.CreatedOn)
+                .Name("createdOn");
+            
+            descriptor
                 .Field(c => c.UpdatedOn)
                 .Name("updatedOn");
 
