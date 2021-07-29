@@ -132,7 +132,7 @@ namespace Sheaft.Domain
             switch (newStatus)
             {
                 case PurchaseOrderStatus.Accepted:
-                    if (Status == PurchaseOrderStatus.Processing)
+                    if (Status is PurchaseOrderStatus.Processing or PurchaseOrderStatus.Accepted)
                         break;
                     
                     if (Status != PurchaseOrderStatus.Waiting)
@@ -226,6 +226,12 @@ namespace Sheaft.Domain
 
         public void Cancel(string reason, bool skipNotification)
         {
+            if(PickingId.HasValue)
+                Picking.RemovePurchaseOrders(new []{this});
+            
+            if(DeliveryId.HasValue)
+                Delivery.RemovePurchaseOrders(new []{this});
+            
             SetStatus(PurchaseOrderStatus.Cancelled, skipNotification);
             Reason = reason;
         }

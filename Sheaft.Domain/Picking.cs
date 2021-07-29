@@ -64,7 +64,8 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation("La préparation requiert une commande à minima.");
 
             if (purchaseOrders.Any(po =>
-                po.Status != PurchaseOrderStatus.Waiting && po.Status != PurchaseOrderStatus.Accepted && po.Status != PurchaseOrderStatus.Processing))
+                po.Status != PurchaseOrderStatus.Waiting && po.Status != PurchaseOrderStatus.Accepted &&
+                po.Status != PurchaseOrderStatus.Processing))
                 throw SheaftException.Validation(
                     "Seule des commandes en attente ou acceptées peuvent être ajoutées à une préparation.");
 
@@ -78,9 +79,9 @@ namespace Sheaft.Domain
                 if (purchaseOrder.PickingId.HasValue)
                     purchaseOrder.Picking.RemovePurchaseOrders(new List<PurchaseOrder> {purchaseOrder});
 
-                if(purchaseOrder.Status == PurchaseOrderStatus.Waiting)
+                if (purchaseOrder.Status == PurchaseOrderStatus.Waiting)
                     purchaseOrder.Accept(true);
-                
+
                 PurchaseOrders.Add(purchaseOrder);
             }
 
@@ -133,7 +134,9 @@ namespace Sheaft.Domain
                 }
 
                 PurchaseOrders.Remove(purchaseOrder);
-                purchaseOrder.SetStatus(PurchaseOrderStatus.Accepted, true);
+                
+                if (purchaseOrder.Status != PurchaseOrderStatus.Accepted)
+                    purchaseOrder.SetStatus(PurchaseOrderStatus.Accepted, true);
             }
 
             Refresh();
@@ -190,12 +193,12 @@ namespace Sheaft.Domain
                 existingPreparedProduct.SetBatches(batches);
                 PreparedProducts.Add(existingPreparedProduct);
             }
-            
+
             if (completed)
                 existingPreparedProduct.CompleteProduct(preparedBy);
 
             Refresh();
-            
+
             if (PreparedProducts.Count == ProductsToPrepare.Count && PreparedProducts.All(p => p.PreparedOn.HasValue))
                 Complete();
         }
