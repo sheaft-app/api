@@ -13,15 +13,15 @@ stages:
           dotnet restore $(System.DefaultWorkingDirectory)/Sheaft.sln
           dotnet build $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore
           dotnet test $(System.DefaultWorkingDirectory)/Sheaft.sln -c Release --no-restore --no-build
-          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.PAYMENT/Sheaft.Web.PAYMENT.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.PAYMENT/   
+          dotnet publish $(System.DefaultWorkingDirectory)/Sheaft.Web.Payment/Sheaft.Web.Payment.csproj -c Release --no-restore --no-build --output publish_output/Sheaft.Web.Payment/   
     - task: ArchiveFiles@2
       displayName: "Archive PAYMENT"
       inputs:
-        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.PAYMENT"
+        rootFolderOrFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment"
         includeRootFolder: false
-        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.PAYMENT/build$(Build.BuildId).zip"
+        archiveFile: "$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip"
     - task: PublishBuildArtifacts@1
       displayName: "Publish PAYMENT"
       inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.PAYMENT/build$(Build.BuildId).zip'
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/publish_output/Sheaft.Web.Payment/build$(Build.BuildId).zip'
         artifactName: 'sheaft-payment'
