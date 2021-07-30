@@ -54,20 +54,9 @@ namespace Sheaft.GraphQL.Recalls
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public async Task<IQueryable<Recall>> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
+        public IQueryable<Recall> GetAll([ScopedService] QueryDbContext context, CancellationToken token)
         {
             SetLogTransaction();
-
-            if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
-            {
-                var producerIds = await context.Agreements
-                    .Where(a => a.StoreId == CurrentUser.Id)
-                    .Select(a => a.ProducerId)
-                    .ToListAsync(token);
-
-                return context.Recalls
-                    .Where(c => producerIds.Contains(c.ProducerId));
-            }
             
             if (CurrentUser.IsInRole(_roleOptions.Producer.Value))
                 return context.Recalls
