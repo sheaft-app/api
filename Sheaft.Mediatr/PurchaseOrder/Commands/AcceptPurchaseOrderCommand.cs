@@ -15,6 +15,7 @@ using Sheaft.Core;
 using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Picking.Commands;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
 {
@@ -54,13 +55,27 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
 
             await _context.SaveChangesAsync(token);
 
-            var order = await _context.Orders.SingleAsync(
-                o => o.PurchaseOrders.Any(po => po.Id == purchaseOrder.Id),
-                token);
-            var delivery = order.Deliveries.FirstOrDefault(d => d.DeliveryMode.ProducerId == purchaseOrder.ProducerId);
-            if (delivery.DeliveryMode.AutoCompleteRelatedPurchaseOrder)
-                _mediatr.Post(new CompletePurchaseOrderCommand(request.RequestUser)
-                    {PurchaseOrderId = purchaseOrder.Id, SkipNotification = request.SkipNotification});
+            var deliveryMode = await
+                _context.DeliveryModes.SingleAsync(d => d.Id == purchaseOrder.ExpectedDelivery.DeliveryModeId, token);
+
+            if (deliveryMode.AutoCompleteRelatedPurchaseOrder)
+            {
+                var result =
+                    await _mediatr.Process(
+                        new CreatePickingCommand(request.RequestUser)
+                            {AutoStart = true, PurchaseOrderIds = new[] {purchaseOrder.Id}}, token);
+                
+                if (!result.Succeeded)
+                    return Success();
+                
+                var completeResult =
+                    await _mediatr.Process(
+                        new CompletePickingCommand(request.RequestUser)
+                            {PickingId = result.Data, AutoComplete = true}, token);
+                
+                if (!completeResult.Succeeded)
+                    return Success();
+            }
 
             return Success();
         }

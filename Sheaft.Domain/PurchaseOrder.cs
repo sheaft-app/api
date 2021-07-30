@@ -158,7 +158,7 @@ namespace Sheaft.Domain
                     break;
                 case PurchaseOrderStatus.Delivered:
                     if (Status != PurchaseOrderStatus.Completed)
-                        throw SheaftException.Validation("La commande doit être en prête pour pouvoir être livrée.");
+                        throw SheaftException.Validation("La commande doit être prête pour pouvoir être livrée.");
                     break;
                 case PurchaseOrderStatus.Cancelled:
                     if (Status == PurchaseOrderStatus.Cancelled)

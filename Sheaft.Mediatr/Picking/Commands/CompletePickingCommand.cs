@@ -38,6 +38,7 @@ namespace Sheaft.Mediatr.Picking.Commands
         }
 
         public Guid PickingId { get; set; }
+        public bool AutoComplete { get; set; }
     }
 
     public class CompletePickingCommandHandler : CommandsHandler,
@@ -60,12 +61,21 @@ namespace Sheaft.Mediatr.Picking.Commands
                 if (picking == null)
                     return Failure("La préparation est introuvable.");
 
-                if (picking.ProductsToPrepare.Select(pp => pp.ProductId)
-                    .Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
-                    return Failure("Certain produits n'ont pas été préparés.");
+                if (!request.AutoComplete)
+                {
+                    if (picking.ProductsToPrepare.Select(pp => pp.ProductId)
+                        .Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
+                        return Failure("Certain produits n'ont pas été préparés.");
 
-                if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
-                    return Failure("Certaines quantités de produits n'ont pas été validées.");
+                    if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
+                        return Failure("Certaines quantités de produits n'ont pas été validées.");
+                }
+                else
+                {
+                    foreach (var product in picking.ProductsToPrepare)
+                        picking.SetProductPreparedQuantity(product.ProductId, product.PurchaseOrderId, product.Quantity,
+                            picking.Producer.FirstName, true, new List<Domain.Batch>());
+                }
 
                 picking.Complete();
 
