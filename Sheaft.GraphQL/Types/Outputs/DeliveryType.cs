@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.Extensions;
 using Sheaft.GraphQL.Deliveries;
+using Sheaft.GraphQL.DeliveryBatchs;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Users;
@@ -145,6 +146,12 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .ResolveWith<DeliveryResolvers>(c => c.GetProducer(default, default, default))
                 .Name("producer")
                 .Type<ProducerType>();
+            
+            descriptor
+                .Field(c => c.DeliveryBatch)
+                .ResolveWith<DeliveryResolvers>(c => c.GetDeliveryBatch(default, default, default))
+                .Name("deliveryBatch")
+                .Type<DeliveryBatchType>();
         }
 
         private class DeliveryResolvers
@@ -188,6 +195,15 @@ namespace Sheaft.GraphQL.Types.Outputs
                 ProducersByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 return dataLoader.LoadAsync(delivery.ProducerId, token);
+            }
+
+            public Task<DeliveryBatch> GetDeliveryBatch(Delivery delivery,
+                DeliveryBatchesByIdBatchDataLoader dataLoader, CancellationToken token)
+            {
+                if (!delivery.DeliveryBatchId.HasValue)
+                    return null;
+                
+                return dataLoader.LoadAsync(delivery.DeliveryBatchId.Value, token);
             }
 
             public Task<User> GetClient(Delivery delivery,
