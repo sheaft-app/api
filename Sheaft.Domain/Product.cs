@@ -34,6 +34,7 @@ namespace Sheaft.Domain
             CatalogsPrices = new List<CatalogProduct>();
 
             DomainEvents = new List<DomainEvent>();
+            VisibleTo = VisibleToKind.None;
 
             RefreshRatings();
             RefreshPrices();
