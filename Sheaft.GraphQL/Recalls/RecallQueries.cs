@@ -14,6 +14,7 @@ using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
+using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Options;
@@ -62,7 +63,7 @@ namespace Sheaft.GraphQL.Recalls
                 return context.Recalls
                     .Where(c => c.ProducerId == CurrentUser.Id);
 
-            return context.Recalls.Where(r => r.Clients.Any(c => c.ClientId == CurrentUser.Id));
+            return context.Recalls.Where(r => r.Clients.Any(c => c.ClientId == CurrentUser.Id) && r.Status != RecallStatus.Waiting);
         }
     }
 }
