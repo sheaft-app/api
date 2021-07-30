@@ -206,7 +206,7 @@ namespace Sheaft.GraphQL.Products
                 .Select(p => p.Id)
                 .ToListAsync(token);
 
-            var products = await context.Products.Where(p => results.Contains(p.Id)).ToListAsync(token);
+            var products = await context.Products.Where(p => results.Contains(p.Id) && p.Producer.CanDirectSell).ToListAsync(token);
             var orderedProducts = results.Select(result => products.SingleOrDefault(p => p.Id == result)).ToList();
 
             return new ProductsSearchDto
