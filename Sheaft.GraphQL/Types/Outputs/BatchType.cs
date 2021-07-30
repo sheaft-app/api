@@ -94,6 +94,13 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<BatchResolvers>(c => c.GetDefinition(default, default, default))
                 .Type<BatchDefinitionType>();
+            
+            descriptor
+                .Field("lockedForEditing")
+                .Authorize(Policies.PRODUCER)
+                .UseDbContext<QueryDbContext>()
+                .ResolveWith<BatchResolvers>(c => c.IsLocked(default, default, default))
+                .Type<BooleanType>();
 
             descriptor
                 .Field("deliveries")
@@ -406,6 +413,11 @@ namespace Sheaft.GraphQL.Types.Outputs
                 BatchDefinitionsByIdBatchDataLoader dataLoader, CancellationToken token)
             {
                 return dataLoader.LoadAsync(batch.DefinitionId, token);
+            }
+
+            public Task<bool> IsLocked(Batch batch, [ScopedService] QueryDbContext context, CancellationToken token)
+            {
+                return context.Set<PreparedProductBatch>().AnyAsync(ppb => ppb.BatchId == batch.Id, token);
             }
         }
     }

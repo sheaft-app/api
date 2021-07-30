@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -63,6 +64,9 @@ namespace Sheaft.Mediatr.Batch.Commands
                 if (existingBatchWithNumber != null)
                     return Failure("Un lot existe déjà avec ce numéro.");
             }
+
+            if (await _context.Set<PreparedProductBatch>().AnyAsync(ppb => ppb.BatchId == entity.Id, token))
+                return Failure("Impossible de modifier un lot qui est déjà rattaché à des produits.");
             
             entity.SetNumber(request.Number);
             entity.SetDLC(request.DLC);
