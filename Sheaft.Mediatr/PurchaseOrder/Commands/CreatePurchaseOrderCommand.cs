@@ -79,6 +79,22 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                 return Failure<Guid>(
                     "Cette fonction ne peux être utilisée que pour créer des commandes pour les professionels.");
 
+            if(request.Products == null || !request.Products.Any())
+                return Failure<Guid>(
+                    "Vous devez ajouter des produits à votre commande.");
+            
+            if(request.Products.Any(p => p.Quantity <= 0))
+                return Failure<Guid>(
+                    "Un ou plusieurs produits possèdent une quantité inférieure ou égale à 0.");
+            
+            if(request.ExpectedDeliveryDate < DateTimeOffset.UtcNow)
+                return Failure<Guid>(
+                    "La date de livraison ne peut être inférieure à aujourd'hui.");
+
+            if (request.From > request.To)
+                return Failure<Guid>(
+                    "L'heure de début ne peut être supérieure à l'heure de fin.");
+
             var productsQuantity = new List<KeyValuePair<Domain.Product, int>>();
             var productIds = request.Products.Select(p => p.Id).Distinct();
             var products = await _context.Products
