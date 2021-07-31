@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -55,7 +55,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
                 await _signalrService.SendNotificationToGroupAsync(target.Item1, nameof(ObservationRepliedEvent), observation.GetNotificationContent(
                     _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
                     _configuration.GetValue<string>("Portal:url"),
-                    reply.User.Name));
+                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)));
             
                 await _emailService.SendTemplatedEmailAsync(
                     target.Item3,
@@ -66,7 +66,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
                         _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
                         _configuration.GetValue<string>("Portal:url"),
                         reply.Comment,
-                        reply.User.Name),
+                        _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)),
                     true,
                     token);
             }

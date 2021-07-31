@@ -35,12 +35,13 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
             var observation = await _context.Observations.SingleAsync(e => e.Id == @event.ObservationId, token);
             if (observation.User.Kind == ProfileKind.Producer)
                 return;
-            
-            await _signalrService.SendNotificationToGroupAsync(observation.ProducerId, nameof(ObservationAddedEvent), observation.GetNotificationContent(
-                _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
-                _configuration.GetValue<string>("Portal:url"),
-                observation.User.Name));
-            
+
+            await _signalrService.SendNotificationToGroupAsync(observation.ProducerId, nameof(ObservationAddedEvent),
+                observation.GetNotificationContent(
+                    _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
+                    _configuration.GetValue<string>("Portal:url"),
+                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)));
+
             await _emailService.SendTemplatedEmailAsync(
                 observation.Producer.Email,
                 observation.Producer.Name,
@@ -50,7 +51,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
                     _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
                     _configuration.GetValue<string>("Portal:url"),
                     observation.Comment,
-                    observation.User.Name),
+                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)),
                 true,
                 token);
         }

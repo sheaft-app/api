@@ -3,22 +3,23 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mailing.Extensions
 {
     public static class ObservationExtensions
     {
-        public static StringContent GetNotificationContent(this Domain.Observation observation, string observationId, string url, string username)
+        public static StringContent GetNotificationContent(this Domain.Observation observation, string observationId, string url, string producerId)
         {
-            return new StringContent(JsonConvert.SerializeObject(observation.GetNotificationData(observationId, url, null, username)), Encoding.UTF8, "application/json");
+            return new StringContent(JsonConvert.SerializeObject(observation.GetNotificationData(observationId, url, null, producerId)), Encoding.UTF8, "application/json");
         }
 
-        public static ObservationMailerModel GetNotificationData(this Domain.Observation observation, string observationId, string url, string comment, string username)
+        public static ObservationMailerModel GetNotificationData(this Domain.Observation observation, string observationId, string url, string comment, string producerId)
         {
             return new ObservationMailerModel
             { 
                 Producer = observation.Producer.Name,
-                User = username,
+                User = observation.User.Name,
                 Comment = comment,
                 Batches = observation.Batches?.Select(b => new BatchMailerModel
                 {
@@ -32,7 +33,10 @@ namespace Sheaft.Mailing.Extensions
                     Reference = b.Reference
                 }).ToList() ?? new List<ProductMailerModel>(),
                 CreatedOn = observation.CreatedOn, 
-                PortalUrl = $"{url}/#/observations/{observationId}" 
+                ObservationId = observationId,
+                PortalUrl = observation.User.Kind == ProfileKind.Producer ? 
+                    $"{url}/#/store-traceability/?observationId={observationId}&producerId={producerId}" :
+                    $"{url}/#/batches/?observationId={observationId}"
             };
         }
     }
