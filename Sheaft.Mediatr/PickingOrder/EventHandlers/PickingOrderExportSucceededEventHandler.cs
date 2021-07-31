@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
             
             var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
             
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(PickingOrderExportSucceededEvent),
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(PickingOrderExportSucceededEvent),
                 new {JobId = jobIdentifier, Name = job.Name, UserId = job.UserId, Url = job.File});
 
             await _emailService.SendTemplatedEmailAsync(

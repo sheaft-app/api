@@ -33,7 +33,7 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
             var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
-            await _signalrService.SendNotificationToGroupAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = jobIdentifier, Name = job.Name, UserId = job.User.Id });
+            await _signalrService.SendNotificationToUserAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = jobIdentifier, Name = job.Name, UserId = job.User.Id });
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{jobIdentifier}";
             await _emailService.SendTemplatedEmailAsync(

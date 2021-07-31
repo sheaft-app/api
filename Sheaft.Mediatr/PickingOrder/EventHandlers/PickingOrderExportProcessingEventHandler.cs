@@ -29,7 +29,7 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
             var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(PickingOrderExportProcessingEvent),
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(PickingOrderExportProcessingEvent),
                 new {JobId = jobIdentifier, Name = job.Name, UserId = job.UserId});
         }
     }

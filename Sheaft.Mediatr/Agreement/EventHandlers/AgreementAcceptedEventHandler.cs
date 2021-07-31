@@ -63,7 +63,7 @@ namespace Sheaft.Mediatr.Agreement.EventHandlers
             }
 
             var eventName = nameof(AgreementAcceptedEvent).Replace("Event", $"{subEventName}Event");
-            await _signalrService.SendNotificationToGroupAsync(id, eventName, agreement.GetNotificationContent(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName));
+            await _signalrService.SendNotificationToUserAsync(id, eventName, agreement.GetNotificationContent(_idSerializer.Serialize("Query", nameof(Agreement), agreement.Id), _configuration.GetValue<string>("Portal:url"), targetName));
             await _emailService.SendTemplatedEmailAsync(
                 email,
                 name,

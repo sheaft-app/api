@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.Product.EventHandlers
         {
             var productEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == productEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.UserId });
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(ProductImportSucceededEvent), new { JobId = job.Id, UserId = job.UserId });
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/products/";
             await _emailService.SendTemplatedEmailAsync(

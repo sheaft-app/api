@@ -36,7 +36,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
             if (observation.User.Kind == ProfileKind.Producer)
                 return;
 
-            await _signalrService.SendNotificationToGroupAsync(observation.ProducerId, nameof(ObservationAddedEvent),
+            await _signalrService.SendNotificationToUserAsync(observation.ProducerId, nameof(ObservationAddedEvent),
                 observation.GetNotificationContent(
                     _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
                     _configuration.GetValue<string>("Portal:url"),

@@ -44,7 +44,7 @@ namespace Sheaft.Mediatr.Recall.EventHandlers
             if (clientRecall.RecallSent)
                 return;
             
-            await _signalrService.SendNotificationToGroupAsync(clientRecall.Client.Id, nameof(RecallSentEvent),
+            await _signalrService.SendNotificationToUserAsync(clientRecall.Client.Id, nameof(RecallSentEvent),
                 recall.GetNotificationContent(
                     _idSerializer.Serialize("Query", nameof(Domain.Recall), recall.Id),
                     _configuration.GetValue<string>("Portal:url"),

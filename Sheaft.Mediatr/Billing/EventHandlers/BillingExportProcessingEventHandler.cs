@@ -28,7 +28,7 @@ namespace Sheaft.Mediatr.Billing.EventHandlers
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(BillingExportProcessingEvent),
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(BillingExportProcessingEvent),
                 new {JobId = job.Id, Name = job.Name, UserId = job.UserId});
         }
     }

@@ -32,7 +32,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         {
             var pickingOrderEvent = notification.DomainEvent;
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
-            await _signalrService.SendNotificationToGroupAsync(job.UserId, nameof(PurchaseOrdersExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.UserId });
+            await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(PurchaseOrdersExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.UserId });
 
             var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{job.Id:N}";
             await _emailService.SendTemplatedEmailAsync(

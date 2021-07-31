@@ -54,7 +54,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
 
             foreach (var target in targets)
             {
-                await _signalrService.SendNotificationToGroupAsync(target.Item1, nameof(ObservationRepliedEvent), observation.GetNotificationContent(
+                await _signalrService.SendNotificationToUserAsync(target.Item1, nameof(ObservationRepliedEvent), observation.GetNotificationContent(
                     _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
                     _configuration.GetValue<string>("Portal:url"),
                     _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)));
