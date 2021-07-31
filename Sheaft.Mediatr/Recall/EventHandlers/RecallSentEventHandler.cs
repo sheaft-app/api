@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.Recall.EventHandlers
                         _idSerializer.Serialize("Query", nameof(Domain.Recall), recall.Id),
                         _configuration.GetValue<string>("Portal:url"),
                         recall.Comment,
-                        recall.Producer.Name),
+                        clientRecall.Client.FirstName),
                     true,
                     token);
                 

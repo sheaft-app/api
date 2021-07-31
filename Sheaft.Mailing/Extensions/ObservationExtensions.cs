@@ -18,6 +18,7 @@ namespace Sheaft.Mailing.Extensions
         {
             return new ObservationMailerModel
             { 
+                ProducerId = producerId,
                 Producer = observation.Producer.Name,
                 User = observation.User.Name,
                 Comment = comment,

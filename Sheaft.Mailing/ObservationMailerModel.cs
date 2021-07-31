@@ -13,5 +13,6 @@ namespace Sheaft.Mailing
         public string User { get; set; }
         public List<BatchMailerModel> Batches { get; set; }
         public List<ProductMailerModel> Products { get; set; }
+        public string ProducerId { get; set; }
     }
 }

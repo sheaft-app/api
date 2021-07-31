@@ -17,7 +17,7 @@ namespace Sheaft.Mailing.Extensions
         {
             return new RecallMailerModel
             { 
-                Producer = recall.Producer.Name,
+                ProducerName = recall.Producer.Name,
                 User = username,
                 Comment = comment,
                 Batches = recall.Batches?.Select(b => new BatchMailerModel
@@ -34,7 +34,8 @@ namespace Sheaft.Mailing.Extensions
                 CreatedOn = recall.CreatedOn, 
                 SaleEndedOn = recall.SaleEndedOn,
                 SaleStartedOn = recall.SaleStartedOn,
-                PortalUrl = $"{url}/#/recalls/{recallId}" 
+                RecallId = recallId,
+                PortalUrl = $"{url}/#/public/recalls/{recallId}" 
             };
         }
     }
