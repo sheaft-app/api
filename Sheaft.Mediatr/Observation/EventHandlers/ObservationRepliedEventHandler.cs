@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -37,6 +37,8 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
             var @event = notification.DomainEvent;
             var observation = await _context.Set<Domain.Observation>().SingleAsync(e => e.Id == @event.ObservationId, token);
             var reply = await _context.Set<Domain.Observation>().SingleAsync(e => e.Id == @event.ReplyId, token);
+            if (reply.User.Kind == ProfileKind.Producer && observation.User.Kind == ProfileKind.Producer)
+                return;
 
             var targets = new List<Tuple<Guid, string, string>>();
             if (reply.User.Kind != ProfileKind.Producer)
