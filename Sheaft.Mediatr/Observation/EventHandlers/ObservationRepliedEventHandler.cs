@@ -59,7 +59,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
                 
                 var url = observation.User.Kind == ProfileKind.Producer
                     ? $"{_configuration.GetValue<string>("Portal:url")}/#/store-traceability/?observationId={observationId}&producerId={producerId}&refresh={Guid.NewGuid():N}"
-                    : $"{_configuration.GetValue<string>("Portal:url")}/#/batches/?observationId={observationId}&refresh={Guid.NewGuid():N}";
+                    : $"{_configuration.GetValue<string>("Portal:url")}/#/traceability/?observationId={observationId}&refresh={Guid.NewGuid():N}";
                 
                 await _signalrService.SendNotificationToUserAsync(target.Item1, nameof(ObservationRepliedEvent), reply.GetNotificationContent(observationId, url, producerId));
             

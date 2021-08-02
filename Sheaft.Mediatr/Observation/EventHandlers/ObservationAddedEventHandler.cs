@@ -40,7 +40,7 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
             var observationId = _idSerializer.Serialize("Query", nameof(Observation), observation.Id);
             var producerId = _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId);
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/batches/?observationId={observationId}&refresh={Guid.NewGuid():N}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/traceability/?observationId={observationId}&refresh={Guid.NewGuid():N}";
 
             await _signalrService.SendNotificationToUserAsync(observation.ProducerId, nameof(ObservationAddedEvent),
                 observation.GetNotificationContent(observationId, url, producerId));
