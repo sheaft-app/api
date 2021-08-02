@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -56,7 +57,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
                 $"Votre commande a expirée",
                 nameof(PurchaseOrderExpiredEvent),
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier,
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}"),
                 true,
                 token);
         }
@@ -67,7 +68,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.ProducerId, "PurchaseOrderWithdrawnEvent",
                 purchaseOrder.GetPurchaseNotifModelAsString(purchaseOrderIdentifier));
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrderIdentifier}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/purchase-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}";
             await _emailService.SendTemplatedEmailAsync(
                 purchaseOrder.VendorInfo.Email,
                 purchaseOrder.VendorInfo.Name,

@@ -9,5 +9,6 @@ namespace Sheaft.Mailing
         public DateTimeOffset CreatedOn { get; set; }
         public string JobUrl { get; set; }
         public string DownloadUrl { get; set; }
+        public string JobId { get; set; }
     }
 }

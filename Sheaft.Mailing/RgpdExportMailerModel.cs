@@ -9,5 +9,6 @@ namespace Sheaft.Mailing
         public string Name { get; set; }
         public string DownloadUrl { get; set; }
         public string PortalUrl { get; set; }
+        public string JobId { get; set; }
     }
 }

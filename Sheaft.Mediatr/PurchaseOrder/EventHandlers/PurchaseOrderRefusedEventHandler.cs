@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -49,7 +50,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
                 $"Votre commande a été annulée par {purchaseOrder.VendorInfo.Name}",
                 nameof(PurchaseOrderRefusedEvent),
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier,
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}"),
                 true,
                 token);
         }

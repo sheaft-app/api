@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -35,13 +36,13 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
             var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
             await _signalrService.SendNotificationToUserAsync(job.User.Id, nameof(PickingOrderExportFailedEvent), new { JobId = jobIdentifier, Name = job.Name, UserId = job.User.Id });
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{jobIdentifier}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{jobIdentifier}?refresh={Guid.NewGuid():N}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
                 $"La création de votre bon de préparation a échouée",
                 nameof(PickingOrderExportFailedEvent),
-                new PickingOrderExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
+                new PickingOrderExportMailerModel { JobId = jobIdentifier, UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
                 true,
                 token);
         }

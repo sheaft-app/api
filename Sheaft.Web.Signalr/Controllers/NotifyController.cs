@@ -63,42 +63,48 @@ namespace Sheaft.Web.Signalr.Controllers
 
         [HttpPost]
         [Route("notify-user/{userId}/{method}")]
-        public async Task<IActionResult> NotifyUser([FromRoute] string userId, [FromRoute] string method,
-            [FromBody] object message, CancellationToken token)
+        public async Task<IActionResult> NotifyUser([FromRoute] string userId, [FromRoute] string method, CancellationToken token)
         {
             if (!IsAuthorized())
                 return Unauthorized();
 
             if (!Guid.TryParse(userId, out Guid id))
                 return BadRequest("Invalid userId (Guid format expected)");
-
-            await _context.Clients.User(id.ToString("N")).SendAsync("event",
-                new {Method = method, UserId = userId, Content = message}, token);
-
+            
+            var body = string.Empty; 
+            using (var reader = new StreamReader(Request.Body)) 
+            { 
+                body = await reader.ReadToEndAsync(); 
+                await _context.Clients.User(id.ToString("N")).SendAsync("event", new { Method = method, UserId = userId, Content = body }, token); 
+            } 
+            
             _sheaftMediatr.Post(
                 new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier))
-                    {UserId = id, Method = method, Content = JsonConvert.SerializeObject(message)});
+                    {UserId = id, Method = method, Content = JsonConvert.SerializeObject(body)});
             
             return Ok();
         }
 
         [HttpPost]
         [Route("notify-group/{groupName}/{method}")]
-        public async Task<IActionResult> NotifyGroup([FromRoute] string groupName, [FromRoute] string method,
-            [FromBody] object message, CancellationToken token)
+        public async Task<IActionResult> NotifyGroup([FromRoute] string groupName, [FromRoute] string method, CancellationToken token)
         {
             if (!IsAuthorized())
                 return Unauthorized();
 
             if (!Guid.TryParse(groupName, out Guid id))
                 return BadRequest("Invalid groupName (Guid format expected)");
-
-            await _context.Clients.Group(groupName).SendAsync("event",
-                new {Method = method, GroupName = groupName, Content = message}, token);
+            
+            var body = string.Empty; 
+            using (var reader = new StreamReader(Request.Body)) 
+            { 
+                body = await reader.ReadToEndAsync(); 
+                await _context.Clients.Group(groupName).SendAsync("event", new { Method = method, GroupName = groupName, Content = body }, token); 
+            } 
 
             _sheaftMediatr.Post(
                 new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier))
-                    {GroupId = id, Method = method, Content = JsonConvert.SerializeObject(message)});
+                    {GroupId = id, Method = method, Content = JsonConvert.SerializeObject(body)});
             return Ok();
         }
     }

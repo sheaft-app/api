@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,15 +18,18 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
         INotificationHandler<DomainEventNotification<PurchaseOrdersExportFailedEvent>>
     {
         private readonly IConfiguration _configuration;
+        private readonly IIdSerializer _idSerializer;
 
         public PurchaseOrdersExportFailedEventHandler(
             IConfiguration configuration,
             IAppDbContext context,
             IEmailService emailService,
+            IIdSerializer idSerializer,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
             _configuration = configuration;
+            _idSerializer = idSerializer;
         }
 
         public async Task Handle(DomainEventNotification<PurchaseOrdersExportFailedEvent> notification, CancellationToken token)
@@ -34,13 +38,14 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var job = await _context.Jobs.SingleAsync(e => e.Id == pickingOrderEvent.JobId, token);
             await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(PurchaseOrdersExportFailedEvent), new { JobId = job.Id, Name = job.Name, UserId = job.UserId });
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{job.Id:N}";
+            var jobIdentifier = _idSerializer.Serialize("Query", nameof(Job), job.Id);
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{jobIdentifier}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
                 $"La création de votre export de commandes a échouée",
                 nameof(PurchaseOrdersExportFailedEvent),
-                new PurchaseOrdersExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
+                new PurchaseOrdersExportMailerModel { JobId = jobIdentifier, UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, JobUrl = url },
                 true,
                 token);
         }

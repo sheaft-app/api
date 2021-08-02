@@ -54,21 +54,21 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
 
             foreach (var target in targets)
             {
-                await _signalrService.SendNotificationToUserAsync(target.Item1, nameof(ObservationRepliedEvent), observation.GetNotificationContent(
-                    _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
-                    _configuration.GetValue<string>("Portal:url"),
-                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)));
+                var observationId = _idSerializer.Serialize("Query", nameof(Observation), observation.Id);
+                var producerId = _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId);
+                
+                var url = observation.User.Kind == ProfileKind.Producer
+                    ? $"{_configuration.GetValue<string>("Portal:url")}/#/store-traceability/?observationId={observationId}&producerId={producerId}&refresh={Guid.NewGuid():N}"
+                    : $"{_configuration.GetValue<string>("Portal:url")}/#/batches/?observationId={observationId}&refresh={Guid.NewGuid():N}";
+                
+                await _signalrService.SendNotificationToUserAsync(target.Item1, nameof(ObservationRepliedEvent), reply.GetNotificationContent(observationId, url, producerId));
             
                 await _emailService.SendTemplatedEmailAsync(
                     target.Item3,
                     target.Item2,
                     $"{reply.User.Name} a répondu à votre remarque",
                     nameof(ObservationRepliedEvent),
-                    observation.GetNotificationData(
-                        _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
-                        _configuration.GetValue<string>("Portal:url"),
-                        reply.Comment,
-                        _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)),
+                    reply.GetNotificationData(observationId, url, reply.Comment, producerId),
                     true,
                     token);
             }

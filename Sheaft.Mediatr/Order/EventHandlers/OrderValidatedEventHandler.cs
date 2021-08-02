@@ -37,11 +37,17 @@ namespace Sheaft.Mediatr.Order.EventHandlers
         {
             var orderEvent = notification.DomainEvent;
             var order = await _context.Orders.SingleAsync(e => e.Id == orderEvent.OrderId, token);
+            if (!order.UserId.HasValue)
+                return;
             
             var purchaseOrderId = order.PurchaseOrders.Count() == 1 ? order.PurchaseOrders.FirstOrDefault()?.Id : (Guid?)null; 
-
+            var purchaseOrderIdentifier = purchaseOrderId.HasValue ? _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId): string.Empty;
             await _signalrService.SendNotificationToUserAsync(order.UserId.Value, nameof(OrderValidatedEvent),
-                order.GetOrderNotifModelAsString(purchaseOrderId.HasValue ? _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrderId): null));
+                new
+                {
+                    PurchaseOrderId = order.GetOrderNotifModelAsString(purchaseOrderIdentifier),
+                    PortalUrl = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}",
+                });
         }
     }
 }

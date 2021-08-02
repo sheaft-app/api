@@ -74,7 +74,7 @@ namespace Sheaft.Mediatr.Observation.Commands
             var entity = new Domain.Observation(Guid.NewGuid(), request.Comment, user, producer);
             entity.SetBatches(batches);
             entity.SetProducts(products);
-            entity.SetVisibility(request.VisibleToAll);
+            entity.SetVisibility(request.VisibleToAll);    
             
             await _context.AddAsync(entity, token);
             await _context.SaveChangesAsync(token);

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
@@ -68,7 +69,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
                         Firstname = client.FirstName,
                         ScheduledOn = deliveryBatch.ScheduledOn,
                         ProducerName = deliveryBatch.AssignedTo.Name,
-                        Url =$"{_configuration.GetValue<string>("Portal:url")}/#/deliveries/{_idSerializer.Serialize("Query", nameof(Delivery), delivery.Id)}" 
+                        Url =$"{_configuration.GetValue<string>("Portal:url")}/#/expected-deliveries/{_idSerializer.Serialize("Query", nameof(Delivery), delivery.Id)}?refresh={Guid.NewGuid():N}" 
                     },
                     true,
                     token);

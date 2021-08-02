@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -49,7 +50,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
                 $"Votre commande pour {purchaseOrder.VendorInfo.Name} est prête !",
                 nameof(PurchaseOrderCompletedEvent),
                 purchaseOrder.GetTemplateData(purchaseOrderIdentifier, 
-                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}"),
+                    $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}"),
                 true,
                 token);
         }

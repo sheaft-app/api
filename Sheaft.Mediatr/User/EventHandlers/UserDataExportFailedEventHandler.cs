@@ -40,13 +40,13 @@ namespace Sheaft.Mediatr.User.EventHandlers
 
             await _signalrService.SendNotificationToUserAsync(job.User.Id, nameof(UserDataExportFailedEvent), new { JobId = jobIdentifier, UserId = job.UserId });
 
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/account/profile";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/jobs/{jobIdentifier}";
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
                 $"Votre export de données a échoué",
                 nameof(UserDataExportFailedEvent),
-                new RgpdExportMailerModel { UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
+                new RgpdExportMailerModel { JobId = jobIdentifier, UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, PortalUrl = url },
                 true,
                 token);
         }

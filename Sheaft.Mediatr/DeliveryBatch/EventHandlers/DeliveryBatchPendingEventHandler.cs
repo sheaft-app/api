@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
@@ -45,9 +46,21 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
                 DeliveryBatchStatus.Partial)
                 return;
 
+            var deliveryBatchIdentifier =
+                _idSerializer.Serialize("Query", nameof(Domain.DeliveryBatch), deliveryBatch.Id);
+            
             await _signalrService.SendNotificationToUserAsync(deliveryBatch.AssignedToId,
                 nameof(DeliveryPostponedEvent),
-                new {Id = deliveryBatch.Id});
+                new
+                {
+                    Id = deliveryBatchIdentifier,
+                    Firstname = deliveryBatch.AssignedTo.FirstName,
+                    ScheduledOn = deliveryBatch.ScheduledOn,
+                    ProducerName = deliveryBatch.AssignedTo.Name,
+                    Name = deliveryBatch.Name,
+                    Url =
+                        $"{_configuration.GetValue<string>("Portal:url")}/#/delivery-batches/{deliveryBatchIdentifier}?refresh={Guid.NewGuid():N}"
+                });
 
             await _emailService.SendTemplatedEmailAsync(
                 deliveryBatch.AssignedTo.Email,
@@ -56,12 +69,13 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
                 nameof(DeliveryBatchPendingEvent),
                 new DeliveryBatchMailerModel
                 {
+                    Id = deliveryBatchIdentifier,
                     Firstname = deliveryBatch.AssignedTo.FirstName,
                     ScheduledOn = deliveryBatch.ScheduledOn,
                     ProducerName = deliveryBatch.AssignedTo.Name,
                     Name = deliveryBatch.Name,
                     Url =
-                        $"{_configuration.GetValue<string>("Portal:url")}/#/delivery-batches/{_idSerializer.Serialize("Query", nameof(Domain.DeliveryBatch), deliveryBatch.Id)}"
+                        $"{_configuration.GetValue<string>("Portal:url")}/#/delivery-batches/{deliveryBatchIdentifier}?refresh={Guid.NewGuid():N}"
                 },
                 true,
                 token);

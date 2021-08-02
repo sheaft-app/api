@@ -35,9 +35,7 @@ namespace Sheaft.Mailing.Extensions
                 }).ToList() ?? new List<ProductMailerModel>(),
                 CreatedOn = observation.CreatedOn, 
                 ObservationId = observationId,
-                PortalUrl = observation.User.Kind == ProfileKind.Producer ? 
-                    $"{url}/#/store-traceability/?observationId={observationId}&producerId={producerId}" :
-                    $"{url}/#/batches/?observationId={observationId}"
+                PortalUrl = url,
             };
         }
     }

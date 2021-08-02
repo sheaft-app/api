@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Extensions;
@@ -15,12 +16,16 @@ namespace Sheaft.Mediatr.Billing.EventHandlers
     public class BillingExportProcessingEventHandler : EventsHandler,
         INotificationHandler<DomainEventNotification<BillingExportProcessingEvent>>
     {
+        private readonly IIdSerializer _idSerializer;
+
         public BillingExportProcessingEventHandler(
             IAppDbContext context,
             IEmailService emailService,
+            IIdSerializer idSerializer,
             ISignalrService signalrService)
             : base(context, emailService, signalrService)
         {
+            _idSerializer = idSerializer;
         }
 
         public async Task Handle(DomainEventNotification<BillingExportProcessingEvent> notification,

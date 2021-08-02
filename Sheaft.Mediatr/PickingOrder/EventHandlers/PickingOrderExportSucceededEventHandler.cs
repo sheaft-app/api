@@ -41,7 +41,7 @@ namespace Sheaft.Mediatr.PickingOrder.EventHandlers
                 $"Votre bon de préparation est prêt",
                 nameof(PickingOrderExportSucceededEvent),
                 new PickingOrderExportMailerModel
-                    {UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},
+                    {JobId = jobIdentifier, UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},
                 true,
                 token);
         }

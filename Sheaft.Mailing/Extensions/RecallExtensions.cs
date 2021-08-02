@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -35,7 +36,7 @@ namespace Sheaft.Mailing.Extensions
                 SaleEndedOn = recall.SaleEndedOn,
                 SaleStartedOn = recall.SaleStartedOn,
                 RecallId = recallId,
-                PortalUrl = $"{url}/#/public/recalls/{recallId}" 
+                PortalUrl = $"{url}/#/public/recalls/{recallId}?refresh={Guid.NewGuid():N}" 
             };
         }
     }

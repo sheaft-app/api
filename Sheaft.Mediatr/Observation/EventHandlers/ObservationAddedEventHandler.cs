@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -36,22 +37,20 @@ namespace Sheaft.Mediatr.Observation.EventHandlers
             if (observation.User.Kind == ProfileKind.Producer)
                 return;
 
+            var observationId = _idSerializer.Serialize("Query", nameof(Observation), observation.Id);
+            var producerId = _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId);
+
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/batches/?observationId={observationId}&refresh={Guid.NewGuid():N}";
+
             await _signalrService.SendNotificationToUserAsync(observation.ProducerId, nameof(ObservationAddedEvent),
-                observation.GetNotificationContent(
-                    _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
-                    _configuration.GetValue<string>("Portal:url"),
-                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)));
+                observation.GetNotificationContent(observationId, url, producerId));
 
             await _emailService.SendTemplatedEmailAsync(
                 observation.Producer.Email,
                 observation.Producer.Name,
                 $"{observation.User.Name} a ajouté une observation concernant un de vos produits ou lot.",
                 nameof(ObservationAddedEvent),
-                observation.GetNotificationData(
-                    _idSerializer.Serialize("Query", nameof(Observation), observation.Id),
-                    _configuration.GetValue<string>("Portal:url"),
-                    observation.Comment,
-                    _idSerializer.Serialize("Query", nameof(Producer), observation.ProducerId)),
+                observation.GetNotificationData(observationId, url, observation.Comment, producerId),
                 true,
                 token);
         }

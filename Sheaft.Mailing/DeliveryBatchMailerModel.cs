@@ -9,5 +9,6 @@ namespace Sheaft.Mailing
         public DateTimeOffset ScheduledOn { get; set; }
         public string Firstname { get; set; }
         public string ProducerName { get; set; }
+        public string Id { get; set; }
     }
 }

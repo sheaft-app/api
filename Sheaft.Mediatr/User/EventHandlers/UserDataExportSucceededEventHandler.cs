@@ -37,13 +37,14 @@ namespace Sheaft.Mediatr.User.EventHandlers
 
             await _signalrService.SendNotificationToUserAsync(job.UserId, nameof(UserDataExportSucceededEvent),
                 new {JobId = jobIdentifier, UserId = job.UserId, Url = job.File});
+            
             await _emailService.SendTemplatedEmailAsync(
                 job.User.Email,
                 job.User.Name,
                 $"Votre export de données est prêt",
                 nameof(UserDataExportSucceededEvent),
                 new RgpdExportMailerModel
-                    {UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},
+                    {JobId = jobIdentifier,UserName = job.User.Name, Name = job.Name, CreatedOn = job.CreatedOn, DownloadUrl = job.File},
                 true,
                 token);
         }

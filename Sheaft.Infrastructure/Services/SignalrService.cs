@@ -46,7 +46,24 @@ namespace Sheaft.Infrastructure.Services
         {
             try
             {
-                await _httpClient.PostAsync(string.Format(_signalrOptions.NotifyUserUrl, userId, eventName), new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json"));
+                var contentToSend = new StringContent(string.Empty, Encoding.UTF8,"application/json");
+                var type = content.GetType();
+                if (type == typeof(StringContent))
+                {
+                    var stringContent = content as StringContent;
+                    if (stringContent != null)
+                        contentToSend = new StringContent(await stringContent.ReadAsStringAsync(), Encoding.UTF8,"application/json");
+                }
+                else if (type == typeof(string))
+                {
+                    var stringContent = content as string;
+                    if (stringContent != null)
+                        contentToSend = new StringContent(stringContent, Encoding.UTF8, "application/json");
+                }
+                else
+                    contentToSend = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8,"application/json");
+
+                await _httpClient.PostAsync(string.Format(_signalrOptions.NotifyUserUrl, userId, eventName), contentToSend);
             }
             catch (Exception e)
             {

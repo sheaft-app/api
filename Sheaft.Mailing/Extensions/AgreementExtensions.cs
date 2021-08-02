@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -19,7 +20,7 @@ namespace Sheaft.Mailing.Extensions
                 Reason = agreement.Reason,
                 AgreementId = agreementId, 
                 CreatedOn = agreement.CreatedOn, 
-                PortalUrl = $"{url}/#/agreements/{agreementId}" 
+                PortalUrl = $"{url}/#/agreements/{agreementId}?refresh={Guid.NewGuid():N}" 
             };
         }
     }

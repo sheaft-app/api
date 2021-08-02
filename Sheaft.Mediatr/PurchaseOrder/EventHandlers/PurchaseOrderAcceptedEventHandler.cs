@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
@@ -42,7 +43,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
 
             var email = purchaseOrder.SenderInfo.Email;
             var name = purchaseOrder.SenderInfo.Name;
-            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}";
+            var url = $"{_configuration.GetValue<string>("Portal:url")}/#/my-orders/{purchaseOrderIdentifier}?refresh={Guid.NewGuid():N}";
 
             await _emailService.SendTemplatedEmailAsync(
                 email,

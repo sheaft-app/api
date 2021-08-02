@@ -14,10 +14,18 @@ namespace Sheaft.Domain
         }
 
         public Observation(Guid id, string comment, User user, Producer producer)
+            : this(id, comment, user, producer, false)
+        {   
+        }
+
+        private Observation(Guid id, string comment, User user, Producer producer, bool isReply)
             : base(id, comment, producer)
         {
             UserId = user.Id;
-            User = user;
+            User = user;        
+            
+            if(user.Kind != ProfileKind.Producer && !isReply)
+                DomainEvents.Add(new ObservationAddedEvent(Id));        
         }
 
         public bool VisibleToAll { get; private set; }
@@ -46,7 +54,7 @@ namespace Sheaft.Domain
             if (Replies == null)
                 Replies = new List<Observation>();
 
-            var reply = new Observation(Guid.NewGuid(), comment, user, Producer);
+            var reply = new Observation(Guid.NewGuid(), comment, user, Producer, true);
             Replies.Add(reply);
 
             DomainEvents.Add(new ObservationRepliedEvent(Id, reply.Id));
