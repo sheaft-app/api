@@ -80,7 +80,7 @@ namespace Sheaft.Web.Signalr.Controllers
             
             _sheaftMediatr.Post(
                 new CreateUserNotificationCommand(new RequestUser("signalr-user", HttpContext.TraceIdentifier))
-                    {UserId = id, Method = method, Content = JsonConvert.SerializeObject(body)});
+                    {UserId = id, Method = method, Content = body});
             
             return Ok();
         }
@@ -104,7 +104,7 @@ namespace Sheaft.Web.Signalr.Controllers
 
             _sheaftMediatr.Post(
                 new CreateGroupNotificationCommand(new RequestUser("signalr-group", HttpContext.TraceIdentifier))
-                    {GroupId = id, Method = method, Content = JsonConvert.SerializeObject(body)});
+                    {GroupId = id, Method = method, Content = body});
             return Ok();
         }
     }
