@@ -57,7 +57,12 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
             {
                 var client = clients.Single(c => c.Id == delivery.ClientId);
                 await _signalrService.SendNotificationToUserAsync(client.Id, nameof(DeliveryPostponedEvent),
-                    new {});
+                    new {
+                        Firstname = client.FirstName,
+                        ScheduledOn = deliveryBatch.ScheduledOn,
+                        ProducerName = deliveryBatch.AssignedTo.Name,
+                        Url =$"{_configuration.GetValue<string>("Portal:url")}/#/expected-deliveries/{_idSerializer.Serialize("Query", nameof(Delivery), delivery.Id)}?refresh={Guid.NewGuid():N}" 
+                    });
                 
                 await _emailService.SendTemplatedEmailAsync(
                     client.Email,

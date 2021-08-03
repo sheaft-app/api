@@ -50,7 +50,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.EventHandlers
                 _idSerializer.Serialize("Query", nameof(Domain.DeliveryBatch), deliveryBatch.Id);
             
             await _signalrService.SendNotificationToUserAsync(deliveryBatch.AssignedToId,
-                nameof(DeliveryPostponedEvent),
+                nameof(DeliveryBatchPendingEvent),
                 new
                 {
                     Id = deliveryBatchIdentifier,
