@@ -46,6 +46,9 @@ namespace Sheaft.Mediatr.PurchaseOrder.EventHandlers
             var purchaseOrder =
                 await _context.PurchaseOrders.SingleAsync(e => e.Id == orderEvent.PurchaseOrderId, token);
 
+            if(!purchaseOrder.OrderId.HasValue)
+                return;
+
             var purchaseOrderIdentifier = _idSerializer.Serialize("Query", nameof(PurchaseOrder), purchaseOrder.Id);
             await _signalrService.SendNotificationToUserAsync(purchaseOrder.ProducerId, "PurchaseOrderReceivedEvent",
                 purchaseOrder.GetPurchaseNotifModelAsString(purchaseOrderIdentifier));
