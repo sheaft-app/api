@@ -61,48 +61,47 @@ namespace Sheaft.Mediatr.QuickOrder.Commands
             entity.SetDescription(request.Description);
             entity.SetIsDefault(request.IsDefault);
             
-            if (request.Products != null && request.Products.Any())
+            if(request.Products == null)
+                request.Products = new List<ResourceIdQuantityInputDto>();
+
+            var productIds = request.Products.Select(p => p.Id).ToList();   
+            var existingProductIds = entity.Products.Select(p => p.CatalogProduct.ProductId);
+            
+            var productToRemoveIds = existingProductIds.Except(productIds);
+            foreach (var productToRemoveId in productToRemoveIds)
             {
-                var productIds = request.Products.Select(p => p.Id).ToList();
-                var agreements = await _context.Set<Domain.Agreement>()
-                    .Where(a => a.StoreId == entity.UserId && a.Catalog.Products.Any(p => productIds.Contains(p.ProductId)))
-                    .Include(a => a.Catalog)
-                        .ThenInclude(c => c.Products)
-                            .ThenInclude(c => c.Product)
-                    .ToListAsync(token);
-
-                var existingProductIds = entity.Products.Select(p => p.CatalogProduct.ProductId);
-                
-                var productToRemoveIds = existingProductIds.Except(productIds);
-                foreach (var productToRemoveId in productToRemoveIds)
-                {
-                    var quickOrderProduct = entity.RemoveProduct(productToRemoveId);
-                    _context.Remove(quickOrderProduct);
-                }
-
-                Result result = null;
-                foreach (var productId in productIds)
-                {
-                    var quantity = request.Products.Where(p => p.Id == productId).Sum(p => p.Quantity);
-                    var catalogProduct =
-                        agreements.Where(a => a.Catalog.Products.Any(p => p.ProductId == productId))
-                            .Select(a => a.Catalog)
-                            .SelectMany(c => c.Products)
-                            .FirstOrDefault(cp => cp.ProductId == productId);
-
-                    if (catalogProduct != null)
-                    {
-                        entity.AddOrUpdateProduct(catalogProduct, quantity);
-                        continue;
-                    }
-
-                    result = Failure("Le produit n'est pas disponible dans vos partenariats.");
-                    break;
-                }
-
-                if (result is {Succeeded: false})
-                    return result;
+                var quickOrderProduct = entity.RemoveProduct(productToRemoveId);
+                _context.Remove(quickOrderProduct);
             }
+            
+            var agreements = await _context.Set<Domain.Agreement>()
+                .Where(a => a.StoreId == entity.UserId && a.Catalog.Products.Any(p => productIds.Contains(p.ProductId)))
+                .Include(a => a.Catalog)
+                    .ThenInclude(c => c.Products)
+                        .ThenInclude(c => c.Product)
+                .ToListAsync(token);
+
+            Result result = null;
+            foreach (var productId in productIds)
+            {
+                var quantity = request.Products.FirstOrDefault(p => p.Id == productId)?.Quantity ?? null;
+                var catalogProduct =
+                    agreements.Where(a => a.Catalog.Products.Any(p => p.ProductId == productId))
+                        .SelectMany(c => c.Catalog.Products)
+                        .FirstOrDefault(cp => cp.ProductId == productId);
+
+                if (catalogProduct != null)
+                {
+                    entity.AddOrUpdateProduct(catalogProduct, quantity);
+                    continue;
+                }
+
+                result = Failure("Le produit n'est pas disponible dans vos partenariats.");
+                break;
+            }
+
+            if (result is {Succeeded: false})
+                return result;
 
             var oldDefaultQuickOrder =
                 await _context.QuickOrders.SingleOrDefaultAsync(
