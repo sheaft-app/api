@@ -95,8 +95,11 @@ namespace Sheaft.Business.BillingsExporters
                 worksheet.Cells[i, 3].Value = string.Join(", ", clientPurchaseOrders
                     .OrderBy(po => po.Reference)
                     .Select(po => $"{po.Reference.AsPurchaseOrderIdentifier()} ({po.CreatedOn:dd/MM/yyyy})"));
-                worksheet.Cells[i, 4].Value = string.Join(", ",
-                    clientBatches.Select(po => $"{po.Number} - {po.DLC:dd/MM/yyyy}{po.DDM:dd/MM/yyyy}"));
+
+                var batches = clientBatches.Select(po => $"{po.Number} - {po.DLC:dd/MM/yyyy}{po.DDM:dd/MM/yyyy}")
+                    .Distinct();
+                
+                worksheet.Cells[i, 4].Value = string.Join(", ", batches);
 
                 var clientGroupedProducts = groupedDelivery
                     .SelectMany(gd => gd.Products)
@@ -129,9 +132,9 @@ namespace Sheaft.Business.BillingsExporters
                     var returnable = groupedProductReturnable.First();
                     worksheet.Cells[i, 5].Value = "Consignes déposées";
                     worksheet.Cells[i, 6].Value = $"{returnable.ReturnableName}";
-                    worksheet.Cells[i, 7].Value = groupedProductReturnable.Sum(p => p.Quantity);
-                    worksheet.Cells[i, 8].Value = returnable.ReturnableWholeSalePrice;
-                    worksheet.Cells[i, 9].Value = returnable.ReturnableVat;
+                    worksheet.Cells[i, 7].Value = returnable.ReturnableWholeSalePrice;
+                    worksheet.Cells[i, 8].Value = returnable.ReturnableVat;
+                    worksheet.Cells[i, 9].Value = groupedProductReturnable.Sum(p => p.Quantity);
                     worksheet.Cells[i, 10].Value = groupedProductReturnable.Sum(p => p.TotalReturnableWholeSalePrice);
                     worksheet.Cells[i, 11].Value = groupedProductReturnable.Sum(p => p.TotalReturnableOnSalePrice);
                     i++;
@@ -149,9 +152,9 @@ namespace Sheaft.Business.BillingsExporters
                     var returnedReturnable = groupedReturnedReturnable.First();
                     worksheet.Cells[i, 5].Value = "Consignes récupérées";
                     worksheet.Cells[i, 6].Value = $"{returnedReturnable.Name}";
-                    worksheet.Cells[i, 7].Value = groupedReturnedReturnable.Sum(p => p.Quantity);
-                    worksheet.Cells[i, 8].Value = returnedReturnable.UnitWholeSalePrice;
-                    worksheet.Cells[i, 9].Value = returnedReturnable.Vat;
+                    worksheet.Cells[i, 7].Value = returnedReturnable.UnitWholeSalePrice;
+                    worksheet.Cells[i, 8].Value = returnedReturnable.Vat;
+                    worksheet.Cells[i, 9].Value = groupedReturnedReturnable.Sum(p => p.Quantity);
                     worksheet.Cells[i, 10].Value = groupedReturnedReturnable.Sum(p => p.TotalWholeSalePrice);
                     worksheet.Cells[i, 11].Value = groupedReturnedReturnable.Sum(p => p.TotalOnSalePrice);
                     i++;
