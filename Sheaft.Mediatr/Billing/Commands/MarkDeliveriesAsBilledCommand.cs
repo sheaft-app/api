@@ -12,7 +12,7 @@ using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Mediatr.Delivery.Commands
+namespace Sheaft.Mediatr.Billing.Commands
 {
     public class MarkDeliveriesAsBilledCommand : Command
     {

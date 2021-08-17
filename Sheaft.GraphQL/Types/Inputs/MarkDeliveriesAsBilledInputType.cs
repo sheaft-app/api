@@ -1,5 +1,6 @@
 using HotChocolate.Types;
 using Sheaft.Domain;
+using Sheaft.Mediatr.Billing.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,6 +13,7 @@ using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
+using Sheaft.Mediatr.Billing.Commands;
 using Sheaft.Mediatr.Delivery.Commands;
 
 namespace Sheaft.GraphQL.Deliveries
@@ -84,6 +86,18 @@ namespace Sheaft.GraphQL.Deliveries
         {
             await ExecuteAsync(mediatr, input, token);
             return await dataLoader.LoadAsync(input.DeliveryIds.ToList(), token);
+        }
+
+        [GraphQLName("markTimeRangeDeliveriesAsBilled")]
+        [Authorize(Policy = Policies.PRODUCER)]
+        [GraphQLType(typeof(ListType<DeliveryType>))]
+        public async Task<IEnumerable<Delivery>> MarkTimeRangeDeliveriesAsBilled(
+            [GraphQLType(typeof(MarkTimeRangeDeliveriesAsBilledInputType))] [GraphQLName("input")]
+            MarkTimeRangeDeliveriesAsBilledCommand input, [Service] ISheaftMediatr mediatr,
+            DeliveriesByIdBatchDataLoader dataLoader, CancellationToken token)
+        {
+            var result = await ExecuteAsync<MarkTimeRangeDeliveriesAsBilledCommand, IEnumerable<Guid>>(mediatr, input, token);
+            return await dataLoader.LoadAsync(result.ToList(), token);
         }
     }
 }
