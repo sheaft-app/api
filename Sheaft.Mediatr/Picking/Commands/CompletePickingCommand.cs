@@ -67,8 +67,9 @@ namespace Sheaft.Mediatr.Picking.Commands
                         .Except(picking.PreparedProducts.Select(pp => pp.ProductId)).Any())
                         return Failure("Certain produits n'ont pas été préparés.");
 
-                    if (picking.PreparedProducts.Any(p => !p.PreparedOn.HasValue))
-                        return Failure("Certaines quantités de produits n'ont pas été validées.");
+                    var nonPreparedProducts = picking.PreparedProducts.Where(p => !p.PreparedOn.HasValue);
+                    foreach (var nonPreparedProduct in nonPreparedProducts)
+                        nonPreparedProduct.CompleteProduct(picking.Producer.Name);
                 }
                 else
                 {
