@@ -251,6 +251,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 DeliveryFeesOnSalePrice = deliveryMode.DeliveryFeesOnSalePrice,
                 DeliveryFeesMinPurchaseOrdersAmount = deliveryMode.DeliveryFeesMinPurchaseOrdersAmount,
                 ApplyDeliveryFeesWhen = deliveryMode.ApplyDeliveryFeesWhen,
+                AcceptPurchaseOrdersWithAmountGreaterThan = deliveryMode.AcceptPurchaseOrdersWithAmountGreaterThan,
                 Address = deliveryMode.Address != null
                     ? new AddressDto
                     {
