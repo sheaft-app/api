@@ -71,6 +71,30 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("description");
             
             descriptor
+                .Field(c => c.DeliveryFeesWholeSalePrice)
+                .Name("deliveryFeesWholeSalePrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesVatPrice)
+                .Name("deliveryFeesVatPrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesOnSalePrice)
+                .Name("deliveryFeesOnSalePrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesMinPurchaseOrdersAmount)
+                .Name("deliveryFeesMinPurchaseOrdersAmount");
+            
+            descriptor
+                .Field(c => c.ApplyDeliveryFeesWhen)
+                .Name("applyDeliveryFeesWhen");
+            
+            descriptor
+                .Field(c => c.AcceptPurchaseOrdersWithAmountGreaterThan)
+                .Name("acceptPurchaseOrdersWithAmountGreaterThan");
+            
+            descriptor
                 .Field(c => c.DeliveryHoursCount)
                 .Name("deliveryHoursCount");
             

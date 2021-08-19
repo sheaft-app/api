@@ -27,11 +27,11 @@ namespace Sheaft.Domain
 
             Closings = new List<DeliveryClosing>();
             DeliveryHours = new List<DeliveryHours>();
-            
+
             SetName(name);
             SetDeliveryHours(openingHours);
             SetAvailability(available);
-            
+
             DomainEvents = new List<DomainEvent>();
         }
 
@@ -44,6 +44,12 @@ namespace Sheaft.Domain
         public string Name { get; private set; }
         public string Description { get; private set; }
         public int? MaxPurchaseOrdersPerTimeSlot { get; private set; }
+        public decimal? DeliveryFeesMinPurchaseOrdersAmount { get; private set; }
+        public decimal? DeliveryFeesWholeSalePrice { get; private set; }
+        public decimal? DeliveryFeesVatPrice { get; private set; }
+        public decimal? DeliveryFeesOnSalePrice { get; private set; }
+        public DeliveryFeesApplication? ApplyDeliveryFeesWhen { get; private set; }
+        public decimal? AcceptPurchaseOrdersWithAmountGreaterThan { get; private set; }
         public bool Available { get; private set; }
         public bool AutoAcceptRelatedPurchaseOrder { get; private set; }
         public bool AutoCompleteRelatedPurchaseOrder { get; private set; }
@@ -53,17 +59,42 @@ namespace Sheaft.Domain
         public int DeliveryHoursCount { get; private set; }
         public int ClosingsCount { get; private set; }
         public virtual ICollection<DeliveryHours> DeliveryHours { get; private set; }
-        public virtual ICollection<DeliveryClosing> Closings  { get; private set; }
+        public virtual ICollection<DeliveryClosing> Closings { get; private set; }
         public virtual ICollection<Agreement> Agreements { get; private set; }
 
         public void SetDeliveryHours(IEnumerable<DeliveryHours> deliveryHours)
         {
             if (DeliveryHours == null)
                 DeliveryHours = new List<DeliveryHours>();
-            
+
             DeliveryHours = deliveryHours.ToList();
             DeliveryHoursCount = DeliveryHours?.Count ?? 0;
         }
+
+        public void SetAcceptPurchaseOrdersWithAmountGreaterThan(decimal? amount)
+        {
+            if (amount.HasValue && amount < 0)
+                throw SheaftException.Validation("Le montant minimum de commande doit être supérieur ou égal à 0€");
+
+            AcceptPurchaseOrdersWithAmountGreaterThan = amount;
+        }
+
+        public void SetDeliveryFees(DeliveryFeesApplication feesApplication, decimal? fees, decimal? minAmount)
+        {
+            if (fees.HasValue && fees < 0)
+                throw SheaftException.Validation("Le forfait de livraison doit être supérieur ou égal à 0€");
+            
+            if (minAmount.HasValue && minAmount < 0)
+                throw SheaftException.Validation("Le montant minimum de commande pour appliquer le forfait doit être supérieur ou égal à 0€");
+
+            ApplyDeliveryFeesWhen = feesApplication;
+            DeliveryFeesMinPurchaseOrdersAmount = minAmount;
+            
+            DeliveryFeesWholeSalePrice = fees.HasValue ? Math.Round(fees.Value, 2) : null;
+            DeliveryFeesVatPrice = DeliveryFeesWholeSalePrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value * 0.20m, 2) : null;
+            DeliveryFeesOnSalePrice = DeliveryFeesWholeSalePrice.HasValue && DeliveryFeesVatPrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value + DeliveryFeesVatPrice.Value, 2) : null;
+        }
+        
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
         {
@@ -100,7 +131,7 @@ namespace Sheaft.Domain
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw SheaftException.Validation("Le nom du mode de livraison est requis.");
-            
+
             Name = name;
         }
 

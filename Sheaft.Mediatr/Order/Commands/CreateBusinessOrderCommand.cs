@@ -153,7 +153,7 @@ namespace Sheaft.Mediatr.Order.Commands
                         deliveryResult = Failure<IEnumerable<Guid>>($"Le producteur {delivery.Producer.Name} est fermé à la date selectionnée");
                         break;
                     }
-
+                    
                     cartDeliveries.Add(new Tuple<Domain.DeliveryMode, DateTimeOffset, string>(delivery,
                         cartDelivery.ExpectedDeliveryDate, cartDelivery.Comment));
                 }

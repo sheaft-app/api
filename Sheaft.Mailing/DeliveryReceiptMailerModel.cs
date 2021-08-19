@@ -16,5 +16,8 @@ namespace Sheaft.Mailing
         public decimal TotalWholeSalePrice { get; set; }
         public decimal TotalVatPrice { get; set; }
         public decimal TotalOnSalePrice { get; set; }
+        public decimal DeliveryFeesWholeSalePrice { get; set; }
+        public decimal DeliveryFeesVatPrice { get; set; }
+        public decimal DeliveryFeesOnSalePrice { get; set; }
     }
 }

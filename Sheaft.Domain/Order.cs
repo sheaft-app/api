@@ -17,7 +17,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public Order(Guid id, DonationKind kind, IEnumerable<Tuple<Product, Guid, int>> orderProducts, decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
+        public Order(Guid id, DonationKind kind, IEnumerable<Tuple<Product, Guid, int>> orderProducts,
+            decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
         {
             Id = id;
             User = user;
@@ -31,7 +32,7 @@ namespace Sheaft.Domain
             Products = new List<OrderProduct>();
             Deliveries = new List<OrderDelivery>();
             PurchaseOrders = new List<PurchaseOrder>();
-            
+
             DomainEvents = new List<DomainEvent>();
 
             SetProducts(orderProducts);
@@ -67,17 +68,20 @@ namespace Sheaft.Domain
         public decimal FeesPrice { get; private set; }
         public decimal DonationFeesPrice { get; private set; }
         public bool Processed { get; private set; }
+        public decimal DeliveryFeesWholeSalePrice { get; private set; }
+        public decimal DeliveryFeesVatPrice { get; private set; }
+        public decimal DeliveryFeesOnSalePrice { get; private set; }
         public Guid? UserId { get; private set; }
         public virtual User User { get; private set; }
-        public virtual ICollection<OrderProduct> Products{ get; private set; }
+        public virtual ICollection<OrderProduct> Products { get; private set; }
         public virtual ICollection<OrderDelivery> Deliveries { get; private set; }
-        public virtual ICollection<PurchaseOrder> PurchaseOrders{ get; private set; }
+        public virtual ICollection<PurchaseOrder> PurchaseOrders { get; private set; }
 
         public void AssignToUser(User user)
         {
             if (User != null)
                 throw SheaftException.Conflict("Un utilisateur est déjà assigné à ce panier.");
-            
+
             User = user;
         }
 
@@ -86,9 +90,10 @@ namespace Sheaft.Domain
             if (PurchaseOrders == null)
                 PurchaseOrders = new List<PurchaseOrder>();
 
-            var purchaseOrder = new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
+            var purchaseOrder =
+                new PurchaseOrder(Guid.NewGuid(), reference, PurchaseOrderStatus.Waiting, producer, this);
             PurchaseOrders.Add(purchaseOrder);
-            
+
             PurchaseOrdersCount = PurchaseOrders.Count;
             return purchaseOrder;
         }
@@ -97,7 +102,7 @@ namespace Sheaft.Domain
         {
             if (Status == OrderStatus.Refused || Status == OrderStatus.Confirmed)
                 return;
-            
+
             switch (status)
             {
                 case OrderStatus.Waiting:
@@ -130,7 +135,7 @@ namespace Sheaft.Domain
             foreach (var orderProduct in orderProducts)
             {
                 var product = new OrderProduct(orderProduct.Item1, orderProduct.Item2, orderProduct.Item3);
-                if(product.Quantity > 0)
+                if (product.Quantity > 0)
                     Products.Add(product);
             }
 
@@ -145,7 +150,40 @@ namespace Sheaft.Domain
             foreach (var orderDelivery in orderDeliveries)
                 Deliveries.Add(new OrderDelivery(orderDelivery.Item1, orderDelivery.Item2, orderDelivery.Item3));
 
+            DeliveryFeesWholeSalePrice = 0;
+            DeliveryFeesVatPrice = 0;
+            DeliveryFeesOnSalePrice = 0;
+            
+            foreach (var delivery in Deliveries)
+            {
+                var deliveryMode = delivery.DeliveryMode;
+
+                if (deliveryMode.AcceptPurchaseOrdersWithAmountGreaterThan.HasValue &&
+                    deliveryMode.AcceptPurchaseOrdersWithAmountGreaterThan.Value >
+                    (TotalProductWholeSalePrice + TotalReturnableWholeSalePrice))
+                    throw SheaftException.Validation(
+                        $"Le montant de la commande pour {deliveryMode.Producer.Name} est inférieur au palier de {deliveryMode.AcceptPurchaseOrdersWithAmountGreaterThan.Value}€ fixé par le producteur.");
+
+                if (deliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication.Always)
+                {
+                    DeliveryFeesWholeSalePrice += deliveryMode.DeliveryFeesWholeSalePrice ?? 0;
+                    DeliveryFeesVatPrice += deliveryMode.DeliveryFeesVatPrice ?? 0;
+                    DeliveryFeesOnSalePrice += deliveryMode.DeliveryFeesOnSalePrice ?? 0;
+                }
+
+                if (deliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication.TotalLowerThanPurchaseOrderAmount &&
+                    deliveryMode.DeliveryFeesMinPurchaseOrdersAmount.HasValue &&
+                    deliveryMode.DeliveryFeesMinPurchaseOrdersAmount.Value >
+                    (TotalProductWholeSalePrice + TotalReturnableWholeSalePrice))
+                {
+                    DeliveryFeesWholeSalePrice += deliveryMode.DeliveryFeesWholeSalePrice ?? 0;
+                    DeliveryFeesVatPrice += deliveryMode.DeliveryFeesVatPrice ?? 0;
+                    DeliveryFeesOnSalePrice += deliveryMode.DeliveryFeesOnSalePrice ?? 0;
+                }
+            }
+
             DeliveriesCount = Deliveries?.Count ?? 0;
+            RefreshOrder();
         }
 
         public void SetDonation(DonationKind kind)
@@ -160,19 +198,25 @@ namespace Sheaft.Domain
             TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
             TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
 
-            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0, DIGITS_COUNT);
+            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
+                DIGITS_COUNT);
 
             LinesCount = Products.Select(p => p.Id).Distinct().Count();
             ProductsCount = Products.Sum(p => p.Quantity);
             ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
-            
-            TotalReturnableWholeSalePrice = Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableVatPrice = Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableOnSalePrice = Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
-            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
-            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice;
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalReturnableWholeSalePrice =
+                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0),
+                    DIGITS_COUNT);
+            TotalReturnableVatPrice =
+                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
+            TotalReturnableOnSalePrice =
+                Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
+
+            TotalWholeSalePrice =
+                TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + DeliveryFeesWholeSalePrice;
+            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + DeliveryFeesVatPrice;
+            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice + DeliveryFeesOnSalePrice, DIGITS_COUNT);
 
             RefreshFees();
         }
@@ -180,7 +224,7 @@ namespace Sheaft.Domain
         private void RefreshFees()
         {
             var prices = GetOrderFees(this, TotalOnSalePrice);
-            
+
             FeesPrice = prices.FeesPrice;
             TotalPrice = prices.TotalPrice;
             DonationFeesPrice = prices.DonationFees;
@@ -195,7 +239,7 @@ namespace Sheaft.Domain
             public decimal FeesPrice { get; set; }
             public decimal DonationFees { get; set; }
         }
-        
+
         public static OrderPrices GetOrderFees(Order order, decimal totalOnSalePrice)
         {
             var donate = 0M;
@@ -214,8 +258,10 @@ namespace Sheaft.Domain
                     break;
             }
 
-            var results = UpdateFees(totalOnSalePrice, feesPrice, donate, order.FeesPercent, order.FeesFixedAmount, order.FeesVatPercent);
-            var totalPrice = Math.Round(totalOnSalePrice + donate + results.FeesPrice - results.DonationFees, DIGITS_COUNT);
+            var results = UpdateFees(totalOnSalePrice, feesPrice, donate, order.FeesPercent, order.FeesFixedAmount,
+                order.FeesVatPercent);
+            var totalPrice = Math.Round(totalOnSalePrice + donate + results.FeesPrice - results.DonationFees,
+                DIGITS_COUNT);
 
             return new OrderPrices
             {
@@ -232,7 +278,8 @@ namespace Sheaft.Domain
             return Math.Ceiling(value) - value;
         }
 
-        private static FeesDto UpdateFees(decimal totalOnSalePrice, decimal feesPrice, decimal donate, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
+        private static FeesDto UpdateFees(decimal totalOnSalePrice, decimal feesPrice, decimal donate,
+            decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
         {
             var total = totalOnSalePrice + feesPrice + donate;
             var newFees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
@@ -240,10 +287,11 @@ namespace Sheaft.Domain
             var donationFees = Math.Round(newFees - feesPrice, DIGITS_COUNT);
             var newFeesPrice = Math.Round(newFees, DIGITS_COUNT);
 
-            return new FeesDto{ FeesPrice = newFeesPrice, DonationFees = donationFees};
+            return new FeesDto { FeesPrice = newFeesPrice, DonationFees = donationFees };
         }
 
-        private static decimal GetFees(decimal total, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
+        private static decimal GetFees(decimal total, decimal feesPercent, decimal feesFixedAmount,
+            decimal feesVatPercent)
         {
             var fees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
             var pspFees = CalculateFees(total + fees, feesPercent, feesFixedAmount, feesVatPercent);
@@ -259,7 +307,8 @@ namespace Sheaft.Domain
             return Math.Round(fees, 2);
         }
 
-        private static decimal CalculateFees(decimal total, decimal feesPercent, decimal feesFixedAmount, decimal feesVatPercent)
+        private static decimal CalculateFees(decimal total, decimal feesPercent, decimal feesFixedAmount,
+            decimal feesVatPercent)
         {
             var fees = (feesPercent * total) + feesFixedAmount;
             return fees + fees * feesVatPercent;
@@ -269,7 +318,7 @@ namespace Sheaft.Domain
         {
             if (Processed)
                 throw SheaftException.Conflict("Ce panier a déjà été traité.");
-            
+
             Processed = true;
         }
     }

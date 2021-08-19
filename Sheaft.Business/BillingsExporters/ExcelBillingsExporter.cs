@@ -162,6 +162,30 @@ namespace Sheaft.Business.BillingsExporters
                 
                 productsCount += clientGroupedReturnedReturnables.Count;
 
+                var groupedDeliveriesFees = groupedDelivery
+                    .Where(gd => gd.DeliveryFeesWholeSalePrice > 0)
+                    .Select(gd => gd)
+                    .GroupBy(gd => gd.DeliveryFeesWholeSalePrice)
+                    .ToList();
+
+                if (groupedDeliveriesFees.Any())
+                {
+                    foreach (var groupedDeliveryFees in groupedDeliveriesFees)
+                    {
+                        var deliveryFees = groupedDeliveryFees.First();
+                        worksheet.Cells[i, 5].Value = "";
+                        worksheet.Cells[i, 6].Value = $"Livraison - {deliveryFees.DeliveryFeesWholeSalePrice}";
+                        worksheet.Cells[i, 7].Value = deliveryFees.DeliveryFeesWholeSalePrice;
+                        worksheet.Cells[i, 8].Value = 20;
+                        worksheet.Cells[i, 9].Value = groupedDeliveryFees.Count();
+                        worksheet.Cells[i, 10].Value = Math.Round(deliveryFees.DeliveryFeesWholeSalePrice *  groupedDeliveryFees.Count(), 2);
+                        worksheet.Cells[i, 11].Value =  Math.Round(deliveryFees.DeliveryFeesOnSalePrice *  groupedDeliveryFees.Count(), 2);
+                        i++;
+                    }
+                    
+                    productsCount += groupedDeliveriesFees.Count;
+                }
+
                 SetStyle(worksheet.Cells[i-productsCount, 7, i, 7], 
                     "#d5e3f5", 
                     null, 

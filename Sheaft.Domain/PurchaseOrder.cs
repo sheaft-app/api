@@ -40,18 +40,31 @@ namespace Sheaft.Domain
                 : new ExpectedAddress(order.User.Address.Line1, order.User.Address.Line2, order.User.Address.Zipcode,
                     order.User.Address.City, order.User.Address.Country, order.User.Address.Longitude,
                     order.User.Address.Latitude);
-
+            
             ExpectedDelivery = new ExpectedPurchaseOrderDelivery(delivery, address);
             
             SetComment(delivery.Comment);
-
             SetReference(reference);
             SetStatus(status, true);
 
             var orderProducts = order.Products.Where(p => p.ProducerId == producer.Id);
             foreach (var orderProduct in orderProducts)
                 AddProduct(orderProduct);
+            
+            var shouldAddDeliveryFees = delivery.DeliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication.Always ||
+                                        (delivery.DeliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication
+                                             .TotalLowerThanPurchaseOrderAmount &&
+                                         delivery.DeliveryMode.DeliveryFeesMinPurchaseOrdersAmount.HasValue &&
+                                         delivery.DeliveryMode.DeliveryFeesMinPurchaseOrdersAmount.Value >
+                                         TotalWholeSalePrice);
+
+            if (shouldAddDeliveryFees)
+            {
+                ExpectedDelivery?.ApplyDeliveryModeFees(delivery.DeliveryMode);
+                RefreshOrder();
+            }
         }
+        
         public PurchaseOrder(Guid id, int reference, PurchaseOrderStatus status, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, DeliveryMode deliveryMode, Producer producer, User client, IEnumerable<KeyValuePair<Domain.Product, int>> products, Catalog catalog, bool skipNotification, string comment = null)
         {
             if (producer == null)
@@ -74,7 +87,7 @@ namespace Sheaft.Domain
                 : new ExpectedAddress(client.Address.Line1, client.Address.Line2, client.Address.Zipcode,
                     client.Address.City, client.Address.Country, client.Address.Longitude,
                     client.Address.Latitude);
-
+            
             ExpectedDelivery = new ExpectedPurchaseOrderDelivery(deliveryMode, expectedDeliveryDate, from, to, address);
             
             SetComment(comment);
@@ -82,6 +95,19 @@ namespace Sheaft.Domain
 
             foreach (var product in products)
                 AddProduct(new PurchaseOrderProduct(product.Key, catalog.Id, product.Value));
+            
+            var shouldAddDeliveryFees = deliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication.Always ||
+                                        (deliveryMode.ApplyDeliveryFeesWhen is DeliveryFeesApplication
+                                             .TotalLowerThanPurchaseOrderAmount &&
+                                         deliveryMode.DeliveryFeesMinPurchaseOrdersAmount.HasValue &&
+                                         deliveryMode.DeliveryFeesMinPurchaseOrdersAmount.Value >
+                                         TotalWholeSalePrice);
+            
+            if (shouldAddDeliveryFees)
+            {
+                ExpectedDelivery?.ApplyDeliveryModeFees(deliveryMode);
+                RefreshOrder();
+            }
             
             SetStatus(status, skipNotification);
         }
@@ -319,9 +345,9 @@ namespace Sheaft.Domain
             TotalReturnableOnSalePrice =
                 Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
-            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice;
-            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice;
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0;
+            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + ExpectedDelivery?.DeliveryFeesVatPrice ?? 0;
+            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice + ExpectedDelivery?.DeliveryFeesOnSalePrice ?? 0, DIGITS_COUNT);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

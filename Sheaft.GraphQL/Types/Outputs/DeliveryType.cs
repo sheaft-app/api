@@ -88,6 +88,18 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("deliveryReceiptUrl");
             
             descriptor
+                .Field(c => c.DeliveryFeesWholeSalePrice)
+                .Name("deliveryFeesWholeSalePrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesVatPrice)
+                .Name("deliveryFeesVatPrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesOnSalePrice)
+                .Name("deliveryFeesOnSalePrice");
+            
+            descriptor
                 .Field(c => c.ProductsToDeliverCount)
                 .Name("productsToDeliverCount");
             

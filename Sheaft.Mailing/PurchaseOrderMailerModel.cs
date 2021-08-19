@@ -13,9 +13,12 @@ namespace Sheaft.Mailing
         public DateTimeOffset ExpectedDeliveryDate { get; set; }
         public decimal TotalOnSalePrice { get; set; }
         public decimal TotalWholeSalePrice { get; set; }
+        public decimal DeliveryFeesWholeSalePrice { get; set; }
+        public decimal DeliveryFeesVatPrice { get; set; }
+        public decimal DeliveryFeesOnSalePrice { get; set; }
         public string PurchaseOrderUrl { get; set; }
         public IEnumerable<PurchaseOrderLineMailerModel> Lines { get; set; }
-        public decimal VatPrice { get; set; }
+        public decimal TotalVatPrice { get; set; }
         public TimeSpan ExpectedFrom { get; set; }
         public TimeSpan ExpectedTo { get; set; }
         public string Address { get; set; }

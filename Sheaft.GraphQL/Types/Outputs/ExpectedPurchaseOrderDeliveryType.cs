@@ -36,6 +36,18 @@ namespace Sheaft.GraphQL.Types.Outputs
             descriptor
                 .Field(c => c.Address)
                 .Name("address");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesWholeSalePrice)
+                .Name("deliveryFeesWholeSalePrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesVatPrice)
+                .Name("deliveryFeesVatPrice");
+            
+            descriptor
+                .Field(c => c.DeliveryFeesOnSalePrice)
+                .Name("deliveryFeesOnSalePrice");
         }
     }
 }

@@ -48,6 +48,10 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public bool AutoCompleteRelatedPurchaseOrder { get; set; }
         public IEnumerable<ClosingInputDto> Closings { get; set; }
         public IEnumerable<AgreementPositionDto> Agreements { get; set; }
+        public decimal? AcceptPurchaseOrdersWithAmountGreaterThan { get; set; }
+        public DeliveryFeesApplication ApplyDeliveryFeesWhen { get; set; }
+        public decimal? DeliveryFees { get; set; }
+        public decimal? DeliveryFeesMinPurchaseOrderAmount { get; set; }
     }
 
     public class UpdateDeliveryModeCommandHandler : CommandsHandler,
@@ -55,6 +59,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
     {
         public UpdateDeliveryModeCommandHandler(
             ISheaftMediatr mediatr,
+            
             IAppDbContext context,
             ILogger<UpdateDeliveryModeCommandHandler> logger)
             : base(mediatr, context, logger)
@@ -75,6 +80,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             entity.SetAutoAcceptRelatedPurchaseOrders(request.AutoAcceptRelatedPurchaseOrder);
             entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
             entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
+            entity.SetAcceptPurchaseOrdersWithAmountGreaterThan(request.AcceptPurchaseOrdersWithAmountGreaterThan);
+            entity.SetDeliveryFees(request.ApplyDeliveryFeesWhen, request.DeliveryFees, request.DeliveryFeesMinPurchaseOrderAmount);
 
             if (request.Address != null)
                 entity.SetAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,

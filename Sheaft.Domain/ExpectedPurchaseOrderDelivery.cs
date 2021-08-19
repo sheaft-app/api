@@ -1,4 +1,5 @@
 using System;
+using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Domain
@@ -34,5 +35,15 @@ namespace Sheaft.Domain
         public DayOfWeek Day { get; private set; }
         public ExpectedAddress Address { get; private set; }
         public Guid DeliveryModeId { get; private set; }
+        public decimal DeliveryFeesWholeSalePrice { get; private set; }
+        public decimal DeliveryFeesVatPrice { get; private set; }
+        public decimal DeliveryFeesOnSalePrice { get; private set; }
+
+        public void ApplyDeliveryModeFees(DeliveryMode deliveryMode)
+        {
+            DeliveryFeesWholeSalePrice = deliveryMode.DeliveryFeesWholeSalePrice ?? 0;
+            DeliveryFeesVatPrice = deliveryMode.DeliveryFeesVatPrice ?? 0;
+            DeliveryFeesOnSalePrice = deliveryMode.DeliveryFeesOnSalePrice ?? 0;
+        }
     }
 }

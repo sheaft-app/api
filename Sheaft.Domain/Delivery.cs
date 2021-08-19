@@ -63,6 +63,9 @@ namespace Sheaft.Domain
         public int ReturnedReturnablesCount { get; private set; }
         public string DeliveryFormUrl { get; private set; }
         public string DeliveryReceiptUrl { get; private set; }
+        public decimal DeliveryFeesWholeSalePrice { get; private set; }
+        public decimal DeliveryFeesVatPrice { get; private set; }
+        public decimal DeliveryFeesOnSalePrice { get; private set; }
         public Guid? DeliveryBatchId { get; private set; }
         public Guid ProducerId { get; private set; }
         public Guid ClientId { get; private set; }
@@ -324,6 +327,10 @@ namespace Sheaft.Domain
             ProductsDeliveredCount = ProductsToDeliverCount + BrokenProductsCount + MissingProductsCount +
                                      ImproperProductsCount + ExcessProductsCount;
 
+            DeliveryFeesWholeSalePrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesWholeSalePrice);
+            DeliveryFeesVatPrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesVatPrice);
+            DeliveryFeesOnSalePrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesOnSalePrice);
+            
             DeliveryBatch?.Refresh();
         }
 

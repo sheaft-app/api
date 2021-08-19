@@ -62,15 +62,21 @@ namespace Sheaft.Mailer.Helpers
                 ScheduledOn = delivery.ScheduledOn,
                 ReceptionnedBy = delivery.ReceptionedBy,
                 Comment = delivery.Comment,
+                DeliveryFeesWholeSalePrice = delivery.DeliveryFeesWholeSalePrice,
+                DeliveryFeesVatPrice = delivery.DeliveryFeesVatPrice,
+                DeliveryFeesOnSalePrice = delivery.DeliveryFeesOnSalePrice,
                 TotalWholeSalePrice = productsToDeliver.Sum(po => po.TotalWholeSalePrice) +
                                       productsDiffs.Sum(p => p.TotalWholeSalePrice) +
-                                      returnedReturnables.Sum(p => p.TotalWholeSalePrice),
+                                      returnedReturnables.Sum(p => p.TotalWholeSalePrice) + 
+                                      delivery.DeliveryFeesWholeSalePrice,
                 TotalVatPrice = productsToDeliver.Sum(po => po.TotalVatPrice) +
                                 productsDiffs.Sum(p => p.TotalVatPrice) +
-                                returnedReturnables.Sum(p => p.TotalVatPrice),
+                                returnedReturnables.Sum(p => p.TotalVatPrice) + 
+                                delivery.DeliveryFeesVatPrice,
                 TotalOnSalePrice = productsToDeliver.Sum(po => po.TotalOnSalePrice) +
                                    productsDiffs.Sum(p => p.TotalOnSalePrice) +
-                                   returnedReturnables.Sum(p => p.TotalOnSalePrice),
+                                   returnedReturnables.Sum(p => p.TotalOnSalePrice) + 
+                                   delivery.DeliveryFeesOnSalePrice,
             };
         }
 
@@ -86,14 +92,17 @@ namespace Sheaft.Mailer.Helpers
                     CreatedOn = purchaseOrder.CreatedOn,
                     ExpectedDeliveryDate = purchaseOrder.ExpectedDelivery.ExpectedDeliveryDate,
                     Products = GetProductsModel(purchaseOrder),
-                    Returnables = GetReturnablesModel(purchaseOrder)
+                    Returnables = GetReturnablesModel(purchaseOrder),
+                    DeliveryFeesWholeSalePrice = purchaseOrder.ExpectedDelivery.DeliveryFeesWholeSalePrice,
+                    DeliveryFeesVatPrice = purchaseOrder.ExpectedDelivery.DeliveryFeesVatPrice,
+                    DeliveryFeesOnSalePrice = purchaseOrder.ExpectedDelivery.DeliveryFeesOnSalePrice,
                 };
 
                 if (purchaseOrder.PickingId.HasValue)
                 {
-                    po.TotalVatPrice = po.Products.Sum(p => p.TotalVatPrice);
-                    po.TotalOnSalePrice = po.Products.Sum(p => p.TotalOnSalePrice);
-                    po.TotalWholeSalePrice = po.Products.Sum(p => p.TotalWholeSalePrice);
+                    po.TotalVatPrice = po.Products.Sum(p => p.TotalVatPrice) + po.DeliveryFeesVatPrice;
+                    po.TotalOnSalePrice = po.Products.Sum(p => p.TotalOnSalePrice) + po.DeliveryFeesOnSalePrice;
+                    po.TotalWholeSalePrice = po.Products.Sum(p => p.TotalWholeSalePrice) + po.DeliveryFeesWholeSalePrice;
                 }
                 else
                 {
