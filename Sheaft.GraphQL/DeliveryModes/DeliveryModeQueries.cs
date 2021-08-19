@@ -161,7 +161,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 producers.Add(producer);
             }
             
-            if (deliveriesMode.All(dm => !dm.MaxPurchaseOrdersPerTimeSlot.HasValue))
+            if (deliveriesMode.All(deliveryMode => !deliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue))
                 return producers;
 
             return await GetNotCapedProducersDeliveriesAsync(context, producers, token);
@@ -178,8 +178,8 @@ namespace Sheaft.GraphQL.DeliveryModes
             var producerDeliveriesHoursToCheck = new List<Tuple<Guid, Guid, DeliveryHourDto>>();
             foreach (var producer in producersDeliveries)
             {
-                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(dm =>
-                    producer.Deliveries.Any(d => dm.MaxPurchaseOrdersPerTimeSlot.HasValue && dm.Id == d.Id));
+                var deliveryModesToCheckMaxOrders = deliveriesMode.Where(deliveryMode =>
+                    producer.Deliveries.Any(d => deliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue && deliveryMode.Id == d.Id));
                 foreach (var deliveryMode in deliveryModesToCheckMaxOrders)
                 {
                     var delivery = producer.Deliveries.FirstOrDefault(d => d.Id == deliveryMode.Id);
@@ -201,7 +201,7 @@ namespace Sheaft.GraphQL.DeliveryModes
                 var deliveries = new List<DeliveryDto>();
                 foreach (var delivery in producer.Deliveries)
                 {
-                    var deliveryMode = deliveriesMode.FirstOrDefault(dm => dm.Id == delivery.Id);
+                    var deliveryMode = deliveriesMode.FirstOrDefault(deliveryMode => deliveryMode.Id == delivery.Id);
                     if (!deliveryMode.MaxPurchaseOrdersPerTimeSlot.HasValue)
                     {
                         deliveries.Add(delivery);
@@ -246,6 +246,11 @@ namespace Sheaft.GraphQL.DeliveryModes
                 Id = deliveryMode.Id,
                 Kind = deliveryMode.Kind,
                 Available = deliveryMode.Available,
+                DeliveryFeesWholeSalePrice = deliveryMode.DeliveryFeesWholeSalePrice,
+                DeliveryFeesVatPrice = deliveryMode.DeliveryFeesVatPrice,
+                DeliveryFeesOnSalePrice = deliveryMode.DeliveryFeesOnSalePrice,
+                DeliveryFeesMinPurchaseOrdersAmount = deliveryMode.DeliveryFeesMinPurchaseOrdersAmount,
+                ApplyDeliveryFeesWhen = deliveryMode.ApplyDeliveryFeesWhen,
                 Address = deliveryMode.Address != null
                     ? new AddressDto
                     {
