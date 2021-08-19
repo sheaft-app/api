@@ -163,6 +163,12 @@ namespace Sheaft.GraphQL.Producers
                             Name = dm.Name,
                             Available = dm.Available,
                             Kind = dm.Kind,
+                            DeliveryFeesWholeSalePrice = dm.DeliveryFeesWholeSalePrice,
+                            DeliveryFeesVatPrice = dm.DeliveryFeesVatPrice,
+                            DeliveryFeesOnSalePrice = dm.DeliveryFeesOnSalePrice,
+                            DeliveryFeesMinPurchaseOrdersAmount = dm.DeliveryFeesMinPurchaseOrdersAmount,
+                            ApplyDeliveryFeesWhen = dm.ApplyDeliveryFeesWhen,
+                            AcceptPurchaseOrdersWithAmountGreaterThan = dm.AcceptPurchaseOrdersWithAmountGreaterThan,
                             Address = dm.Address != null ? new AddressDto
                             {
                                 Line1 = dm.Address.Line1,
