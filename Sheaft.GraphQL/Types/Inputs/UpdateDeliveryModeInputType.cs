@@ -42,12 +42,12 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Name("lockOrderHoursBeforeDelivery");
             
             descriptor
-                .Field(c => c.DeliveryFees)
-                .Name("deliveryFees");
+                .Field(c => c.DeliveryFeesWholeSalePrice)
+                .Name("deliveryFeesWholeSalePrice");
             
             descriptor
-                .Field(c => c.DeliveryFeesMinPurchaseOrderAmount)
-                .Name("deliveryFeesMinPurchaseOrderAmount");
+                .Field(c => c.DeliveryFeesMinPurchaseOrdersAmount)
+                .Name("deliveryFeesMinPurchaseOrdersAmount");
             
             descriptor
                 .Field(c => c.ApplyDeliveryFeesWhen)

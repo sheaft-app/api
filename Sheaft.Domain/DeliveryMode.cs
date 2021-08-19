@@ -73,19 +73,25 @@ namespace Sheaft.Domain
 
         public void SetAcceptPurchaseOrdersWithAmountGreaterThan(decimal? amount)
         {
-            if (amount.HasValue && amount < 0)
+            if (amount is < 0)
                 throw SheaftException.Validation("Le montant minimum de commande doit être supérieur ou égal à 0€");
 
             AcceptPurchaseOrdersWithAmountGreaterThan = amount;
         }
 
-        public void SetDeliveryFees(DeliveryFeesApplication feesApplication, decimal? fees, decimal? minAmount)
+        public void SetDeliveryFees(DeliveryFeesApplication? feesApplication, decimal? fees, decimal? minAmount)
         {
-            if (fees.HasValue && fees < 0)
-                throw SheaftException.Validation("Le forfait de livraison doit être supérieur ou égal à 0€");
+            if (fees is <= 0)
+                throw SheaftException.Validation("Le forfait de livraison doit être supérieur à 0€");
             
-            if (minAmount.HasValue && minAmount < 0)
-                throw SheaftException.Validation("Le montant minimum de commande pour appliquer le forfait doit être supérieur ou égal à 0€");
+            if (minAmount is <= 0)
+                throw SheaftException.Validation("Le montant minimum de commande pour appliquer le forfait doit être supérieur à 0€");
+            
+            if(feesApplication is DeliveryFeesApplication.TotalLowerThanPurchaseOrderAmount && !minAmount.HasValue)
+                throw SheaftException.Validation("Le montant minimum de commande pour appliquer le forfait est requis.");
+            
+            if(feesApplication is DeliveryFeesApplication.TotalLowerThanPurchaseOrderAmount && minAmount < AcceptPurchaseOrdersWithAmountGreaterThan)
+                throw SheaftException.Validation("Le montant minimum de commande pour appliquer le forfait de livraison doit être supérieur au montant minimum d'acceptation de commande.");
 
             ApplyDeliveryFeesWhen = feesApplication;
             DeliveryFeesMinPurchaseOrdersAmount = minAmount;
@@ -94,7 +100,6 @@ namespace Sheaft.Domain
             DeliveryFeesVatPrice = DeliveryFeesWholeSalePrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value * 0.20m, 2) : null;
             DeliveryFeesOnSalePrice = DeliveryFeesWholeSalePrice.HasValue && DeliveryFeesVatPrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value + DeliveryFeesVatPrice.Value, 2) : null;
         }
-        
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)
         {

@@ -48,8 +48,8 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
         public IEnumerable<ClosingInputDto> Closings { get; set; }
         public decimal? AcceptPurchaseOrdersWithAmountGreaterThan { get; set; }
         public DeliveryFeesApplication ApplyDeliveryFeesWhen { get; set; }
-        public decimal? DeliveryFees { get; set; }
-        public decimal? DeliveryFeesMinPurchaseOrderAmount { get; set; }
+        public decimal? DeliveryFeesWholeSalePrice { get; set; }
+        public decimal? DeliveryFeesMinPurchaseOrdersAmount { get; set; }
 
         public override void SetRequestUser(RequestUser user)
         {
@@ -92,7 +92,7 @@ namespace Sheaft.Mediatr.DeliveryMode.Commands
             entity.SetAutoCompleteRelatedPurchaseOrders(request.AutoCompleteRelatedPurchaseOrder);
             entity.SetMaxPurchaseOrdersPerTimeSlot(request.MaxPurchaseOrdersPerTimeSlot);
             entity.SetAcceptPurchaseOrdersWithAmountGreaterThan(request.AcceptPurchaseOrdersWithAmountGreaterThan);
-            entity.SetDeliveryFees(request.ApplyDeliveryFeesWhen, request.DeliveryFees, request.DeliveryFeesMinPurchaseOrderAmount);
+            entity.SetDeliveryFees(request.ApplyDeliveryFeesWhen, request.DeliveryFeesWholeSalePrice, request.DeliveryFeesMinPurchaseOrdersAmount);
 
             if (entity.Kind is DeliveryKind.Collective or DeliveryKind.Farm or DeliveryKind.Market)
                 producer.SetCanDirectSell(true);
