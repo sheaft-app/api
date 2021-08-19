@@ -116,6 +116,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 type: "decimal(18,2)",
                 nullable: false,
                 defaultValue: 0m);
+
+            migrationBuilder.Sql(@"
+                update app.PurchaseOrders set 
+                      ExpectedDelivery_DeliveryFeesWholeSalePrice = 0,
+                      ExpectedDelivery_DeliveryFeesVatPrice = 0,
+                      ExpectedDelivery_DeliveryFeesOnSalePrice = 0
+                where ExpectedDelivery_DeliveryFeesWholeSalePrice is null");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

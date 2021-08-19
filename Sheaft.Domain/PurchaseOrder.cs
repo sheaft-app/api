@@ -345,9 +345,9 @@ namespace Sheaft.Domain
             TotalReturnableOnSalePrice =
                 Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
 
-            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0;
-            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + ExpectedDelivery?.DeliveryFeesVatPrice ?? 0;
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice + ExpectedDelivery?.DeliveryFeesOnSalePrice ?? 0, DIGITS_COUNT);
+            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + (ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0);
+            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + (ExpectedDelivery?.DeliveryFeesVatPrice ?? 0);
+            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
