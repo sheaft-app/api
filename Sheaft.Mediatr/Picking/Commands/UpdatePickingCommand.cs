@@ -67,12 +67,16 @@ namespace Sheaft.Mediatr.Picking.Commands
                 picking.AddPurchaseOrders(purchaseOrdersToAdd);
             
             picking.SetName(request.Name);
-
             await _context.SaveChangesAsync(token);
-            
-            if(picking.Status == PickingStatus.InProgress)
-                _mediatr.Post(new GeneratePickingFormCommand(request.RequestUser) {PickingId = picking.Id});
-            
+
+            if (picking.Status == PickingStatus.InProgress)
+            {
+                picking.ClearForm();
+                await _context.SaveChangesAsync(token);
+                
+                _mediatr.Post(new GeneratePickingFormCommand(request.RequestUser) { PickingId = picking.Id });
+            }
+
             return Success();
         }
     }

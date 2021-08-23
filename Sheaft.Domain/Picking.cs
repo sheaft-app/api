@@ -215,5 +215,10 @@ namespace Sheaft.Domain
             PurchaseOrdersCount = PurchaseOrders.Count;
             PreparedProductsCount = PreparedProducts?.Sum(p => p.Quantity) ?? 0;
         }
+
+        public void ClearForm()
+        {
+            PickingFormUrl = null;
+        }
     }
 }
