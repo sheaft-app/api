@@ -27,7 +27,7 @@ namespace Sheaft.Mailer.Helpers
 
             var returnablesDiffs = delivery.Products
                 .Where(p => p.RowKind != ModificationKind.ToDeliver && p.HasReturnable)
-                .GroupBy(p => new {p.ReturnableId, p.RowKind})
+                .GroupBy(p => new { p.ReturnableId, p.RowKind })
                 .Select(p =>
                 {
                     var returnable = p.First();
@@ -67,15 +67,30 @@ namespace Sheaft.Mailer.Helpers
                 DeliveryFeesOnSalePrice = delivery.DeliveryFeesOnSalePrice,
                 TotalWholeSalePrice = productsToDeliver.Sum(po => po.TotalWholeSalePrice) +
                                       productsDiffs.Sum(p => p.TotalWholeSalePrice) +
-                                      returnedReturnables.Sum(p => p.TotalWholeSalePrice) + 
+                                      returnedReturnables.Sum(p => p.TotalWholeSalePrice) +
                                       delivery.DeliveryFeesWholeSalePrice,
-                TotalVatPrice = productsToDeliver.Sum(po => po.TotalVatPrice) +
-                                productsDiffs.Sum(p => p.TotalVatPrice) +
-                                returnedReturnables.Sum(p => p.TotalVatPrice) + 
-                                delivery.DeliveryFeesVatPrice,
+                TotalVat5Price =
+                    productsToDeliver.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
+                    + productsToDeliver.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + productsDiffs.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
+                    + productsDiffs.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + returnedReturnables.Where(p => p.Vat == 5.5m).Sum(p => p.TotalVatPrice),
+                TotalVat10Price =
+                    productsToDeliver.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
+                    + productsToDeliver.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + productsDiffs.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
+                    + productsDiffs.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + returnedReturnables.Where(p => p.Vat == 10m).Sum(p => p.TotalVatPrice),
+                TotalVat20Price =
+                    productsToDeliver.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
+                    + productsToDeliver.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + productsDiffs.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
+                    + productsDiffs.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                    + returnedReturnables.Where(p => p.Vat == 20m).Sum(p => p.TotalVatPrice)
+                    + delivery.DeliveryFeesVatPrice,
                 TotalOnSalePrice = productsToDeliver.Sum(po => po.TotalOnSalePrice) +
                                    productsDiffs.Sum(p => p.TotalOnSalePrice) +
-                                   returnedReturnables.Sum(p => p.TotalOnSalePrice) + 
+                                   returnedReturnables.Sum(p => p.TotalOnSalePrice) +
                                    delivery.DeliveryFeesOnSalePrice,
             };
         }
@@ -100,13 +115,32 @@ namespace Sheaft.Mailer.Helpers
 
                 if (purchaseOrder.PickingId.HasValue)
                 {
-                    po.TotalVatPrice = po.Products.Sum(p => p.TotalVatPrice) + po.DeliveryFeesVatPrice;
+                    po.TotalVat5Price =
+                        po.Products.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                    po.TotalVat10Price =
+                        po.Products.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                    po.TotalVat20Price =
+                        po.Products.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                        + po.DeliveryFeesVatPrice;
                     po.TotalOnSalePrice = po.Products.Sum(p => p.TotalOnSalePrice) + po.DeliveryFeesOnSalePrice;
-                    po.TotalWholeSalePrice = po.Products.Sum(p => p.TotalWholeSalePrice) + po.DeliveryFeesWholeSalePrice;
+                    po.TotalWholeSalePrice =
+                        po.Products.Sum(p => p.TotalWholeSalePrice) + po.DeliveryFeesWholeSalePrice;
                 }
                 else
                 {
-                    po.TotalVatPrice = purchaseOrder.TotalVatPrice;
+                    po.TotalVat5Price =
+                        po.Products.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                    po.TotalVat10Price =
+                        po.Products.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                    po.TotalVat20Price =
+                        po.Products.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
+                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                        + po.DeliveryFeesVatPrice;
                     po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice;
                     po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice;
                 }
@@ -139,7 +173,7 @@ namespace Sheaft.Mailer.Helpers
 
         private static DeliveryProductMailerModel GetProductModel(PreparedProduct p, ModificationKind rowKind)
         {
-            var model = GetProductModel((ProductRow) p, rowKind);
+            var model = GetProductModel((ProductRow)p, rowKind);
             model.Batches = p.Batches?.Select(b => new BatchMailerModel
             {
                 Number = b.Batch.Number,

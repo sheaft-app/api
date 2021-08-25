@@ -199,9 +199,19 @@
         <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalWholeSalePrice EUR</td>
     </tr>
     <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;">Livraison réceptionnée par : <strong>@Model.ReceptionnedBy</strong></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVatPrice EUR</td>
+        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (5.5%)</td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat5Price EUR</td>
+    </tr>
+    <tr style="border:none;">
+        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (10%)</td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat10Price EUR</td>
+    </tr>
+    <tr style="border:none;">
+        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (20%)</td>
+        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat20Price EUR</td>
     </tr>
     <tr style="border:none;">
         <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
@@ -216,6 +226,10 @@
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <tbody>
     <tr style="border:none;">
+        <td style="border:none;">
+           Livraison réceptionnée par : <strong>@Model.ReceptionnedBy</strong>
+        </td>
+    </tr><tr style="border:none;">
         <td style="border:none;">
             <strong>Remarques :</strong>
         </td>

@@ -35,7 +35,7 @@ namespace Sheaft.Business.BillingsExporters
                     var data = CreateExcelDeliveriesFile(package, user, from, to, deliveries, token);
 
                     return Success(new ResourceExportDto
-                        {Data = data, Extension = "xlsx", MimeType = "application/ms-excel"});
+                        { Data = data, Extension = "xlsx", MimeType = "application/ms-excel" });
                 }
             }
         }
@@ -44,7 +44,9 @@ namespace Sheaft.Business.BillingsExporters
             RequestUser user, DateTimeOffset? from, DateTimeOffset? to, IEnumerable<Delivery> deliveries,
             CancellationToken token)
         {
-            var worksheet = package.Workbook.Worksheets.Add(from.HasValue && to.HasValue ? $"A Facturer {from:ddMMyyyy} au {to:ddMMyyyy}" : "A Facturer");
+            var worksheet = package.Workbook.Worksheets.Add(from.HasValue && to.HasValue
+                ? $"A Facturer {from:ddMMyyyy} au {to:ddMMyyyy}"
+                : "A Facturer");
 
             worksheet.Cells[1, 1].Value = "Client";
             worksheet.Cells[1, 2].Value = "Livraisons";
@@ -58,17 +60,17 @@ namespace Sheaft.Business.BillingsExporters
             worksheet.Cells[1, 10].Value = "Total HT";
             worksheet.Cells[1, 11].Value = "Total TTC";
 
-            SetStyle(worksheet.Cells[1, 1, 1, 11], 
-                "#90bf72", 
-                "#ffffff", 
-                true, 
+            SetStyle(worksheet.Cells[1, 1, 1, 11],
+                "#90bf72",
+                "#ffffff",
+                true,
                 ExcelVerticalAlignment.Center,
                 ExcelHorizontalAlignment.Center);
-            
+
             var i = 2;
 
             var groupedDeliveries = deliveries
-                .GroupBy(d => new {d.ClientId, d.Client})
+                .GroupBy(d => new { d.ClientId, d.Client })
                 .OrderBy(c => c.Key.Client);
 
             foreach (var groupedDelivery in groupedDeliveries)
@@ -98,7 +100,7 @@ namespace Sheaft.Business.BillingsExporters
 
                 var batches = clientBatches.Select(po => $"{po.Number} - {po.DLC:dd/MM/yyyy}{po.DDM:dd/MM/yyyy}")
                     .Distinct();
-                
+
                 worksheet.Cells[i, 4].Value = string.Join(", ", batches);
 
                 var clientGroupedProducts = groupedDelivery
@@ -141,7 +143,7 @@ namespace Sheaft.Business.BillingsExporters
                 }
 
                 productsCount += clientGroupedProductsReturnables.Count;
-                
+
                 var clientGroupedReturnedReturnables = groupedDelivery
                     .SelectMany(gd => gd.ReturnedReturnables)
                     .GroupBy(p => p.ReturnableId)
@@ -159,13 +161,17 @@ namespace Sheaft.Business.BillingsExporters
                     worksheet.Cells[i, 11].Value = groupedReturnedReturnable.Sum(p => p.TotalOnSalePrice);
                     i++;
                 }
-                
+
                 productsCount += clientGroupedReturnedReturnables.Count;
+
+                var totalDeliveryWholeSalePrice = 0m;
+                var totalDeliveryVatPrice = 0m;
+                var totalDeliveryOnSalePrice = 0m;
 
                 var groupedDeliveriesFees = groupedDelivery
                     .Where(gd => gd.DeliveryFeesWholeSalePrice > 0)
                     .Select(gd => gd)
-                    .GroupBy(gd => gd.DeliveryFeesWholeSalePrice)
+                    .GroupBy(gd => gd.DeliveryFeesOnSalePrice)
                     .ToList();
 
                 if (groupedDeliveriesFees.Any())
@@ -173,30 +179,42 @@ namespace Sheaft.Business.BillingsExporters
                     foreach (var groupedDeliveryFees in groupedDeliveriesFees)
                     {
                         var deliveryFees = groupedDeliveryFees.First();
+
+                        var deliveryFeesWholeSalePrice =
+                            Math.Round(deliveryFees.DeliveryFeesWholeSalePrice * groupedDeliveryFees.Count(), 2);
+                        var deliveryFeesOnSalePrice =
+                            Math.Round(deliveryFees.DeliveryFeesOnSalePrice * groupedDeliveryFees.Count(), 2);
+
                         worksheet.Cells[i, 5].Value = "";
                         worksheet.Cells[i, 6].Value = $"Livraison - {deliveryFees.DeliveryFeesWholeSalePrice}";
                         worksheet.Cells[i, 7].Value = deliveryFees.DeliveryFeesWholeSalePrice;
                         worksheet.Cells[i, 8].Value = 20;
                         worksheet.Cells[i, 9].Value = groupedDeliveryFees.Count();
-                        worksheet.Cells[i, 10].Value = Math.Round(deliveryFees.DeliveryFeesWholeSalePrice *  groupedDeliveryFees.Count(), 2);
-                        worksheet.Cells[i, 11].Value =  Math.Round(deliveryFees.DeliveryFeesOnSalePrice *  groupedDeliveryFees.Count(), 2);
+                        worksheet.Cells[i, 10].Value = deliveryFeesWholeSalePrice;
+                        worksheet.Cells[i, 11].Value = deliveryFeesOnSalePrice;
+
+                        totalDeliveryWholeSalePrice += deliveryFeesWholeSalePrice;
+                        totalDeliveryVatPrice +=
+                            Math.Round(deliveryFees.DeliveryFeesVatPrice * groupedDeliveries.Count(), 2);
+                        totalDeliveryOnSalePrice += deliveryFeesOnSalePrice;
+
                         i++;
                     }
-                    
+
                     productsCount += groupedDeliveriesFees.Count;
                 }
 
-                SetStyle(worksheet.Cells[i-productsCount, 7, i, 7], 
-                    "#d5e3f5", 
-                    null, 
-                    false, 
+                SetStyle(worksheet.Cells[i - productsCount, 7, i, 7],
+                    "#d5e3f5",
+                    null,
+                    false,
                     ExcelVerticalAlignment.Center,
                     ExcelHorizontalAlignment.Right);
-                
-                SetStyle(worksheet.Cells[i-productsCount, 10, i, 11], 
-                    "#d5e3f5", 
-                    null, 
-                    false, 
+
+                SetStyle(worksheet.Cells[i - productsCount, 10, i, 11],
+                    "#d5e3f5",
+                    null,
+                    false,
                     ExcelVerticalAlignment.Center,
                     ExcelHorizontalAlignment.Right);
 
@@ -218,27 +236,83 @@ namespace Sheaft.Business.BillingsExporters
                         .Sum(p => p.TotalWholeSalePrice);
 
                 worksheet.Cells[i, 11].Value =
-                    Math.Round(productsWholeSalePrice + returnablesWholeSalePrice + returnedReturnablesWholeSalePrice,
+                    Math.Round(productsWholeSalePrice + returnablesWholeSalePrice + returnedReturnablesWholeSalePrice + totalDeliveryWholeSalePrice,
                         2);
 
-                i++;
-                worksheet.Cells[i, 5].Value = "Total TVA";
-                worksheet.Cells[i, 5, i, 10].Merge = true;
-
-                var productsVatPrice = groupedDelivery
+                var productsVat5Price = groupedDelivery
                     .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.Vat == 5.5m)
                     .Sum(p => p.TotalProductVatPrice);
 
-                var returnablesVatPrice = groupedDelivery
+                var productsVat10Price = groupedDelivery
                     .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.Vat == 10m)
+                    .Sum(p => p.TotalProductVatPrice);
+
+                var productsVat20Price = groupedDelivery
+                    .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.Vat == 20m)
+                    .Sum(p => p.TotalProductVatPrice);
+
+                var returnablesVat5Price = groupedDelivery
+                    .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.ReturnableVat == 5.5m)
                     .Sum(p => p.TotalReturnableVatPrice ?? 0);
 
-                var returnedReturnablesVatPrice = groupedDelivery
+                var returnablesVat10Price = groupedDelivery
+                    .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.ReturnableVat == 10m)
+                    .Sum(p => p.TotalReturnableVatPrice ?? 0);
+
+                var returnablesVat20Price = groupedDelivery
+                    .SelectMany(gd => gd.Products)
+                    .Where(dp => dp.ReturnableVat == 20m)
+                    .Sum(p => p.TotalReturnableVatPrice ?? 0);
+
+                var returnedReturnablesVat5Price = groupedDelivery
                     .SelectMany(gd => gd.ReturnedReturnables)
+                    .Where(dp => dp.Vat == 5.5m)
                     .Sum(p => p.TotalVatPrice);
 
-                worksheet.Cells[i, 11].Value =
-                    Math.Round(productsVatPrice + returnablesVatPrice + returnedReturnablesVatPrice, 2);
+                var returnedReturnablesVat10Price = groupedDelivery
+                    .SelectMany(gd => gd.ReturnedReturnables)
+                    .Where(dp => dp.Vat == 10m)
+                    .Sum(p => p.TotalVatPrice);
+
+                var returnedReturnablesVat20Price = groupedDelivery
+                    .SelectMany(gd => gd.ReturnedReturnables)
+                    .Where(dp => dp.Vat == 20m)
+                    .Sum(p => p.TotalVatPrice);
+
+                var totalVat5 = Math.Round(productsVat5Price + returnablesVat5Price + returnedReturnablesVat5Price, 2);
+                if (totalVat5 > 0)
+                {
+                    i++;
+                    worksheet.Cells[i, 5].Value = "Total TVA (5%)";
+                    worksheet.Cells[i, 5, i, 10].Merge = true;
+
+                    worksheet.Cells[i, 11].Value = totalVat5;
+                }
+
+                var totalVat10 = Math.Round(productsVat10Price + returnablesVat10Price + returnedReturnablesVat10Price, 2);
+                if (totalVat10 > 0)
+                {
+                    i++;
+                    worksheet.Cells[i, 5].Value = "Total TVA (10%)";
+                    worksheet.Cells[i, 5, i, 10].Merge = true;
+
+                    worksheet.Cells[i, 11].Value = totalVat10;
+                }
+                
+                var totalVat20 = Math.Round(productsVat20Price + returnablesVat20Price + returnedReturnablesVat20Price + totalDeliveryVatPrice, 2);
+                if (totalVat20 > 0)
+                {
+                    i++;
+                    worksheet.Cells[i, 5].Value = "Total TVA (20%)";
+                    worksheet.Cells[i, 5, i, 10].Merge = true;
+
+                    worksheet.Cells[i, 11].Value = totalVat20;
+                }
 
                 i++;
                 worksheet.Cells[i, 5].Value = "Total TTC";
@@ -257,12 +331,12 @@ namespace Sheaft.Business.BillingsExporters
                     .Sum(p => p.TotalOnSalePrice);
 
                 worksheet.Cells[i, 11].Value =
-                    Math.Round(productsOnSalePrice + returnablesOnSalePrice + returnedReturnablesOnSalePrice, 2);
-                
-                SetStyle(worksheet.Cells[i-2, 5, i, 11], 
-                    "#adcff7", 
-                    null, 
-                    true, 
+                    Math.Round(productsOnSalePrice + returnablesOnSalePrice + returnedReturnablesOnSalePrice + totalDeliveryOnSalePrice, 2);
+
+                SetStyle(worksheet.Cells[i - 2, 5, i, 11],
+                    "#adcff7",
+                    null,
+                    true,
                     ExcelVerticalAlignment.Center,
                     ExcelHorizontalAlignment.Right);
 
@@ -272,11 +346,11 @@ namespace Sheaft.Business.BillingsExporters
                 worksheet.Cells[j, 4, i, 4].Merge = true;
                 i++;
             }
-            
-            SetStyle(worksheet.Cells[2, 1, i - 1, 4], 
-                null, 
-                null, 
-                false, 
+
+            SetStyle(worksheet.Cells[2, 1, i - 1, 4],
+                null,
+                null,
+                false,
                 ExcelVerticalAlignment.Center,
                 ExcelHorizontalAlignment.Left);
 
@@ -295,8 +369,8 @@ namespace Sheaft.Business.BillingsExporters
             worksheet.Column(11).AutoFit();
 
             for (var row = 1; row < i; row++)
-                for (var col = 1; col < 12; col++)
-                    worksheet.Cells[row, col].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+            for (var col = 1; col < 12; col++)
+                worksheet.Cells[row, col].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
             return package.GetAsByteArray();
         }
