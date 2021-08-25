@@ -85,6 +85,9 @@ namespace Sheaft.Domain
             Reason = null;
             StartedOn = DateTimeOffset.UtcNow;
             Status = DeliveryBatchStatus.InProgress;
+
+            foreach (var delivery in Deliveries.Where(d => d.Status is DeliveryStatus.Waiting or DeliveryStatus.Skipped or DeliveryStatus.InProgress))
+                delivery.SetAsReady();
         }
 
         public void CompleteBatch(bool partial = false)
@@ -123,7 +126,6 @@ namespace Sheaft.Domain
             if (Deliveries.Any(d => d.Status == DeliveryStatus.Delivered || d.Status == DeliveryStatus.Rejected))
                 throw SheaftException.Validation("La tournée contient déjà des livraisons terminées ou refusées, veuillez compléter la tournée en précisant une nouvelle date.");
 
-            Status = Status == DeliveryBatchStatus.InProgress ? DeliveryBatchStatus.Ready : Status;
             StartedOn = null;
             ScheduledOn = rescheduledOn;
             From = from;
