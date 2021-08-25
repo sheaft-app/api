@@ -49,13 +49,6 @@ namespace Sheaft.Mediatr.Delivery.Commands
         public async Task<Result> Handle(GenerateDeliveryFormCommand request, CancellationToken token)
         {
             var delivery = await _context.Deliveries
-                .Include(d => d.Products)
-                .Include(d => d.PurchaseOrders)
-                    .ThenInclude(p => p.Picking)
-                        .ThenInclude(po => po.PreparedProducts)
-                .Include(d => d.PurchaseOrders)
-                    .ThenInclude(p => p.Products)
-                .Include(d => d.ReturnedReturnables)
                 .SingleAsync(d => d.Id == request.DeliveryId, token);
             
             var producer = await _context.Producers.SingleAsync(p => p.Id == delivery.ProducerId, token);

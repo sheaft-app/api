@@ -61,7 +61,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         public async Task<Result> Handle(GenerateDeliveryBatchFormsCommand request, CancellationToken token)
         {
             var deliveryBatch = await _context.DeliveryBatches.SingleAsync(d => d.Id == request.DeliveryBatchId, token);
-
+    
             var outputDocument = new PdfDocument();
             Result<byte[]> blobResult = null;
             foreach (var delivery in deliveryBatch.Deliveries)

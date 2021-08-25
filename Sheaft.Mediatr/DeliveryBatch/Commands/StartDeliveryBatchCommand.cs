@@ -78,13 +78,22 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
                 delivery.StartDelivery();
             }
             
-            await _mediatr.Process(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
-                {DeliveryBatchId = deliveryBatch.Id}, token);
+            await _context.SaveChangesAsync(token);
+
+            try
+            {
+                await _mediatr.Process(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
+                    { DeliveryBatchId = deliveryBatch.Id }, token);
+            }
+            catch (Exception e)
+            {
+                _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
+                    { DeliveryBatchId = deliveryBatch.Id });
+            }
 
             foreach (var delivery in deliveryBatch.Deliveries)
                 _mediatr.Post(new GenerateDeliveryReceiptCommand(request.RequestUser) {DeliveryId = delivery.Id});
             
-            await _context.SaveChangesAsync(token);
             return Success();
         }
     }
