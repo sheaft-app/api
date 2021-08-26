@@ -2,11 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Donation;
 

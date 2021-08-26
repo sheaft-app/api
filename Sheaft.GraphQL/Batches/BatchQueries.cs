@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +11,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Batches
 {

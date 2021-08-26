@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using System.Threading;
+using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core.Options;
 using Sheaft.Domain.Views;
-using Sheaft.Options;
 
 namespace Sheaft.Infrastructure.Persistence
 {

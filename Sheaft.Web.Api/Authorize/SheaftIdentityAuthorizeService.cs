@@ -1,22 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using System;
-using IdentityModel;
-using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
-using System.Security.Claims;
-using Microsoft.Extensions.Options;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using IdentityModel;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Caching.Distributed;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Web.Api.Authorize
 {

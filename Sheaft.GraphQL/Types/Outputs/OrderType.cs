@@ -2,17 +2,13 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GreenDonut;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.Domain.Extensions;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Orders;
 using Sheaft.GraphQL.PurchaseOrders;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 

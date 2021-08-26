@@ -1,12 +1,10 @@
-using System;
 using System.Linq;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Data;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;

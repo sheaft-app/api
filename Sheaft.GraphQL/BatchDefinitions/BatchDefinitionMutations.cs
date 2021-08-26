@@ -1,24 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.Batch.Commands;
 using Sheaft.Mediatr.BatchDefinition.Commands;
-using Sheaft.Mediatr.Catalog.Commands;
 
-namespace Sheaft.GraphQL.Catalogs
+namespace Sheaft.GraphQL.BatchDefinitions
 {
     [ExtendObjectType(Name = "Mutation")]
     public class BatchDefinitionMutations : SheaftMutation

@@ -1,18 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Producers;
-using Sheaft.GraphQL.Products;
-using Sheaft.GraphQL.QuickOrders;
 using Sheaft.GraphQL.Returnables;
-using Sheaft.GraphQL.Tags;
-using Sheaft.GraphQL.Users;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Sheaft.Domain.Enum;
+﻿using System.Collections.Generic;
 
 namespace Sheaft.Web.Manage.Models
 {

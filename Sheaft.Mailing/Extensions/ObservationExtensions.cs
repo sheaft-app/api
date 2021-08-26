@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
-using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mailing.Extensions
 {

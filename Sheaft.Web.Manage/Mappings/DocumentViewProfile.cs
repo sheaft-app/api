@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings
@@ -10,12 +9,8 @@ namespace Sheaft.Web.Manage.Mappings
         {
             CreateMap<Domain.Document, DocumentShortViewModel>();
             CreateMap<Domain.Document, DocumentViewModel>();
-            CreateMap<DocumentViewModel, DocumentDto>();
             CreateMap<DocumentViewModel, DocumentShortViewModel>();
             CreateMap<DocumentShortViewModel, DocumentViewModel>();
-            CreateMap<DocumentShortViewModel, DocumentDto>();
-            CreateMap<DocumentDto, DocumentViewModel>();
-            CreateMap<DocumentDto, DocumentShortViewModel>();
         }
     }
 }

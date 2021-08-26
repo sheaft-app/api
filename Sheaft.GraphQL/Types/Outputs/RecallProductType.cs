@@ -1,8 +1,5 @@
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Observations;
-using Sheaft.GraphQL.Recalls;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

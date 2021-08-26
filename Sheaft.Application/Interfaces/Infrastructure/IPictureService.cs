@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IPictureService
     {

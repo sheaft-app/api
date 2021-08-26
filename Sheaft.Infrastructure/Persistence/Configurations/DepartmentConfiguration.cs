@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations

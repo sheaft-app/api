@@ -5,13 +5,8 @@ using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Domain.Events.Delivery;
-using Sheaft.Domain.Events.PurchaseOrder;
 using Sheaft.Mailing;
 
 namespace Sheaft.Mediatr.Billing.EventHandlers

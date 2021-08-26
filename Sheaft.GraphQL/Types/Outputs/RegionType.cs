@@ -1,8 +1,6 @@
 ﻿using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Regions;
 
 namespace Sheaft.GraphQL.Types.Outputs

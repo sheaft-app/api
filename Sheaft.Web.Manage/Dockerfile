@@ -13,12 +13,10 @@ COPY ["Sheaft.Web.Manage/Sheaft.Web.Manage.csproj", "Sheaft.Web.Manage/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
 COPY ["Sheaft.Application/Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
+COPY ["Sheaft.Mediatr/Sheaft.Mediatr.csproj", "Sheaft.Mediatr/"]
+COPY ["Sheaft.Core/Sheaft.Core.csproj", "Sheaft.Core/"]
 COPY ["Sheaft.Mailing/Sheaft.Mailing.csproj", "Sheaft.Mailing/"]
 COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
-COPY ["Sheaft.Mediatr/Sheaft.Mediatr.csproj", "Sheaft.Mediatr/"]
-COPY ["Sheaft.Business/Sheaft.Business.csproj", "Sheaft.Business/"]
-COPY ["Sheaft.Core/Sheaft.Core.csproj", "Sheaft.Core/"]
-COPY ["Sheaft.Options/Sheaft.Options.csproj", "Sheaft.Options/"]
 RUN dotnet restore "Sheaft.Web.Manage/Sheaft.Web.Manage.csproj"
 COPY . .
 WORKDIR "/src/Sheaft.Web.Manage"

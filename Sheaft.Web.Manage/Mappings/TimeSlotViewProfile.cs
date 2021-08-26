@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 using Sheaft.Web.Manage.Models;
 
@@ -10,8 +9,6 @@ namespace Sheaft.Web.Manage.Mappings
         public TimeSlotViewProfile()
         {
             CreateMap<TimeSlotHour, TimeSlotViewModel>();
-            CreateMap<TimeSlotDto, TimeSlotViewModel>();
-            CreateMap<TimeSlotViewModel, TimeSlotDto>();
         }
     }
 }

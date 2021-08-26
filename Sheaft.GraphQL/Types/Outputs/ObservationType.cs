@@ -8,7 +8,6 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Batches;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Users;

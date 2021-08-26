@@ -5,13 +5,12 @@ using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Mediatr.Delivery.Commands;
 using Sheaft.Mediatr.Picking.Commands;
 
 namespace Sheaft.GraphQL.Pickings

@@ -9,8 +9,7 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces.Business;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
@@ -23,15 +22,11 @@ namespace Sheaft.GraphQL.DeliveryBatchs
     [ExtendObjectType(Name = "Query")]
     public class DeliveryBatchQueries : SheaftQuery
     {
-        private readonly IDeliveryBatchService _deliveryBatchService;
-
         public DeliveryBatchQueries(
-            IDeliveryBatchService deliveryBatchService,
             ICurrentUserService currentUserService,
             IHttpContextAccessor httpContextAccessor)
             : base(currentUserService, httpContextAccessor)
         {
-            _deliveryBatchService = deliveryBatchService;
         }
 
         [GraphQLName("deliveryBatch")]
@@ -60,18 +55,6 @@ namespace Sheaft.GraphQL.DeliveryBatchs
 
             return context.DeliveryBatches
                 .Where(c => c.AssignedToId == CurrentUser.Id && c.Status != DeliveryBatchStatus.Cancelled);
-        }
-
-        [GraphQLName("availableDeliveryBatches")]
-        [GraphQLType(typeof(ListType<AvailableDeliveryBatchDtoType>))]
-        [Authorize(Policy = Policies.PRODUCER)]
-        public async Task<IEnumerable<AvailableDeliveryBatchDto>> GetAvailableDeliveryBatches(
-            bool includeProcessingPurchaseOrders, CancellationToken token)
-        {
-            SetLogTransaction(includeProcessingPurchaseOrders);
-            
-            return await _deliveryBatchService.GetAvailableDeliveryBatchesAsync(CurrentUser.Id,
-                includeProcessingPurchaseOrders, token);
         }
     }
 }

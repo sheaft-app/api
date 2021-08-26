@@ -5,19 +5,64 @@
     </PropertyGroup>
 
     <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
       <ProjectReference Include="..\Sheaft.Core\Sheaft.Core.csproj" />
       <ProjectReference Include="..\Sheaft.Domain\Sheaft.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper" Version="10.1.1" />
+      <PackageReference Include="EPPlus" Version="4.5.3.3" />
       <PackageReference Include="FluentValidation" Version="10.0.4" />
       <PackageReference Include="IdentityModel" Version="5.1.0" />
       <PackageReference Include="MediatR" Version="9.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-      <PackageReference Include="NetTopologySuite" Version="2.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Mailing\Templates\AgreementAcceptedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\AgreementCancelledEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\AgreementCreatedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\AgreementRefusedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\BillingExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\BillingExportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveriesExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveriesExportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryBatchFormsCompletedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryBatchFormsGeneratedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryBatchPendingEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryForm.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryFormGeneratedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryPostponedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryReceipt.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\DeliveryReceiptGeneratedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\ObservationAddedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\ObservationRepliedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\OrderConfirmedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\OrderRefusedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PickingFormGeneratedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PickingOrderExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PickingOrderExportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PreAuthorizationFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PreAuthorizationSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\ProductImportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\ProductImportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderAcceptedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderCancelledEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderCompletedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderCreatedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderExpiredEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderReceivedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderRefusedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrdersExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrdersExportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\PurchaseOrderWithdrawnedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\RecallSentEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\TransactionsExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\TransactionsExportSucceededEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\UserDataExportFailedEvent.cshtml" />
+      <_ContentIncludedByDefault Remove="Mailing\Templates\UserDataExportSucceededEvent.cshtml" />
     </ItemGroup>
 
 </Project>

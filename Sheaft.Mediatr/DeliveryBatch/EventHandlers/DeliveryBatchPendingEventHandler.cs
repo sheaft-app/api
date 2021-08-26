@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Domain;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Declaration;
-using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Events.DeliveryBatch;
 using Sheaft.Mailing;
 

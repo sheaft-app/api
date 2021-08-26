@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings

@@ -12,12 +12,13 @@ using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Infrastructure.Services;
-using Sheaft.Web.Common;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Services;
+using Sheaft.Core.Options;
+using Sheaft.Infrastructure.Services;
 using Sheaft.Mediatr;
-using Sheaft.Options;
+using Sheaft.Web.Common;
 
 namespace Sheaft.Web.Payment
 {

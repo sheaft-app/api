@@ -1,7 +1,13 @@
-﻿using Amazon;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Reflection;
+using Amazon;
 using Amazon.SimpleEmail;
 using AspNetCoreRateLimit;
 using Hangfire;
+using HotChocolate.Types;
 using IdentityModel;
 using MangoPay.SDK;
 using MediatR;
@@ -21,42 +27,33 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
+using Razor.Templating.Core;
 using Serilog;
 using Serilog.Events;
-using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.Services;
-using Sheaft.Web.Api.Authorize;
-using Sheaft.Web.Common;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Reflection;
-using HotChocolate.Types;
-using Razor.Templating.Core;
 using Sheaft.Application.Behaviours;
-using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Exporters;
+using Sheaft.Application.Factories;
+using Sheaft.Application.Importers;
+using Sheaft.Application.Interfaces.Exporters;
 using Sheaft.Application.Interfaces.Factories;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Importers;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Mappings;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
-using Sheaft.Business;
-using Sheaft.Business.BillingsExporters;
-using Sheaft.Business.Factories;
-using Sheaft.Business.PickingOrdersExporters;
-using Sheaft.Business.ProductsImporters;
-using Sheaft.Business.PurchaseOrdersExporters;
-using Sheaft.Business.TransactionsExporters;
+using Sheaft.Application.Services;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL;
+using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Persistence.Extensions;
+using Sheaft.Infrastructure.Services;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Store.Commands;
-using Sheaft.Options;
+using Sheaft.Web.Api.Authorize;
 using Sheaft.Web.Api.Extensions;
+using Sheaft.Web.Common;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -243,7 +240,7 @@ namespace Sheaft.Web.Api
                 }
             });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(CreateProductProfile).Assembly);
+            services.AddAutoMapper(typeof(CreateProductProfile).Assembly); 
             services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
             services.AddHttpClient();
 
@@ -287,8 +284,6 @@ namespace Sheaft.Web.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
-            services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
-            services.AddScoped<IPickingService, PickingService>();
             services.AddScoped<IOrderService, OrderService>();
             
             services.AddScopedDynamic<IProductsFileImporter>(typeof(ExcelProductsImporter).Assembly.GetTypes().Where(t => t.GetInterfaces().Contains(typeof(IProductsFileImporter))));

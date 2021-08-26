@@ -2,7 +2,6 @@
 
 namespace Sheaft.Application.Models
 {
-
     public class IdentityPictureDto
     {
         public IdentityPictureDto(Guid id, string picture)

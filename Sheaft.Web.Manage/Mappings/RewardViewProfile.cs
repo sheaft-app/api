@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings
@@ -10,11 +9,6 @@ namespace Sheaft.Web.Manage.Mappings
         {
             CreateMap<Domain.Reward, RewardViewModel>();
             CreateMap<Domain.Reward, LevelRewardViewModel>();
-            
-            CreateMap<RewardDto, RewardViewModel>();
-            CreateMap<RewardDto, LevelRewardViewModel>();
-            CreateMap<RewardViewModel, RewardDto>();
-            CreateMap<LevelRewardViewModel, RewardDto>();
         }
     }
 }

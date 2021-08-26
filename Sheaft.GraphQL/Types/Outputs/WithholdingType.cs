@@ -6,8 +6,6 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.GraphQL.Withholdings;
 using Sheaft.Infrastructure.Persistence;

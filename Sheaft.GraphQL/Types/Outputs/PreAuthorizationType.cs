@@ -1,14 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Orders;
 using Sheaft.GraphQL.PreAuthorizations;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

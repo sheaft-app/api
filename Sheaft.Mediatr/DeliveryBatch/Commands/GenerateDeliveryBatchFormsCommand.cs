@@ -1,31 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Domain;
-using Sheaft.Domain.Enum;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
-using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
-using Sheaft.Domain.Events.DeliveryBatch;
-using Sheaft.Mediatr.Delivery.Commands;
-using Sheaft.Mediatr.Producer.Commands;
+using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core;
+using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.DeliveryBatch.Commands
 {

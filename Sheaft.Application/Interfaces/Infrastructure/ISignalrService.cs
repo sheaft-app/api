@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface ISignalrService
     {

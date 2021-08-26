@@ -4,14 +4,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
-using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.Web.Manage.Controllers
 {

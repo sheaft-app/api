@@ -8,15 +8,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
-using Sheaft.Core.Exceptions;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
-using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Agreement.Commands
 {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IEmailService
     {

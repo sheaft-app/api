@@ -2,9 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IBlobService
     {

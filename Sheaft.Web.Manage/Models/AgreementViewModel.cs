@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Sheaft.Domain.Enum;
-
-namespace Sheaft.Web.Manage.Models
+﻿namespace Sheaft.Web.Manage.Models
 {
     public class AgreementViewModel : ShortAgreementViewModel
     {

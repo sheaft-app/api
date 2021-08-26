@@ -6,9 +6,9 @@ using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core.Options;
 using Sheaft.Domain.Enum;
-using Sheaft.Options;
 using Sheaft.Web.Payment.Models;
 
 namespace Sheaft.Web.Payment.Controllers

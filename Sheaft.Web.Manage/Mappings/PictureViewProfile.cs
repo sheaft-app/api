@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 using Sheaft.Web.Manage.Models;

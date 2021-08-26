@@ -1,7 +1,7 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Batches;
+using Sheaft.GraphQL.BatchDefinitions;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

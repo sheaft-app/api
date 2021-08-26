@@ -1,5 +1,4 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 
 namespace Sheaft.GraphQL.Types.Outputs

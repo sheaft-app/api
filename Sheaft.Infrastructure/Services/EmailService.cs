@@ -1,20 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using Razor.Templating.Core;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 using Sheaft.Core.Extensions;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings
@@ -9,8 +8,6 @@ namespace Sheaft.Web.Manage.Mappings
         public LevelViewProfile()
         {
             CreateMap<Domain.Level, LevelViewModel>();
-            CreateMap<LevelDto, LevelViewModel>();
-            CreateMap<LevelViewModel, LevelDto>();
         }
     }
 }

@@ -2,14 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Models;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Business;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Consumers;
 using Sheaft.Infrastructure.Persistence;
 

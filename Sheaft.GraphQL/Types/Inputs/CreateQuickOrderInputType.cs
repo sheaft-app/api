@@ -1,5 +1,4 @@
 ﻿using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Mediatr.QuickOrder.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs

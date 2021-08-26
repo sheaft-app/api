@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Agreement;
 using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain

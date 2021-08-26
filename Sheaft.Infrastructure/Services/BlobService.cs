@@ -1,17 +1,17 @@
-﻿using Azure.Storage.Blobs;
-using Azure.Storage.Sas;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.Extensions.Logging;
 using Azure.Storage;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

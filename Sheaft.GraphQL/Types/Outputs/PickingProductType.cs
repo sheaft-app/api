@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.Pickings;
 using Sheaft.GraphQL.PurchaseOrders;
 

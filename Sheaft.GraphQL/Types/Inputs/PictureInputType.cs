@@ -1,7 +1,6 @@
 ﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.Mediatr.Product.Commands;
 
 namespace Sheaft.GraphQL.Types.Inputs
 {

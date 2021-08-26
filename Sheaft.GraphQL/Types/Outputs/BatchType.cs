@@ -9,10 +9,12 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
+using Sheaft.GraphQL.BatchDefinitions;
 using Sheaft.GraphQL.Batches;
 using Sheaft.GraphQL.Deliveries;
 using Sheaft.GraphQL.Observations;
@@ -21,7 +23,6 @@ using Sheaft.GraphQL.PurchaseOrders;
 using Sheaft.GraphQL.Recalls;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

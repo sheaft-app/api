@@ -3,7 +3,6 @@ using Sheaft.Domain.Enum;
 
 namespace Sheaft.Application.Models
 {
-
     public class PspUserNormalDto : PspUserDto
     {
         public string FirstName { get; set; }

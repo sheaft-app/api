@@ -7,14 +7,14 @@ using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
-namespace Sheaft.GraphQL.Batches
+namespace Sheaft.GraphQL.BatchDefinitions
 {
     [ExtendObjectType(Name = "Query")]
     public class BatchDefinitionQueries : SheaftQuery

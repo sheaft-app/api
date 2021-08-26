@@ -7,9 +7,7 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.GraphQL.BankAccounts;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Payouts;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
 

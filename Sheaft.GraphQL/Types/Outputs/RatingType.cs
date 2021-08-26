@@ -2,10 +2,8 @@
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Ratings;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 
 namespace Sheaft.GraphQL.Types.Outputs

@@ -50,7 +50,7 @@ namespace Sheaft.Infrastructure.Persistence
         public DbSet<Store> Stores { get; set; }
         public DbSet<Producer> Producers { get; set; }
         public DbSet<Consumer> Consumers { get; set; }
-        public DbSet<Business> Businesses { get; set; }
+        public DbSet<Domain.Business> Businesses { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Withholding> Withholdings { get; set; }
 

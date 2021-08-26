@@ -1,14 +1,14 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Powells.CouponCode;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

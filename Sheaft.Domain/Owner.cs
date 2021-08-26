@@ -1,8 +1,6 @@
 ﻿using System;
-using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Interop;
 
 namespace Sheaft.Domain
 {

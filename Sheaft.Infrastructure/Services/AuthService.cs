@@ -1,21 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
 using IdentityModel.Client;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
-using Sheaft.Domain;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

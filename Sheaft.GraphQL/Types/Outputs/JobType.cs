@@ -3,11 +3,8 @@ using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Jobs;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

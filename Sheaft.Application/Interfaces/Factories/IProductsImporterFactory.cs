@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Interfaces.Importers;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.Interfaces.Factories

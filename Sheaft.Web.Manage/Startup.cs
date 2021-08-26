@@ -2,48 +2,45 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Reflection;
+using Amazon;
+using Amazon.SimpleEmail;
+using Hangfire;
+using HotChocolate.Types.Relay;
 using IdentityModel;
 using MangoPay.SDK;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Azure.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.Services;
-using Microsoft.Azure.Search;
-using Hangfire;
+using Microsoft.IdentityModel.Logging;
+using NewRelic.LogEnrichers.Serilog;
 using Newtonsoft.Json;
-using Amazon.SimpleEmail;
-using Amazon;
-using HotChocolate.Types.Relay;
-using MediatR;
 using Serilog;
 using Serilog.Events;
-using NewRelic.LogEnrichers.Serilog;
-using Sheaft.Web.Common;
-using Microsoft.IdentityModel.Logging;
-using Microsoft.Azure.Cosmos.Table;
-using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Exporters;
+using Sheaft.Application.Factories;
+using Sheaft.Application.Importers;
+using Sheaft.Application.Interfaces.Exporters;
 using Sheaft.Application.Interfaces.Factories;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Importers;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Mappings;
-using Sheaft.Business;
-using Sheaft.Business.BillingsExporters;
-using Sheaft.Business.Factories;
-using Sheaft.Business.PickingOrdersExporters;
-using Sheaft.Business.ProductsImporters;
-using Sheaft.Business.PurchaseOrdersExporters;
-using Sheaft.Business.TransactionsExporters;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Services;
+using Sheaft.Core.Options;
+using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.Services;
 using Sheaft.Mediatr;
 using Sheaft.Mediatr.Product.Commands;
 using Sheaft.Mediatr.Store.Commands;
-using Sheaft.Options;
+using Sheaft.Web.Common;
 using Sheaft.Web.Manage.Mappings;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
@@ -133,8 +130,7 @@ namespace Sheaft.Web.Manage
                     .Build();
             });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(ProductViewProfile).Assembly, typeof(CreateProductProfile).Assembly);
-
+            services.AddAutoMapper(typeof(ProductViewProfile).Assembly);
             services.Configure<KestrelServerOptions>(options =>
             {
                 options.AllowSynchronousIO = true;
@@ -204,7 +200,8 @@ namespace Sheaft.Web.Manage
                     };
                 });
 
-            services.AddMediatR(new List<Assembly>() { typeof(RegisterStoreCommand).Assembly }.ToArray());
+            services.AddAutoMapper(typeof(CreateProductProfile).Assembly); 
+            services.AddMediatR(typeof(RegisterStoreCommand).Assembly);
             
             var jobsDatabaseConfig = jobsDatabaseSettings.Get<JobsDatabaseOptions>();
             services.AddHangfire(configuration =>
@@ -244,8 +241,6 @@ namespace Sheaft.Web.Manage
             services.AddScoped<IPdfGenerator, PdfGenerator>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
-            services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
-            services.AddScoped<IPickingService, PickingService>();
             services.AddScoped<IOrderService, OrderService>();
             
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));

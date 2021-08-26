@@ -1,5 +1,9 @@
-﻿using MangoPay.SDK;
-using MangoPay.SDK.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MangoPay.SDK;
 using MangoPay.SDK.Core.Enumerations;
 using MangoPay.SDK.Entities;
 using MangoPay.SDK.Entities.GET;
@@ -7,21 +11,14 @@ using MangoPay.SDK.Entities.POST;
 using MangoPay.SDK.Entities.PUT;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Options;
 using Address = Sheaft.Domain.Address;
-using CardType = MangoPay.SDK.Core.Enumerations.CardType;
 using TransactionStatus = Sheaft.Domain.Enum.TransactionStatus;
 
 namespace Sheaft.Infrastructure.Services

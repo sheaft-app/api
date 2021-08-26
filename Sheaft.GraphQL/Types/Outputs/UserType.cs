@@ -4,11 +4,11 @@ using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Users;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

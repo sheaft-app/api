@@ -8,13 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
@@ -23,7 +21,6 @@ using Sheaft.Mediatr.BatchDefinition.Commands;
 using Sheaft.Mediatr.Catalog.Commands;
 using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.User.Commands;
-using Sheaft.Options;
 
 namespace Sheaft.Mediatr.Producer.Commands
 {

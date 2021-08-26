@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Domain.Events.PickingOrder;
 
 namespace Sheaft.Mediatr.PickingOrder.EventHandlers

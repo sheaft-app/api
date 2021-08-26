@@ -1,5 +1,4 @@
 ﻿using System;
-using Sheaft.Core.Enums;
 
 namespace Sheaft.Core
 {

@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Application.Models;
 using Sheaft.Core;
 using Sheaft.Domain;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IPspService
     {

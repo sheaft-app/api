@@ -3,20 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Core.Exceptions;
-using Sheaft.Domain;
 using Sheaft.Domain.Enum;
-using Sheaft.Domain.Events.Declaration;
 using Sheaft.Domain.Events.Delivery;
 using Sheaft.Domain.Extensions;
 using Sheaft.Mailing;
-using Sheaft.Mediatr.Delivery.Commands;
 
 namespace Sheaft.Mediatr.Delivery.EventHandlers
 {

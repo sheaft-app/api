@@ -29,18 +29,16 @@ using Razor.Templating.Core;
 using Serilog;
 using Serilog.Events;
 using Sheaft.Application.Behaviours;
-using Sheaft.Application.Interfaces.Business;
+using Sheaft.Application.Exporters;
+using Sheaft.Application.Factories;
+using Sheaft.Application.Importers;
+using Sheaft.Application.Interfaces.Exporters;
 using Sheaft.Application.Interfaces.Factories;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Importers;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Mappings;
-using Sheaft.Business;
-using Sheaft.Business.BillingsExporters;
-using Sheaft.Business.Factories;
-using Sheaft.Business.PickingOrdersExporters;
-using Sheaft.Business.ProductsImporters;
-using Sheaft.Business.PurchaseOrdersExporters;
-using Sheaft.Business.TransactionsExporters;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Application.Services;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
@@ -58,7 +56,6 @@ using Sheaft.Mediatr.PurchaseOrder.Commands;
 using Sheaft.Mediatr.Store.Commands;
 using Sheaft.Mediatr.Transfer.Commands;
 using Sheaft.Mediatr.Zone.Commands;
-using Sheaft.Options;
 using Sheaft.Web.Common;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
@@ -202,9 +199,8 @@ namespace Sheaft.Web.Jobs
                     };
                 });
 
-            services.AddAutoMapper(typeof(ProductProfile).Assembly, typeof(CreateProductProfile).Assembly);
+            services.AddAutoMapper(typeof(CreateProductProfile).Assembly); 
             services.AddMediatR(typeof(RefreshPayinStatusCommand).Assembly);
-
             services.AddMemoryCache();
             services.AddHttpClient();
 
@@ -225,8 +221,6 @@ namespace Sheaft.Web.Jobs
             services.AddScoped<IPdfGenerator, PdfGenerator>();
             
             services.AddScoped<IDeliveryService, DeliveryService>();
-            services.AddScoped<IDeliveryBatchService, DeliveryBatchService>();
-            services.AddScoped<IPickingService, PickingService>();
             services.AddScoped<IOrderService, OrderService>();
 
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));

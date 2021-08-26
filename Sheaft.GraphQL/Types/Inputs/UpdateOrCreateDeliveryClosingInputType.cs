@@ -1,5 +1,4 @@
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
 using Sheaft.Mediatr.DeliveryMode.Commands;
 

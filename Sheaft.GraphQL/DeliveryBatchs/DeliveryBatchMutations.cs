@@ -1,25 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
-using HotChocolate.Data;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 using Microsoft.AspNetCore.Http;
-using Sheaft.Application.Interfaces.Business;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Models;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
-using Sheaft.Infrastructure.Persistence;
 using Sheaft.Mediatr.DeliveryBatch.Commands;
-using Sheaft.Mediatr.DeliveryMode.Commands;
 
 namespace Sheaft.GraphQL.DeliveryBatchs
 {

@@ -9,13 +9,13 @@ using HotChocolate.Types;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Agreements;
 using Sheaft.GraphQL.Business;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Observations;
 using Sheaft.GraphQL.Producers;
 using Sheaft.GraphQL.Products;
@@ -24,7 +24,6 @@ using Sheaft.GraphQL.Stores;
 using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

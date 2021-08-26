@@ -1,9 +1,5 @@
 ﻿using System.Linq;
 using AutoMapper;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Models;
-using Sheaft.Core;
-using Sheaft.Domain.Enum;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings

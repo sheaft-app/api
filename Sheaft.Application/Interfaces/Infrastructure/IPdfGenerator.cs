@@ -2,7 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Core;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IPdfGenerator
     {

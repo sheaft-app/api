@@ -1,13 +1,13 @@
-﻿using IdentityModel.Client;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Sheaft.Options;
+using IdentityModel.Client;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Sheaft.Application.Interfaces.Services;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

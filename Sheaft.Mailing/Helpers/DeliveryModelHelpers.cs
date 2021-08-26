@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Extensions;
-using Sheaft.Mailing;
 
-namespace Sheaft.Mailer.Helpers
+namespace Sheaft.Mailing.Helpers
 {
     public static class DeliveryModelHelpers
     {

@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
 using Sheaft.Application.Services;
 using Sheaft.Core;
-using Sheaft.Domain;
-using Sheaft.Domain.Enum;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Infrastructure.Services
 {

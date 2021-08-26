@@ -7,15 +7,11 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
-using Sheaft.Application.Models;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Core;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
-using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 
 namespace Sheaft.Mediatr.Recall.Commands

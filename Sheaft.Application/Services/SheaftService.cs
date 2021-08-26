@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Sheaft.Core;
-using Sheaft.Core.Enums;
 
 namespace Sheaft.Application.Services
 {

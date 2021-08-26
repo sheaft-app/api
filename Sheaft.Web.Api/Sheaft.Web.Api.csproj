@@ -42,9 +42,7 @@
     <PackageReference Include="Serilog.Sinks.NewRelic.Logs" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sheaft.Business\Sheaft.Business.csproj" />
     <ProjectReference Include="..\Sheaft.GraphQL\Sheaft.GraphQL.csproj" />
-    <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     <ProjectReference Include="..\Sheaft.Mediatr\Sheaft.Mediatr.csproj" />
     <ProjectReference Include="..\Sheaft.Web.Common\Sheaft.Web.Common.csproj" />
   </ItemGroup>

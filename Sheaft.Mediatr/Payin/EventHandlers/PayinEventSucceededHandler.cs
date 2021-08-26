@@ -1,17 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.Types.Relay;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces;
-using Sheaft.Application.Interfaces.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.Payin;
-using Sheaft.Domain.Extensions;
 using Sheaft.Mailing;
 
 namespace Sheaft.Mediatr.Payin.EventHandlers

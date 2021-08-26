@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Sheaft.Core.Enums;
 using Sheaft.Core.Exceptions;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events.User;
 using Sheaft.Domain.Interop;
 

@@ -1,13 +1,9 @@
-﻿using Hangfire.Common;
+﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
-using Hangfire.States;
-using Hangfire.Storage;
-using System;
-using Hangfire.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Sheaft.Options;
+using Sheaft.Core.Options;
 
 namespace Sheaft.Web.Jobs
 {

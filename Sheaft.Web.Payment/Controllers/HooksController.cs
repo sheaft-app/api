@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Sheaft.Application.Interfaces.Infrastructure;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Domain;
 using Sheaft.Domain.Enum;
@@ -12,7 +11,6 @@ using Sheaft.Mediatr.Legal.Commands;
 using Sheaft.Mediatr.Payin.Commands;
 using Sheaft.Mediatr.PayinRefund.Commands;
 using Sheaft.Mediatr.Payout.Commands;
-using Sheaft.Mediatr.PreAuthorization;
 using Sheaft.Mediatr.PreAuthorization.Commands;
 using Sheaft.Mediatr.Transfer.Commands;
 

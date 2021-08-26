@@ -2,13 +2,9 @@
 using System.Threading.Tasks;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.GraphQL.Catalogs;
 using Sheaft.GraphQL.Notifications;
-using Sheaft.GraphQL.Tags;
 using Sheaft.GraphQL.Users;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

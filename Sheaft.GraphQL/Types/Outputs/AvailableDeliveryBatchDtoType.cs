@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.Resolvers;
-using HotChocolate.Types;
-using Microsoft.EntityFrameworkCore;
+﻿using HotChocolate.Types;
 using Sheaft.Application.Models;
-using Sheaft.GraphQL.Agreements;
-using Sheaft.GraphQL.DeliveryModes;
-using Sheaft.GraphQL.Producers;
-using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

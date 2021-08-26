@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Sheaft.Application.Models;
 using Sheaft.Web.Manage.Models;
 
 namespace Sheaft.Web.Manage.Mappings
@@ -9,8 +8,6 @@ namespace Sheaft.Web.Manage.Mappings
         public RegionViewProfile()
         {
             CreateMap<Domain.Region, RegionViewModel>();
-            CreateMap<RegionDto, RegionViewModel>();
-            CreateMap<RegionViewModel, RegionDto>();
         }
     }
 }

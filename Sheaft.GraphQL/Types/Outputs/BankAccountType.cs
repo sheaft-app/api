@@ -2,7 +2,6 @@
 using HotChocolate.Types;
 using Sheaft.Domain;
 using Sheaft.GraphQL.BankAccounts;
-using Sheaft.GraphQL.Catalogs;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

@@ -8,12 +8,12 @@ using HotChocolate.Types.Relay;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Security;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.PurchaseOrders
 {

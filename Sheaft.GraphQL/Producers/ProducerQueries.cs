@@ -10,20 +10,18 @@ using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Search;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
-using Sheaft.Application.Extensions;
-using Sheaft.Application.Interfaces.Infrastructure;
+using Sheaft.Application.Interfaces.Services;
 using Sheaft.Application.Models;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.GraphQL.Types.Inputs;
 using Sheaft.GraphQL.Types.Outputs;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Options;
 
 namespace Sheaft.GraphQL.Producers
 {

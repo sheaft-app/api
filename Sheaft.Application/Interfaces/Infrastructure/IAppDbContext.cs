@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Sheaft.Domain;
 using Sheaft.Domain.Interop;
 using Sheaft.Domain.Views;
 
-namespace Sheaft.Application.Interfaces.Infrastructure
+namespace Sheaft.Application.Interfaces.Services
 {
     public interface IAppDbContext : IDisposable, IAsyncDisposable, IInfrastructure<IServiceProvider>
     {

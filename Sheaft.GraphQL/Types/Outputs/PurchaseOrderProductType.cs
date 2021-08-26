@@ -1,7 +1,5 @@
-﻿using HotChocolate.Resolvers;
-using HotChocolate.Types;
+﻿using HotChocolate.Types;
 using Sheaft.Domain;
-using Sheaft.GraphQL.PurchaseOrders;
 
 namespace Sheaft.GraphQL.Types.Outputs
 {

@@ -1,5 +1,3 @@
-using System;
-
 namespace Sheaft.Web.Payment.Models
 {
     public class ErrorViewModel

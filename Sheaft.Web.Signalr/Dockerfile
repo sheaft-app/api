@@ -13,11 +13,10 @@ COPY ["Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj", "Sheaft.Web.Signalr/"]
 COPY ["Sheaft.Web.Common/Sheaft.Web.Common.csproj", "Sheaft.Web.Common/"]
 COPY ["Sheaft.Application/Sheaft.Application.csproj", "Sheaft.Application/"]
 COPY ["Sheaft.Domain/Sheaft.Domain.csproj", "Sheaft.Domain/"]
-COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 COPY ["Sheaft.Mediatr/Sheaft.Mediatr.csproj", "Sheaft.Mediatr/"]
-COPY ["Sheaft.Business/Sheaft.Business.csproj", "Sheaft.Business/"]
 COPY ["Sheaft.Core/Sheaft.Core.csproj", "Sheaft.Core/"]
-COPY ["Sheaft.Options/Sheaft.Options.csproj", "Sheaft.Options/"]
+COPY ["Sheaft.Mailing/Sheaft.Mailing.csproj", "Sheaft.Mailing/"]
+COPY ["Sheaft.Infrastructure/Sheaft.Infrastructure.csproj", "Sheaft.Infrastructure/"]
 RUN dotnet restore "Sheaft.Web.Signalr/Sheaft.Web.Signalr.csproj"
 COPY . .
 WORKDIR "/src/Sheaft.Web.Signalr"
