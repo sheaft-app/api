@@ -22,6 +22,10 @@ namespace Sheaft.GraphQL.Types.Inputs
             descriptor
                 .Field(c => c.ScheduledOn)
                 .Name("scheduledOn");
+            
+            descriptor
+                .Field(c => c.SetAsReady)
+                .Name("setAsReady");
 
             descriptor
                 .Field(c => c.Deliveries)

@@ -33,6 +33,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
         public TimeSpan From { get; set; }
         public Guid ProducerId { get; set; }
         public Guid? CreatedFromPartialBatchId { get; set; }
+        public bool SetAsReady { get; set; } = true;
         public IEnumerable<ClientDeliveryPositionDto> Deliveries { get; set; }
 
         public override void SetRequestUser(RequestUser user)
@@ -158,7 +159,10 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
             await _context.AddAsync(deliveryBatch, token);
             await _context.SaveChangesAsync(token);
-
+            
+            if(request.SetAsReady)
+                _mediatr.Post(new SetDeliveryBatchAsReadyCommand(request.RequestUser) {Id = deliveryBatch.Id});
+            
             return Success(deliveryBatch.Id);
         }
 

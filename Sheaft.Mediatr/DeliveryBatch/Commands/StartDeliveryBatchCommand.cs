@@ -46,21 +46,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             if (deliveryBatch == null)
                 return Failure("La tournée de livraison est introuvable.");
             
-            Result result = null;
-            foreach (var delivery in deliveryBatch.Deliveries)
-            {
-                result = await _mediatr.Process(
-                    new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id}, token);
-
-                if (!result.Succeeded)
-                    break;
-            }
-            
-            if (result is {Succeeded: false})
-                return Failure(result);
-            
             deliveryBatch.StartBatch();
-            
             if (request.StartFirstDelivery)
             {
                 var delivery = deliveryBatch.Deliveries.OrderBy(d => d.Position).First();
@@ -68,21 +54,6 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             }
             
             await _context.SaveChangesAsync(token);
-
-            try
-            {
-                await _mediatr.Process(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
-                    { DeliveryBatchId = deliveryBatch.Id }, token);
-            }
-            catch (Exception e)
-            {
-                _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
-                    { DeliveryBatchId = deliveryBatch.Id });
-            }
-
-            foreach (var delivery in deliveryBatch.Deliveries)
-                _mediatr.Post(new GenerateDeliveryReceiptCommand(request.RequestUser) {DeliveryId = delivery.Id});
-            
             return Success();
         }
     }

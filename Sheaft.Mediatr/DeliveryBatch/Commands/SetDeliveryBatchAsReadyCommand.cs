@@ -51,7 +51,7 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             {
                 result = await _mediatr.Process(
                     new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id}, token);
-
+                
                 if (!result.Succeeded)
                     break;
             }
