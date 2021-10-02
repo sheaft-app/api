@@ -315,7 +315,7 @@ namespace Sheaft.Domain
         }
 
         private void Refresh()
-        {
+        {   
             ReturnedReturnablesCount = ReturnedReturnables?.Sum(p => p.Quantity) ?? 0;
             BrokenProductsCount = Products.Where(p => p.RowKind == ModificationKind.Broken).Sum(p => p.Quantity);
             ImproperProductsCount = Products.Where(p => p.RowKind == ModificationKind.Improper).Sum(p => p.Quantity);
@@ -330,6 +330,9 @@ namespace Sheaft.Domain
             DeliveryFeesWholeSalePrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesWholeSalePrice);
             DeliveryFeesVatPrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesVatPrice);
             DeliveryFeesOnSalePrice = PurchaseOrders.Max(po => po.ExpectedDelivery.DeliveryFeesOnSalePrice);
+            
+            if(PurchaseOrdersCount < 1)
+                Status = DeliveryStatus.Cancelled;
             
             DeliveryBatch?.Refresh();
         }
