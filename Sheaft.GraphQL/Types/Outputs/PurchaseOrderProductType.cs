@@ -91,6 +91,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("returnableVat");
                 
             descriptor
+                .Field(c => c.ReturnableId)
+                .Name("returnableId");
+                
+            descriptor
                 .Field(c => c.TotalReturnableWholeSalePrice)
                 .Name("totalReturnableWholeSalePrice");
                 
