@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Interfaces.Services;
 using Sheaft.Core;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.PurchaseOrder.Commands
@@ -34,17 +37,20 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
     {
         private readonly IIdentifierService _identifierService;
         private readonly ITableService _tableService;
+        private readonly RoleOptions _roles;
 
         public CreatePurchaseOrderFromOrderCommandHandler(
             IAppDbContext context,
             ISheaftMediatr mediatr,
             IIdentifierService identifierService,
             ITableService tableService,
+            IOptionsSnapshot<RoleOptions> roles,
             ILogger<CreatePurchaseOrderFromOrderCommandHandler> logger)
             : base(mediatr, context, logger)
         {
             _identifierService = identifierService;
             _tableService = tableService;
+            _roles = roles.Value;
         }
 
         public async Task<Result<Guid>> Handle(CreatePurchaseOrderFromOrderCommand request, CancellationToken token)
@@ -67,7 +73,7 @@ namespace Sheaft.Mediatr.PurchaseOrder.Commands
                     purchaseOrder.ExpectedDelivery.To, delivery.DeliveryMode.MaxPurchaseOrdersPerTimeSlot.Value, token);
 
             if (delivery.DeliveryMode.AutoAcceptRelatedPurchaseOrder)
-                _mediatr.Post(new AcceptPurchaseOrderCommand(request.RequestUser)
+                _mediatr.Post(new AcceptPurchaseOrderCommand(new RequestUser{Email = producer.Email, Id = producer.Id, Name = producer.Name, Roles = new List<string>{_roles.Producer.Value, _roles.Owner.Value}})
                     {PurchaseOrderId = purchaseOrder.Id, SkipNotification = false});
 
             return Success(purchaseOrder.Id);
