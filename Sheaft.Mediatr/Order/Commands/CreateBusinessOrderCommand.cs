@@ -157,8 +157,7 @@ namespace Sheaft.Mediatr.Order.Commands
                 if (!cartDeliveries.Any())
                     return Failure<IEnumerable<Guid>>("Les crénaux de livraisons doivent être selectionnés.");
 
-                var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, cartProducts,
-                    _pspOptions.FixedAmount, _pspOptions.Percent, _pspOptions.VatPercent, user);
+                var order = new Domain.Order(Guid.NewGuid(), DonationKind.None, cartProducts, user: user);
 
                 order.SetDeliveries(cartDeliveries);
                 order.SetStatus(OrderStatus.Confirmed);

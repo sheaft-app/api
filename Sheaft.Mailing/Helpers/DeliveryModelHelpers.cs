@@ -46,6 +46,10 @@ namespace Sheaft.Mailing.Helpers
                 .Select(GetReturnedReturnableModel)
                 .ToList();
 
+            var vat5Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 5.5m);
+            var vat10Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 10m);
+            var vat20Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 20m) + delivery.DeliveryFeesVatPrice;
+            
             return new DeliveryFormMailerModel()
             {
                 Identifier = delivery.Reference.AsDeliveryIdentifier(),
@@ -67,30 +71,24 @@ namespace Sheaft.Mailing.Helpers
                                       productsDiffs.Sum(p => p.TotalWholeSalePrice) +
                                       returnedReturnables.Sum(p => p.TotalWholeSalePrice) +
                                       delivery.DeliveryFeesWholeSalePrice,
-                TotalVat5Price =
-                    productsToDeliver.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
-                    + productsToDeliver.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + productsDiffs.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
-                    + productsDiffs.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + returnedReturnables.Where(p => p.Vat == 5.5m).Sum(p => p.TotalVatPrice),
-                TotalVat10Price =
-                    productsToDeliver.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
-                    + productsToDeliver.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + productsDiffs.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
-                    + productsDiffs.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + returnedReturnables.Where(p => p.Vat == 10m).Sum(p => p.TotalVatPrice),
-                TotalVat20Price =
-                    productsToDeliver.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
-                    + productsToDeliver.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + productsDiffs.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
-                    + productsDiffs.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
-                    + returnedReturnables.Where(p => p.Vat == 20m).Sum(p => p.TotalVatPrice)
-                    + delivery.DeliveryFeesVatPrice,
+                TotalVat5Price = vat5Price,
+                TotalVat10Price = vat10Price,
+                TotalVat20Price = vat20Price,
+                TotalVatPrice = vat5Price + vat10Price + vat20Price,
                 TotalOnSalePrice = productsToDeliver.Sum(po => po.TotalOnSalePrice) +
                                    productsDiffs.Sum(p => p.TotalOnSalePrice) +
                                    returnedReturnables.Sum(p => p.TotalOnSalePrice) +
                                    delivery.DeliveryFeesOnSalePrice,
             };
+        }
+
+        private static decimal GetVatPriceForPercent(List<DeliveryProductMailerModel> productsToDeliver, List<DeliveryProductMailerModel> productsDiffs, List<DeliveryReturnableMailerModel> returnedReturnables, decimal percent)
+        {
+            return productsToDeliver.Where(p => p.Vat == percent).Sum(p => p.ProductTotalVatPrice)
+                + productsToDeliver.Where(p => p.ReturnableVat == percent).Sum(p => p.ReturnableTotalVatPrice) ?? 0
+                + productsDiffs.Where(p => p.Vat == percent).Sum(p => p.ProductTotalVatPrice)
+                + productsDiffs.Where(p => p.ReturnableVat == percent).Sum(p => p.ReturnableTotalVatPrice) ?? 0
+                + returnedReturnables.Where(p => p.Vat == percent).Sum(p => p.TotalVatPrice);
         }
 
         private static List<DeliveryPurchaseOrderMailerModel> GetPurchaseOrders(

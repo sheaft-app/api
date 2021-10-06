@@ -69,10 +69,11 @@
     <tr style="background-color: #009688;color: #ffffff;text-align: left;">
         <th style="padding: 12px 15px;">Produit</th>
         <th style="padding: 12px 15px;">Lot(s)</th>
-        <th style="padding: 12px 15px;text-align: center;">Quantité</th>
+        <th style="padding: 12px 15px;text-align: center;">Qté</th>
         <th style="padding: 12px 15px;text-align: center;">PU HT (€)</th>
         <th style="padding: 12px 15px;text-align: center;">TVA (%)</th>
         <th style="padding: 12px 15px;text-align: center;">Total HT (€)</th>
+        <th style="padding: 12px 15px;text-align: center;">Total TTC (€)</th>
     </tr>
     </thead>
     <tbody>
@@ -95,11 +96,11 @@
                         {
                             if (batch.DLC.HasValue)
                             {
-                                <p>@batch.Number - DLC: @batch.DLC.Value.ToString("dd/MM/yyyy")</p>
+                                <p>@batch.Number (DLC: @batch.DLC.Value.ToString("dd/MM/yyyy"))</p>
                             }
                             else if (batch.DDM.HasValue)
                             {
-                                <p>@batch.Number - DDM: @batch.DDM.Value.ToString("dd/MM/yyyy")</p>
+                                <p>@batch.Number (DLM: @batch.DDM.Value.ToString("dd/MM/yyyy"))</p>
                             }
                             else
                             {
@@ -112,6 +113,7 @@
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductWholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalOnSalePrice</td>
             </tr>
         }
         @foreach (var returnable in item.Returnables)
@@ -123,6 +125,7 @@
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalOnSalePrice</td>
             </tr>
         }
     }
@@ -145,6 +148,7 @@
                     <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductWholeSalePrice</td>
                     <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
                     <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalWholeSalePrice</td>
+                    <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.ProductTotalOnSalePrice</td>
                 </tr>
             }
 
@@ -159,6 +163,7 @@
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.WholeSalePrice</td>
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.Vat</td>
                         <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalWholeSalePrice</td>
+                        <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@returnable.TotalOnSalePrice</td>
                     </tr>
                 }
             }
@@ -178,6 +183,7 @@
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.WholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.Vat</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalWholeSalePrice</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@product.TotalOnSalePrice</td>
             </tr>
         }
     }
@@ -185,38 +191,32 @@
     @if (Model.DeliveryFeesWholeSalePrice > 0)
     {
         <tr style="padding: 10px 15px;text-align: left;">
-            <td style="padding: 10px 15px;vertical-align: center;">Livraison</td>
+            <th colspan="6" style="padding:15px 5px;">Livraison</th>
+        </tr>
+        <tr style="padding: 10px 15px;text-align: left;">
+            <td style="padding: 10px 15px;vertical-align: center;">Livraison au magasin</td>
                 <td/>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">1</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@Model.DeliveryFeesWholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">20.00</td>
+                <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@Model.DeliveryFeesWholeSalePrice</td>
                 <td style="padding: 10px 15px;vertical-align: center; text-align: right;">@Model.DeliveryFeesOnSalePrice</td>
         </tr>
     }
     <tr style="border:none;">
         <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total HT</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalWholeSalePrice EUR</td>
-    </tr>
-    <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (5.5%)</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat5Price EUR</td>
-    </tr>
-    <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (10%)</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat10Price EUR</td>
-    </tr>
-    <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 0px;vertical-align: center; text-align: left;"></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA (20%)</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVat20Price EUR</td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total HT</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalWholeSalePrice EUR</th>
     </tr>
     <tr style="border:none;">
         <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TTC</td>
-        <td style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalOnSalePrice EUR</td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVatPrice EUR</th>
+    </tr>
+    <tr style="border:none;">
+        <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TTC</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalOnSalePrice EUR</th>
     </tr>
     <tr style="border:none;">
         <td colspan="6" style="border:none;padding: 10px;"></td>

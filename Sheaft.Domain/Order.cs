@@ -18,7 +18,7 @@ namespace Sheaft.Domain
         }
 
         public Order(Guid id, DonationKind kind, IEnumerable<Tuple<Product, Guid, int>> orderProducts,
-            decimal fixedAmount, decimal percent, decimal vatPercent, User user = null)
+            decimal fixedAmount = 0, decimal percent = 0, decimal vatPercent = 0, User user = null)
         {
             Id = id;
             User = user;
@@ -293,6 +293,9 @@ namespace Sheaft.Domain
         private static decimal GetFees(decimal total, decimal feesPercent, decimal feesFixedAmount,
             decimal feesVatPercent)
         {
+            if (feesPercent <= 0)
+                return 0;
+            
             var fees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
             var pspFees = CalculateFees(total + fees, feesPercent, feesFixedAmount, feesVatPercent);
             var increment = fees;
