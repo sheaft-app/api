@@ -75,6 +75,8 @@ namespace Sheaft.Domain
         public virtual ICollection<DeliveryReturnable> ReturnedReturnables { get; private set; }
         public byte[] RowVersion { get; set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
+        public DateTimeOffset? ReceiptSentOn { get; set; }
+        public DateTimeOffset? DeliveryFormSentOn { get; set; }
 
         public void SetReturnedReturnables(IEnumerable<KeyValuePair<Returnable, int>> returnables)
         {

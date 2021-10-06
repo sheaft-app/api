@@ -125,9 +125,10 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             }
 
             deliveryBatch.SetName(request.Name);
-
             await _context.SaveChangesAsync(token);
-            return Success();
+            
+            var result = await _mediatr.Process(new GenerateDeliveryBatchDocumentsCommand(request.RequestUser){Id = deliveryBatch.Id}, token);
+            return result is {Succeeded: false} ? Failure(result) : Success();
         }
     }
 }

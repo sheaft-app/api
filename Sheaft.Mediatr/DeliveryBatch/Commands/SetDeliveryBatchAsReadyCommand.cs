@@ -46,28 +46,8 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
 
             deliveryBatch.SetBatchReady();
 
-            Result result = null;
-            foreach (var delivery in deliveryBatch.Deliveries)
-            {
-                result = await _mediatr.Process(
-                    new GenerateDeliveryFormCommand(request.RequestUser) {DeliveryId = delivery.Id}, token);
-                
-                if (!result.Succeeded)
-                    break;
-            }
-
-            if (result is {Succeeded: false})
-                return Failure(result);
-
-            await _context.SaveChangesAsync(token);
-            
-            _mediatr.Post(new GenerateDeliveryBatchFormsCommand(request.RequestUser)
-                {DeliveryBatchId = deliveryBatch.Id});
-
-            foreach (var delivery in deliveryBatch.Deliveries)
-                _mediatr.Post(new GenerateDeliveryReceiptCommand(request.RequestUser) {DeliveryId = delivery.Id});
-            
-            return Success();
+            var result = await _mediatr.Process(new GenerateDeliveryBatchDocumentsCommand(request.RequestUser){Id = deliveryBatch.Id}, token);
+            return result is {Succeeded: false} ? Failure(result) : Success();
         }
     }
 }

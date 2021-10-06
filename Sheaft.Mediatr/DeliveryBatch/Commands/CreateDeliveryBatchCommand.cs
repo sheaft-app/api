@@ -163,7 +163,8 @@ namespace Sheaft.Mediatr.DeliveryBatch.Commands
             if(request.SetAsReady)
                 _mediatr.Post(new SetDeliveryBatchAsReadyCommand(request.RequestUser) {Id = deliveryBatch.Id});
             
-            return Success(deliveryBatch.Id);
+            var result = await _mediatr.Process(new GenerateDeliveryBatchDocumentsCommand(request.RequestUser){Id = deliveryBatch.Id}, token);
+            return result is {Succeeded: false} ? Failure<Guid>(result) : Success(deliveryBatch.Id);
         }
 
         private async Task<IEnumerable<UserAgreementPosition>> GetUsersPositionsAsync(

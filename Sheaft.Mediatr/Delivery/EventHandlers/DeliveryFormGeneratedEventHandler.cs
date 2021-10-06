@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -37,7 +38,7 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
         {
             var @event = notification.DomainEvent;
             var delivery = await _context.Deliveries.SingleAsync(d => d.Id == @event.DeliveryId, token);
-            if (delivery.Status != DeliveryStatus.Delivered || delivery.DeliveryBatch is {Status: DeliveryBatchStatus.Cancelled})
+            if (delivery.DeliveryFormSentOn.HasValue || delivery.Status != DeliveryStatus.Delivered || delivery.DeliveryBatch is {Status: DeliveryBatchStatus.Cancelled})
                 return;
 
             var client = await _context.Users.SingleAsync(u => u.Id == delivery.ClientId, token);
@@ -74,6 +75,9 @@ namespace Sheaft.Mediatr.Delivery.EventHandlers
                 },
                 true,
                 token);
+            
+            delivery.DeliveryFormSentOn = DateTimeOffset.UtcNow;
+            await _context.SaveChangesAsync(token);
         }
     }
 }
