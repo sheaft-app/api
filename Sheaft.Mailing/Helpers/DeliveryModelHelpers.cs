@@ -113,13 +113,13 @@ namespace Sheaft.Mailing.Helpers
                 {
                     po.TotalVat5Price =
                         po.Products.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalVatPrice) ?? 0;
                     po.TotalVat10Price =
                         po.Products.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalVatPrice) ?? 0;
                     po.TotalVat20Price =
                         po.Products.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalVatPrice) ?? 0
                         + po.DeliveryFeesVatPrice;
                     po.TotalOnSalePrice = po.Products.Sum(p => p.TotalOnSalePrice) + po.DeliveryFeesOnSalePrice;
                     po.TotalWholeSalePrice =
@@ -129,16 +129,16 @@ namespace Sheaft.Mailing.Helpers
                 {
                     po.TotalVat5Price =
                         po.Products.Where(p => p.Vat == 5.5m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                        + po.Products.Where(p => p.ReturnableVat == 5.5m).Sum(p => p.ReturnableTotalVatPrice) ?? 0;
                     po.TotalVat10Price =
                         po.Products.Where(p => p.Vat == 10m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0;
+                        + po.Products.Where(p => p.ReturnableVat == 10m).Sum(p => p.ReturnableTotalVatPrice) ?? 0;
                     po.TotalVat20Price =
                         po.Products.Where(p => p.Vat == 20m).Sum(p => p.ProductTotalVatPrice)
-                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalOnSalePrice) ?? 0
+                        + po.Products.Where(p => p.ReturnableVat == 20m).Sum(p => p.ReturnableTotalVatPrice) ?? 0
                         + po.DeliveryFeesVatPrice;
-                    po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice;
-                    po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice;
+                    po.TotalOnSalePrice = purchaseOrder.TotalOnSalePrice + po.DeliveryFeesOnSalePrice;
+                    po.TotalWholeSalePrice = purchaseOrder.TotalWholeSalePrice + po.DeliveryFeesWholeSalePrice;
                 }
 
                 results.Add(po);
