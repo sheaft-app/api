@@ -34,33 +34,41 @@
 <div style="width:100%; text-align: center;">
     <h1>Bon de livraison <strong>(@Model.Identifier)</strong></h1>
 </div>
-<div style="display: flex; justify-content: space-between">
-    <div style="text-align: left;">
-        <strong>@Model.Producer.Name</strong><br/>
-        @Model.Producer.Email<br/>
-        @Model.Producer.Phone<br/>
-        @Model.Producer.Address.Line1<br/>
-        @if (!string.IsNullOrWhiteSpace(@Model.Producer.Address.Line2))
-        {
-            @Model.Producer.Address.Line2<br/>
-        }
-        @Model.Producer.Address.Zipcode<br/>
-        @Model.Producer.Address.City<br/>
-    </div>
-    <div style="text-align: right;">
-        <strong>@Model.Client.Name</strong><br/>
-        @Model.Client.Email<br/>
-        @Model.Client.Phone<br/>
+<table style="width:100%; border:none;">
+    <tbody>
+    <tr>
+        <td style="border:none;">
+            <div style="text-align: left;">
+                <strong style="font-size: 16px;">@Model.Producer.Name</strong><br/>
+                @Model.Producer.Email<br/>
+                @Model.Producer.Phone<br/>
+                @Model.Producer.Address.Line1<br/>
+                @if (!string.IsNullOrWhiteSpace(@Model.Producer.Address.Line2))
+                {
+                @Model.Producer.Address.Line2<br/>
+                }
+                @Model.Producer.Address.Zipcode<br/>
+                @Model.Producer.Address.City<br/>
+            </div>
+        </td>
+        <td style="border:none;">
+            <div style="text-align: right;">
+                <strong style="font-size: 16px;">@Model.Client.Name</strong><br/>
+                @Model.Client.Email<br/>
+                @Model.Client.Phone<br/>
 
-        @Model.Client.Address.Line1<br/>
-        @if (!string.IsNullOrWhiteSpace(@Model.Client.Address.Line2))
-        {
-            @Model.Client.Address.Line2<br/>
-        }
-        @Model.Client.Address.Zipcode<br/>
-        @Model.Client.Address.City<br/>
-    </div>
-</div>
+                @Model.Client.Address.Line1<br/>
+                @if (!string.IsNullOrWhiteSpace(@Model.Client.Address.Line2))
+                {
+                @Model.Client.Address.Line2<br/>
+                }
+                @Model.Client.Address.Zipcode<br/>
+                @Model.Client.Address.City<br/>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
 <div style="padding:15px 0px">
     <p>Date de livraison: <strong>@(Model.DeliveredOn.HasValue ? Model.DeliveredOn.Value.ToString("dd/MM/yyyy") : Model.ScheduledOn.ToString("dd/MM/yyyy"))</strong></p>
 </div>
@@ -70,10 +78,10 @@
         <th style="padding: 12px 15px;">Produit</th>
         <th style="padding: 12px 15px;">Lot(s)</th>
         <th style="padding: 12px 15px;text-align: center;">Qté</th>
-        <th style="padding: 12px 15px;text-align: center;">PU HT (€)</th>
-        <th style="padding: 12px 15px;text-align: center;">TVA (%)</th>
-        <th style="padding: 12px 15px;text-align: center;">Total HT (€)</th>
-        <th style="padding: 12px 15px;text-align: center;">Total TTC (€)</th>
+        <th style="padding: 12px 15px;text-align: center;">PU <br/>HT (€)</th>
+        <th style="padding: 12px 15px;text-align: center;">TVA <br/>(%)</th>
+        <th style="padding: 12px 15px;text-align: center;">Total <br/>HT (€)</th>
+        <th style="padding: 12px 15px;text-align: center;">Total <br/>TTC (€)</th>
     </tr>
     </thead>
     <tbody>
@@ -96,11 +104,11 @@
                         {
                             if (batch.DLC.HasValue)
                             {
-                                <p>@batch.Number (DLC: @batch.DLC.Value.ToString("dd/MM/yyyy"))</p>
+                                <p>@batch.Number (DLC:@batch.DLC.Value.ToString("dd/MM/yyyy"))</p>
                             }
                             else if (batch.DDM.HasValue)
                             {
-                                <p>@batch.Number (DLM: @batch.DDM.Value.ToString("dd/MM/yyyy"))</p>
+                                <p>@batch.Number (DLM:@batch.DDM.Value.ToString("dd/MM/yyyy"))</p>
                             }
                             else
                             {
@@ -204,19 +212,19 @@
         </tr>
     }
     <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total HT</th>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalWholeSalePrice EUR</th>
+        <td colspan="5" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">Total HT</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">@Model.TotalWholeSalePrice EUR</th>
     </tr>
     <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TVA</th>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalVatPrice EUR</th>
+        <td colspan="5" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">Total TVA</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">@Model.TotalVatPrice EUR</th>
     </tr>
     <tr style="border:none;">
-        <td colspan="4" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">Total TTC</th>
-        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;">@Model.TotalOnSalePrice EUR</th>
+        <td colspan="5" style="border:none;padding: 10px 15px;vertical-align: center; text-align: right;"></td>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">Total TTC</th>
+        <th style=" padding: 10px 15px;vertical-align: center; text-align: right;border: #dddddd solid 1px;">@Model.TotalOnSalePrice EUR</th>
     </tr>
     <tr style="border:none;">
         <td colspan="6" style="border:none;padding: 10px;"></td>
@@ -226,11 +234,12 @@
 <table cellpadding="0" cellspacing="0" align="center" width="100%" role="module" data-type="columns" style="border-collapse:collapse; padding:15px 0px 0px 0px;" bgcolor="#FFFFFF">
     <tbody>
     <tr style="border:none;">
-        <td style="border:none;">
-           Livraison réceptionnée par : <strong>@Model.ReceptionnedBy</strong>
+        <td style="border:none; padding:10px 0;">
+            Livraison réceptionnée par : <strong>@Model.ReceptionnedBy</strong>
         </td>
-    </tr><tr style="border:none;">
-        <td style="border:none;">
+    </tr>
+    <tr style="border:none;">
+        <td style="border:none; padding:10px 0;">
             <strong>Remarques :</strong>
         </td>
     </tr>
