@@ -287,6 +287,7 @@ namespace Sheaft.Domain
         public void Complete(bool skipNotification)
         {
             SetStatus(PurchaseOrderStatus.Completed, skipNotification);
+            RefreshOrder();
         }
 
         public void Accept(bool skipNotification)
@@ -324,22 +325,45 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Products.Sum(p => p.TotalProductWholeSalePrice);
-            TotalProductVatPrice = Products.Sum(p => p.TotalProductVatPrice);
+            if (PickingId.HasValue && Picking.Status == PickingStatus.Completed)
+            {
+                var preparedProducts = Picking.PreparedProducts.Where(p => p.PurchaseOrderId == Id).ToList();
+                TotalProductWholeSalePrice = preparedProducts.Sum(p => p.TotalProductWholeSalePrice);
+                TotalProductVatPrice = preparedProducts.Sum(p => p.TotalProductVatPrice);
+
+                TotalWeight = preparedProducts.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;
+
+                LinesCount = preparedProducts.Select(p => p.Id).Distinct().Count();
+                ProductsCount = preparedProducts.Sum(p => p.Quantity);
+                ReturnablesCount = preparedProducts.Where(p => p.HasReturnable).Sum(p => p.Quantity);
+
+                TotalReturnableWholeSalePrice =
+                    preparedProducts.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0);
+                TotalReturnableVatPrice = preparedProducts.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0);
+            }
+            else
+            {
+                TotalProductWholeSalePrice = Products.Sum(p => p.TotalProductWholeSalePrice);
+                TotalProductVatPrice = Products.Sum(p => p.TotalProductVatPrice);
+
+                TotalWeight = Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;
+
+                LinesCount = Products.Select(p => p.Id).Distinct().Count();
+                ProductsCount = Products.Sum(p => p.Quantity);
+                ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
+
+                TotalReturnableWholeSalePrice =
+                    Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0);
+                TotalReturnableVatPrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0);
+            }
+            
             TotalProductOnSalePrice = TotalProductWholeSalePrice + TotalProductVatPrice;
-
-            TotalWeight = Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;
-
-            LinesCount = Products.Select(p => p.Id).Distinct().Count();
-            ProductsCount = Products.Sum(p => p.Quantity);
-            ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
-
-            TotalReturnableWholeSalePrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0);
-            TotalReturnableVatPrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0);
             TotalReturnableOnSalePrice = TotalReturnableWholeSalePrice + TotalReturnableVatPrice;
 
-            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + (ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0);
-            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + (ExpectedDelivery?.DeliveryFeesVatPrice ?? 0);
+            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice +
+                                  (ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0);
+            TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice +
+                            (ExpectedDelivery?.DeliveryFeesVatPrice ?? 0);
             TotalOnSalePrice = TotalWholeSalePrice + TotalVatPrice;
         }
 
