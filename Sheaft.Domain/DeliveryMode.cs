@@ -96,9 +96,9 @@ namespace Sheaft.Domain
             ApplyDeliveryFeesWhen = feesApplication;
             DeliveryFeesMinPurchaseOrdersAmount = minAmount;
             
-            DeliveryFeesWholeSalePrice = fees.HasValue ? Math.Round(fees.Value, 2) : null;
-            DeliveryFeesVatPrice = DeliveryFeesWholeSalePrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value * 0.20m, 2) : null;
-            DeliveryFeesOnSalePrice = DeliveryFeesWholeSalePrice.HasValue && DeliveryFeesVatPrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value + DeliveryFeesVatPrice.Value, 2) : null;
+            DeliveryFeesWholeSalePrice = fees.HasValue ? Math.Round(fees.Value, 2, MidpointRounding.AwayFromZero) : null;
+            DeliveryFeesVatPrice = DeliveryFeesWholeSalePrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value * 0.20m, 2, MidpointRounding.AwayFromZero) : null;
+            DeliveryFeesOnSalePrice = DeliveryFeesWholeSalePrice.HasValue && DeliveryFeesVatPrice.HasValue ? Math.Round(DeliveryFeesWholeSalePrice.Value * 1.20m, 2, MidpointRounding.AwayFromZero) : null;
         }
 
         public void SetLockOrderHoursBeforeDelivery(int? lockOrderHoursBeforeDelivery)

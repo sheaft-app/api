@@ -18,7 +18,7 @@ namespace Sheaft.Domain
             Order = order;
             OrderId = order.Id;
             Fees = 0;
-            Debited = Math.Round(order.Donation - order.DonationFeesPrice, 2);
+            Debited = Math.Round(order.Donation - order.DonationFeesPrice, 2, MidpointRounding.AwayFromZero);
             CreditedWallet = creditedWallet;
             CreditedWalletId = creditedWallet.Id;
             DebitedWallet = debitedWallet;

@@ -63,7 +63,7 @@ namespace Sheaft.Application.Exporters
             purchaseOrdersWorksheet.Cells[i, 11].Value = product.Name;
             purchaseOrdersWorksheet.Cells[i, 12].Value = product.Quantity;
             purchaseOrdersWorksheet.Cells[i, 13].Value = product.UnitWholeSalePrice;
-            purchaseOrdersWorksheet.Cells[i, 14].Value = product.UnitOnSalePrice;
+            purchaseOrdersWorksheet.Cells[i, 14].Value = product.UnitWholeSalePrice * (1+product.Vat / 100);
             purchaseOrdersWorksheet.Cells[i, 15].Value = product.Vat;
             purchaseOrdersWorksheet.Cells[i, 16].Value = product.TotalWholeSalePrice;
             purchaseOrdersWorksheet.Cells[i, 17].Value = product.TotalOnSalePrice;

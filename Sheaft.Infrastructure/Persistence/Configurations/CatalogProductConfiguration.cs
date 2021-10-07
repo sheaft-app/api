@@ -12,12 +12,13 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.UpdatedOn);
             entity.Property(c => c.RowVersion).IsRowVersion();
             
-            entity.Property(o => o.VatPricePerUnit).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.OnSalePricePerUnit).HasColumnType("decimal(10,2)");
             entity.Property(o => o.WholeSalePricePerUnit).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.VatPrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.OnSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.WholeSalePrice).HasColumnType("decimal(10,2)");
+            
+            entity.Ignore(o => o.VatPricePerUnit);
+            entity.Ignore(o => o.OnSalePricePerUnit);
+            entity.Ignore(o => o.VatPrice);
+            entity.Ignore(o => o.OnSalePrice);
             
             entity.ToTable("CatalogProducts");
         }

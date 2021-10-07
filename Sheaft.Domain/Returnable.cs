@@ -35,8 +35,8 @@ namespace Sheaft.Domain
         public string Description { get; private set; }
         public decimal WholeSalePrice { get; private set; }
         public decimal Vat { get; private set; }
-        public decimal VatPrice { get; private set; }
-        public decimal OnSalePrice { get; private set; }
+        public decimal VatPrice => Math.Round(WholeSalePrice * Vat / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal OnSalePrice => Math.Round(WholeSalePrice * (1+Vat / 100), 2, MidpointRounding.AwayFromZero);
         public Guid ProducerId { get; private set; }
         public virtual Producer Producer { get; private set; }
         public byte[] RowVersion { get; private set; }
@@ -46,8 +46,7 @@ namespace Sheaft.Domain
             if (newPrice <= 0)
                 throw SheaftException.Validation("Le prix doit être supérieur à 0€.");
 
-            WholeSalePrice = Math.Round(newPrice, DIGITS_COUNT);
-            RefreshPrices();
+            WholeSalePrice = Math.Round(newPrice, DIGITS_COUNT, MidpointRounding.AwayFromZero);
         }
 
         public void SetVat(decimal newVat)
@@ -59,7 +58,6 @@ namespace Sheaft.Domain
                 throw SheaftException.Validation("La TVA doit être inférieure à 100%.");
 
             Vat = newVat;
-            RefreshPrices();
         }
 
         public void SetName(string name)
@@ -73,12 +71,6 @@ namespace Sheaft.Domain
         public void SetDescription(string description)
         {
             Description = description;
-        }
-
-        protected void RefreshPrices()
-        {
-            VatPrice = Math.Round(WholeSalePrice * Vat / 100, DIGITS_COUNT);
-            OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
     }
 }

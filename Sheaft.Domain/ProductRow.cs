@@ -19,8 +19,6 @@ namespace Sheaft.Domain
             Conditioning = product.Conditioning;
             QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = product.UnitWholeSalePrice;
-            UnitOnSalePrice = product.UnitOnSalePrice;
-            UnitVatPrice = product.UnitVatPrice;
             UnitWeight = product.UnitWeight;
             Vat = product.Vat;
 
@@ -31,9 +29,7 @@ namespace Sheaft.Domain
             ReturnableId = product.ReturnableId;
             ReturnableName = product.ReturnableName;
             ReturnableVat = product.ReturnableVat;
-            ReturnableVatPrice = product.ReturnableVatPrice;
             ReturnableWholeSalePrice = product.ReturnableWholeSalePrice;
-            ReturnableOnSalePrice = product.ReturnableOnSalePrice;
             HasReturnable = product.ReturnableWholeSalePrice.HasValue;
 
             TotalWeight = product.TotalWeight;
@@ -61,8 +57,6 @@ namespace Sheaft.Domain
             Conditioning = product.Conditioning;
             QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = product.UnitWholeSalePrice;
-            UnitOnSalePrice = product.UnitOnSalePrice;
-            UnitVatPrice = product.UnitVatPrice;
             UnitWeight = product.UnitWeight;
             Vat = product.Vat;
 
@@ -73,9 +67,7 @@ namespace Sheaft.Domain
             ReturnableId = product.ReturnableId;
             ReturnableName = product.ReturnableName;
             ReturnableVat = product.ReturnableVat;
-            ReturnableVatPrice = product.ReturnableVatPrice;
             ReturnableWholeSalePrice = product.ReturnableWholeSalePrice;
-            ReturnableOnSalePrice = product.ReturnableOnSalePrice;
             HasReturnable = product.ReturnableWholeSalePrice.HasValue;
 
             ProductId = product.ProductId;
@@ -92,8 +84,6 @@ namespace Sheaft.Domain
             Conditioning = product.Conditioning;
             QuantityPerUnit = product.QuantityPerUnit;
             UnitWholeSalePrice = productPrice.WholeSalePricePerUnit;
-            UnitOnSalePrice = productPrice.OnSalePricePerUnit;
-            UnitVatPrice = productPrice.VatPricePerUnit;
             UnitWeight = product.Weight;
             Vat = product.Vat;
 
@@ -104,9 +94,7 @@ namespace Sheaft.Domain
             ReturnableId = product.ReturnableId;
             ReturnableName = product.Returnable?.Name;
             ReturnableVat = product.Returnable?.Vat;
-            ReturnableVatPrice = product.Returnable?.VatPrice;
             ReturnableWholeSalePrice = product.Returnable?.WholeSalePrice;
-            ReturnableOnSalePrice = product.Returnable?.OnSalePrice;
 
             ProductId = product.Id;
             HasReturnable = ReturnableId.HasValue;
@@ -128,8 +116,8 @@ namespace Sheaft.Domain
         public int Quantity { get; protected set; }
         public decimal Vat { get; private set; }
         public decimal UnitWholeSalePrice { get; private set; }
-        public decimal UnitVatPrice { get; private set; }
-        public decimal UnitOnSalePrice { get; private set; }
+        public decimal UnitVatPrice => Math.Round(UnitWholeSalePrice * Vat / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal UnitOnSalePrice => Math.Round(UnitWholeSalePrice * (1+Vat / 100), 2, MidpointRounding.AwayFromZero);
         public decimal? UnitWeight { get; private set; }
         public decimal TotalProductWholeSalePrice { get; private set; }
         public decimal TotalProductVatPrice { get; private set; }
@@ -138,9 +126,9 @@ namespace Sheaft.Domain
         public bool HasReturnable { get; private set; }
         public Guid? ReturnableId { get; private set; }
         public string ReturnableName { get; private set; }
-        public decimal? ReturnableOnSalePrice { get; private set; }
         public decimal? ReturnableWholeSalePrice { get; private set; }
-        public decimal? ReturnableVatPrice { get; private set; }
+        public decimal? ReturnableVatPrice => Math.Round(ReturnableWholeSalePrice ?? 0m * ReturnableVat ?? 0m / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal? ReturnableOnSalePrice => Math.Round(ReturnableWholeSalePrice ?? 0m * (1+ReturnableVat ?? 0m / 100), 2, MidpointRounding.AwayFromZero);
         public decimal? ReturnableVat { get; private set; }
         public decimal? TotalReturnableWholeSalePrice { get; private set; }
         public decimal? TotalReturnableVatPrice { get; private set; }
@@ -156,19 +144,19 @@ namespace Sheaft.Domain
 
         protected void RefreshLine()
         {
-            TotalProductVatPrice = Math.Round(Quantity * UnitVatPrice, DIGITS_COUNT);
-            TotalProductWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT);
-            TotalProductOnSalePrice = Math.Round(TotalProductVatPrice + TotalProductWholeSalePrice, DIGITS_COUNT);
+            TotalProductWholeSalePrice = Math.Round(Quantity * UnitWholeSalePrice, DIGITS_COUNT, MidpointRounding.AwayFromZero);
+            TotalProductVatPrice = Math.Round(Quantity * UnitWholeSalePrice * Vat / 100, DIGITS_COUNT, MidpointRounding.AwayFromZero);
+            TotalProductOnSalePrice = Math.Round(Quantity * UnitWholeSalePrice * (1 + Vat / 100), DIGITS_COUNT, MidpointRounding.AwayFromZero);
 
-            TotalReturnableVatPrice = HasReturnable ? Math.Round(Quantity * ReturnableVatPrice.Value, DIGITS_COUNT) : (decimal?)null;
-            TotalReturnableWholeSalePrice = HasReturnable ? Math.Round(Quantity * ReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
-            TotalReturnableOnSalePrice = HasReturnable ? Math.Round(TotalReturnableVatPrice.Value  + TotalReturnableWholeSalePrice.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalReturnableWholeSalePrice = HasReturnable ? Math.Round(Quantity * ReturnableWholeSalePrice.Value, DIGITS_COUNT, MidpointRounding.AwayFromZero) : (decimal?)null;
+            TotalReturnableVatPrice = HasReturnable ? Math.Round(Quantity * ReturnableWholeSalePrice.Value * ReturnableVat.Value / 100, DIGITS_COUNT, MidpointRounding.AwayFromZero) : (decimal?)null;
+            TotalReturnableOnSalePrice = HasReturnable ? Math.Round(Quantity * ReturnableWholeSalePrice.Value * (1+ ReturnableVat.Value /100), DIGITS_COUNT, MidpointRounding.AwayFromZero) : (decimal?)null;
 
-            TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT) : (decimal?)null;
+            TotalWeight = UnitWeight.HasValue ? Math.Round(Quantity * UnitWeight.Value, DIGITS_COUNT, MidpointRounding.AwayFromZero) : (decimal?)null;
 
-            TotalVatPrice = Math.Round(TotalProductVatPrice + (TotalReturnableVatPrice ?? 0), DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(TotalProductWholeSalePrice + (TotalReturnableWholeSalePrice ?? 0), DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(TotalVatPrice + TotalWholeSalePrice, DIGITS_COUNT);
+            TotalVatPrice = TotalProductVatPrice + (TotalReturnableVatPrice ?? 0);
+            TotalWholeSalePrice = TotalProductWholeSalePrice + (TotalReturnableWholeSalePrice ?? 0);
+            TotalOnSalePrice = TotalVatPrice + TotalWholeSalePrice;
         }
 
         public void AddQuantity(int quantity)

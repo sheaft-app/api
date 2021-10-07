@@ -28,12 +28,12 @@ namespace Sheaft.Domain
         public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset? UpdatedOn { get; private set; }
-        public decimal OnSalePrice { get; private set; }
         public decimal WholeSalePrice { get; private set; }
-        public decimal VatPrice { get; private set; }
+        public decimal VatPrice => Math.Round(WholeSalePrice * Product.Vat / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal OnSalePrice => Math.Round(WholeSalePrice * (1+Product.Vat / 100), 2, MidpointRounding.AwayFromZero);
         public decimal WholeSalePricePerUnit { get; private set; }
-        public decimal VatPricePerUnit { get; private set; }
-        public decimal OnSalePricePerUnit { get; private set; }
+        public decimal VatPricePerUnit => Math.Round(WholeSalePricePerUnit * Product.Vat / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal OnSalePricePerUnit => Math.Round(WholeSalePricePerUnit * (1+Product.Vat / 100), 2, MidpointRounding.AwayFromZero);
         public Guid CatalogId { get; private set; }
         public Guid ProductId { get; private set; }
         public virtual Product Product { get; private set; }
@@ -45,36 +45,30 @@ namespace Sheaft.Domain
             if (newPrice < 0)
                 throw SheaftException.Validation("Le prix d'un produit du catalogue ne peut être inférieur à 0€.");
 
-            WholeSalePricePerUnit = Math.Round(newPrice, DIGITS_COUNT);
+            WholeSalePricePerUnit = Math.Round(newPrice, DIGITS_COUNT, MidpointRounding.AwayFromZero);
             RefreshPrice(Product.Vat, Product.Unit, Product.QuantityPerUnit);
         }
 
         public void RefreshPrice(decimal vat, UnitKind unit, decimal quantityPerUnit)
         {
-            VatPricePerUnit = Math.Round(WholeSalePricePerUnit * vat / 100, DIGITS_COUNT);
-            OnSalePricePerUnit = Math.Round(WholeSalePricePerUnit + VatPricePerUnit, DIGITS_COUNT);
-
             switch (unit)
             {
                 case UnitKind.ml:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit * 1000, DIGITS_COUNT);
+                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit * 1000, DIGITS_COUNT, MidpointRounding.AwayFromZero);
                     break;
                 case UnitKind.l:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit, DIGITS_COUNT);
+                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit, DIGITS_COUNT, MidpointRounding.AwayFromZero);
                     break;
                 case UnitKind.g:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit * 1000, DIGITS_COUNT);
+                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit * 1000, DIGITS_COUNT, MidpointRounding.AwayFromZero);
                     break;
                 case UnitKind.kg:
-                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit, DIGITS_COUNT);
+                    WholeSalePrice = Math.Round(WholeSalePricePerUnit / quantityPerUnit, DIGITS_COUNT, MidpointRounding.AwayFromZero);
                     break;
                 default:
                     WholeSalePrice = WholeSalePricePerUnit;
                     break;
             }
-
-            VatPrice = Math.Round(WholeSalePrice * vat / 100, DIGITS_COUNT);
-            OnSalePrice = Math.Round(WholeSalePrice + VatPrice, DIGITS_COUNT);
         }
 
         public void UpdatePrice(decimal percent)

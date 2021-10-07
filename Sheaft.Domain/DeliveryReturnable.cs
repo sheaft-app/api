@@ -19,9 +19,7 @@ namespace Sheaft.Domain
             Kind = returnable.Kind;
             Name = returnable.Name;
             Vat = returnable.Vat;
-            UnitVatPrice = returnable.VatPrice;
             UnitWholeSalePrice = returnable.WholeSalePrice;
-            UnitOnSalePrice = returnable.OnSalePrice;
             ReturnableId = returnable.Id;
             Quantity = -quantity;
             
@@ -36,8 +34,8 @@ namespace Sheaft.Domain
         public string Name { get; private set; }
         public decimal Vat { get; private set; }
         public decimal UnitWholeSalePrice { get; private set; }
-        public decimal UnitVatPrice { get; private set; }
-        public decimal UnitOnSalePrice { get; private set; }
+        public decimal UnitVatPrice => Math.Round(UnitWholeSalePrice * Vat / 100, 2, MidpointRounding.AwayFromZero);
+        public decimal UnitOnSalePrice => Math.Round(UnitWholeSalePrice * (1+Vat / 100), 2, MidpointRounding.AwayFromZero);
         public decimal TotalWholeSalePrice { get; private set; }
         public decimal TotalVatPrice { get; private set; }
         public decimal TotalOnSalePrice { get; private set; }
@@ -56,9 +54,9 @@ namespace Sheaft.Domain
 
         private void RefreshLine()
         {
-            TotalVatPrice = Math.Round(UnitVatPrice * Quantity, DIGITS_COUNT);
-            TotalWholeSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT);
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalVatPrice = Math.Round(UnitWholeSalePrice * Quantity * Vat / 100, DIGITS_COUNT, MidpointRounding.AwayFromZero);
+            TotalWholeSalePrice = Math.Round(UnitWholeSalePrice * Quantity, DIGITS_COUNT, MidpointRounding.AwayFromZero);
+            TotalOnSalePrice = Math.Round(UnitWholeSalePrice * Quantity * (1 + Vat / 100), DIGITS_COUNT, MidpointRounding.AwayFromZero);
         }
     }
 }

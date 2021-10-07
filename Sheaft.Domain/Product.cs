@@ -110,7 +110,7 @@ namespace Sheaft.Domain
             if (newWeight <= 0)
                 throw SheaftException.Validation("Le poids ne peut être inférieur à 0.");
 
-            Weight = Math.Round(newWeight.Value, DIGITS_COUNT);
+            Weight = Math.Round(newWeight.Value, DIGITS_COUNT, MidpointRounding.AwayFromZero);
         }
 
         public void SetVat(decimal? newVat)

@@ -22,7 +22,7 @@ namespace Sheaft.Domain
             Products = new List<CatalogProduct>();
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
         public DateTimeOffset CreatedOn { get; }
         public DateTimeOffset? UpdatedOn { get; }
         public DateTimeOffset? RemovedOn { get; }

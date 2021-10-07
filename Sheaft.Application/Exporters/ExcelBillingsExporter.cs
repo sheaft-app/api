@@ -181,9 +181,9 @@ namespace Sheaft.Application.Exporters
                         var deliveryFees = groupedDeliveryFees.First();
 
                         var deliveryFeesWholeSalePrice =
-                            Math.Round(deliveryFees.DeliveryFeesWholeSalePrice * groupedDeliveryFees.Count(), 2);
+                            Math.Round(deliveryFees.DeliveryFeesWholeSalePrice * groupedDeliveryFees.Count(), 2, MidpointRounding.AwayFromZero);
                         var deliveryFeesOnSalePrice =
-                            Math.Round(deliveryFees.DeliveryFeesOnSalePrice * groupedDeliveryFees.Count(), 2);
+                            Math.Round(deliveryFees.DeliveryFeesOnSalePrice * groupedDeliveryFees.Count(), 2, MidpointRounding.AwayFromZero);
 
                         worksheet.Cells[i, 5].Value = "";
                         worksheet.Cells[i, 6].Value = $"Livraison - {deliveryFees.DeliveryFeesWholeSalePrice}";
@@ -195,7 +195,7 @@ namespace Sheaft.Application.Exporters
 
                         totalDeliveryWholeSalePrice += deliveryFeesWholeSalePrice;
                         totalDeliveryVatPrice +=
-                            Math.Round(deliveryFees.DeliveryFeesVatPrice * groupedDeliveries.Count(), 2);
+                            Math.Round(deliveryFees.DeliveryFeesVatPrice * groupedDeliveries.Count(), 2, MidpointRounding.AwayFromZero);
                         totalDeliveryOnSalePrice += deliveryFeesOnSalePrice;
 
                         i++;
@@ -237,7 +237,7 @@ namespace Sheaft.Application.Exporters
 
                 worksheet.Cells[i, 11].Value =
                     Math.Round(productsWholeSalePrice + returnablesWholeSalePrice + returnedReturnablesWholeSalePrice + totalDeliveryWholeSalePrice,
-                        2);
+                        2, MidpointRounding.AwayFromZero);
 
                 var productsVat5Price = groupedDelivery
                     .SelectMany(gd => gd.Products)
@@ -284,7 +284,7 @@ namespace Sheaft.Application.Exporters
                     .Where(dp => dp.Vat == 20m)
                     .Sum(p => p.TotalVatPrice);
 
-                var totalVat5 = Math.Round(productsVat5Price + returnablesVat5Price + returnedReturnablesVat5Price, 2);
+                var totalVat5 = Math.Round(productsVat5Price + returnablesVat5Price + returnedReturnablesVat5Price, 2, MidpointRounding.AwayFromZero);
                 if (totalVat5 > 0)
                 {
                     i++;
@@ -294,7 +294,7 @@ namespace Sheaft.Application.Exporters
                     worksheet.Cells[i, 11].Value = totalVat5;
                 }
 
-                var totalVat10 = Math.Round(productsVat10Price + returnablesVat10Price + returnedReturnablesVat10Price, 2);
+                var totalVat10 = Math.Round(productsVat10Price + returnablesVat10Price + returnedReturnablesVat10Price, 2, MidpointRounding.AwayFromZero);
                 if (totalVat10 > 0)
                 {
                     i++;
@@ -304,7 +304,7 @@ namespace Sheaft.Application.Exporters
                     worksheet.Cells[i, 11].Value = totalVat10;
                 }
                 
-                var totalVat20 = Math.Round(productsVat20Price + returnablesVat20Price + returnedReturnablesVat20Price + totalDeliveryVatPrice, 2);
+                var totalVat20 = Math.Round(productsVat20Price + returnablesVat20Price + returnedReturnablesVat20Price + totalDeliveryVatPrice, 2, MidpointRounding.AwayFromZero);
                 if (totalVat20 > 0)
                 {
                     i++;
@@ -331,7 +331,7 @@ namespace Sheaft.Application.Exporters
                     .Sum(p => p.TotalOnSalePrice);
 
                 worksheet.Cells[i, 11].Value =
-                    Math.Round(productsOnSalePrice + returnablesOnSalePrice + returnedReturnablesOnSalePrice + totalDeliveryOnSalePrice, 2);
+                    Math.Round(productsOnSalePrice + returnablesOnSalePrice + returnedReturnablesOnSalePrice + totalDeliveryOnSalePrice, 2, MidpointRounding.AwayFromZero);
 
                 SetStyle(worksheet.Cells[i - 2, 5, i, 11],
                     "#adcff7",

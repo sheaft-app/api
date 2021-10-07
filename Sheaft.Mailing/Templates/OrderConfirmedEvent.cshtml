@@ -249,7 +249,7 @@
                                                                                     <br/>
                                                                                     <p>Pour information, les frais bancaires liés à ce paiement s'élèvent à @Model.Fees€ TTC.</p>
                                                                                     <br/>
-                                                                                    <p>Si vous aviez utilisé une plateforme concurrente, vous auriez payé @(Math.Round((Model.TotalPrice - Model.Donation) * 0.20m, 2))€ de plus (pour une plateforme appliquant 20% de marge sur le prix de vente des producteurs).</p>
+                                                                                    <p>Si vous aviez utilisé une plateforme concurrente, vous auriez payé @(Math.Round((Model.TotalPrice - Model.Donation) * 0.20m, 2, MidpointRounding.AwayFromZero))€ de plus (pour une plateforme appliquant 20% de marge sur le prix de vente des producteurs).</p>
 
                                                                                     <br/>
                                                                                     <br/>

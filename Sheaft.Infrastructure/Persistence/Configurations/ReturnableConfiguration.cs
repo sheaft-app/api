@@ -26,11 +26,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.Kind).HasDefaultValue(ReturnableKind.Container);
 
             entity.Property(o => o.Name).IsRequired();
-            entity.Property(o => o.VatPrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.OnSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.WholeSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");
 
+            entity.Ignore(o => o.VatPrice);
+            entity.Ignore(o => o.OnSalePrice);
+            
             entity.HasKey(c => c.Id);
             entity.ToTable("Returnables");
         }

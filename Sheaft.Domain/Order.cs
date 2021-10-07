@@ -194,29 +194,23 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalWholeSalePrice), DIGITS_COUNT);
-            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalVatPrice), DIGITS_COUNT);
-            TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
+            TotalProductWholeSalePrice = Products.Sum(p => p.TotalWholeSalePrice);
+            TotalProductVatPrice = Products.Sum(p => p.TotalVatPrice);
+            TotalProductOnSalePrice = TotalProductWholeSalePrice + TotalProductVatPrice;
 
-            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
-                DIGITS_COUNT);
+            TotalWeight = Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;
 
             LinesCount = Products.Select(p => p.Id).Distinct().Count();
             ProductsCount = Products.Sum(p => p.Quantity);
             ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
 
-            TotalReturnableWholeSalePrice =
-                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0),
-                    DIGITS_COUNT);
-            TotalReturnableVatPrice =
-                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0), DIGITS_COUNT);
-            TotalReturnableOnSalePrice =
-                Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
+            TotalReturnableWholeSalePrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0);
+            TotalReturnableVatPrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0);
+            TotalReturnableOnSalePrice = TotalReturnableWholeSalePrice + TotalReturnableVatPrice;
 
-            TotalWholeSalePrice =
-                TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + DeliveryFeesWholeSalePrice;
+            TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + DeliveryFeesWholeSalePrice;
             TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + DeliveryFeesVatPrice;
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice + DeliveryFeesOnSalePrice, DIGITS_COUNT);
+            TotalOnSalePrice = TotalWholeSalePrice + TotalVatPrice + DeliveryFeesOnSalePrice;
 
             RefreshFees();
         }
@@ -260,8 +254,8 @@ namespace Sheaft.Domain
 
             var results = UpdateFees(totalOnSalePrice, feesPrice, donate, order.FeesPercent, order.FeesFixedAmount,
                 order.FeesVatPercent);
-            var totalPrice = Math.Round(totalOnSalePrice + donate + results.FeesPrice - results.DonationFees,
-                DIGITS_COUNT);
+            
+            var totalPrice = totalOnSalePrice + donate + results.FeesPrice - results.DonationFees;
 
             return new OrderPrices
             {
@@ -284,8 +278,8 @@ namespace Sheaft.Domain
             var total = totalOnSalePrice + feesPrice + donate;
             var newFees = CalculateFees(total, feesPercent, feesFixedAmount, feesVatPercent);
 
-            var donationFees = Math.Round(newFees - feesPrice, DIGITS_COUNT);
-            var newFeesPrice = Math.Round(newFees, DIGITS_COUNT);
+            var donationFees = Math.Round(newFees - feesPrice, DIGITS_COUNT, MidpointRounding.AwayFromZero);
+            var newFeesPrice = Math.Round(newFees, DIGITS_COUNT, MidpointRounding.AwayFromZero);
 
             return new FeesDto { FeesPrice = newFeesPrice, DonationFees = donationFees };
         }
@@ -307,7 +301,7 @@ namespace Sheaft.Domain
                 pspFees = CalculateFees(total + fees, feesPercent, feesFixedAmount, feesVatPercent);
             }
 
-            return Math.Round(fees, 2);
+            return Math.Round(fees, 2, MidpointRounding.AwayFromZero);
         }
 
         private static decimal CalculateFees(decimal total, decimal feesPercent, decimal feesFixedAmount,

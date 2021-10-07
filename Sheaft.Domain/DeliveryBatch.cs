@@ -154,7 +154,7 @@ namespace Sheaft.Domain
             var positionCounter = 0;
             foreach (var delivery in deliveries.OrderBy(d => d.Position))
             {
-                if(delivery.DeliveryBatchId != Id)
+                if(delivery.DeliveryBatchId.HasValue && delivery.DeliveryBatchId != Id)
                     delivery.DeliveryBatch.RemoveDelivery(delivery);
                 
                 delivery.SetPosition(positionCounter);

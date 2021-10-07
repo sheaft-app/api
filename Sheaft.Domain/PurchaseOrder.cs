@@ -324,29 +324,23 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Math.Round(Products.Sum(p => p.TotalProductWholeSalePrice), DIGITS_COUNT);
-            TotalProductVatPrice = Math.Round(Products.Sum(p => p.TotalProductVatPrice), DIGITS_COUNT);
-            TotalProductOnSalePrice = Math.Round(TotalProductWholeSalePrice + TotalProductVatPrice, DIGITS_COUNT);
+            TotalProductWholeSalePrice = Products.Sum(p => p.TotalProductWholeSalePrice);
+            TotalProductVatPrice = Products.Sum(p => p.TotalProductVatPrice);
+            TotalProductOnSalePrice = TotalProductWholeSalePrice + TotalProductVatPrice;
 
-            TotalWeight = Math.Round(Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0,
-                DIGITS_COUNT);
+            TotalWeight = Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;
 
             LinesCount = Products.Select(p => p.Id).Distinct().Count();
             ProductsCount = Products.Sum(p => p.Quantity);
             ReturnablesCount = Products.Where(p => p.HasReturnable).Sum(p => p.Quantity);
 
-            TotalReturnableWholeSalePrice =
-                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0),
-                    DIGITS_COUNT);
-            TotalReturnableVatPrice =
-                Math.Round(Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0),
-                    DIGITS_COUNT);
-            TotalReturnableOnSalePrice =
-                Math.Round(TotalReturnableWholeSalePrice + TotalReturnableVatPrice, DIGITS_COUNT);
+            TotalReturnableWholeSalePrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableWholeSalePrice.Value : 0);
+            TotalReturnableVatPrice = Products.Sum(p => p.HasReturnable ? p.TotalReturnableVatPrice.Value : 0);
+            TotalReturnableOnSalePrice = TotalReturnableWholeSalePrice + TotalReturnableVatPrice;
 
             TotalWholeSalePrice = TotalProductWholeSalePrice + TotalReturnableWholeSalePrice + (ExpectedDelivery?.DeliveryFeesWholeSalePrice ?? 0);
             TotalVatPrice = TotalProductVatPrice + TotalReturnableVatPrice + (ExpectedDelivery?.DeliveryFeesVatPrice ?? 0);
-            TotalOnSalePrice = Math.Round(TotalWholeSalePrice + TotalVatPrice, DIGITS_COUNT);
+            TotalOnSalePrice = TotalWholeSalePrice + TotalVatPrice;
         }
 
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();

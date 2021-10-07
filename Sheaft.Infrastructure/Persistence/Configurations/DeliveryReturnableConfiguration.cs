@@ -15,11 +15,12 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(o => o.TotalVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.TotalOnSalePrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.UnitWholeSalePrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.UnitOnSalePrice).HasColumnType("decimal(10,2)");
-            entity.Property(o => o.UnitVatPrice).HasColumnType("decimal(10,2)");
             entity.Property(o => o.Vat).HasColumnType("decimal(10,2)");
-
             entity.Property(o => o.Name).UseCollation("Latin1_general_CI_AI").IsRequired();
+            
+            entity.Ignore(o => o.UnitOnSalePrice);
+            entity.Ignore(o => o.UnitVatPrice);
+            
             entity.HasKey(c => c.Id);
             entity.ToTable("DeliveryReturnables");
         }
