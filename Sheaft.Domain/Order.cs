@@ -194,8 +194,8 @@ namespace Sheaft.Domain
 
         private void RefreshOrder()
         {
-            TotalProductWholeSalePrice = Products.Sum(p => p.TotalWholeSalePrice);
-            TotalProductVatPrice = Products.Sum(p => p.TotalVatPrice);
+            TotalProductWholeSalePrice = Products.Sum(p => p.TotalProductWholeSalePrice);
+            TotalProductVatPrice = Products.Sum(p => p.TotalProductVatPrice);
             TotalProductOnSalePrice = TotalProductWholeSalePrice + TotalProductVatPrice;
 
             TotalWeight = Products.Where(p => p.TotalWeight.HasValue).Sum(p => p.TotalWeight) ?? 0;

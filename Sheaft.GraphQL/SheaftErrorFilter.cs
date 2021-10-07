@@ -98,7 +98,9 @@ namespace Sheaft.GraphQL
             }
 
             if (exception != null)
-                extensions.Add("StackTrace", exception.StackTrace);
+            {
+                extensions.Add("Exception", exception.InnerException ?? exception);
+            }
 
             extensions.Add("StatusCode", statusCode);
             error = error.WithExtensions(extensions);

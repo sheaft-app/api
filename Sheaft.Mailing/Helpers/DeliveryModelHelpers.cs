@@ -42,13 +42,13 @@ namespace Sheaft.Mailing.Helpers
                     };
                 }).ToList();
 
-            var returnedReturnables = delivery.ReturnedReturnables
+            var returnedReturnables = delivery.ReturnedReturnables?
                 .Select(GetReturnedReturnableModel)
-                .ToList();
+                .ToList() ?? new List<DeliveryReturnableMailerModel>();
 
-            var vat5Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 5.5m);
-            var vat10Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 10m);
-            var vat20Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnedReturnables, 20m) + delivery.DeliveryFeesVatPrice;
+            var vat5Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnablesDiffs, returnedReturnables, 5.5m);
+            var vat10Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnablesDiffs, returnedReturnables, 10m);
+            var vat20Price = GetVatPriceForPercent(productsToDeliver, productsDiffs, returnablesDiffs, returnedReturnables, 20m) + delivery.DeliveryFeesVatPrice;
             
             return new DeliveryFormMailerModel()
             {
@@ -82,12 +82,13 @@ namespace Sheaft.Mailing.Helpers
             };
         }
 
-        private static decimal GetVatPriceForPercent(List<DeliveryProductMailerModel> productsToDeliver, List<DeliveryProductMailerModel> productsDiffs, List<DeliveryReturnableMailerModel> returnedReturnables, decimal percent)
+        private static decimal GetVatPriceForPercent(List<DeliveryProductMailerModel> productsToDeliver, List<DeliveryProductMailerModel> productsDiffs, List<DeliveryReturnableMailerModel> returnablesDiffs, List<DeliveryReturnableMailerModel> returnedReturnables, decimal percent)
         {
             return productsToDeliver.Where(p => p.Vat == percent).Sum(p => p.ProductTotalVatPrice)
                 + productsToDeliver.Where(p => p.ReturnableVat == percent).Sum(p => p.ReturnableTotalVatPrice) ?? 0
                 + productsDiffs.Where(p => p.Vat == percent).Sum(p => p.ProductTotalVatPrice)
                 + productsDiffs.Where(p => p.ReturnableVat == percent).Sum(p => p.ReturnableTotalVatPrice) ?? 0
+                + returnablesDiffs.Where(p => p.Vat == percent).Sum(p => p.TotalVatPrice)
                 + returnedReturnables.Where(p => p.Vat == percent).Sum(p => p.TotalVatPrice);
         }
 
