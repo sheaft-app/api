@@ -60,6 +60,15 @@ namespace Sheaft.Infrastructure.Services
             if (!string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
                 return Failure<string>("Impossible de créer le consommateur, l'utilisateur existe déjà.");
 
+            if (!consumerLegal.Owner.BirthDate.HasValue)
+                return Failure<string>("La date de naissance de l'acheteur est requise pour le service de paiements.");
+            
+            if (!consumerLegal.Owner.Nationality.HasValue)
+                return Failure<string>("La nationalité de l'acheteur est requise pour le service de paiements.");
+            
+            if (!consumerLegal.Owner.CountryOfResidence.HasValue)
+                return Failure<string>("Le pays de résidence de l'acheteur est requise pour le service de paiements.");
+
             await EnsureAccessTokenIsValidAsync(token);
 
             var result = await _api.Users.CreateAsync(GetIdempotencyKey(consumerLegal.Id),
@@ -67,9 +76,9 @@ namespace Sheaft.Infrastructure.Services
                     consumerLegal.Owner.Email,
                     consumerLegal.Owner.FirstName,
                     consumerLegal.Owner.LastName,
-                    consumerLegal.Owner.BirthDate.DateTime,
-                    consumerLegal.Owner.Nationality.GetCountry(),
-                    consumerLegal.Owner.CountryOfResidence.GetCountry())
+                    consumerLegal.Owner.BirthDate.Value.DateTime,
+                    consumerLegal.Owner.Nationality.Value.GetCountry(),
+                    consumerLegal.Owner.CountryOfResidence.Value.GetCountry())
                 {
                     Address = consumerLegal.Owner.Address.GetAddress(),
                     Tag = $"Id='{consumerLegal.Id}'"
@@ -83,6 +92,15 @@ namespace Sheaft.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(consumerLegal.User.Identifier))
                 return Failure<string>("Impossible de mettre à jour l'utilisateur, l'identifiant est requis.");
 
+            if (!consumerLegal.Owner.BirthDate.HasValue)
+                return Failure<string>("La date de naissance de l'acheteur est requise pour le service de paiements.");
+            
+            if (!consumerLegal.Owner.Nationality.HasValue)
+                return Failure<string>("La nationalité de l'acheteur est requise pour le service de paiements.");
+            
+            if (!consumerLegal.Owner.CountryOfResidence.HasValue)
+                return Failure<string>("Le pays de résidence de l'acheteur est requise pour le service de paiements.");
+            
             await EnsureAccessTokenIsValidAsync(token);
 
             var result = await _api.Users.UpdateNaturalAsync(
@@ -91,9 +109,9 @@ namespace Sheaft.Infrastructure.Services
                     Email = consumerLegal.Owner.Email,
                     FirstName = consumerLegal.Owner.FirstName,
                     LastName = consumerLegal.Owner.LastName,
-                    Birthday = consumerLegal.Owner.BirthDate.DateTime,
-                    Nationality = consumerLegal.Owner.Nationality.GetCountry(),
-                    CountryOfResidence = consumerLegal.Owner.CountryOfResidence.GetCountry(),
+                    Birthday = consumerLegal.Owner.BirthDate.Value.DateTime,
+                    Nationality = consumerLegal.Owner.Nationality.Value.GetCountry(),
+                    CountryOfResidence = consumerLegal.Owner.CountryOfResidence.Value.GetCountry(),
                     Address = consumerLegal.Owner.Address.GetAddress(),
                     Tag = $"Id='{consumerLegal.Id}'"
                 }, consumerLegal.User.Identifier);
@@ -106,6 +124,15 @@ namespace Sheaft.Infrastructure.Services
             if (!string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
                 return Failure<string>("Impossible de créer l'utilisateur, l'identifiant existe déjà.");
 
+            if (!businessLegal.Owner.BirthDate.HasValue)
+                return Failure<string>("La date de naissance de l'acheteur est requise pour le service de paiements.");
+            
+            if (!businessLegal.Owner.Nationality.HasValue)
+                return Failure<string>("La nationalité de l'acheteur est requise pour le service de paiements.");
+            
+            if (!businessLegal.Owner.CountryOfResidence.HasValue)
+                return Failure<string>("Le pays de résidence de l'acheteur est requise pour le service de paiements.");
+            
             await EnsureAccessTokenIsValidAsync(token);
 
             var result = await _api.Users.CreateAsync(GetIdempotencyKey(businessLegal.Id),
@@ -115,9 +142,9 @@ namespace Sheaft.Infrastructure.Services
                     businessLegal.Kind.GetLegalPersonType(),
                     businessLegal.Owner.FirstName,
                     businessLegal.Owner.LastName,
-                    businessLegal.Owner.BirthDate.DateTime,
-                    businessLegal.Owner.Nationality.GetCountry(),
-                    businessLegal.Owner.CountryOfResidence.GetCountry())
+                    businessLegal.Owner.BirthDate.Value.DateTime,
+                    businessLegal.Owner.Nationality.Value.GetCountry(),
+                    businessLegal.Owner.CountryOfResidence.Value.GetCountry())
                 {
                     CompanyNumber = businessLegal.Siret,
                     HeadquartersAddress = businessLegal.Address.GetAddress(),
@@ -134,6 +161,15 @@ namespace Sheaft.Infrastructure.Services
             if (string.IsNullOrWhiteSpace(businessLegal.User.Identifier))
                 return Failure<string>("Impossible de mettre à jour l'utilisateur, l'identifiant est requis.");
 
+            if (!businessLegal.Owner.BirthDate.HasValue)
+                return Failure<string>("La date de naissance de l'acheteur est requise pour le service de paiements.");
+            
+            if (!businessLegal.Owner.Nationality.HasValue)
+                return Failure<string>("La nationalité de l'acheteur est requise pour le service de paiements.");
+            
+            if (!businessLegal.Owner.CountryOfResidence.HasValue)
+                return Failure<string>("Le pays de résidence de l'acheteur est requise pour le service de paiements.");
+            
             await EnsureAccessTokenIsValidAsync(token);
 
             var result = await _api.Users.UpdateLegalAsync(
@@ -144,9 +180,9 @@ namespace Sheaft.Infrastructure.Services
                     LegalPersonType = businessLegal.Kind.GetLegalPersonType(),
                     LegalRepresentativeFirstName = businessLegal.Owner.FirstName,
                     LegalRepresentativeLastName = businessLegal.Owner.LastName,
-                    LegalRepresentativeBirthday = businessLegal.Owner.BirthDate.DateTime,
-                    LegalRepresentativeNationality = businessLegal.Owner.Nationality.GetCountry(),
-                    LegalRepresentativeCountryOfResidence = businessLegal.Owner.CountryOfResidence.GetCountry(),
+                    LegalRepresentativeBirthday = businessLegal.Owner.BirthDate.Value.DateTime,
+                    LegalRepresentativeNationality = businessLegal.Owner.Nationality.Value.GetCountry(),
+                    LegalRepresentativeCountryOfResidence = businessLegal.Owner.CountryOfResidence.Value.GetCountry(),
                     CompanyNumber = businessLegal.Siret,
                     HeadquartersAddress = businessLegal.Address.GetAddress(),
                     LegalRepresentativeAddress = businessLegal.Owner.Address.GetAddress(),

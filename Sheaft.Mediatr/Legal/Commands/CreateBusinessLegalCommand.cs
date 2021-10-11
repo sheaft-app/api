@@ -56,6 +56,25 @@ namespace Sheaft.Mediatr.Legal.Commands
         public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)
         {
             var business = await _context.Businesses.SingleAsync(e => e.Id == request.UserId, token);
+            
+            var owner = new Owner(
+                request.Owner.FirstName,
+                request.Owner.LastName,
+                request.Owner.Email
+            );
+            
+            owner.SetNationality(request.Owner.Nationality);
+            owner.SetBirthDate(request.Owner.BirthDate);
+            owner.SetCountryOfResidence(request.Owner.CountryOfResidence);
+            
+            var ownerAddress = request.Owner.Address != null
+                ? new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2,
+                    request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country)
+                : null;
+            
+            if(ownerAddress != null)
+                owner.SetAddress(ownerAddress);
+            
             var legals = business.SetLegals(
                 request.Kind,
                 request.Name,
@@ -64,16 +83,7 @@ namespace Sheaft.Mediatr.Legal.Commands
                 request.VatIdentifier,
                 new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
                     request.Address.City, request.Address.Country),
-                new Owner(
-                    request.Owner.FirstName,
-                    request.Owner.LastName,
-                    request.Owner.Email,
-                    request.Owner.BirthDate,
-                    new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2,
-                        request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country),
-                    request.Owner.Nationality,
-                    request.Owner.CountryOfResidence
-                ),
+                owner,
                 request.RegistrationCity,
                 request.RegistrationCode,
                 request.RegistrationKind);

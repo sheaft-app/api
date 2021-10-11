@@ -30,9 +30,9 @@ namespace Sheaft.Mediatr.Legal.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public DateTimeOffset BirthDate { get; set; }
-        public CountryIsoCode Nationality { get; set; }
-        public CountryIsoCode CountryOfResidence { get; set; }
+        public DateTimeOffset? BirthDate { get; set; }
+        public CountryIsoCode? Nationality { get; set; }
+        public CountryIsoCode? CountryOfResidence { get; set; }
         public AddressDto Address { get; set; }
 
         public override void SetRequestUser(RequestUser user)
@@ -60,20 +60,26 @@ namespace Sheaft.Mediatr.Legal.Commands
         public async Task<Result<Guid>> Handle(CreateConsumerLegalCommand request, CancellationToken token)
         {
             var consumer = await _context.Consumers.SingleAsync(e => e.Id == request.UserId, token);
-            var legals = consumer.SetLegals(new Owner(
+            
+            var owner = new Owner(
                 request.FirstName,
                 request.LastName,
-                request.Email,
-                request.BirthDate,
-                new OwnerAddress(request.Address.Line1,
-                    request.Address.Line2,
-                    request.Address.Zipcode,
-                    request.Address.City,
-                    request.Address.Country
-                ),
-                request.Nationality,
-                request.CountryOfResidence
-            ));
+                request.Email
+            );
+            
+            owner.SetNationality(request.Nationality);
+            owner.SetBirthDate(request.BirthDate);
+            owner.SetCountryOfResidence(request.CountryOfResidence);
+            
+            var ownerAddress = request.Address != null
+                ? new OwnerAddress(request.Address.Line1, request.Address.Line2,
+                    request.Address.Zipcode, request.Address.City, request.Address.Country)
+                : null;
+            
+            if(ownerAddress != null)
+                owner.SetAddress(ownerAddress);
+            
+            var legals = consumer.SetLegals(owner);
 
             await _context.SaveChangesAsync(token);
 
