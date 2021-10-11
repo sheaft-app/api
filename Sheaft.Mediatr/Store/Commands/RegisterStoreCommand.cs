@@ -95,7 +95,7 @@ namespace Sheaft.Mediatr.Store.Commands
 
                 if (store != null)
                 {
-                    store.Restore();
+                    _context.Restore(store);
                 }
                 else
                 {

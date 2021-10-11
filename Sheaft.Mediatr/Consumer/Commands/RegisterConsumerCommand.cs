@@ -72,7 +72,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
             {
                 if (consumer != null)
                 {
-                    consumer.Restore();
+                    _context.Restore(consumer);
                 }
                 else
                 {

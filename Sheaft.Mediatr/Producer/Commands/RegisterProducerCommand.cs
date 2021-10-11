@@ -94,7 +94,7 @@ namespace Sheaft.Mediatr.Producer.Commands
             {
                 if (producer != null)
                 {
-                    producer.Restore();
+                    _context.Restore(producer);
                 }
                 else
                 {
