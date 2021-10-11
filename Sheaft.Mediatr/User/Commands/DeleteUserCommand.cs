@@ -4,10 +4,13 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Sheaft.Application.Extensions;
 using Sheaft.Application.Interfaces.Mediatr;
 using Sheaft.Application.Interfaces.Services;
 using Sheaft.Core;
+using Sheaft.Core.Options;
 using Sheaft.Domain;
 
 namespace Sheaft.Mediatr.User.Commands
@@ -37,18 +40,22 @@ namespace Sheaft.Mediatr.User.Commands
     public class DeleteUserCommandHandler : CommandsHandler,
         IRequestHandler<DeleteUserCommand, Result>
     {
+        private readonly RoleOptions _roles;
+
         public DeleteUserCommandHandler(
             ISheaftMediatr mediatr,
             IAppDbContext context,
+            IOptionsSnapshot<RoleOptions> roleOptions,
             ILogger<DeleteUserCommandHandler> logger)
             : base(mediatr, context, logger)
         {
+            _roles = roleOptions.Value;
         }
 
         public async Task<Result> Handle(DeleteUserCommand request, CancellationToken token)
         {
             var entity = await _context.Users.SingleAsync(e => e.Id == request.UserId, token);
-            if(entity.Id != request.RequestUser.Id)
+            if(entity.Id != request.RequestUser.Id && !request.RequestUser.IsInAnyRoles(new []{_roles.Admin.Value, _roles.Support.Value}))
                 return Failure("Vous n'êtes pas autorisé à accéder à cette ressource.");
 
             var hasActiveOrders = await _context.PurchaseOrders.AnyAsync(
