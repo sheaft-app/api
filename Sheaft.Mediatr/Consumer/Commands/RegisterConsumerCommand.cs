@@ -21,8 +21,8 @@ namespace Sheaft.Mediatr.Consumer.Commands
     {
         protected RegisterConsumerCommand()
         {
-            
         }
+
         [JsonConstructor]
         public RegisterConsumerCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -61,16 +61,28 @@ namespace Sheaft.Mediatr.Consumer.Commands
 
         public async Task<Result<Guid>> Handle(RegisterConsumerCommand request, CancellationToken token)
         {
+            var consumer = await _context.Consumers
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(r => r.Id == request.ConsumerId || r.Email == request.Email, token);
+
+            if (consumer is { RemovedOn: null })
+                return Failure<Guid>("Un compte existe déjà avec ces informations.");
+
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                var consumer = await _context.Consumers
-                    .FirstOrDefaultAsync(r => r.Id == request.ConsumerId || r.Email == request.Email, token);
                 if (consumer != null)
-                    return Failure<Guid>("Un compte existe déjà avec ces informations.");
+                {
+                    consumer.Restore();
+                }
+                else
+                {
+                    consumer = new Domain.Consumer(request.ConsumerId, request.Email, request.FirstName,
+                        request.LastName,
+                        request.Phone);
 
-                consumer = new Domain.Consumer(request.ConsumerId, request.Email, request.FirstName, request.LastName,
-                    request.Phone);
-                await _context.AddAsync(consumer, token);
+                    await _context.AddAsync(consumer, token);
+                }
+
                 await _context.SaveChangesAsync(token);
 
                 var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
@@ -91,7 +103,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                     Name = consumer.Name,
                     Phone = consumer.Phone,
                     Picture = resultImage.Data,
-                    Roles = new List<Guid> {_roleOptions.Consumer.Id},
+                    Roles = new List<Guid> { _roleOptions.Consumer.Id },
                     UserId = consumer.Id
                 }, token);
 
@@ -103,7 +115,7 @@ namespace Sheaft.Mediatr.Consumer.Commands
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                 {
                     _mediatr.Post(new CreateSponsoringCommand(request.RequestUser)
-                        {Code = request.SponsoringCode, UserId = consumer.Id});
+                        { Code = request.SponsoringCode, UserId = consumer.Id });
                 }
 
                 return Success(consumer.Id);

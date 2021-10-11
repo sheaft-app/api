@@ -24,14 +24,14 @@ namespace Sheaft.Mediatr.Store.Commands
     {
         protected RegisterStoreCommand()
         {
-            
         }
+
         [JsonConstructor]
         public RegisterStoreCommand(RequestUser requestUser) : base(requestUser)
         {
             StoreId = RequestUser.Id;
         }
-        
+
         public Guid StoreId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -70,39 +70,49 @@ namespace Sheaft.Mediatr.Store.Commands
 
         public async Task<Result<Guid>> Handle(RegisterStoreCommand request, CancellationToken token)
         {
-            var store = await _context.Stores.SingleOrDefaultAsync(r => r.Id == request.StoreId || r.Email == request.Email, token);
-            if (store != null)
+            var store = await _context.Stores.SingleOrDefaultAsync(
+                r => r.Id == request.StoreId || r.Email == request.Email, token);
+
+            if (store is { RemovedOn: null })
                 return Failure<Guid>("Un compte existe déjà avec ces informations.");
-
-            var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
-            var department =
-                await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
-
-            var address = request.Address != null
-                ? new UserAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                    request.Address.City, request.Address.Country,
-                    department, request.Address.Longitude, request.Address.Latitude)
-                : null;
-
-            var openingHours = new List<OpeningHours>();
-            if (request.OpeningHours != null)
-                foreach (var oh in request.OpeningHours)
-                    openingHours.AddRange(oh.Days.Select(c => new OpeningHours(c, oh.From, oh.To)));
-
-            store = new Domain.Store(request.StoreId, request.Name, request.FirstName, request.LastName,
-                request.Email,
-                address, openingHours, request.OpenForNewBusiness, request.Phone);
-
-            if (request.Tags != null && request.Tags.Any())
-            {
-                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
-                store.SetTags(tags);
-            }
 
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                await _context.AddAsync(store, token);
+                var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
+                var department =
+                    await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
+
+                var address = request.Address != null
+                    ? new UserAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                        request.Address.City, request.Address.Country,
+                        department, request.Address.Longitude, request.Address.Latitude)
+                    : null;
+
+                var openingHours = new List<OpeningHours>();
+                if (request.OpeningHours != null)
+                    foreach (var oh in request.OpeningHours)
+                        openingHours.AddRange(oh.Days.Select(c => new OpeningHours(c, oh.From, oh.To)));
+
+                if (store != null)
+                {
+                    store.Restore();
+                }
+                else
+                {
+                    store = new Domain.Store(request.StoreId, request.Name, request.FirstName, request.LastName,
+                        request.Email,
+                        address, openingHours, request.OpenForNewBusiness, request.Phone);
+
+                    await _context.AddAsync(store, token);
+                }
+
                 await _context.SaveChangesAsync(token);
+
+                if (request.Tags != null && request.Tags.Any())
+                {
+                    var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
+                    store.SetTags(tags);
+                }
 
                 var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
@@ -114,7 +124,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 if (!resultImage.Succeeded)
                     return Failure<Guid>(resultImage);
 
-                var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Store.Id};
+                var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Store.Id };
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                 {
                     Email = store.Email,
@@ -150,7 +160,7 @@ namespace Sheaft.Mediatr.Store.Commands
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                 {
                     _mediatr.Post(new CreateSponsoringCommand(request.RequestUser)
-                        {Code = request.SponsoringCode, UserId = store.Id});
+                        { Code = request.SponsoringCode, UserId = store.Id });
                 }
 
                 return Success(store.Id);

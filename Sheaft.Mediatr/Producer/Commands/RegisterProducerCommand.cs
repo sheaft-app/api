@@ -77,12 +77,10 @@ namespace Sheaft.Mediatr.Producer.Commands
             var producer =
                 await _context.Producers.SingleOrDefaultAsync(
                     r => r.Id == request.ProducerId || r.Email == request.Email, token);
-            if (producer != null)
+
+            if (producer is { RemovedOn: null })
                 return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
-            // if (request.Legals.RegistrationKind == null)
-            //     return Failure<Guid>("Le numéro RCS ou RM est requis pour la création d'un compte producteur.");
-            
             var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
             var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
 
@@ -92,21 +90,31 @@ namespace Sheaft.Mediatr.Producer.Commands
                     request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
                 : null;
 
-            producer = new Domain.Producer(request.ProducerId, request.Name, request.FirstName, request.LastName,
-                request.Email,
-                address, request.OpenForNewBusiness, request.Phone);
-            producer.SetNotSubjectToVat(request.NotSubjectToVat);
-
-            if (request.Tags != null && request.Tags.Any())
-            {
-                var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
-                producer.SetTags(tags);
-            }
-
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
-                await _context.AddAsync(producer, token);
+                if (producer != null)
+                {
+                    producer.Restore();
+                }
+                else
+                {
+                    producer = new Domain.Producer(request.ProducerId, request.Name, request.FirstName,
+                        request.LastName,
+                        request.Email,
+                        address, request.OpenForNewBusiness, request.Phone);
+
+                    await _context.AddAsync(producer, token);
+                }
+
+                producer.SetNotSubjectToVat(request.NotSubjectToVat);
+                producer.SetAddress(address);
                 await _context.SaveChangesAsync(token);
+
+                if (request.Tags != null && request.Tags.Any())
+                {
+                    var tags = await _context.Tags.Where(t => request.Tags.Contains(t.Id)).ToListAsync(token);
+                    producer.SetTags(tags);
+                }
 
                 var resultImage = await _mediatr.Process(new UpdateUserPreviewCommand(request.RequestUser)
                 {
@@ -118,7 +126,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 if (!resultImage.Succeeded)
                     return Failure<Guid>(resultImage);
 
-                var roles = new List<Guid> {_roleOptions.Owner.Id, _roleOptions.Producer.Id};
+                var roles = new List<Guid> { _roleOptions.Owner.Id, _roleOptions.Producer.Id };
                 var authResult = await _mediatr.Process(new UpdateAuthUserCommand(request.RequestUser)
                 {
                     Email = producer.Email,
@@ -160,10 +168,10 @@ namespace Sheaft.Mediatr.Producer.Commands
                     IsDefault = true,
                     Products = new List<ProductPriceInputDto>()
                 }, token);
-                
+
                 if (!catalogConsumerResult.Succeeded)
                     return catalogConsumerResult;
-                
+
                 var catalogStoreResult = await _mediatr.Process(new CreateCatalogCommand(request.RequestUser)
                 {
                     Kind = CatalogKind.Stores,
@@ -172,18 +180,19 @@ namespace Sheaft.Mediatr.Producer.Commands
                     IsDefault = true,
                     Products = new List<ProductPriceInputDto>()
                 }, token);
-                
+
                 if (!catalogStoreResult.Succeeded)
                     return catalogStoreResult;
-                
+
                 var batchDefinitionResult = await _mediatr.Process(new CreateBatchDefinitionCommand(request.RequestUser)
                 {
                     Name = "Tracabilité par défaut",
                     IsDefault = true,
-                    Description = "Configuration générée par défaut, vous pouvez la modifier pour ajouter des champs spécifiques à votre gestion de la tracabilité pour votre production.",
+                    Description =
+                        "Configuration générée par défaut, vous pouvez la modifier pour ajouter des champs spécifiques à votre gestion de la tracabilité pour votre production.",
                     FieldDefinitions = new List<BatchField>()
                 }, token);
-                
+
                 if (!batchDefinitionResult.Succeeded)
                     return batchDefinitionResult;
 
@@ -192,7 +201,7 @@ namespace Sheaft.Mediatr.Producer.Commands
                 if (!string.IsNullOrWhiteSpace(request.SponsoringCode))
                 {
                     _mediatr.Post(new CreateSponsoringCommand(request.RequestUser)
-                        {Code = request.SponsoringCode, UserId = producer.Id});
+                        { Code = request.SponsoringCode, UserId = producer.Id });
                 }
 
                 return Success(producer.Id);
