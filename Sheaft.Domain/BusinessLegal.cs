@@ -11,12 +11,13 @@ namespace Sheaft.Domain
         {
         }
 
-        public BusinessLegal(Guid id, Business business, LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner)
+        public BusinessLegal(Guid id, Business business, LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner, BillingAddress billingAddress)
             : base(id, kind, business, owner)
         {
             SetName(name);
             SetEmail(email);
             SetAddress(address);
+            SetBillingAddress(billingAddress);
             SetSiret(siret);
             SetVatIdentifier(vatIdentifier);
         }
@@ -28,6 +29,7 @@ namespace Sheaft.Domain
         public string VatIdentifier { get; private set; }
         public Guid? DeclarationId { get; private set; }
         public LegalAddress Address { get; private set; }
+        public BillingAddress BillingAddress { get; private set; }
         public virtual Declaration Declaration { get; private set; }
 
         public void SetDeclaration()
@@ -63,6 +65,11 @@ namespace Sheaft.Domain
         public void SetAddress(LegalAddress legalAddress)
         {
             Address = legalAddress;
+        }
+
+        public void SetBillingAddress(BillingAddress billingAddress)
+        {
+            BillingAddress = billingAddress;
         }
 
         public void SetEmail(string email)

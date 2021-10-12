@@ -12,6 +12,8 @@ namespace Sheaft.Infrastructure.Persistence.Configurations
             entity.Property(c => c.VatIdentifier);
 
             entity.OwnsOne(c => c.Address);
+            entity.OwnsOne(c => c.BillingAddress);
+            
             entity.HasOne(c => c.Declaration).WithOne().HasForeignKey<BusinessLegal>(c => c.DeclarationId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

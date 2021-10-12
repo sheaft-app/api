@@ -43,18 +43,11 @@ namespace Sheaft.Domain
             if (corsicaRegex.Match(code).Success)
             {
                 var departmentCode = int.Parse(code);
-                if (departmentCode < 20200)
-                    return "2A";
-
-                if (departmentCode >= 20200)
-                    return "2B";
+                return departmentCode < 20200 ? "2A" : "2B";
             }
 
             var regex = new Regex("(^([2[A-B]{2})|^([0-9]{2}))([0-9]{0,3})");
-            if (regex.Match(code).Success)
-                return code.Substring(0, 2);
-            
-            return null;
+            return regex.Match(code).Success ? code.Substring(0, 2) : null;
         }
     }
 }

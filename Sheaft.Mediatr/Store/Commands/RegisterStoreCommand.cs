@@ -142,6 +142,7 @@ namespace Sheaft.Mediatr.Store.Commands
 
                 var result = await _mediatr.Process(new CreateBusinessLegalCommand(request.RequestUser)
                 {
+                    Billing = request.Legals.Billing,
                     Address = request.Legals.Address,
                     Name = request.Legals.Name,
                     Email = request.Legals.Email,

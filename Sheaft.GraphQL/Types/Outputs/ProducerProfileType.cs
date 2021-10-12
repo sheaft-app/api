@@ -103,7 +103,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("legals")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ProducerProfileResolvers>(c => c.GetLegals(default!, default!, default!, default))
-                .Type<ListType<BusinessLegalType>>();
+                .Type<BusinessLegalType>();
             
             descriptor
                 .Field(c => c.Closings)

@@ -81,15 +81,7 @@ namespace Sheaft.Mediatr.Producer.Commands
             if (producer is { RemovedOn: null })
                 return Failure<Guid>("Un compte existe déjà avec ces informations.");
 
-            var departmentCode = UserAddress.GetDepartmentCode(request.Address.Zipcode);
-            var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
-
-            var address = request.Address != null
-                ? new UserAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                    request.Address.City,
-                    request.Address.Country, department, request.Address.Longitude, request.Address.Latitude)
-                : null;
-
+            var address = await GetAddressAsync(request.Address, token);
             using (var transaction = await _context.BeginTransactionAsync(token))
             {
                 if (producer != null)
@@ -144,6 +136,7 @@ namespace Sheaft.Mediatr.Producer.Commands
 
                 var result = await _mediatr.Process(new CreateBusinessLegalCommand(request.RequestUser)
                 {
+                    Billing = request.Legals.Billing,
                     Address = request.Legals.Address,
                     Name = request.Legals.Name,
                     Email = request.Legals.Email,
@@ -206,6 +199,19 @@ namespace Sheaft.Mediatr.Producer.Commands
 
                 return Success(producer.Id);
             }
+        }
+
+        private async Task<UserAddress> GetAddressAsync(AddressDto address, CancellationToken token)
+        {
+            if (address == null)
+                return null;
+            
+            var departmentCode = UserAddress.GetDepartmentCode(address.Zipcode);
+            var department = await _context.Departments.SingleOrDefaultAsync(d => d.Code == departmentCode, token);
+
+            return new UserAddress(address.Line1, address.Line2, address.Zipcode,
+                    address.City,
+                    address.Country, department, address.Longitude, address.Latitude);
         }
     }
 }

@@ -55,6 +55,11 @@ namespace Sheaft.GraphQL.Types.Inputs
                 .Field(c => c.Address)
                 .Name("address")
                 .Type<NonNullType<AddressInputType>>();
+                
+            descriptor
+                .Field(c => c.Billing)
+                .Name("billing")
+                .Type<BillingAddressInputType>();
         }
     }
 }

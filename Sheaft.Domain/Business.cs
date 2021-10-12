@@ -63,12 +63,12 @@ namespace Sheaft.Domain
             ClosingsCount = Closings?.Count ?? 0;
         }
 
-        public BusinessLegal SetLegals(LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, Owner owner, string registrationCity = null, string registrationCode = null, RegistrationKind? registrationKind = null)
+        public BusinessLegal SetLegals(LegalKind kind, string name, string email, string siret, string vatIdentifier, LegalAddress address, BillingAddress billingAddress, Owner owner, string registrationCity = null, string registrationCode = null, RegistrationKind? registrationKind = null)
         {
             if (Legal?.Id != null)
                 throw SheaftException.AlreadyExists("Les informations légales de cette société existent déjà.");
 
-            var legals = new BusinessLegal(Guid.NewGuid(),this, kind, name, email, siret, vatIdentifier, address, owner);
+            var legals = new BusinessLegal(Guid.NewGuid(),this, kind, name, email, siret, vatIdentifier, address, owner, billingAddress);
             if(registrationKind.HasValue)
                 legals.SetRegistrationKind(registrationKind.Value, registrationCity, registrationCode);
             

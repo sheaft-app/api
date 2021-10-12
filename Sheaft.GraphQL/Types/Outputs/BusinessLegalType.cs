@@ -34,6 +34,10 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("address");
                 
             descriptor
+                .Field(c => c.BillingAddress)
+                .Name("billing");
+                
+            descriptor
                 .Field(c => c.Owner)
                 .Name("owner");
         }

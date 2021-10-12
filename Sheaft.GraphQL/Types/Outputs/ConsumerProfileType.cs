@@ -103,7 +103,7 @@ namespace Sheaft.GraphQL.Types.Outputs
                 .Name("legals")
                 .UseDbContext<QueryDbContext>()
                 .ResolveWith<ConsumerProfileResolvers>(c => c.GetLegals(default!, default!, default!, default))
-                .Type<ListType<ConsumerLegalType>>();
+                .Type<ConsumerLegalType>();
         }
 
         private class ConsumerProfileResolvers

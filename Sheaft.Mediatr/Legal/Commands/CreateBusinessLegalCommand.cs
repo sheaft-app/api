@@ -18,8 +18,8 @@ namespace Sheaft.Mediatr.Legal.Commands
     {
         protected CreateBusinessLegalCommand()
         {
-            
         }
+
         [JsonConstructor]
         public CreateBusinessLegalCommand(RequestUser requestUser) : base(requestUser)
         {
@@ -33,6 +33,7 @@ namespace Sheaft.Mediatr.Legal.Commands
         public string Siret { get; set; }
         public OwnerInputDto Owner { get; set; }
         public AddressDto Address { get; set; }
+        public BillingAddressDto Billing { get; set; }
         public RegistrationKind? RegistrationKind { get; set; }
         public string RegistrationCity { get; set; }
         public string RegistrationCode { get; set; }
@@ -56,52 +57,64 @@ namespace Sheaft.Mediatr.Legal.Commands
         public async Task<Result<Guid>> Handle(CreateBusinessLegalCommand request, CancellationToken token)
         {
             var business = await _context.Businesses.SingleAsync(e => e.Id == request.UserId, token);
-            
+
             var owner = new Owner(
                 request.Owner.FirstName,
                 request.Owner.LastName,
                 request.Owner.Email
             );
-            
+
             owner.SetNationality(request.Owner.Nationality);
             owner.SetBirthDate(request.Owner.BirthDate);
             owner.SetCountryOfResidence(request.Owner.CountryOfResidence);
-            
+
             var ownerAddress = request.Owner.Address != null
                 ? new OwnerAddress(request.Owner.Address.Line1, request.Owner.Address.Line2,
                     request.Owner.Address.Zipcode, request.Owner.Address.City, request.Owner.Address.Country)
                 : null;
-            
-            if(ownerAddress != null)
+
+            if (ownerAddress != null)
                 owner.SetAddress(ownerAddress);
-            
+
+            var billingAddress = request.Billing != null
+                ? new BillingAddress(request.Billing.Line1, request.Billing.Line2,
+                    request.Billing.Zipcode, request.Billing.City, request.Billing.Country, request.Billing.Name)
+                : null;
+
+            var legalAddress = new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
+                request.Address.City, request.Address.Country);
+
             var legals = business.SetLegals(
                 request.Kind,
                 request.Name,
                 request.Email,
                 request.Siret,
                 request.VatIdentifier,
-                new LegalAddress(request.Address.Line1, request.Address.Line2, request.Address.Zipcode,
-                    request.Address.City, request.Address.Country),
+                legalAddress,
+                billingAddress,
                 owner,
                 request.RegistrationCity,
                 request.RegistrationCode,
                 request.RegistrationKind);
-            
+
             await _context.SaveChangesAsync(token);
 
-            if (string.IsNullOrWhiteSpace(business.Identifier))
+            if (business.Kind != ProfileKind.Store)
             {
-                var userResult = await _mediatr.Process(
-                    new CheckBusinessLegalConfigurationCommand(request.RequestUser) {UserId = business.Id}, token);
-                if (!userResult.Succeeded)
-                    return Failure<Guid>(userResult);
-            }
-            else
-            {
-                var result = await _pspService.UpdateBusinessAsync(legals, token);
-                if (!result.Succeeded)
-                    return Failure<Guid>(result);
+                if (string.IsNullOrWhiteSpace(business.Identifier))
+                {
+                    var userResult = await _mediatr.Process(
+                        new CheckBusinessLegalConfigurationCommand(request.RequestUser)
+                            { UserId = business.Id }, token);
+                    if (!userResult.Succeeded)
+                        return Failure<Guid>(userResult);
+                }
+                else
+                {
+                    var result = await _pspService.UpdateBusinessAsync(legals, token);
+                    if (!result.Succeeded)
+                        return Failure<Guid>(result);
+                }
             }
 
             return Success(legals.Id);
