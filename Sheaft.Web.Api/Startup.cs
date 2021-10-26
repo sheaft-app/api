@@ -365,7 +365,7 @@ namespace Sheaft.Web.Api
             });
 
             services.AddRazorTemplating();
-            services.AddMvc(option => option.EnableEndpointRouting = true);
+            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
@@ -492,7 +492,7 @@ namespace Sheaft.Web.Api
             
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapGraphQL()
                     .RequireAuthorization(Policies.ANONYMOUS_OR_CONNECTED);
             });
