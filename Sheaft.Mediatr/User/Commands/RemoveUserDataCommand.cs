@@ -46,7 +46,7 @@ namespace Sheaft.Mediatr.User.Commands
 
         public async Task<Result<string>> Handle(RemoveUserDataCommand request, CancellationToken token)
         {
-            var entity = await _context.Users.FirstOrDefaultAsync(c => c.Id == request.UserId, token);
+            var entity = await _context.Users.IgnoreQueryFilters().SingleOrDefaultAsync(c => c.Id == request.UserId, token);
             if (entity == null)
                 return Failure<string>("L'utilisateur est introuvable.");
 
