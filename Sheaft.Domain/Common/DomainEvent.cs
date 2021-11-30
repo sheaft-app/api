@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sheaft.Domain.Common
+namespace Sheaft.Domain.Events
 {
     public interface IHasDomainEvent
     {

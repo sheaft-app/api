@@ -4,6 +4,8 @@ namespace Sheaft.Domain.Interop
 {
     public interface ITrackRemove
     {
-        DateTimeOffset? RemovedOn { get; }
+        bool Removed { get; }
+
+        void Restore();
     }
 }

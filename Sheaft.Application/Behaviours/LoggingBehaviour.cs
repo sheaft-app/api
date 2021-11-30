@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Core.Exceptions;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 
 namespace Sheaft.Application.Behaviours
 {
-    public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    internal class LoggingBehaviour<TRequest, TResponse> : MediatR.IPipelineBehavior<TRequest, TResponse>
         where TRequest : ITrackedUser
     {
         private readonly ILogger _logger;
@@ -19,11 +19,11 @@ namespace Sheaft.Application.Behaviours
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken token,
+            MediatR.RequestHandlerDelegate<TResponse> next)
         {
             if (request.RequestUser == null)
-                throw SheaftException.Unexpected("The requestUser must be assigned for the command.");
+                throw new Exception("The requestUser must be assigned for the command.");
             
             var requestName = typeof(TRequest).Name;
             _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Name);

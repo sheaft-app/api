@@ -2,22 +2,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Razor.Templating.Core;
-using Sheaft.Application.Interfaces.Services;
-using Sheaft.Application.Services;
-using Sheaft.Core;
+using Sheaft.Application.Interfaces;
+using Sheaft.Domain.Common;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
 namespace Sheaft.Infrastructure.Services
 {
-    public class PdfGenerator : SheaftService, IPdfGenerator
+    internal class PdfGenerator : IPdfGenerator
     {
         private readonly IConverter _converter;
 
         public PdfGenerator(
             IConverter converter,
             ILogger<PdfGenerator> logger)
-            : base(logger)
         {
             _converter = converter;
         }
@@ -47,7 +45,7 @@ namespace Sheaft.Infrastructure.Services
             };
 
             var result = _converter.Convert(pdf);
-            return Success(result);
+            return Result<byte[]>.Success(result);
         }
     }
 }

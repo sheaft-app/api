@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using Sheaft.Domain;
+using Sheaft.Domain.Common;
 
 namespace Sheaft.Application.Behaviours
 {
-    public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    internal class PerformanceBehaviour<TRequest, TResponse> : MediatR.IPipelineBehavior<TRequest, TResponse>
         where TRequest : ITrackedUser
     {
         private readonly Stopwatch _timer;
@@ -20,8 +20,8 @@ namespace Sheaft.Application.Behaviours
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken token,
+            MediatR.RequestHandlerDelegate<TResponse> next)
         {
             _timer.Start();
 
