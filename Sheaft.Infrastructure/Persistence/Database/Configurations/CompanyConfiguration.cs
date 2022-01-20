@@ -36,14 +36,7 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 .HasForeignKey(d => d.CompanyId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
-
-            entity
-                .HasMany(c => c.Catalogs)
-                .WithOne()
-                .HasForeignKey(d => d.SupplierId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
-
+            
             entity
                 .HasOne(c => c.Details)
                 .WithOne()

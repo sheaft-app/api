@@ -6,11 +6,11 @@ namespace Sheaft.Domain.Common
 {
     public class Result
     {
-        internal Result(bool succeeded, List<string> errors = null, Exception exception = null)
+        internal Result(bool succeeded, IEnumerable<string> errors = null, Exception exception = null)
         {
             Succeeded = succeeded;
             Exception = exception;
-            Errors = errors ?? new List<string>();
+            Errors = errors?.ToList() ?? new List<string>();
             
             if (exception is AggregateException aggregateException)
                 Errors.AddRange(aggregateException.InnerExceptions.Select(ie => ie.Message));
@@ -33,10 +33,14 @@ namespace Sheaft.Domain.Common
             return new Result(true);
         }
 
+        public static Result Failure(Exception exception = null)
+        {
+            return Failure(exception?.Message, exception);
+        }
+
         public static Result Failure(string error = null, Exception exception = null)
         {
-            return new Result(false,
-                new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
+            return Failure(new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
                 exception);
         }
 
@@ -52,7 +56,7 @@ namespace Sheaft.Domain.Common
     {
         public T Data { get; private set; }
 
-        internal Result(bool succeeded, List<string> errors, Exception exception = null)
+        internal Result(bool succeeded, IEnumerable<string> errors, Exception exception = null)
             : base(succeeded, errors, exception)
         {
         }
@@ -62,14 +66,18 @@ namespace Sheaft.Domain.Common
             return new Result<T>(true, new List<string> {message}) {Data = data};
         }
 
+        public new static Result<T> Failure(Exception exception = null)
+        {
+            return Failure(exception?.Message, exception);
+        }
+
         public new static Result<T> Failure(string error = null, Exception exception = null)
         {
-            return new Result<T>(false,
-                new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
+            return Failure(new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
                 exception);
         }
 
-        public new static Result<T> Failure(List<string> errors, Exception exception = null)
+        public static Result<T> Failure(IEnumerable<string> errors, Exception exception = null)
         {
             return new Result<T>(false, errors, exception);
         }

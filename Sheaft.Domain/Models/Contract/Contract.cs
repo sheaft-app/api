@@ -17,7 +17,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public Contract(Company client, Company supplier, User createdBy, Distribution distribution = null)
+        public Contract(Company client, Company supplier, RequestUser createdBy, Distribution distribution = null)
         {
             Id = Guid.NewGuid();
             ClientId = client.Id;
@@ -27,9 +27,8 @@ namespace Sheaft.Domain
             SupplierId = supplier.Id;
             Supplier = supplier;
             CreatedById = createdBy.Id;
-            CreatedBy = createdBy;
 
-            if (CreatedBy.Roles.Any(r => r.Role.Name == RoleDefinition.Store))
+            if (createdBy.IsInRole(RoleDefinition.Store))
             {
                 Status = ContractStatus.WaitingForSupplierApproval;
             }
@@ -68,16 +67,16 @@ namespace Sheaft.Domain
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         public byte[] RowVersion { get; private set; }
 
-        public void AcceptAgreement(Distribution delivery, User acceptedBy)
+        public void AcceptAgreement(Distribution delivery, RequestUser acceptedBy)
         {
             if (Status != ContractStatus.WaitingForSupplierApproval &&
                 Status != ContractStatus.WaitingForStoreApproval)
                 throw new ValidationException("Le partenariat ne peut pas être accepté, il n'est en attente d'acceptation.");
 
-            if(Status == ContractStatus.WaitingForSupplierApproval && acceptedBy.Roles.All(r => r.Role.Name != RoleDefinition.Supplier))
+            if(Status == ContractStatus.WaitingForSupplierApproval && acceptedBy.IsInRole(RoleDefinition.Store))
                 throw new ValidationException("Le partenariat doit être accepté par le producteur.");
             
-            if(Status == ContractStatus.WaitingForStoreApproval && acceptedBy.Roles.All(r => r.Role.Name != RoleDefinition.Store))
+            if(Status == ContractStatus.WaitingForStoreApproval && acceptedBy.IsInRole(RoleDefinition.Supplier))
                 throw new ValidationException("Le partenariat doit être accepté par le magasin.");
 
             if (delivery != null)
@@ -104,16 +103,16 @@ namespace Sheaft.Domain
             DomainEvents.Add(new ContractCancelledEvent(Id));
         }
 
-        public void RefuseAgreement(string reason, User refusedBy)
+        public void RefuseAgreement(string reason, RequestUser refusedBy)
         {
             if (Status != ContractStatus.WaitingForSupplierApproval &&
                 Status != ContractStatus.WaitingForStoreApproval)
                 throw new ValidationException("Le partenariat n'est pas en attente d'acceptation.");
 
-            if (Status == ContractStatus.WaitingForSupplierApproval && refusedBy.Roles.All(r => r.Role.Name != RoleDefinition.Supplier))
+            if (Status == ContractStatus.WaitingForSupplierApproval && refusedBy.IsInRole(RoleDefinition.Store))
                 throw new ValidationException("Le partenariat ne peut être refusé que par le producteur.");
             
-            if(Status == ContractStatus.WaitingForStoreApproval && refusedBy.Roles.All(r => r.Role.Name != RoleDefinition.Store))
+            if(Status == ContractStatus.WaitingForStoreApproval && refusedBy.IsInRole(RoleDefinition.Supplier))
                 throw new ValidationException("Le partenariat ne peut être refusé que par le magasin.");
 
             Status = ContractStatus.Refused;
@@ -123,11 +122,6 @@ namespace Sheaft.Domain
 
         public void Reset()
         {
-            if (CreatedBy.Roles.All(r => r.Role.Name == RoleDefinition.Supplier))
-                Status = ContractStatus.WaitingForStoreApproval;
-            else
-                Status = ContractStatus.WaitingForSupplierApproval;
-
             Reason = null;
         }
 

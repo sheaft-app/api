@@ -6,7 +6,7 @@ namespace Sheaft.Domain
     {
         protected CompanySetting(){}
         
-        public CompanySetting(Guid companyId, Setting setting, string value)
+        internal CompanySetting(Guid companyId, Setting setting, string value)
         {
             CompanyId = companyId;
             Setting = setting;

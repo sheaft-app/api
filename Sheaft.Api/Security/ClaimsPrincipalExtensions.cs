@@ -32,6 +32,22 @@ namespace Sheaft.Api.Security
             return user.FindFirst("familyName")?.Value;
         }
 
+        public static string GetPhone(this ClaimsPrincipal user)
+        {
+            if (user.Identity is {IsAuthenticated: false})
+                return string.Empty;
+
+            return user.FindFirst("mobilePhone")?.Value;
+        }
+
+        public static string GetPicture(this ClaimsPrincipal user)
+        {
+            if (user.Identity is {IsAuthenticated: false})
+                return string.Empty;
+
+            return user.FindFirst("picture")?.Value;
+        }
+
         public static string GetEmail(this ClaimsPrincipal user)
         {
             if (user.Identity is {IsAuthenticated: false})
@@ -81,9 +97,9 @@ namespace Sheaft.Api.Security
             return userClaims.Select(uc => uc.Value)?.Distinct().ToList();
         }
 
-        public static RequestUser ToIdentityUser(this ClaimsPrincipal user, string requestId, Impersonification impersonification = null)
+        public static RequestUser ToIdentityUser(this ClaimsPrincipal user)
         {
-            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetRoles(), user.TryGetCompanyId(), requestId, impersonification);
+            return new RequestUser(user.TryGetUserId(), user.GetName(), user.GetEmail(), user.GetFirstName(), user.GetLastName(), user.GetPhone(), user.GetPicture(), user.GetRoles(), user.TryGetCompanyId());
         }
     }
 }

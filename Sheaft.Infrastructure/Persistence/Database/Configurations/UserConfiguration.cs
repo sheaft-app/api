@@ -25,20 +25,17 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 .IsRowVersion();
 
             entity
-                .Property(c => c.Name)
-                .UseCollation("Latin1_general_CI_AI")
-                .IsRequired();
-
-            entity
                 .Property(c => c.Email)
                 .IsRequired();
 
             entity
                 .Property(c => c.Firstname)
+                .UseCollation("Latin1_general_CI_AI")
                 .IsRequired();
 
             entity
                 .Property(c => c.Lastname)
+                .UseCollation("Latin1_general_CI_AI")
                 .IsRequired();
 
             entity.OwnsOne(c => c.Address);

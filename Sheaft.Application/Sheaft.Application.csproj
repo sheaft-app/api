@@ -61,4 +61,8 @@
       <_ContentIncludedByDefault Remove="Mailing\Templates\UserDataExportSucceededEvent.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services" />
+    </ItemGroup>
+
 </Project>

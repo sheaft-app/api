@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sheaft.Application.Configurations;
-using Sheaft.Application.Persistence;
+using Sheaft.Application.Storage;
 
-namespace Sheaft.Infrastructure.Persistence
+namespace Sheaft.Infrastructure.Storage
 {
-    internal class BlobService : IBlobService
+    internal class FileService : IFileService
     {
         private readonly StorageConfiguration _storageConfiguration;
 
-        public BlobService(IOptionsSnapshot<StorageConfiguration> storageOptions, ILogger<BlobService> logger)
+        public FileService(IOptionsSnapshot<StorageConfiguration> storageOptions, ILogger<FileService> logger)
         {
             _storageConfiguration = storageOptions.Value;
         }

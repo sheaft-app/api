@@ -3,11 +3,11 @@ using Sheaft.Infrastructure.Persistence.Database.Configurations;
 
 namespace Sheaft.Infrastructure.Persistence
 {
-    public partial class AppDbContext
+    internal partial class AppDbContext
     {
         protected void OnModelCreating(ModelBuilder modelBuilder, bool isAdminContext)
         {
-            modelBuilder.HasDefaultSchema("app");
+            modelBuilder.HasDefaultSchema("dbo");
 
             base.OnModelCreating(modelBuilder);
 
@@ -32,8 +32,6 @@ namespace Sheaft.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new QuickOrderConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new RatingConfiguration());
             modelBuilder.ApplyConfiguration(new RecallConfiguration(isAdminContext));
-            modelBuilder.ApplyConfiguration(new RecallBatchNumberConfiguration());
-            modelBuilder.ApplyConfiguration(new RecallClientConfiguration());
             modelBuilder.ApplyConfiguration(new RecallClientConfiguration());
             modelBuilder.ApplyConfiguration(new ReturnableConfiguration(isAdminContext));
             modelBuilder.ApplyConfiguration(new SettingConfiguration());

@@ -9,7 +9,7 @@ namespace Sheaft.Domain
         {
         }
         
-        public CompanyPicture(string url, int position) : base(url, position)
+        internal CompanyPicture(string url, int position) : base(url, position)
         {
         }
     }

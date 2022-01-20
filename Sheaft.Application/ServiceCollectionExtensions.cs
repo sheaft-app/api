@@ -29,7 +29,7 @@ namespace Sheaft.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
             
-            services.AddMediatR(new List<Assembly>() { typeof(Command).Assembly }.ToArray());
+            services.AddMediatR(new List<Assembly>() { typeof(BaseCommand).Assembly }.ToArray());
         }
     }
 }

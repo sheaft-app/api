@@ -24,16 +24,19 @@ namespace Sheaft.Domain
             Value = value;
             Comment = comment;
             UserId = user.Id;
-            Username = user.Name;
+            Username = $"{user.Firstname} {user.Lastname}";
             Email = user.Email;
+            Picture = user.Picture;
         }
+
 
         public Guid Id { get; } = Guid.NewGuid();
         public DateTimeOffset CreatedOn { get; private set; }
         public decimal Value { get; private set; }
         public string Comment { get; private set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
+        public string Username { get; private set; }
+        public string Email { get; private set; }
+        public string Picture { get; private set; }
         public Guid ProductId { get; private set; }
         public Guid UserId { get; private set; }
     }

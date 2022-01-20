@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Sheaft.Domain.Security;
 
 namespace Sheaft.Domain.Common
 {
@@ -12,54 +13,36 @@ namespace Sheaft.Domain.Common
 
     public class RequestUser
     {
-        public RequestUser() : this(Guid.NewGuid().ToString("N"))
-        {
-        }
-
-        public RequestUser(string requestId, Impersonification impersonification = null) : this(Guid.Empty, "Anonymous",
-            null, new List<string>{"ANONYMOUS"}, null, requestId, impersonification)
-        {
-        }
-
-        public RequestUser(string name, string requestId, Impersonification impersonification = null) : this(Guid.Empty,
-            name, null, new List<string>{"ANONYMOUS"}, null, requestId, impersonification)
+        public RequestUser() 
+            : this(null, null, null)
         {
         }
 
         [JsonConstructor]
-        public RequestUser(Guid? id, string name, string email, List<string> roles, Guid? companyId = null, string requestId = null,
-            Impersonification impersonifiedBy = null)
+        public RequestUser(Guid? id, string name, string email, string firstname = null, string lastname = null, string phone = null, string picture = null, List<string> roles = null, Guid? companyId = null)
         {
             Id = id ?? Guid.Empty;
-            Name = name ?? string.Empty;
-            Email = email ?? string.Empty;
+            Name = name ?? RoleDefinition.Anonymous;
+            Email = email;
+            Firstname = firstname;
+            Lastname = lastname;
+            Phone = phone;
+            Picture = picture;
             CompanyId = companyId;
-            Roles = roles?.ToList() ?? new List<string>();
-            RequestId = requestId ?? Guid.NewGuid().ToString("N");
-            ImpersonifiedBy = impersonifiedBy;
+            Roles = roles?.ToList() ?? new List<string>{RoleDefinition.Anonymous};
         }
 
         public Guid Id { get; }
         public string Name { get; }
         public string Email { get; }
+        public string Phone { get; }
+        public string Picture { get; }
+        public string Lastname { get; }
+        public string Firstname { get; }
         public List<string> Roles { get; }
         public Guid? CompanyId { get; }
-        public Impersonification ImpersonifiedBy { get; }
-        public string RequestId { get; }
-
         public bool IsAuthenticated() => Id != Guid.Empty;
-        public bool IsImpersonating() => ImpersonifiedBy != null;
-    }
-
-    public class Impersonification
-    {
-        public Impersonification(Guid id, string name = null)
-        {
-            Id = id;
-            Name = name;
-        }
-
-        public Guid Id { get; }
-        public string Name { get; }
+        public bool IsInRole(string role) => Roles.Contains(role);
+        public bool IsInRoles(IEnumerable<string> roles) => Roles.Intersect(roles).Any();
     }
 }

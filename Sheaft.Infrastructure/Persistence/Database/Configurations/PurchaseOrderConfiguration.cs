@@ -24,21 +24,17 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 .Property(c => c.UpdatedOn)
                 .IsRowVersion();
 
-            entity.Property(o => o.Reference).IsRequired();
+            entity.Property(o => o.Reference)
+                .HasField("_identifier")
+                .HasColumnName("Reference");
 
-            entity.OwnsMany(o => o.Products, p =>
+            entity.OwnsMany(o => o.Lines, p =>
             {
-                p.OwnsOne(r => r.Returnable, rt =>
-                {
-                    rt.Property(e => e.Vat).HasColumnType("decimal(10,2)");
-                    rt.Property(e => e.WholeSalePrice).HasColumnType("decimal(10,2)");
-                });
-
                 p.Property(e => e.Vat).HasColumnType("decimal(10,2)");
                 p.Property(e => e.WholeSalePrice).HasColumnType("decimal(10,2)");
                 p.Property(e => e.WholeSalePricePerUnit).HasColumnType("decimal(10,2)");
 
-                p.ToTable("PurchaseOrderProducts");
+                p.ToTable("PurchaseOrderLines");
             });
 
             entity.OwnsOne(c => c.Vendor, c =>
@@ -46,6 +42,7 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 c.Property(e => e.Name).IsRequired();
                 c.Property(e => e.Email).IsRequired();
             });
+            
             entity.OwnsOne(c => c.Sender, c =>
             {
                 c.Property(e => e.Name).IsRequired();
@@ -59,7 +56,7 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
             });            
 
             entity.HasKey(c => c.Id);
-            entity.HasIndex(c => new { VendorId = c.Vendor.CompanyId, c.Reference}).IsUnique();
+            entity.HasIndex(c => c.Reference).IsUnique();
             entity.ToTable("PurchaseOrders");
         }
     }

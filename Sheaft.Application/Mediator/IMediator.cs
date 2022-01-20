@@ -8,13 +8,13 @@ namespace Sheaft.Application.Mediator
 {
     public interface IMediator
     {
-        void Post<T>(ICommand<T> command, string jobName = null);
-        void Post(ICommand command, string jobName = null);
+        void Post<T>(BaseCommand<T> command, string jobName = null);
+        void Post(BaseCommand command, string jobName = null);
         void Post(DomainEvent notification, string jobName = null);
-        void Schedule(ICommand command, TimeSpan delay, string jobName = null);
-        void Schedule<T>(ICommand<T> command, TimeSpan delay, string jobName = null);
+        void Schedule(BaseCommand command, TimeSpan delay, string jobName = null);
+        void Schedule<T>(BaseCommand<T> command, TimeSpan delay, string jobName = null);
         void Schedule(DomainEvent notification, TimeSpan delay, string jobName = null);
-        Task<Result> Process(ICommand command, CancellationToken token);
-        Task<Result<T>> Process<T>(ICommand<T> command, CancellationToken token);
+        Task<Result> Process(BaseCommand command, CancellationToken token);
+        Task<Result<T>> Process<T>(BaseCommand<T> command, CancellationToken token);
     }
 }

@@ -8,7 +8,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public CompanyBilling(Guid companyId, string iban, string bic, BillingAddress address)
+        internal CompanyBilling(Guid companyId, string iban, string bic, BillingAddress address)
         {
             CompanyId = companyId;
             Address = address;

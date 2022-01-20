@@ -2,12 +2,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Razor.Templating.Core;
-using Sheaft.Application.Interfaces;
+using Sheaft.Application.Pdf;
 using Sheaft.Domain.Common;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
-namespace Sheaft.Infrastructure.Services
+namespace Sheaft.Infrastructure.Pdf
 {
     internal class PdfGenerator : IPdfGenerator
     {

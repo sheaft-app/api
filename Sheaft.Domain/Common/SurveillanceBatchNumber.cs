@@ -13,8 +13,7 @@ namespace Sheaft.Domain.BaseClass
         {
             BatchNumberId = batchNumber.Id;
         }
-
-        public Guid Id { get; } = Guid.NewGuid();
+        
         public DateTimeOffset UpdatedOn { get; private set; }
         public Guid BatchNumberId { get; private set; }
     }

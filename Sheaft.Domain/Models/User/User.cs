@@ -13,7 +13,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public User(Guid id, string name, string firstname, string lastname, string email, string phone = null)
+        internal User(Guid id, string name, string firstname, string lastname, string email, string phone = null)
         {
             Id = id;
         }
@@ -22,7 +22,6 @@ namespace Sheaft.Domain
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset UpdatedOn { get; private set; }
         public bool Removed { get; private set; }
-        public string Name { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
         public string Picture { get; private set; }
@@ -30,8 +29,6 @@ namespace Sheaft.Domain
         public string Lastname { get; private set; }
         public Guid? CompanyId { get; private set; }
         public UserAddress Address { get; private set; }
-        public Company Company { get; private set; }
-        public ICollection<UserRole> Roles { get; private set; }
         public ICollection<Cart> Carts { get; private set; }
         public List<DomainEvent> DomainEvents { get; private set; } = new List<DomainEvent>();
 
@@ -44,7 +41,6 @@ namespace Sheaft.Domain
         {
             Firstname = string.Empty;
             Lastname = string.Empty;
-            Name = string.Empty;
             Email = $"{Guid.NewGuid():N}@anonym.ous";
             Phone = string.Empty;
             SetAddress("Anonymous", null, Address.Zipcode, "Anonymous", Address.Country);

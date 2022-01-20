@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Sheaft.Api.Authorize;
-using Sheaft.Api.Extensions;
+using Sheaft.Api.Middlewares;
 using Sheaft.Api.Security;
 using Sheaft.Application;
 using Sheaft.Infrastructure;
@@ -49,7 +49,6 @@ namespace Sheaft.Api
             services.AddAuthorization(Configuration);
             
             services.AddApplicationServices(Configuration);
-            
             services.AddInfrastructureServices(Configuration);
             
             services.AddLogging(config =>

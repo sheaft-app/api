@@ -32,18 +32,21 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 .IsRequired();
 
             entity
-                .HasMany(c => c.Batches)
-                .WithOne()
-                .HasForeignKey(c => c.RecallId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .OwnsMany(c => c.Batches, p =>
+                {
+                    p.HasOne<BatchNumber>()
+                        .WithMany()
+                        .HasForeignKey(bn => bn.BatchNumberId)
+                        .OnDelete(DeleteBehavior.Restrict);
+                    
+                    p.ToTable("RecallBatchNumbers");
+                });
 
             entity
-                .HasMany(c => c.Products)
-                .WithOne()
-                .HasForeignKey(c => c.RecallId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+                .OwnsMany(c => c.Products, p =>
+                {
+                    p.ToTable("RecallProducts");
+                });
 
             entity
                 .HasMany(c => c.Clients)
@@ -57,17 +60,6 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
         }
     }
 
-    public class RecallProductConfiguration : IEntityTypeConfiguration<RecallProduct>
-    {
-        public void Configure(EntityTypeBuilder<RecallProduct> entity)
-        {
-            entity.HasOne<Product>().WithMany().HasForeignKey(c => c.ProductId).OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasKey(c => c.Id);
-            entity.ToTable("RecallProducts");
-        }
-    }
-
     public class RecallClientConfiguration : IEntityTypeConfiguration<RecallClient>
     {
         public void Configure(EntityTypeBuilder<RecallClient> entity)
@@ -76,17 +68,6 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
 
             entity.HasKey(c => new { c.RecallId, c.ClientId });
             entity.ToTable("RecallClients");
-        }
-    }
-
-    public class RecallBatchNumberConfiguration : IEntityTypeConfiguration<RecallBatchNumber>
-    {
-        public void Configure(EntityTypeBuilder<RecallBatchNumber> entity)
-        {
-            entity.HasOne<BatchNumber>().WithMany().HasForeignKey(c => c.BatchNumberId).OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasKey(c => c.Id);
-            entity.ToTable("RecallBatchNumbers");
         }
     }
 }

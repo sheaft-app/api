@@ -16,13 +16,9 @@ namespace Sheaft.Infrastructure
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var contextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                var context = contextFactory.CreateDbContext();
-                
+                var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
                 if (!context.AllMigrationsApplied())
-                {
-                    context.Migrate();
-                }
+                    context.Database.Migrate();
 
                 var settingsEnum = Enum.GetValues(typeof(SettingKind)).Cast<SettingKind>().ToList();
                 var settings = context.Settings.ToList();

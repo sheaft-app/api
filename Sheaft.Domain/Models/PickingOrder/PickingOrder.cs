@@ -80,7 +80,7 @@ namespace Sheaft.Domain
             Products ??= new List<PickingProduct>();
             foreach (var purchaseOrder in purchaseOrders)
             {
-                foreach (var purchaseOrderProduct in purchaseOrder.Products)
+                foreach (var purchaseOrderProduct in purchaseOrder.Lines)
                     Products.Add(new PickingProduct(purchaseOrderProduct.ProductId, purchaseOrder.Id, purchaseOrderProduct.Quantity));
             }
 
@@ -100,7 +100,7 @@ namespace Sheaft.Domain
 
             foreach (var purchaseOrder in purchaseOrders)
             {
-                foreach (var purchaseOrderProduct in purchaseOrder.Products)
+                foreach (var purchaseOrderProduct in purchaseOrder.Lines)
                 {
                     var product = Products.FirstOrDefault(p =>
                         p.ProductId == purchaseOrderProduct.ProductId && p.PurchaseOrderId == purchaseOrder.Id);

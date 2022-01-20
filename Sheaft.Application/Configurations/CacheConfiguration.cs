@@ -1,6 +1,5 @@
 ﻿namespace Sheaft.Application.Configurations
 {
-
     public class CacheConfiguration
     {
         public const string SETTING = "Cache";

@@ -30,7 +30,6 @@ namespace Sheaft.Application.Behaviours
             
             using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
-                ["RequestId"] = request.RequestUser.RequestId,
                 ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
                 ["UserEmail"] = request.RequestUser.Email,
                 ["UserName"] = request.RequestUser.Name,

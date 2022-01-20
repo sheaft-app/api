@@ -4,22 +4,25 @@ using Amazon.SimpleEmail;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Sheaft.Application.Configurations;
-using Sheaft.Application.Interfaces;
+using Sheaft.Application.Identifiers;
 using Sheaft.Application.Mediator;
 using Sheaft.Application.Notifications;
+using Sheaft.Application.Pdf;
 using Sheaft.Application.Persistence;
+using Sheaft.Application.Storage;
+using Sheaft.Domain;
 using Sheaft.Infrastructure.Hangfire;
+using Sheaft.Infrastructure.Identifiers;
 using Sheaft.Infrastructure.Mediator;
 using Sheaft.Infrastructure.Notifications;
+using Sheaft.Infrastructure.Pdf;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.Providers;
-using Sheaft.Infrastructure.Services;
+using Sheaft.Infrastructure.Storage;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -36,10 +39,18 @@ namespace Sheaft.Infrastructure
             RegisterHangfire(services, configuration);
             RegisterDatabaseServices(services, configuration);
             RegisterSignalr(services);
+            
+            RegisterRepositories(services);
 
             services.AddHttpClient();
             services.AddRazorTemplating();
             services.AddScoped<IIdentifierService, IdentifierService>();
+        }
+
+        private static void RegisterRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IRepository<Company>, CompanyRepository>();
         }
 
         private static void RegisterMediator(IServiceCollection services)
@@ -65,9 +76,8 @@ namespace Sheaft.Infrastructure
 
         private static void RegisterStorageServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<IFileService, FileService>();
             var storageConfig = configuration.GetSection(StorageConfiguration.SETTING).Get<StorageConfiguration>();
-            services.AddSingleton(CloudStorageAccount.Parse(storageConfig.ConnectionString));
         }
 
         private static void RegisterSignalr(IServiceCollection services)
@@ -81,8 +91,11 @@ namespace Sheaft.Infrastructure
         {
             services.AddScoped<IDapperContext, DapperContext>();
             
+            services.Configure<AppDatabaseConfiguration>(configuration.GetSection(AppDatabaseConfiguration.SETTING));
+            services.Configure<JobsDatabaseConfiguration>(configuration.GetSection(JobsDatabaseConfiguration.SETTING));
+            
             var databaseConfig = configuration.GetSection(AppDatabaseConfiguration.SETTING).Get<AppDatabaseConfiguration>();
-            services.AddPooledDbContextFactory<AppDbContext>(options =>
+            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
             {
                 options.UseSqlServer(databaseConfig.ConnectionString, x =>
                 {
@@ -96,6 +109,7 @@ namespace Sheaft.Infrastructure
         {
             var jobsDatabaseConfig =
                 configuration.GetSection(JobsDatabaseConfiguration.SETTING).Get<JobsDatabaseConfiguration>();
+            
             services.AddHangfire(hangfireConfig =>
             {
                 hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions
@@ -106,14 +120,16 @@ namespace Sheaft.Infrastructure
                     UseRecommendedIsolationLevel = true,
                     DisableGlobalLocks = true
                 });
+                
                 hangfireConfig.UseSerializerSettings(new JsonSerializerSettings
                 {
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.None
                 });
             });
 
             GlobalJobFilters.Filters.Add(new ProlongExpirationTimeAttribute());
             GlobalJobFilters.Filters.Add(new LogEverythingAttribute());
+            
             RecuringJobs.Register(configuration.GetSection(RoutineConfiguration.SETTING).Get<RoutineConfiguration>());
             
             services.AddHangfireServer();

@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Application", "Sheaf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Infrastructure", "Sheaft.Infrastructure\Sheaft.Infrastructure.csproj", "{8F861470-B5E5-4313-8C7D-53830A07426E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Application.Tests", "Sheaft.Application.Tests\Sheaft.Application.Tests.csproj", "{F8740A6A-4A09-44DD-8F1D-96748CBAC62C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{8F861470-B5E5-4313-8C7D-53830A07426E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F861470-B5E5-4313-8C7D-53830A07426E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F861470-B5E5-4313-8C7D-53830A07426E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8740A6A-4A09-44DD-8F1D-96748CBAC62C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8740A6A-4A09-44DD-8F1D-96748CBAC62C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8740A6A-4A09-44DD-8F1D-96748CBAC62C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8740A6A-4A09-44DD-8F1D-96748CBAC62C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

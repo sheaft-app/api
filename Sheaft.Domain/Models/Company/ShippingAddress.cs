@@ -11,8 +11,8 @@ namespace Sheaft.Domain
         {
         }
 
-        public ShippingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, double? longitude, double? latitude) :
-            base(line1, line2, zipcode, city, country)
+        internal ShippingAddress(string line1, string line2, string zipcode, string city, CountryIsoCode country, double? longitude, double? latitude) 
+            : base(line1, line2, zipcode, city, country)
         {
             Longitude = longitude;
             Latitude = latitude;

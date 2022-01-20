@@ -2,10 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
+using Sheaft.Application.Persistence;
 
 namespace Sheaft.Infrastructure.Persistence.Database
 {
-    internal class InnerTransaction : IDbContextTransaction
+    internal class InnerTransaction : ITransaction
     {
         private readonly IDbContextTransaction _transaction;
         private readonly Action _action;
@@ -23,15 +24,6 @@ namespace Sheaft.Infrastructure.Persistence.Database
         }
 
         public Guid TransactionId { get; }
-
-        public void Commit()
-        {
-            if(TransactionId == Guid.Empty)
-                return;
-            
-            _action();
-            _transaction.Commit();
-        }
 
         public Task CommitAsync(CancellationToken token = default)
         {
@@ -52,26 +44,12 @@ namespace Sheaft.Infrastructure.Persistence.Database
 
         public ValueTask DisposeAsync()
         {
-            if(TransactionId == Guid.Empty)
-                return new ValueTask(Task.CompletedTask);
-                
-            return _transaction.DisposeAsync();
-        }
-
-        public void Rollback()
-        {
-            if(TransactionId == Guid.Empty)
-                return;
-
-            _transaction.Rollback();
+            return TransactionId == Guid.Empty ? new ValueTask(Task.CompletedTask) : _transaction.DisposeAsync();
         }
 
         public Task RollbackAsync(CancellationToken token = default)
         {
-            if(TransactionId == Guid.Empty)
-                return Task.CompletedTask;
-
-            return _transaction.RollbackAsync(token);
+            return TransactionId == Guid.Empty ? Task.CompletedTask : _transaction.RollbackAsync(token);
         }
     }
 }

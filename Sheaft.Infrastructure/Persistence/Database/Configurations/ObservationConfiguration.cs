@@ -42,11 +42,15 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
                 .HasMany(c => c.Replies)
                 .WithOne()
                 .HasForeignKey(c => c.ReplyToId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.OwnsMany(c => c.BatchNumbers, b =>
             {
-                b.HasOne<BatchNumber>().WithMany().HasForeignKey(bn => bn.BatchNumberId).OnDelete(DeleteBehavior.Restrict);
+                b.HasOne<BatchNumber>()
+                    .WithMany()
+                    .HasForeignKey(bn => bn.BatchNumberId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
                 b.ToTable("ObservationBatchNumbers");
             });
             

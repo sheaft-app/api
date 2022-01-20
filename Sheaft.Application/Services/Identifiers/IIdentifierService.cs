@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Application.Interfaces
+namespace Sheaft.Application.Identifiers
 {
     public interface IIdentifierService
     {

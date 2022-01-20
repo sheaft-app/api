@@ -3,15 +3,18 @@ using Sheaft.Domain.BaseClass;
 
 namespace Sheaft.Domain
 {
-    public class Vendor : PurchaseOrderUser
+    public class Vendor
     {
         protected Vendor() { }
 
-        public Vendor(Company vendor) : base(vendor)
+        public Vendor(Company vendor)
         {
-            CompanyId = vendor.Id;
+            Id = vendor.Id;
         }
 
-        public Guid CompanyId { get; private set; }
+        public Guid Id { get; private set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public string Phone { get; private set; }
     }
 }

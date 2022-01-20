@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 namespace Sheaft.Api.Middlewares
@@ -24,6 +25,14 @@ namespace Sheaft.Api.Middlewares
             {
                 await next(context);
             }
+        }
+    }
+    
+    public static class RobotsTxtMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseRobotsTxt(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<RobotsTxtMiddleware>();
         }
     }
 }

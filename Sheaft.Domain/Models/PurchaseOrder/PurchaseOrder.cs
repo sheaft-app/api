@@ -13,19 +13,21 @@ namespace Sheaft.Domain
     public class PurchaseOrder : IEntity, IHasDomainEvent
     {
         private const int DIGITS_COUNT = 2;
+        private string _identifier;
 
         protected PurchaseOrder()
         {
         }
 
-        public PurchaseOrder(Guid cartId, int reference, PurchaseOrderStatus status, Vendor vendor, Sender sender, PurchaseOrderDelivery expectedDelivery, IEnumerable<Tuple<Product, CatalogProductPrice, int>> products)
+        public PurchaseOrder(Guid cartId, int reference, PurchaseOrderStatus status, Vendor vendor, Sender sender, PurchaseOrderDelivery expectedDelivery, IEnumerable<Tuple<Product, CatalogProductPrice, int>> products, string comment = null)
         {
-            Reference = reference;
+            Reference = reference.ToString();
             Sender = sender;
             Vendor = vendor;
             CartId = cartId;
             ExpectedDelivery = expectedDelivery;
-            Products = new List<PurchaseOrderProduct>();
+            Comment = comment;
+            Lines = new List<PurchaseOrderLine>();
             DomainEvents = new List<DomainEvent> {new PurchaseOrderCreatedEvent(Id)};
             
             SetStatus(status, true);
@@ -48,14 +50,22 @@ namespace Sheaft.Domain
         public DateTimeOffset? AcceptedOn { get; private set; }
         public DateTimeOffset? CompletedOn { get; private set; }
         public DateTimeOffset? DroppedOn { get; private set; }
-        public int Reference { get; private set; }
+        public string Reference
+        {
+            get { return _identifier.Replace($"{Vendor.Id:N}_", string.Empty);}
+            private set
+            {
+                _identifier = $"{Vendor.Id:N}_{value}";
+            } 
+        }
+        public string Comment { get; private set; }
         public string Reason { get; private set; }
         public PurchaseOrderStatus Status { get; private set; }
         public Guid CartId { get; private set; }
         public Sender Sender { get; private set; }
         public Vendor Vendor { get; private set; }
         public PurchaseOrderDelivery ExpectedDelivery { get; private set; }
-        public ICollection<PurchaseOrderProduct> Products { get; private set; }
+        public ICollection<PurchaseOrderLine> Lines { get; private set; }
         public List<DomainEvent> DomainEvents { get; } = new List<DomainEvent>();
         
         public void Restore()
@@ -199,11 +209,11 @@ namespace Sheaft.Domain
             if (Status != PurchaseOrderStatus.Pending)
                 throw new ValidationException("Impossible d'ajouter un produit, la commande n'est plus en attente.");
 
-            var productLine = Products.SingleOrDefault(p => p.ProductId == productWithPriceAndQuantity.Item1.Id);
+            var productLine = Lines.SingleOrDefault(p => p.ProductId == productWithPriceAndQuantity.Item1.Id);
             if (productLine != null)
-                Products.Remove(productLine);
+                Lines.Remove(productLine);
 
-            Products.Add(new PurchaseOrderProduct(productWithPriceAndQuantity.Item1, productWithPriceAndQuantity.Item2, productWithPriceAndQuantity.Item3));
+            Lines.Add(new PurchaseOrderLine(productWithPriceAndQuantity.Item1, productWithPriceAndQuantity.Item2, productWithPriceAndQuantity.Item3));
         }
     }
 }

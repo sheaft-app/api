@@ -9,7 +9,7 @@ namespace Sheaft.Domain
         {
         }
 
-        public CompanyLegals(Guid companyId, LegalKind kind, string name, string identifier, string vatNumber, bool isExemptedFromVat, LegalsAddress address)
+        internal CompanyLegals(Guid companyId, LegalKind kind, string name, string identifier, string vatNumber, bool isExemptedFromVat, LegalsAddress address)
         {
             CompanyId = companyId;
             Kind = kind;

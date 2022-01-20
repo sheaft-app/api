@@ -2,16 +2,16 @@
 using Newtonsoft.Json;
 using Sheaft.Domain.Common;
 
-namespace Sheaft.Domain.Events.Store
+namespace Sheaft.Domain.Events.Company
 {
-    public class StoreRegisteredEvent : DomainEvent
+    public class CompanyRegistered : DomainEvent
     {
         [JsonConstructor]
-        public StoreRegisteredEvent(Guid storeId)
+        public CompanyRegistered(Guid companyId)
         {
-            StoreId = storeId;
+            CompanyId = companyId;
         }
 
-        public Guid StoreId { get; }
+        public Guid CompanyId { get; }
     }
 }

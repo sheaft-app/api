@@ -9,17 +9,15 @@ namespace Sheaft.Domain
         {
         }
         
-        public PurchaseOrderDelivery(Guid distributionId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, PurchaseOrderDeliveryAddress address, string comment = null)
+        public PurchaseOrderDelivery(Guid distributionId, DateTimeOffset expectedDeliveryDate, TimeSpan from, TimeSpan to, PurchaseOrderDeliveryAddress address)
         {
             DistributionId = distributionId;
             Address = address;
             From = from;
             To = to;
             ExpectedDeliveryDate = expectedDeliveryDate;
-            Comment = comment;
         }
 
-        public string Comment { get; private set; }
         public DateTimeOffset ExpectedDeliveryDate { get; private set; }
         public TimeSpan From { get; private set; }
         public TimeSpan To { get; private set; }

@@ -2,14 +2,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Sheaft.Infrastructure.Providers
+namespace Sheaft.Infrastructure.Notifications
 {
     internal class NameUserIdProvider : IUserIdProvider
     {
         public string GetUserId(HubConnectionContext connection)
         {
-            var userId = connection.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            return userId;
+            return connection.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

@@ -3,23 +3,32 @@ using Sheaft.Domain.BaseClass;
 
 namespace Sheaft.Domain
 {
-    public class Sender : PurchaseOrderUser
+    public class Sender 
     {
         protected Sender() { }
 
-        public Sender(User user) : base(user)
+        public Sender(User user)
         {
-            UserId = user.Id;
+            Id = user.Id;
+            Name = $"{user.Firstname} {user.Lastname}";
+            Email = user.Email;
+            Phone = user.Phone;
+            CompanyId = user.CompanyId;
         }
         
-        public Sender(User user, Company company) : base(company)
+        public Sender(User user, Company company)
         {
-            UserId = user.Id;
+            Id = user.Id;
+            Name = company.Name;
+            Email = company.Email;
+            Phone = company.Phone;
             CompanyId = company.Id;
         }
         
-        public string Picture { get; private set; }
-        public Guid UserId { get; private set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public string Phone { get; private set; }
+        public Guid Id { get; private set; }
         public Guid? CompanyId { get; private set; }
     }
 }

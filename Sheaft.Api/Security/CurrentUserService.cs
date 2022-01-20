@@ -22,10 +22,9 @@ namespace Sheaft.Api.Security
 
             if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 return Result<RequestUser>.Success(
-                    _httpContextAccessor.HttpContext.User.ToIdentityUser(_httpContextAccessor.HttpContext
-                        .TraceIdentifier));
+                    _httpContextAccessor.HttpContext.User.ToIdentityUser());
 
-            return Result<RequestUser>.Success(new RequestUser(_httpContextAccessor.HttpContext.TraceIdentifier));
+            return Result<RequestUser>.Success(new RequestUser());
         }
     }
 }

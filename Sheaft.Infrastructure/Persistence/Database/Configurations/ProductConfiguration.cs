@@ -53,7 +53,7 @@ namespace Sheaft.Infrastructure.Persistence.Database.Configurations
             entity.HasOne(c => c.Returnable)
                 .WithMany()
                 .HasForeignKey(c => c.ReturnableId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne<Company>()
                 .WithMany()

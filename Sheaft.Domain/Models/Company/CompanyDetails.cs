@@ -11,7 +11,7 @@ namespace Sheaft.Domain
         {
         }
         
-        public CompanyDetails(Guid companyId, string summary, string description = null, string website = null, string facebook = null, string instagram = null, string twitter = null)
+        internal CompanyDetails(Guid companyId, string summary, string description = null, string website = null, string facebook = null, string instagram = null, string twitter = null)
         {
             CompanyId = companyId;
             Summary = summary;

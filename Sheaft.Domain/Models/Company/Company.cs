@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sheaft.Domain.BaseClass;
 using Sheaft.Domain.Common;
 using Sheaft.Domain.Enum;
 using Sheaft.Domain.Events;
@@ -15,33 +16,31 @@ namespace Sheaft.Domain
         {
         }
 
-        public Company(string name, string email, ShippingAddress address, bool openForBusiness = true, string phone = null)
+        public Company(string name, string email, string phone, ShippingAddress address)
         {
             if (address == null)
-                throw new ValidationException("L'adresse du siège social est requise.");
+                throw new ValidationException("L'adresse de livraison est requise.");
             
-            Id = Guid.NewGuid();
             Name = name;
             Email = email;
             Phone = phone;
-            OpenForNewContracts = openForBusiness;
             ShippingAddress = address;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; } = Guid.NewGuid();
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string Phone { get; private set; }
         public DateTimeOffset CreatedOn { get; private set; }
         public DateTimeOffset UpdatedOn { get; private set; }
         public bool Removed { get; private set; }
-        public bool OpenForNewContracts { get; private set; }
+        public bool OpenForNewContracts { get; set; }
         public CompanyLegals Legals { get; private set; }
         public CompanyDetails Details { get; private set; }
         public CompanyBilling Billing { get; private set; }
         public ShippingAddress ShippingAddress { get; private set; }
         public ICollection<CompanySetting> Settings { get; private set; }
-        public ICollection<Catalog> Catalogs { get; private set; }
+        public ICollection<User> Users { get; private set; }
         public List<DomainEvent> DomainEvents { get; private set; } = new List<DomainEvent>();
         
         public void Restore()
@@ -49,14 +48,27 @@ namespace Sheaft.Domain
             Removed = false;
         }
 
-        public CompanyLegals SetLegals(LegalKind kind, string name, string siret, string vatIdentifier, LegalsAddress address, string registrationCity = null, string registrationCode = null, RegistrationKind? registrationKind = null)
+        public void SetLegalsInfo(LegalKind kind, string name, string siret, string vatNumber, LegalsAddress address, string registrationCity = null, string registrationCode = null, RegistrationKind? registrationKind = null)
         {
-            var legals = new CompanyLegals(Id, kind, name, siret, vatIdentifier, string.IsNullOrWhiteSpace(vatIdentifier), address);
+            Legals = new CompanyLegals(Id, kind, name, siret, vatNumber, string.IsNullOrWhiteSpace(vatNumber), address);;
             if(registrationKind.HasValue)
-                legals.SetRegistrationKind(registrationKind.Value, registrationCity, registrationCode);
+                Legals.SetRegistrationKind(registrationKind.Value, registrationCity, registrationCode);
+        }
+
+        public void SetDetailsInfo(string summary, string description, string website, string facebook, string instagram, string twitter, IEnumerable<Picture> pictures)
+        {
+            Details = new CompanyDetails(Id, summary, description, website, facebook, instagram, twitter);
+            Details.SetPictures(pictures);
+        }
+
+        public void SetBillingInfo(string name, string iban, string bic, string streetAddress, string postalCode, string city, string country, string line2 = null)
+        {
+            Billing = new CompanyBilling(Id, iban, bic, new BillingAddress(name,streetAddress, line2, postalCode, city, CountryIsoCode.FR));
+        }
+
+        public void AddUser()
+        {
             
-            Legals = legals;
-            return legals;
         }
         
         public CompanySetting GetSetting(SettingKind kind)
