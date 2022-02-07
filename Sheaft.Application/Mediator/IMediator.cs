@@ -2,19 +2,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Events;
 
 namespace Sheaft.Application.Mediator
 {
     public interface IMediator
     {
-        void Post<T>(BaseCommand<T> command, string jobName = null);
-        void Post(BaseCommand command, string jobName = null);
-        void Post(DomainEvent notification, string jobName = null);
-        void Schedule(BaseCommand command, TimeSpan delay, string jobName = null);
-        void Schedule<T>(BaseCommand<T> command, TimeSpan delay, string jobName = null);
-        void Schedule(DomainEvent notification, TimeSpan delay, string jobName = null);
-        Task<Result> Process(BaseCommand command, CancellationToken token);
-        Task<Result<T>> Process<T>(BaseCommand<T> command, CancellationToken token);
+        void Publish(IIntegrationEvent notification, string jobName = null);
+        void Post(ICommand<Result> command, string jobName = null);
+        void Post<T>(ICommand<Result<T>> command, string jobName = null);
+        void Schedule(ICommand<Result> command, TimeSpan delay, string jobName = null);
+        void Schedule<T>(ICommand<Result<T>> command, TimeSpan delay, string jobName = null);
+        Task<Result> Process(ICommand<Result> command, CancellationToken token);
+        Task<Result<T>> Process<T>(ICommand<Result<T>> command, CancellationToken token);
     }
 }

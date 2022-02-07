@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Sheaft.Application;
+using Sheaft.Domain;
 using Sheaft.Domain.Common;
 
 namespace Sheaft.Api.Security
@@ -18,13 +20,13 @@ namespace Sheaft.Api.Security
         public Result<RequestUser> GetCurrentUserInfo()
         {
             if (_httpContextAccessor.HttpContext?.User?.Identity == null)
-                return Result<RequestUser>.Success(new RequestUser());
+                return Result<RequestUser>.Success(new RequestUser(null));
 
             if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 return Result<RequestUser>.Success(
                     _httpContextAccessor.HttpContext.User.ToIdentityUser());
 
-            return Result<RequestUser>.Success(new RequestUser());
+            return Result<RequestUser>.Success(new RequestUser(null));
         }
     }
 }

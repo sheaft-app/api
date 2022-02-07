@@ -4,17 +4,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Sheaft.Domain;
+using Sheaft.Application.Mediator;
 using Sheaft.Domain.Common;
 
 namespace Sheaft.Application.Behaviours
 {
     internal class LoggingBehaviour<TRequest, TResponse> : MediatR.IPipelineBehavior<TRequest, TResponse>
-        where TRequest : ITrackedUser
+        where TRequest : ICommand<TResponse>
+        where TResponse: IResult
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<LoggingBehaviour<TRequest, TResponse>> _logger;
 
-        public LoggingBehaviour(ILogger<TRequest> logger)
+        public LoggingBehaviour(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
         {
             _logger = logger;
         }
@@ -26,15 +27,11 @@ namespace Sheaft.Application.Behaviours
                 throw new Exception("The requestUser must be assigned for the command.");
             
             var requestName = typeof(TRequest).Name;
-            _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Name);
+            _logger.LogInformation("Processing request: {Name} for {@UserId}", requestName, request.RequestUser.Id);
             
             using (var scope = _logger.BeginScope(new Dictionary<string, object>
             {
-                ["UserIdentifier"] = request.RequestUser.Id.ToString("N"),
-                ["UserEmail"] = request.RequestUser.Email,
-                ["UserName"] = request.RequestUser.Name,
-                ["Roles"] = string.Join(';', request.RequestUser.Roles),
-                ["IsAuthenticated"] = request.RequestUser.IsAuthenticated().ToString(),
+                ["UserId"] = request.RequestUser.Id,
                 ["Command"] = requestName,
                 ["Data"] = JsonConvert.SerializeObject(request),
             }))

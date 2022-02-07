@@ -2,16 +2,17 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Domain.Exceptions;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace Sheaft.Application.Behaviours
 {
     internal class ValidationBehaviour<TRequest, TResponse> : MediatR.IPipelineBehavior<TRequest, TResponse>
         where TRequest : MediatR.IRequest<TResponse>
     {
-        private readonly IEnumerable<FluentValidation.IValidator<TRequest>> _validators;
+        private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-        public ValidationBehaviour(IEnumerable<FluentValidation.IValidator<TRequest>> validators)
+        public ValidationBehaviour(IEnumerable<IValidator<TRequest>> validators)
         {
             _validators = validators;
         }
@@ -22,14 +23,14 @@ namespace Sheaft.Application.Behaviours
             if (!_validators.Any())
                 return await next();
 
-            var context = new FluentValidation.ValidationContext<TRequest>(request);
+            var context = new ValidationContext<TRequest>(request);
 
             var validationResults =
                 await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, token)));
             
             var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
             if (failures.Count != 0)
-                throw new ValidationException(failures.Select(f => new KeyValuePair<string, string>(f.PropertyName, f.ErrorMessage)));
+                throw new ValidationException("An error occured while validating data.", failures.Select(f => new ValidationFailure(f.PropertyName, f.ErrorMessage)));
 
             return await next();
         }

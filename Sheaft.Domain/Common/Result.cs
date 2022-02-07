@@ -4,82 +4,149 @@ using System.Linq;
 
 namespace Sheaft.Domain.Common
 {
-    public class Result
+    public class ValidationError
     {
-        internal Result(bool succeeded, IEnumerable<string> errors = null, Exception exception = null)
+        public string Identifier { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
+    public enum ResultStatus
+    {
+        Ok,
+        Error,
+        Forbidden,
+        Unauthorized,
+        Invalid,
+        NotFound
+    }
+
+    public interface IResult
+    {
+        bool IsSuccess { get; }
+        ResultStatus Status { get; }
+        string Message { get; }
+        IEnumerable<string> Errors { get; }
+        List<ValidationError> ValidationErrors { get; }
+    }
+
+    public class Result : IResult
+    {
+        protected Result()
         {
-            Succeeded = succeeded;
-            Exception = exception;
-            Errors = errors?.ToList() ?? new List<string>();
-            
-            if (exception is AggregateException aggregateException)
-                Errors.AddRange(aggregateException.InnerExceptions.Select(ie => ie.Message));
-            else
-            {
-                var exceptionMessage = exception?.InnerException?.Message ?? exception?.Message;
-                if (!string.IsNullOrWhiteSpace(exceptionMessage) && !Errors.Contains(exceptionMessage))
-                    Errors.Add(exceptionMessage);
-            }
         }
 
-        public bool Succeeded { get; }
+        protected Result(ResultStatus status)
+        {
+            Status = status;
+        }
 
-        public List<string> Errors { get; }
-
-        public Exception Exception { get; }
+        public ResultStatus Status { get; } = ResultStatus.Ok;
+        public bool IsSuccess => Status == ResultStatus.Ok;
+        public string Message { get; protected set; } = string.Empty;
+        public IEnumerable<string> Errors { get; protected set; } = new List<string>();
+        public List<ValidationError> ValidationErrors { get; protected set; } = new List<ValidationError>();
 
         public static Result Success()
         {
-            return new Result(true);
+            return new Result();
         }
 
-        public static Result Failure(Exception exception = null)
+        public static Result Success(string successMessage)
         {
-            return Failure(exception?.Message, exception);
+            return new Result {Message = successMessage};
         }
 
-        public static Result Failure(string error = null, Exception exception = null)
+        public static Result Error(Exception exception)
         {
-            return Failure(new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
-                exception);
+            return new Result(ResultStatus.Error) { Message = exception.Message };
         }
 
-        public static Result Failure(List<string> errors, Exception exception = null)
+        public static Result Error(params string[] errorMessages)
         {
-            return new Result(false,
-                errors,
-                exception);
+            return new Result(ResultStatus.Error) {Errors = errorMessages, Message = errorMessages.Length > 1 ? "Multiple errors occured." : errorMessages.FirstOrDefault()};
+        }
+
+        public static Result Invalid(List<ValidationError> validationErrors)
+        {
+            return new Result(ResultStatus.Invalid) {ValidationErrors = validationErrors, Message = "Error(s) occured while applying validations."};
+        }
+
+        public static Result NotFound()
+        {
+            return new Result(ResultStatus.NotFound){Message = "Resource not found."};
+        }
+
+        public static Result Forbidden()
+        {
+            return new Result(ResultStatus.Forbidden){Message = "Resource access is not allowed."};
+        }
+
+        public static Result Unauthorized()
+        {
+            return new Result(ResultStatus.Unauthorized){Message = "Resource requires authenticated access."};
         }
     }
 
     public class Result<T> : Result
     {
-        public T Data { get; private set; }
+        public Result(T value)
+        {
+            Value = value;
+        }
 
-        internal Result(bool succeeded, IEnumerable<string> errors, Exception exception = null)
-            : base(succeeded, errors, exception)
+        private Result(ResultStatus status)
+            : base(status)
         {
         }
 
-        public static Result<T> Success(T data, string message = null)
+        public static implicit operator T(Result<T> result) => result.Value;
+        public static implicit operator Result<T>(T value) => Success(value);
+
+        public T Value { get; }
+
+        public static Result<T> Success(T value)
         {
-            return new Result<T>(true, new List<string> {message}) {Data = data};
+            return new Result<T>(value);
         }
 
-        public new static Result<T> Failure(Exception exception = null)
+        public static Result<T> Success(T value, string successMessage)
         {
-            return Failure(exception?.Message, exception);
+            return new Result<T>(value) {Message = successMessage};
+        }
+        
+        public new static Result<T> Success()
+        {
+            return new Result<T>(ResultStatus.Ok);
         }
 
-        public new static Result<T> Failure(string error = null, Exception exception = null)
+        public new static Result<T> Error(Exception e)
         {
-            return Failure(new List<string> {error ?? "Une erreur inattendue est survenue pendant le traitement de la requête."},
-                exception);
+            return new Result<T>(ResultStatus.Error) {Message = e.Message};
         }
 
-        public static Result<T> Failure(IEnumerable<string> errors, Exception exception = null)
+        public new static Result<T> Error(params string[] errorMessages)
         {
-            return new Result<T>(false, errors, exception);
+            return new Result<T>(ResultStatus.Error) {Errors = errorMessages, Message = errorMessages.Length > 1 ? "Multiple errors occured." : errorMessages.FirstOrDefault()};
+        }
+
+        public new static Result<T> Invalid(List<ValidationError> validationErrors)
+        {
+            return new Result<T>(ResultStatus.Invalid) {ValidationErrors = validationErrors, Message = "Error(s) occured while applying validations."};
+        }
+
+        public new static Result<T> NotFound()
+        {
+            return new Result<T>(ResultStatus.NotFound){Message = "Resource not found."};
+        }
+
+        public new static Result<T> Forbidden()
+        {
+            return new Result<T>(ResultStatus.Forbidden){Message = "Resource access is not allowed."};
+        }
+
+        public new static Result<T> Unauthorized()
+        {
+            return new Result<T>(ResultStatus.Unauthorized){Message = "Resource requires authenticated access."};
         }
     }
 }

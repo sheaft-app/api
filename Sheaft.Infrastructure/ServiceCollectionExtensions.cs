@@ -4,25 +4,15 @@ using Amazon.SimpleEmail;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Sheaft.Application.Configurations;
-using Sheaft.Application.Identifiers;
 using Sheaft.Application.Mediator;
-using Sheaft.Application.Notifications;
-using Sheaft.Application.Pdf;
-using Sheaft.Application.Persistence;
-using Sheaft.Application.Storage;
-using Sheaft.Domain;
+using Sheaft.Application.Services;
 using Sheaft.Infrastructure.Hangfire;
-using Sheaft.Infrastructure.Identifiers;
 using Sheaft.Infrastructure.Mediator;
-using Sheaft.Infrastructure.Notifications;
-using Sheaft.Infrastructure.Pdf;
-using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.Storage;
+using Sheaft.Infrastructure.Services;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -49,8 +39,7 @@ namespace Sheaft.Infrastructure
 
         private static void RegisterRepositories(IServiceCollection services)
         {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IRepository<Company>, CompanyRepository>();
+            //services.AddScoped<IRepository<>, Repository<>>();
         }
 
         private static void RegisterMediator(IServiceCollection services)
@@ -89,20 +78,8 @@ namespace Sheaft.Infrastructure
 
         private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IDapperContext, DapperContext>();
-            
             services.Configure<AppDatabaseConfiguration>(configuration.GetSection(AppDatabaseConfiguration.SETTING));
             services.Configure<JobsDatabaseConfiguration>(configuration.GetSection(JobsDatabaseConfiguration.SETTING));
-            
-            var databaseConfig = configuration.GetSection(AppDatabaseConfiguration.SETTING).Get<AppDatabaseConfiguration>();
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
-            {
-                options.UseSqlServer(databaseConfig.ConnectionString, x =>
-                {
-                    x.UseNetTopologySuite();
-                    x.MigrationsHistoryTable("AppMigrationTable", "ef");
-                });
-            });
         }
 
         private static void RegisterHangfire(IServiceCollection services, IConfiguration configuration)

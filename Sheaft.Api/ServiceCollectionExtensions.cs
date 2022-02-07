@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
@@ -9,8 +8,6 @@ using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Sheaft.Api.Security;
-using Sheaft.Application.Configurations;
-using Sheaft.Domain.Security;
 
 namespace Sheaft.Api
 {
@@ -18,17 +15,6 @@ namespace Sheaft.Api
     {
         public static void AddCorsServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var corsConfig = configuration.GetSection(CorsConfiguration.SETTING).Get<CorsConfiguration>();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("cors",
-                    builder =>
-                    {
-                        builder.WithOrigins(corsConfig.Origins.ToArray())
-                            .WithHeaders(corsConfig.Headers.ToArray())
-                            .WithMethods(corsConfig.Methods.ToArray());
-                    });
-            });
         }
         
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -57,24 +43,6 @@ namespace Sheaft.Api
 
         public static void AddCaching(this IServiceCollection services, IConfiguration configuration)
         {
-            var cacheSettings = configuration.GetSection(CacheConfiguration.SETTING);
-            
-            services.Configure<AppDatabaseConfiguration>(configuration.GetSection(AppDatabaseConfiguration.SETTING));
-            var databaseSettings = configuration.GetSection(AppDatabaseConfiguration.SETTING);
-            
-            services.Configure<CacheConfiguration>(cacheSettings);
-            var cacheConfig = cacheSettings.Get<CacheConfiguration>();
-            
-            services.Configure<AppDatabaseConfiguration>(databaseSettings);
-            var databaseConfig = databaseSettings.Get<AppDatabaseConfiguration>();
-            
-            services.AddDistributedSqlServerCache(options =>
-            {
-                options.ConnectionString = databaseConfig.ConnectionString;
-                options.SchemaName = cacheConfig.SchemaName;
-                options.TableName = cacheConfig.TableName;
-            });
-            
             services.AddMemoryCache();
         }
         
@@ -92,54 +60,6 @@ namespace Sheaft.Api
                 {
                     builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
                     builder.RequireAuthenticatedUser();
-                });
-                options.AddPolicy(Policies.REGISTERED, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Supplier, RoleDefinition.Store, RoleDefinition.Consumer);
-                });
-                options.AddPolicy(Policies.STORE_OR_PRODUCER, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Supplier, RoleDefinition.Store);
-                });
-                options.AddPolicy(Policies.STORE_OR_CONSUMER, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Store, RoleDefinition.Consumer);
-                });
-                options.AddPolicy(Policies.UNREGISTERED, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Anonymous);
-                });
-                options.AddPolicy(Policies.OWNER, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Owner);
-                });
-                options.AddPolicy(Policies.PRODUCER, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Supplier);
-                });
-                options.AddPolicy(Policies.STORE, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Store);
-                });
-                options.AddPolicy(Policies.CONSUMER, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                    builder.RequireRole(RoleDefinition.Consumer);
                 });
                 options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
                 {

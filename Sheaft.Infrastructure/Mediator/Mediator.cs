@@ -5,7 +5,6 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Sheaft.Application.Mediator;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Events;
 
 namespace Sheaft.Infrastructure.Mediator
 {
@@ -25,54 +24,47 @@ namespace Sheaft.Infrastructure.Mediator
             _logger = logger;
         }
 
-        public void Post(BaseCommand command, string jobName = null)
-        {
-            var name = jobName ?? command.GetType().Name;
-            _logger.LogTrace("Offloading command {name}", name);
-            _backgroundJobClient.Enqueue<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
-        }
-
-        public void Post<T>(BaseCommand<T> command, string jobName = null)
-        {
-            var name = jobName ?? command.GetType().Name;
-            _logger.LogTrace("Offloading command<T> {name}", name);
-            _backgroundJobClient.Enqueue<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
-        }
-
-        public void Post(DomainEvent notification, string jobName = null)
+        public void Publish(IIntegrationEvent notification, string jobName = null)
         {
             var name = jobName ?? notification.GetType().Name;
-            _logger.LogTrace("Publishing event {name}", name);
+            _logger.LogTrace("Publishing integration event {Name}", name);
             _backgroundJobClient.Enqueue<Dispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None));
         }
 
-        public void Schedule(BaseCommand command, TimeSpan delay, string jobName = null)
+        public void Post(ICommand<Result> command, string jobName = null)
         {
             var name = jobName ?? command.GetType().Name;
-            _logger.LogTrace("Scheduling command {name}", name);
+            _logger.LogTrace("Posting command {Name}", name);
+            _backgroundJobClient.Enqueue<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
+        }
+
+        public void Post<T>(ICommand<Result<T>> command, string jobName = null)
+        {
+            var name = jobName ?? command.GetType().Name;
+            _logger.LogTrace("Posting command<T> {Name}", name);
+            _backgroundJobClient.Enqueue<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
+        }
+
+        public void Schedule(ICommand<Result> command, TimeSpan delay, string jobName = null)
+        {
+            var name = jobName ?? command.GetType().Name;
+            _logger.LogTrace("Scheduling command {Name}", name);
             _backgroundJobClient.Schedule<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
 
-        public void Schedule<T>(BaseCommand<T> command, TimeSpan delay, string jobName = null)
+        public void Schedule<T>(ICommand<Result<T>> command, TimeSpan delay, string jobName = null)
         {
             var name = jobName ?? command.GetType().Name;
-            _logger.LogTrace("Scheduling command<T> {name}", name);
+            _logger.LogTrace("Scheduling command<T> {Name}", name);
             _backgroundJobClient.Schedule<Dispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None), delay);
         }
 
-        public void Schedule(DomainEvent notification, TimeSpan delay, string jobName = null)
-        {
-            var name = jobName ?? notification.GetType().Name;
-            _logger.LogTrace("Scheduling event {name}", name);
-            _backgroundJobClient.Schedule<Dispatcher>(bridge => bridge.Execute(name, notification, CancellationToken.None), delay);
-        }
-
-        public async Task<Result> Process(BaseCommand command, CancellationToken token)
+        public async Task<Result> Process(ICommand<Result> command, CancellationToken token)
         {
             return await _mediatr.Send(command, token);
         }
 
-        public async Task<Result<T>> Process<T>(BaseCommand<T> command, CancellationToken token)
+        public async Task<Result<T>> Process<T>(ICommand<Result<T>> command, CancellationToken token)
         {
             return await _mediatr.Send(command, token);
         }

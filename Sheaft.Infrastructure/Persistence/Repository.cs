@@ -1,162 +1,124 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Sheaft.Application.Mediator;
-using Sheaft.Application.Persistence;
-using Sheaft.Domain;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Events;
-using Sheaft.Domain.Interop;
-using Sheaft.Infrastructure.Persistence.Database;
+using EventId = Sheaft.Domain.Common.EventId;
 
 namespace Sheaft.Infrastructure.Persistence
 {
-    public class UnitOfWork : IUnitOfWork
+    public abstract class Repository<T> : IRepository<T>
+        where T : class, IEntity
     {
-        private readonly IMediator _mediatr;
-        private readonly DbContext _context;
+        private readonly IMediator _mediator;
+        protected readonly IDbConnectionFactory ContextFactory;
+        protected readonly ILogger Logger;
 
-        public UnitOfWork(
-            IMediator mediatr,
-            IAppDbContext context)
+        protected Repository(
+            IMediator mediator,
+            IDbConnectionFactory contextFactory,
+            ILogger logger)
         {
-            _mediatr = mediatr;
-            _context = context as DbContext;
+            _mediator = mediator;
+            ContextFactory = contextFactory;
+            Logger = logger;
         }
-        
-        public async Task<Result<int>> SaveChanges(CancellationToken token)
+
+        public abstract Task<Result<T>> Get(Guid identifier, CancellationToken token);
+
+        public async Task<Result> Save(T entity, CancellationToken token)
         {
+            using var ctx = ContextFactory.CreateConnection();
+            ctx.Open();
+            using var trx = ctx.BeginTransaction();
+
             try
             {
-                UpdateRelatedData();
-                return Result<int>.Success(await _context.SaveChangesAsync(token));
-            }
-            catch (Exception e)
-            {
-                return Result<int>.Failure(e);
-            }
-        }
-
-        public async Task<ITransaction> BeginTransaction(CancellationToken token = default)
-        {
-            if (_context.Database.CurrentTransaction != null)
-                return new InnerTransaction();
-
-            return new InnerTransaction(await _context.Database.BeginTransactionAsync(token), DispatchEvents);
-        }
-
-        private void UpdateRelatedData()
-        {
-            _context.ChangeTracker.DetectChanges();
-
-            foreach (var entry in _context.ChangeTracker.Entries())
-            {
-                if (entry.State == EntityState.Unchanged)
-                    continue;
-                
-                if (entry.Entity is ITrackCreation)
+                var result = await OnSave(trx, entity, token);
+                if (!result.IsSuccess)
                 {
-                    var createdOnProperty = entry.Property("CreatedOn");
-                    if ((DateTimeOffset) createdOnProperty.CurrentValue == default && entry.State != EntityState.Deleted)
-                    {
-                        entry.State = EntityState.Added;
-                        createdOnProperty.CurrentValue = DateTimeOffset.UtcNow;
-                    }
-                }
-
-                if (entry.Entity is ITrackUpdate)
-                {
-                    var updatedOnProperty = entry.Property("UpdatedOn");
-                    updatedOnProperty.CurrentValue = DateTimeOffset.UtcNow;
-                }
-
-                if (entry.State == EntityState.Deleted && entry.Entity is ITrackRemove)
-                {
-                    var removedProperty = entry.Property("Removed");
-                    if (removedProperty.CurrentValue == null || !(bool)removedProperty.CurrentValue)
-                        removedProperty.CurrentValue = true;
-
-                    entry.State = EntityState.Modified;
-                }
-            }
-            
-            if(_context.Database.CurrentTransaction == null)
-                DispatchEvents();
-        }
-
-        private void DispatchEvents()
-        {
-            while (true)
-            {
-                var domainEventEntity = _context.ChangeTracker.Entries<IHasDomainEvent>()
-                    .Select(x => x.Entity.DomainEvents)
-                    .SelectMany(x => x)
-                    .FirstOrDefault(domainEvent => !domainEvent.IsPublished);
-
-                if (domainEventEntity == null)
-                    break;
-
-                domainEventEntity.IsPublished = true;
-                _mediatr.Post(domainEventEntity);
-            }
-        }
-    }
-    
-    public abstract class Repository<T> : IRepository<T> where T: class, IIdEntity
-    {
-        protected DbSet<T> DbSet { get; init; }
-        
-        public virtual async Task<Result<T>> GetById(Guid id, CancellationToken token)
-        {
-            try
-            {
-                var entity = await DbSet.SingleOrDefaultAsync(c => c.Id == id, token);
-                if(entity == null)
-                    return Result<T>.Failure($"L'identifiant {id} est introuvable.");
+                    Logger.LogWarning(
+                        "Rollback transaction while saving entity {Name}:{Identifier} because an error occured: {Message}",
+                        entity.GetType().Name, entity.Identifier, result.Message);
                     
-                return Result<T>.Success(entity);
-            }
-            catch (Exception e)
-            {
-                return Result<T>.Failure(e);
-            }
-        }
-        
-        public async Task<Result<Guid>> Add(T entity, CancellationToken token)
-        {
-            try
-            {
-                await DbSet.AddAsync(entity, token);
-                return Result<Guid>.Success(entity.Id);
-            }
-            catch (Exception e)
-            {
-                return Result<Guid>.Failure(e);
-            }
-        }
+                    trx.Rollback();
+                    return result;
+                }
 
-        public async Task<Result> Remove(Guid id)
-        {
-            try
-            {
-                var entity = await DbSet.SingleAsync(e => e.Id == id);
-                DbSet.Remove(entity);
+                if(entity is not IAggregateRoot aggregate)
+                    trx.Commit();
+                else
+                {
+                    ProcessEvents<IDomainEvent>(aggregate.DomainEvents);
+                    trx.Commit();
+                    ProcessEvents<IIntegrationEvent>(aggregate.DomainEvents);
+                }
+
                 return Result.Success();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                return Result.Failure(e);
+                Logger.LogWarning(
+                    "Rollback transaction while saving entity {Name}:{Identifier} because an unexpected error occured: {Message}",
+                    entity.GetType().Name, entity.Identifier, e.Message);
+                
+                trx.Rollback();
+                return Result.Error(e.Message);
+            }
+            finally
+            {
+                ctx.Close();
             }
         }
-    }
 
-    public class CompanyRepository : Repository<Company>
-    {
-        public CompanyRepository(IAppDbContext context)
+        protected abstract Task<Result> OnSave(IDbTransaction transaction, T entity, CancellationToken token);
+        protected abstract Task<Result> OnDomainEventProcessed(IDomainEvent domainEvent);
+
+        private void ProcessEvents<U>(IEnumerable<IEvent> eventsToProcess)
+            where U : IEvent
         {
-            DbSet = ((DbContext)context).Set<Company>();
+            var orderedEvents = eventsToProcess
+                .OfType<U>()
+                .OrderBy(o => o.OccuredAt)
+                .ToList();
+
+            var idx = 0;
+            var processedEvents = new EventId[orderedEvents.Count];
+            foreach (var orderedEvent in orderedEvents)
+            {
+                if (processedEvents.Contains(orderedEvent.EventId))
+                    continue;
+
+                ProcessEvent(orderedEvent);
+                processedEvents[idx++] = orderedEvent.EventId;
+            }
+        }
+
+        private void ProcessEvent<U>(U orderedEvent) where U : IEvent
+        {
+            switch (orderedEvent)
+            {
+                case IDomainEvent domainEvent:
+                    ProcessDomainEvent(domainEvent);
+                    break;
+                case IIntegrationEvent integrationEvent:
+                    ProcessIntegrationEvent(integrationEvent);
+                    break;
+            }
+        }
+
+        private void ProcessDomainEvent(IDomainEvent domainEvent)
+        {
+            OnDomainEventProcessed(domainEvent);
+        }
+
+        private void ProcessIntegrationEvent(IIntegrationEvent domainEvent)
+        {
+            _mediator.Publish(domainEvent);
         }
     }
 }

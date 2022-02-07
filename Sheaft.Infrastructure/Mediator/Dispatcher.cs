@@ -2,11 +2,9 @@
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Sheaft.Application;
+using MediatR;
 using Sheaft.Application.Mediator;
 using Sheaft.Domain.Common;
-using Sheaft.Domain.Events;
-using Sheaft.Domain.Exceptions;
 
 namespace Sheaft.Infrastructure.Mediator
 {
@@ -20,35 +18,27 @@ namespace Sheaft.Infrastructure.Mediator
         }
 
         [DisplayName("{0}")]
-        public async Task<Result<T>> Execute<T>(string jobName, MediatR.IRequest<Result<T>> data, CancellationToken token)
+        public async Task<Result> Execute(string jobName, ICommand<Result> data, CancellationToken token)
         {
-            var result = await _mediatr.Send(data, token);
-            if (result.Succeeded)
-                return result;
-
-            throw new SheaftException(result);
+            return await _mediatr.Send(data, token);
         }
 
         [DisplayName("{0}")]
-        public async Task<Result> Execute(string jobName, MediatR.IRequest<Result> data, CancellationToken token)
+        public async Task<Result<T>> Execute<T>(string jobName, ICommand<Result<T>> data, CancellationToken token)
         {
-            var result = await _mediatr.Send(data, token);
-            if (result.Succeeded)
-                return result;
-                
-            throw new SheaftException(result);
+            return await _mediatr.Send(data, token);
         }
 
         [DisplayName("{0}")]
-        public async Task Execute(string jobName, DomainEvent data, CancellationToken token)
+        public async Task Execute(string jobName, IIntegrationEvent data, CancellationToken token)
         {
             await _mediatr.Publish(GetNotificationCorrespondingToDomainEvent(data), token);
         }
 
-        private MediatR.INotification GetNotificationCorrespondingToDomainEvent(DomainEvent domainEvent)
+        private INotification GetNotificationCorrespondingToDomainEvent(IIntegrationEvent domainEvent)
         {
-            return (MediatR.INotification)Activator.CreateInstance(
-                typeof(DomainEventNotification<>).MakeGenericType(domainEvent.GetType()), domainEvent);
+            return (INotification)Activator.CreateInstance(
+                typeof(WrappedEventNotification<>).MakeGenericType(domainEvent.GetType()), domainEvent);
         }
     }
 }

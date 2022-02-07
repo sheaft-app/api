@@ -80,8 +80,6 @@ namespace Sheaft.Api
             app.UseAuthorization();
             app.UseWebSockets();
             
-            app.UseInfrastructure();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHangfireDashboardWithAuthorizationPolicy(Policies.HANGFIRE, "/hangfire", new DashboardOptions

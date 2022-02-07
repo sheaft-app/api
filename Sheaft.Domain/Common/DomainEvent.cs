@@ -1,21 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Sheaft.Domain.Events
+namespace Sheaft.Domain.Common
 {
-    public interface IHasDomainEvent
+    public interface IEvent
     {
-        public List<DomainEvent> DomainEvents { get; }
+        EventId EventId { get; }
+        DateTimeOffset OccuredAt { get; }
     }
 
-    public abstract class DomainEvent
+    public record EventId
     {
-        protected DomainEvent()
+        public EventId()
         {
-            DateOccurred = DateTimeOffset.UtcNow;
+            Value = Guid.NewGuid();
         }
-        
-        public bool IsPublished { get; set; }
-        public DateTimeOffset DateOccurred { get; }
+
+        public Guid Value { get; }
+    }
+
+    public interface IDomainEvent : IEvent
+    {
+    }
+
+    public interface IIntegrationEvent : IEvent
+    {
+    }
+
+    public abstract record Event : IEvent
+    {
+        public EventId EventId { get; } = new();
+        public DateTimeOffset OccuredAt { get; } = DateTimeOffset.UtcNow;
+        public bool Processed { get; set; }
     }
 }
