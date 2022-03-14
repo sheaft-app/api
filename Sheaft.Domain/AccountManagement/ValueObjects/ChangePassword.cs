@@ -1,3 +1,3 @@
-﻿namespace Sheaft.Domain.AccountManagement.ValueObjects;
+﻿namespace Sheaft.Domain.AccountManagement;
 
-public record ChangePassword(string OldPassword, NewPassword NewPassword);
+public record ChangePassword(string OldPassword, string NewPassword, string Confirm);

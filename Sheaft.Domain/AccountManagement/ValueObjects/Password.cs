@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-namespace Sheaft.Domain.AccountManagement.ValueObjects;
+namespace Sheaft.Domain.AccountManagement;
 
 public record Password
 {
@@ -9,13 +8,13 @@ public record Password
     public Password(string password)
     {
         if (string.IsNullOrWhiteSpace(password))
-            throw new ArgumentNullException(nameof(password));
+            throw new InvalidOperationException("Password is required.");
         
         if (password.Length < MIN_LENGTH)
             throw new InvalidOperationException($"Password is too short (minimum {MIN_LENGTH} characters)");
         
         if (!Regex.IsMatch(password, "[\\w\\W]+"))
-            throw new InvalidOperationException("Password is invalid");
+            throw new InvalidOperationException("Password contains invalid characters");
 
         Value = password;
     }

@@ -1,5 +1,3 @@
-﻿using Sheaft.Domain.Common;
+﻿namespace Sheaft.Domain.AccountManagement;
 
-namespace Sheaft.Domain.AccountManagement.Events;
-
-public record AccountLoggedIn(EntityId AccountId) : Event, IDomainEvent, IIntegrationEvent;
+public record AccountLoggedIn(string AccountId) : DomainEvent;

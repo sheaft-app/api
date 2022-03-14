@@ -1,8 +1,6 @@
-﻿using Sheaft.Application;
-using Sheaft.Domain;
-using Sheaft.Domain.Common;
+﻿using Sheaft.Domain;
 
-namespace Sheaft.Api.Security
+namespace Sheaft.Api
 {
     public interface ICurrentUserService
     {

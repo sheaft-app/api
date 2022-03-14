@@ -1,29 +1,20 @@
 using System.Security.Claims;
-using Sheaft.Application;
 using Sheaft.Domain;
 
-namespace Sheaft.Api.Security
+namespace Sheaft.Api
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static long? TryGetUserId(this ClaimsPrincipal user)
+        private static string? TryGetUserId(this ClaimsPrincipal user)
         {
-            if (user.Identity is {IsAuthenticated: false})
-                return null;
-
-            var userClaim = user.FindFirst("sub")?.Value;
-            if (string.IsNullOrWhiteSpace(userClaim))
-                return null;
-
-            if (long.TryParse(userClaim, out var userId))
-                return userId;
-
-            return null;
+            return user.Identity is {IsAuthenticated: true} 
+                ? user.FindFirst("sub")?.Value
+                : null;
         }
 
         public static RequestUser ToIdentityUser(this ClaimsPrincipal user)
         {
-            return new RequestUser(user.TryGetUserId());
+            return new RequestUser(user.Identity?.IsAuthenticated ?? false, user.TryGetUserId());
         }
     }
 }

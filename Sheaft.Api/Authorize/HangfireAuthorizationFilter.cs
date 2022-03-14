@@ -1,9 +1,8 @@
 ﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Sheaft.Api.Authorize
+namespace Sheaft.Api
 {
     public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter {
         private readonly string _policyName;

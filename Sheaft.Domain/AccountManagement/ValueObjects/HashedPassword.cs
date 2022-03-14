@@ -1,24 +1,29 @@
-﻿using Sheaft.Domain.AccountManagement.Services;
-
-namespace Sheaft.Domain.AccountManagement.ValueObjects;
+﻿namespace Sheaft.Domain.AccountManagement;
 
 public record HashedPassword
 {
-    private HashedPassword(string hash)
+    private HashedPassword(string hash, string salt)
     {
         Hash = hash;
+        Salt = salt;
     }
 
-    public string Hash { get; }
+    public string Hash { get; private set; }
+    public string Salt { get; private set; }
 
     public static HashedPassword Create(Password password, IPasswordHasher hasher)
     {
         return Create(password.Value, hasher);
     }
-    
-    internal static HashedPassword Create(string password, IPasswordHasher hasher)
+
+    internal static HashedPassword FromHashedString(string hashedPassword, string salt)
     {
-        var hashedPassword = hasher.HashPassword(password);
-        return new HashedPassword(hashedPassword);
+        return new HashedPassword(hashedPassword, salt);
     }
-};
+    
+    public static HashedPassword Create(string password, IPasswordHasher hasher)
+    {
+        (string hashedPassword, string usedSalt) = hasher.CreatePassword(password);
+        return new HashedPassword(hashedPassword, usedSalt);
+    }
+}

@@ -1,81 +1,140 @@
-using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Identity.Web;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Sheaft.Api.Security;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Sheaft.Application;
+using Sheaft.Infrastructure;
 
-namespace Sheaft.Api
+namespace Sheaft.Api;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void AddCorsServices(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddCorsServices(this IServiceCollection services, IConfiguration configuration)
+        services.AddCors(c =>
         {
-        }
-        
-        public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
-        {
-            JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-            
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApi(configuration, Constants.AzureAdB2C)
-                .EnableTokenAcquisitionToCallDownstreamApi()
-                .AddInMemoryTokenCaches();
-            
-            services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            c.DefaultPolicyName = "CORS";
+            c.AddPolicy("CORS", new CorsPolicy
             {
+                Headers = {"*"},
+                Origins = {"*"},
+                Methods = {"*"}
             });
-            
-            services.AddAuthentication("OpenIdConnect")
-                .AddMicrosoftIdentityWebApp(configuration, Constants.AzureAdB2C);
+        });
+    }
 
-            services.Configure<MicrosoftIdentityOptions>(options =>
-            {
-                options.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
-                options.UsePkce = true;
-                options.ResponseType = OpenIdConnectResponseType.Code;
-            });
-        }
+    public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        var securitySettingsConfiguration = configuration.GetSection(SecuritySettings.SECTION);
+        services.Configure<ISecuritySettings>(securitySettingsConfiguration);
+        
+        services.AddScoped(provider =>
+            provider.GetService<IOptionsSnapshot<ISecuritySettings>>().Value);
 
-        public static void AddCaching(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddMemoryCache();
-        }
+        var jwtSettingsConfiguration = configuration.GetSection(JwtSettings.SECTION);
+        services.Configure<JwtSettings>(jwtSettingsConfiguration);
         
-        public static void AddAuthorization(this IServiceCollection services, IConfiguration configuration)
-        {
-            IdentityModelEventSource.ShowPII = true;
-            services.AddAuthorization(options =>
+        services.AddScoped(provider =>
+            provider.GetService<IOptionsSnapshot<IJwtSettings>>().Value);
+
+        var jwtSettings = jwtSettingsConfiguration.Get<JwtSettings>();
+        services
+            .AddAuthentication(options =>
             {
-                options.AddPolicy(Policies.HANGFIRE, cfg =>
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                options.LoginPath = "hangfire/login";
+                options.LogoutPath = "hangfire/logout";
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    cfg.AddAuthenticationSchemes("OpenIdConnect");
-                    cfg.AddRequirements().RequireAuthenticatedUser();
-                });
-                options.AddPolicy(Policies.AUTHENTICATED, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAuthenticatedUser();
-                });
-                options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
-                {
-                    builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                    builder.RequireAssertion(c => c.User.Identity is not {IsAuthenticated: true} || c.User.Identity.IsAuthenticated);
-                });
-                
-                options.DefaultPolicy = options.GetPolicy(Policies.ANONYMOUS_OR_CONNECTED);
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Issuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                    ClockSkew = TimeSpan.Zero
+                };
             });
-        }
-        
-        public static void AddWebCommon(this IServiceCollection services)
+    }
+
+    public static void AddCaching(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMemoryCache();
+    }
+
+    public static void AddAuthorization(this IServiceCollection services, IConfiguration configuration)
+    {
+        IdentityModelEventSource.ShowPII = true;
+        services.AddAuthorization(options =>
         {
-            services.AddHttpClient();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<ICurrentUserService, CurrentUserService>();
-        }
+            options.AddPolicy(Policies.HANGFIRE, cfg =>
+            {
+                cfg.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
+                cfg.AddRequirements().RequireAuthenticatedUser();
+            });
+            options.AddPolicy(Policies.AUTHENTICATED, builder =>
+            {
+                builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                builder.RequireAuthenticatedUser();
+            });
+            options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
+            {
+                builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                builder.RequireAssertion(c =>
+                    c.User.Identity is not {IsAuthenticated: true} || c.User.Identity.IsAuthenticated);
+            });
+
+            options.DefaultPolicy = options.GetPolicy(Policies.ANONYMOUS_OR_CONNECTED);
+        });
+    }
+
+    public static IServiceCollection RegisterSwagger(this IServiceCollection services)
+    {
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(c =>
+        {
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT containing userid claim",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        },
+                        UnresolvedReference = true
+                    },
+                    new List<string>()
+                }
+            });
+        });
+
+        return services;
+    }
+
+    public static void AddWebCommon(this IServiceCollection services)
+    {
+        services.AddHttpClient();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
     }
 }

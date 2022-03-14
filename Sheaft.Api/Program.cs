@@ -1,23 +1,93 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+﻿using Hangfire;
+using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Serilog;
+using Sheaft.Api;
+using Sheaft.Application;
+using Sheaft.Domain;
+using Sheaft.Infrastructure;
 
-namespace Sheaft.Api
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+try
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-            Log.CloseAndFlush();
-        }
+    var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+    builder.Host.UseSerilog((ctx, lc) =>
+        lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
+    
+    builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
+    builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+
+    builder.Services.AddWebCommon();
+    builder.Services.AddCaching(builder.Configuration);
+    builder.Services.AddCorsServices(builder.Configuration);
+    builder.Services.AddAuthentication(builder.Configuration);
+    builder.Services.AddAuthorization(builder.Configuration);
+
+    builder.Services.AddDomain();
+    builder.Services.AddApplicationServices(builder.Configuration);
+    builder.Services.AddInfrastructureServices(builder.Configuration);
+
+    builder.Services.AddLogging(config => { config.AddSerilog(dispose: true); });
+
+    builder.Services.RegisterSwagger();
+    builder.Services.AddMvc();
+
+
+    var app = builder.Build();
+
+    // using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+    // {
+    //     var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+    //     if (!context.AllMigrationsApplied())
+    //         context.Database.Migrate();
+    // }
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseDeveloperExceptionPage();
     }
+    else
+    {
+        app.UseHttpsRedirection();
+        app.UseHsts();
+    }
+
+    app.UseRobotsTxt();
+    app.UseCors("CORS");
+    app.UseSerilogRequestLogging();
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseWebSockets();
+    
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapHangfireDashboardWithAuthorizationPolicy(Policies.HANGFIRE, "/hangfire", new DashboardOptions
+        {
+            AppPath = app.Configuration.GetValue<string>("Portal:Url"),
+            Authorization = new List<IDashboardAuthorizationFilter>
+                {new HangfireAuthorizationFilter(Policies.HANGFIRE)}
+        });
+
+        endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+    });
+
+    await app.RunAsync();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unhandled exception");
+}
+finally
+{
+    Log.Information("Shut down complete");
+    Log.CloseAndFlush();
 }

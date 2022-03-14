@@ -1,5 +1,3 @@
-﻿using Sheaft.Domain.Common;
+﻿namespace Sheaft.Domain.AccountManagement;
 
-namespace Sheaft.Domain.AccountManagement.Events;
-
-public record PasswordChanged(EntityId AccountId) : Event, IIntegrationEvent;
+public record PasswordChanged(string Username) : DomainEvent;

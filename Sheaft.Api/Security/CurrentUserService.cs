@@ -1,18 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Sheaft.Application;
-using Sheaft.Domain;
-using Sheaft.Domain.Common;
+﻿using Sheaft.Domain;
 
-namespace Sheaft.Api.Security
+namespace Sheaft.Api
 {
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CurrentUserService(
-            IHttpContextAccessor httpContextAccessor,
-            ILogger<CurrentUserService> logger)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
@@ -20,13 +14,11 @@ namespace Sheaft.Api.Security
         public Result<RequestUser> GetCurrentUserInfo()
         {
             if (_httpContextAccessor.HttpContext?.User?.Identity == null)
-                return Result<RequestUser>.Success(new RequestUser(null));
+                return Result.Success(new RequestUser(false));
 
-            if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                return Result<RequestUser>.Success(
-                    _httpContextAccessor.HttpContext.User.ToIdentityUser());
-
-            return Result<RequestUser>.Success(new RequestUser(null));
+            return Result.Success(_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated 
+                ? _httpContextAccessor.HttpContext.User.ToIdentityUser() 
+                : new RequestUser(false));
         }
     }
 }

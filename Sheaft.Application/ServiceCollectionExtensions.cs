@@ -1,24 +1,22 @@
-using System.Collections.Generic;
-using System.Reflection;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Sheaft.Application.Behaviours;
 
-namespace Sheaft.Application
+namespace Sheaft.Application;
+
+public static class ServiceCollectionInitializers
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddOptions();
-            
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
-            
-            services.AddMediatR(new List<Assembly>() { typeof(ServiceCollectionExtensions).Assembly }.ToArray());
-        }
+        var assembly = typeof(ServiceCollectionInitializers).Assembly;
+        
+        services.AddMediatR(assembly);
+        services.AddValidatorsFromAssembly(assembly, includeInternalTypes:true);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+        
+        return services;
     }
 }

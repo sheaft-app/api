@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Sheaft.Domain.AccountManagement.ValueObjects;
+using Sheaft.Domain.ProfileManagement;
 
 namespace Sheaft.UnitTests;
 

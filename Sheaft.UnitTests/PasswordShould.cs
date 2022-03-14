@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
-using Sheaft.Domain;
-using Sheaft.Domain.AccountManagement.ValueObjects;
+using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.UnitTests;
 
@@ -9,13 +8,13 @@ public class PasswordShould
     [Test]
     public void Throw_If_Null_Or_Empty()
     {
-        Assert.That(() => new Password(""), Throws.ArgumentNullException);
+        Assert.That(() => new Password(""), Throws.Exception);
     }
 
     [Test]
     public void Throw_If_Too_Short()
     {
-        Assert.That(() => new Password("aze5"), Throws.InvalidOperationException);
+        Assert.That(() => new Password("aze5"), Throws.Exception);
     }
 
     [Test]
