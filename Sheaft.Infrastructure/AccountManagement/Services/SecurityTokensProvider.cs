@@ -43,7 +43,7 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         return new AccessToken(accessToken, "Bearer", _securitySettings.AccessTokenExpirationInMinutes);
     }
 
-    public (RefreshToken data, string token) GenerateRefreshToken(Username username)
+    public RefreshToken GenerateRefreshToken(Username username)
     {
         var tokenId = RefreshTokenId.New();
         var claims = new List<Claim>
@@ -55,10 +55,10 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         var expires = DateTimeOffset.UtcNow.AddMinutes(_securitySettings.RefreshTokenExpirationInMinutes);
 
         var refreshToken = CreateToken(claims, expires);
-        return (new RefreshToken(tokenId, expires), refreshToken);
+        return new RefreshToken(new RefreshTokenInfo(tokenId, expires), refreshToken);
     }
 
-    public (Username, RefreshTokenId) ReadRefreshTokenData(string refreshToken)
+    public (Username, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken)
     {
         var result = new JwtSecurityTokenHandler().ReadJwtToken(refreshToken);
         if (result == null)

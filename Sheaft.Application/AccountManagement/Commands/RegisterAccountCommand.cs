@@ -71,10 +71,9 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
         if (accountResult.IsFailure)
             return Result.Failure<string>(accountResult);
         
-        _uow.Add(accountResult.Value);
-        _uow.Add(profile);
-        
+        _uow.Accounts.Add(accountResult.Value);
         var result = await _uow.Save(token);
+        
         return Result.SuccessIf(result, accountResult.Value.Profile.Identifier.Value);
     }
 }

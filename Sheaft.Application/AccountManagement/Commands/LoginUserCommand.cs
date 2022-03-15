@@ -42,11 +42,11 @@ internal class LoginUserHandler : ICommandHandler<LoginUserCommand, Result<Authe
         if (loginResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(loginResult);
 
-        _uow.Update(account);
-        var repoResult = await _uow.Save(token);
+        _uow.Accounts.Update(account);
+        var result = await _uow.Save(token);
         
-        return repoResult.IsSuccess
+        return result.IsSuccess
             ? Result.Success(new AuthenticationTokenDto(loginResult.Value.AccessToken, loginResult.Value.RefreshToken, loginResult.Value.TokenType, loginResult.Value.ExpiresIn))
-            : Result.Failure<AuthenticationTokenDto>(repoResult);
+            : Result.Failure<AuthenticationTokenDto>(result);
     }
 }

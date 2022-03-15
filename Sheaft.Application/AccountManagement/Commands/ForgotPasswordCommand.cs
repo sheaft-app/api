@@ -46,7 +46,7 @@ internal class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Re
         if (forgotPasswordResult.IsFailure)
             return forgotPasswordResult;
 
-        _uow.Update(account);
+        _uow.Accounts.Update(account);
         return await _uow.Save(token);
     }
 }

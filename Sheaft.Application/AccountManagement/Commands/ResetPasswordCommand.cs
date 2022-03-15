@@ -43,7 +43,7 @@ internal class ResetPasswordHandler : ICommandHandler<ResetPasswordCommand, Resu
         if (resetPasswordResult.IsFailure)
             return Result.Failure(resetPasswordResult);
 
-        _uow.Update(account);
+        _uow.Accounts.Update(account);
         return await _uow.Save(token);
     }
 }

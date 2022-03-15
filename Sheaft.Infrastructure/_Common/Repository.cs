@@ -7,13 +7,11 @@ namespace Sheaft.Infrastructure;
 internal abstract class Repository<T, TU> : IRepository<T, TU>
     where T : class, IAggregateRoot
 {
-    private readonly IDbContext _context;
     protected readonly DbSet<T> Values;
 
     protected Repository(IDbContext context)
     {
-        _context = context;
-        Values = _context.Set<T>();
+        Values = context.Set<T>();
     }
 
     protected async Task<Result<T>> QueryAsync(Func<Task<Result<T>>> func)
@@ -38,6 +36,21 @@ internal abstract class Repository<T, TU> : IRepository<T, TU>
         {
             return Result.Failure<Maybe<T>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
+    }
+    
+    public void Add(T entity)
+    {
+        Values.Add(entity);
+    }
+
+    public void Update(T entity)
+    {
+        Values.Update(entity);
+    }
+
+    public void Remove(T entity)
+    {
+        Values.Remove(entity);
     }
 
     public abstract Task<Result<T>> Get(TU identifier, CancellationToken token);

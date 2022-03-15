@@ -55,7 +55,7 @@ public class RefreshAccessTokenCommandShould
         Assert.IsTrue(refreshResult.IsFailure);
     }
 
-    private (RefreshAccessTokenHandler, AuthenticationToken, SecurityTokensProvider) InitHandler()
+    private (RefreshAccessTokenHandler, AuthenticationResult, SecurityTokensProvider) InitHandler()
     {
         var securityTokensProvider = new SecurityTokensProvider(new JwtSettings
         {

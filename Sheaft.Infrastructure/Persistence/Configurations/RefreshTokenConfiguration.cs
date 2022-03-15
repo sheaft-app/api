@@ -5,9 +5,9 @@ using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
-public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
+public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshTokenInfo>
 {
-    public void Configure(EntityTypeBuilder<RefreshToken> builder)
+    public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)
     {
         builder.Property<long>("Id")
             .ValueGeneratedOnAdd();

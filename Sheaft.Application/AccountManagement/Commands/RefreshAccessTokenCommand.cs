@@ -29,20 +29,21 @@ internal class RefreshAccessTokenHandler : ICommandHandler<RefreshAccessTokenCom
 
     public async Task<Result<AuthenticationTokenDto>> Handle(RefreshAccessTokenCommand request, CancellationToken token)
     {
-        var (username, refreshTokenId) = _securityTokensProvider.ReadRefreshTokenData(request.RefreshToken);
+        var (username, refreshTokenId) = _securityTokensProvider.RetrieveTokenIdentifierData(request.RefreshToken);
         var accountResult = await _uow.Accounts.Get(username, token);
         if (accountResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(accountResult);
 
         var account = accountResult.Value;
-        var refreshAccessResult = account.RefreshAccessToken(refreshTokenId, _securityTokensProvider);
-        if (refreshAccessResult.IsFailure)
-            return Result.Failure<AuthenticationTokenDto>(refreshAccessResult);
+        var refreshResult = account.RefreshAccessToken(refreshTokenId, _securityTokensProvider);
+        if (refreshResult.IsFailure)
+            return Result.Failure<AuthenticationTokenDto>(refreshResult);
 
-        _uow.Update(account);
-        var repoResult = await _uow.Save(token);
-        return repoResult.IsSuccess
-            ? Result.Success(new AuthenticationTokenDto(refreshAccessResult.Value.AccessToken, refreshAccessResult.Value.RefreshToken, refreshAccessResult.Value.TokenType, refreshAccessResult.Value.ExpiresIn))
-            : Result.Failure<AuthenticationTokenDto>(repoResult);
+        _uow.Accounts.Update(account);
+        var result = await _uow.Save(token);
+        
+        return result.IsSuccess
+            ? Result.Success(new AuthenticationTokenDto(refreshResult.Value.AccessToken, refreshResult.Value.RefreshToken, refreshResult.Value.TokenType, refreshResult.Value.ExpiresIn))
+            : Result.Failure<AuthenticationTokenDto>(result);
     }
 }

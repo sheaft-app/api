@@ -2,7 +2,7 @@
 
 public class Account : AggregateRoot
 {
-    private List<RefreshToken> _refreshTokens = new List<RefreshToken>();
+    private List<RefreshTokenInfo> _refreshTokens = new List<RefreshTokenInfo>();
     
     private Account()
     {
@@ -21,7 +21,7 @@ public class Account : AggregateRoot
     public HashedPassword Password { get; private set; }
     public ResetPasswordInfo? ResetPasswordInfo { get; private set; }
     public Profile Profile { get; private set; }
-    public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+    public IReadOnlyCollection<RefreshTokenInfo> RefreshTokens => _refreshTokens.AsReadOnly();
 
     public Result ChangeEmail(NewEmailAddress newEmailAddress)
     {
@@ -52,18 +52,18 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    public Result<AuthenticationToken> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider)
+    public Result<AuthenticationResult> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider)
     {
         var passwordIsValid = hasher.PasswordIsValid(password, Password);
         if (!passwordIsValid)
-            return Result.Failure<AuthenticationToken>(ErrorKind.BadRequest, "invalid.username.or.password", "Invalid password.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "invalid.username.or.password", "Invalid password.");
         
         RaiseEvent(new AccountLoggedIn(Profile.Identifier.Value));
 
         return GenerateAccessToken(securityTokensProvider);
     }
 
-    public Result<AuthenticationToken> RefreshAccessToken(RefreshTokenId refreshTokenId, ISecurityTokensProvider securityTokensProvider)
+    public Result<AuthenticationResult> RefreshAccessToken(RefreshTokenId refreshTokenId, ISecurityTokensProvider securityTokensProvider)
     {
         var existingToken = _refreshTokens.SingleOrDefault(rt => rt.Identifier == refreshTokenId);
         if(existingToken is {Expired: false} && existingToken.ExpiresOn > DateTimeOffset.UtcNow)
@@ -72,15 +72,15 @@ public class Account : AggregateRoot
         InvalideAllRefreshTokens();
         
         if(existingToken == null)
-            return Result.Failure<AuthenticationToken>(ErrorKind.BadRequest, "The refresh token used does not exists. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token used does not exists. You need to re-authenticate yourself.");
         
         if(existingToken.Expired)
-            return Result.Failure<AuthenticationToken>(ErrorKind.BadRequest, "The refresh token used was already deactivated. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token used was already deactivated. You need to re-authenticate yourself.");
         
         if(existingToken.ExpiresOn < DateTimeOffset.UtcNow)
-            return Result.Failure<AuthenticationToken>(ErrorKind.BadRequest, "The refresh token is expired. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token is expired. You need to re-authenticate yourself.");
         
-        return Result.Failure<AuthenticationToken>(ErrorKind.Unexpected, "You need to re-authenticate yourself.");
+        return Result.Failure<AuthenticationResult>(ErrorKind.Unexpected, "You need to re-authenticate yourself.");
     }
 
     public Result ForgotPassword(DateTimeOffset currentDate, int tokenValidityInHours)
@@ -112,12 +112,12 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    private Result<AuthenticationToken> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider)
+    private Result<AuthenticationResult> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider)
     {
         var refreshToken = InsertNewRefreshToken(securityTokensProvider);
         var accessToken = securityTokensProvider.GenerateAccessToken(this);
 
-        return Result.Success(new AuthenticationToken(accessToken.Value, refreshToken, accessToken.TokenType,
+        return Result.Success(new AuthenticationResult(accessToken.Value, refreshToken, accessToken.TokenType,
             accessToken.ExpiresIn));
     }
 
@@ -125,10 +125,10 @@ public class Account : AggregateRoot
     {
         InvalideAllRefreshTokens();
         
-        var (data, refreshToken) = securityTokensProvider.GenerateRefreshToken(Username);
-        _refreshTokens.Add(data);
+        var data = securityTokensProvider.GenerateRefreshToken(Username);
+        _refreshTokens.Add(data.Info);
         
-        return refreshToken;
+        return data.Token;
     }
 
     private void InvalideAllRefreshTokens()
