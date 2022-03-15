@@ -2,7 +2,6 @@ using Amazon;
 using Amazon.SimpleEmail;
 using Hangfire;
 using Hangfire.MemoryStorage;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -99,7 +98,7 @@ public static class ServiceCollectionExtensions
         };
 
         services.AddSingleton<IDictionary<DatabaseConnectionName, string>>(connectionStrings);
-        services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
+        services.AddSingleton<IDbConnectionFactory, SqlDbConnectionFactory>();
         
         services.AddDbContext<IDbContext, AppDbContext>(optionsBuilder =>
         {

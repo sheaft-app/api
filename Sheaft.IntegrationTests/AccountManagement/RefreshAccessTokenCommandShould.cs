@@ -2,11 +2,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
-using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.IntegrationTests.Fakes;
+using Sheaft.IntegrationTests.Helpers;
 
 namespace Sheaft.IntegrationTests.AccountManagement;
 
@@ -74,7 +74,7 @@ public class RefreshAccessTokenCommandShould
         var password = "password";
         
         var hasher = new PasswordHasher("my_salt_value");
-        var account = AccountTestsHelper.GetDefaultAccount(hasher, username, password);
+        var account = AccountTests.GetDefaultAccount(hasher, username, password);
         
         context.Accounts.Add(account);
         context.SaveChanges();

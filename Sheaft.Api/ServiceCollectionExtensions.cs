@@ -29,17 +29,11 @@ public static class ServiceCollectionExtensions
 
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var securitySettingsConfiguration = configuration.GetSection(SecuritySettings.SECTION);
-        services.Configure<ISecuritySettings>(securitySettingsConfiguration);
-        
-        services.AddScoped(provider =>
-            provider.GetService<IOptionsSnapshot<ISecuritySettings>>().Value);
-
         var jwtSettingsConfiguration = configuration.GetSection(JwtSettings.SECTION);
         services.Configure<JwtSettings>(jwtSettingsConfiguration);
         
-        services.AddScoped(provider =>
-            provider.GetService<IOptionsSnapshot<IJwtSettings>>().Value);
+        services.AddScoped<IJwtSettings>(provider =>
+            provider.GetService<IOptionsSnapshot<JwtSettings>>().Value);
 
         var jwtSettings = jwtSettingsConfiguration.Get<JwtSettings>();
         services
@@ -80,21 +74,15 @@ public static class ServiceCollectionExtensions
             options.AddPolicy(Policies.HANGFIRE, cfg =>
             {
                 cfg.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
-                cfg.AddRequirements().RequireAuthenticatedUser();
+                cfg.RequireAuthenticatedUser();
             });
             options.AddPolicy(Policies.AUTHENTICATED, builder =>
             {
                 builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
                 builder.RequireAuthenticatedUser();
             });
-            options.AddPolicy(Policies.ANONYMOUS_OR_CONNECTED, builder =>
-            {
-                builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
-                builder.RequireAssertion(c =>
-                    c.User.Identity is not {IsAuthenticated: true} || c.User.Identity.IsAuthenticated);
-            });
 
-            options.DefaultPolicy = options.GetPolicy(Policies.ANONYMOUS_OR_CONNECTED);
+            options.DefaultPolicy = options.GetPolicy(Policies.AUTHENTICATED);
         });
     }
 
@@ -131,8 +119,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static void AddWebCommon(this IServiceCollection services)
+    public static void AddWebCommon(this IServiceCollection services, IConfiguration configuration)
     {
+        var securitySettingsConfiguration = configuration.GetSection(SecuritySettings.SECTION);
+        services.Configure<SecuritySettings>(securitySettingsConfiguration);
+        
+        services.AddScoped<ISecuritySettings>(provider =>
+            provider.GetService<IOptionsSnapshot<SecuritySettings>>().Value);
+        
         services.AddHttpClient();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();

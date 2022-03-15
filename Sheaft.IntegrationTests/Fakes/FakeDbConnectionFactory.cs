@@ -1,5 +1,9 @@
-﻿using System.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Data.Sqlite;
 using Sheaft.Infrastructure;
 
 namespace Sheaft.IntegrationTests.Fakes;
@@ -7,11 +11,18 @@ namespace Sheaft.IntegrationTests.Fakes;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class FakeDbConnectionFactory : IDbConnectionFactory
+internal class SqliteDbConnectionFactory : IDbConnectionFactory
 {
-    public IDbConnection CreateConnection(DatabaseConnectionName connectionName)
+    private readonly string _connectionString;
+
+    public SqliteDbConnectionFactory(string? connectionString = "DataSource=:memory:")
     {
-        return new FakeDbConnection();
+        _connectionString = connectionString;
+    }
+
+    public DbConnection CreateConnection(DatabaseConnectionName connectionName)
+    {
+        return new SqliteConnection(_connectionString);
     }
 }
 

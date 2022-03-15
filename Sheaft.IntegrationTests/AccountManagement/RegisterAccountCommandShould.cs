@@ -8,6 +8,7 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.IntegrationTests.Fakes;
+using Sheaft.IntegrationTests.Helpers;
 
 namespace Sheaft.IntegrationTests.AccountManagement;
 
@@ -53,7 +54,7 @@ public class RegisterAccountCommandShould
 
         foreach (var emailAddress in emails)
         {
-            var account = AccountTestsHelper.GetDefaultAccount(hasher, emailAddress.Value, password);
+            var account = AccountTests.GetDefaultAccount(hasher, emailAddress.Value, password);
             context.Accounts.Add(account);
         }
         

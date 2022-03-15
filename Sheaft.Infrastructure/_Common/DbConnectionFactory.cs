@@ -1,23 +1,23 @@
-﻿using System.Data;
+﻿using System.Data.Common;
 using Microsoft.Data.SqlClient;
 
 namespace Sheaft.Infrastructure;
 
 public interface IDbConnectionFactory
 {
-    IDbConnection CreateConnection(DatabaseConnectionName connectionName);
+    DbConnection CreateConnection(DatabaseConnectionName connectionName);
 }
 
-internal class DbConnectionFactory : IDbConnectionFactory
+internal class SqlDbConnectionFactory : IDbConnectionFactory
 {
     private readonly IDictionary<DatabaseConnectionName, string> _connectionStrings;
 
-    public DbConnectionFactory(IDictionary<DatabaseConnectionName, string> connectionStrings)
+    public SqlDbConnectionFactory(IDictionary<DatabaseConnectionName, string> connectionStrings)
     {
         _connectionStrings = connectionStrings;
     }
 
-    public IDbConnection CreateConnection(DatabaseConnectionName connectionName)
+    public DbConnection CreateConnection(DatabaseConnectionName connectionName)
     {
         if (_connectionStrings.TryGetValue(connectionName, out var connectionString))
             return new SqlConnection(connectionString);

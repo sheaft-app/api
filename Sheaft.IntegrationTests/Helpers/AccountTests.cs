@@ -2,9 +2,9 @@
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Infrastructure.AccountManagement;
 
-namespace Sheaft.IntegrationTests.AccountManagement;
+namespace Sheaft.IntegrationTests.Helpers;
 
-public static class AccountTestsHelper
+public static class AccountTests
 {
     public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com", string password = "P@ssword", string siret = "15932477173006")
     {

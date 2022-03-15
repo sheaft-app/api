@@ -24,7 +24,7 @@ try
     builder.Services.Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true);
     builder.Services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
 
-    builder.Services.AddWebCommon();
+    builder.Services.AddWebCommon(builder.Configuration);
     builder.Services.AddCaching(builder.Configuration);
     builder.Services.AddCorsServices(builder.Configuration);
     builder.Services.AddAuthentication(builder.Configuration);

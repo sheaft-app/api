@@ -1,12 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
-using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Fakes;
+using Sheaft.IntegrationTests.Helpers;
 
 namespace Sheaft.IntegrationTests.AccountManagement;
 
@@ -45,7 +44,7 @@ public class LoginUserCommandShould
         var password = "password";
         
         var hasher = new PasswordHasher("my_salt_value");
-        context.Accounts.Add(AccountTestsHelper.GetDefaultAccount(hasher, username, password));
+        context.Accounts.Add(AccountTests.GetDefaultAccount(hasher, username, password));
 
         context.SaveChanges();
         

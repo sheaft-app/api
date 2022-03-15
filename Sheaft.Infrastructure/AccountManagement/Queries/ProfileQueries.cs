@@ -15,56 +15,36 @@ internal class ProfileQueries : IProfileQueries
 
     public async Task<Result<ProfileDto>> GetProfile(ProfileId userIdentifier, CancellationToken token)
     {
-        using var connection = _dbConnectionFactory.CreateConnection(DatabaseConnectionName.AppDatabase);
-        connection.Open();
+        await using var connection = _dbConnectionFactory.CreateConnection(DatabaseConnectionName.AppDatabase);
 
         try
         {
-            token.ThrowIfCancellationRequested();
-
-            var profiles = new Dictionary<string, ProfileDto>();
-            await connection.QueryAsync<dynamic, dynamic, ProfileDto>(@"
+            await connection.OpenAsync(token);
+            
+            var result = await connection.QuerySingleOrDefaultAsync<ProfileDto>(@"
                SELECT 
-                      p.Identifier as UserIdentifier
-                    , p.Firstname
-                    , p.Lastname
+                      p.Identifier as Id
+                    , p.User_Firstname as Firstname
+                    , p.User_Lastname as Lastname
                     , a.Email
                     , p.CreatedOn
                     , p.UpdatedOn
-                    , g.Identifier as GroupIdentifier
-                    , g.Name
                 FROM [dbo].[Profiles] p
                     JOIN [dbo].[Accounts] a ON p.AccountId = a.Id
-                    LEFT JOIN [dbo].[GroupMembers] gu ON p.Identifier = gu.ProfileIdentifier
-                    LEFT JOIN [dbo].[Groups] g ON g.Id = gu.GroupId
                 WHERE p.Identifier = @UserIdentifier
                 GROUP BY 
                          p.Identifier
-                       , p.Firstname
-                       , p.Lastname
+                       , p.User_Firstname
+                       , p.User_Lastname
                        , a.Email
                        , p.CreatedOn
-                       , p.UpdatedOn
-                       , g.Identifier
-                       , g.Name",
-                (user, group) =>
-                {
-                    token.ThrowIfCancellationRequested();
-
-                    if (!profiles.TryGetValue(user.UserIdentifier, out ProfileDto dto))
-                        profiles.Add(user.UserIdentifier,
-                            dto = new ProfileDto(user.UserIdentifier, user.Firstname, user.Lastname, user.Email,
-                                user.CreatedOn, user.UpdatedOn));
-
-                    return dto;
-                },
-                new {UserIdentifier = userIdentifier.Value},
-                splitOn: "GroupIdentifier");
+                       , p.UpdatedOn",
+                new {UserIdentifier = userIdentifier.Value});
 
             token.ThrowIfCancellationRequested();
 
-            return profiles.TryGetValue(userIdentifier.Value, out var profileDto)
-                ? Result.Success(profileDto)
+            return result != null
+                ? Result.Success(result)
                 : Result.Failure<ProfileDto>(ErrorKind.NotFound, "profile.not.found");
         }
         catch (Exception e)
@@ -73,7 +53,7 @@ internal class ProfileQueries : IProfileQueries
         }
         finally
         {
-            connection.Close();
+            await connection.CloseAsync();
         }
     }
 }

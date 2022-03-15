@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,12 @@ public class FakeDbContextFactory : IDisposable
             .UseSqlite(_connection).Options;
     }
 
-    public AppDbContext CreateContext()
+    public AppDbContext CreateContext(DbConnection? connection = null)
     {
         if (_connection != null) 
             return new AppDbContext(CreateOptions());
         
-        _connection = new SqliteConnection("DataSource=:memory:");
+        _connection = connection ?? new SqliteConnection("DataSource=:memory:");
         _connection.Open();
 
         var options = CreateOptions();
