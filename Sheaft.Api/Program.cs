@@ -37,6 +37,8 @@ try
     builder.Services.AddLogging(config => { config.AddSerilog(dispose: true); });
 
     builder.Services.RegisterSwagger();
+    
+    builder.Services.AddRazorPages();
     builder.Services.AddMvc();
 
 
@@ -72,14 +74,15 @@ try
 
     app.UseEndpoints(endpoints =>
     {
-        endpoints.MapHangfireDashboardWithAuthorizationPolicy(Policies.HANGFIRE, "/hangfire", new DashboardOptions
+        endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions
         {
             AppPath = app.Configuration.GetValue<string>("Portal:Url"),
             Authorization = new List<IDashboardAuthorizationFilter>
-                {new HangfireAuthorizationFilter(Policies.HANGFIRE)}
-        });
+                {new HangfireAuthorizationFilter(Policies.AUTHENTICATED)}
+        }).RequireAuthorization(Policies.AUTHENTICATED);
 
         endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        endpoints.MapRazorPages();
     });
 
     await app.RunAsync();

@@ -1,0 +1,14 @@
+﻿@page
+@model Logout
+@{
+    ViewData["Title"] = "Logout";
+}
+<div>
+    @Model.Message
+</div>
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        <button class="btn btn-outline-primary btn-sm">Logout</button>
+    </div>
+</form>

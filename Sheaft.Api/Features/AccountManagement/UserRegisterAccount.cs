@@ -1,7 +1,6 @@
-using Mapster;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
 
 namespace Sheaft.Api.AccountManagement;
@@ -9,7 +8,7 @@ namespace Sheaft.Api.AccountManagement;
 [Route(Routes.API)]
 public class UserRegisterAccount : Feature
 {
-    public UserRegisterAccount(IMediator mediator)
+    public UserRegisterAccount(ISheaftMediator mediator)
         : base(mediator)
     {
     }
@@ -19,7 +18,7 @@ public class UserRegisterAccount : Feature
     public async Task<ActionResult<string>> Post([FromBody] RegisterDto data, CancellationToken token)
     {
         var (tradeName, contactEmail, contactPhone, (commercialName, siret, legalAddress), user) = data;
-        var result = await Mediator.Send(
+        var result = await Mediator.Execute(
             new RegisterAccountCommand(user.Email, user.Password, user.Confirm, tradeName, contactEmail, contactPhone,
                 commercialName, siret, legalAddress.Line1, legalAddress.Line2, legalAddress.Zipcode,
                 legalAddress.City, user.Firstname, user.Lastname), token);

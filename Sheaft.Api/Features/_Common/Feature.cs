@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
@@ -11,10 +10,10 @@ namespace Sheaft.Api;
 [ApiController]
 public class Feature : ControllerBase
 {
-    protected readonly IMediator Mediator;
+    protected readonly ISheaftMediator Mediator;
     protected string CurrentUserId => HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-    public Feature(IMediator mediator)
+    public Feature(ISheaftMediator mediator)
     {
         Mediator = mediator;
     }

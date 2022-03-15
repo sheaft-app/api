@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -41,12 +42,12 @@ public static class ServiceCollectionExtensions
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
-                options.LoginPath = "hangfire/login";
-                options.LogoutPath = "hangfire/logout";
+                options.LoginPath = "/account/login";
+                options.LogoutPath = "/account/logout";
+                options.ExpireTimeSpan = TimeSpan.FromDays(1);
             })
             .AddJwtBearer(options =>
             {
@@ -71,14 +72,11 @@ public static class ServiceCollectionExtensions
         IdentityModelEventSource.ShowPII = true;
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(Policies.HANGFIRE, cfg =>
-            {
-                cfg.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme);
-                cfg.RequireAuthenticatedUser();
-            });
             options.AddPolicy(Policies.AUTHENTICATED, builder =>
             {
-                builder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+                builder.AddAuthenticationSchemes(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    JwtBearerDefaults.AuthenticationScheme);
                 builder.RequireAuthenticatedUser();
             });
 
@@ -93,26 +91,16 @@ public static class ServiceCollectionExtensions
         {
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT containing userid claim",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-            });
-
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
+                Reference = new OpenApiReference
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Id = "Bearer",
-                            Type = ReferenceType.SecurityScheme
-                        },
-                        UnresolvedReference = true
-                    },
-                    new List<string>()
-                }
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                },
+                Description = "JWT containing userid claim",
+                Name = "JWT",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer"
             });
         });
 
@@ -127,8 +115,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISecuritySettings>(provider =>
             provider.GetService<IOptionsSnapshot<SecuritySettings>>().Value);
         
-        services.AddHttpClient();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddHttpClient();
     }
 }

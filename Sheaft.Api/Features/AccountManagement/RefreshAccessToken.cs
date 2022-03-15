@@ -1,6 +1,6 @@
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
 
 namespace Sheaft.Api.AccountManagement;
@@ -8,7 +8,7 @@ namespace Sheaft.Api.AccountManagement;
 [Route(Routes.TOKEN)]
 public class RefreshAccessToken : Feature
 {
-    public RefreshAccessToken(IMediator mediator)
+    public RefreshAccessToken(ISheaftMediator mediator)
         : base(mediator)
     {
     }
@@ -17,7 +17,7 @@ public class RefreshAccessToken : Feature
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthenticationTokenDto>> Post([FromBody] string refreshToken, CancellationToken token)
     {
-        var result = await Mediator.Send(new RefreshAccessTokenCommand(refreshToken), token);
+        var result = await Mediator.Execute(new RefreshAccessTokenCommand(refreshToken), token);
         return HandleCommandResult(result);
     }
 }

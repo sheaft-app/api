@@ -1,5 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
 
 namespace Sheaft.Api.AccountManagement;
@@ -7,7 +7,7 @@ namespace Sheaft.Api.AccountManagement;
 [Route(Routes.PROFILE)]
 public class GetProfile : Feature
 {
-    public GetProfile(IMediator mediator)
+    public GetProfile(ISheaftMediator mediator)
         : base(mediator)
     {
     }
@@ -15,7 +15,7 @@ public class GetProfile : Feature
     [HttpGet("")]
     public async Task<ActionResult<ProfileDto>> Get(CancellationToken token)
     {
-        var result = await Mediator.Send(new GetProfileQuery(CurrentUserId), token);
+        var result = await Mediator.Query(new GetProfileQuery(CurrentUserId), token);
         return HandleQueryResult(result);
     }
 }

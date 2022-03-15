@@ -2,6 +2,7 @@ using Amazon;
 using Amazon.SimpleEmail;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -113,16 +114,17 @@ public static class ServiceCollectionExtensions
         
         services.AddHangfire(hangfireConfig =>
         {
-            // hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions
-            // {
-            //     CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            //     SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-            //     QueuePollInterval = TimeSpan.Zero,
-            //     UseRecommendedIsolationLevel = true,
-            //     DisableGlobalLocks = true
-            // });
+            hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions
+            {
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.FromSeconds(15),
+                UseRecommendedIsolationLevel = true,
+                DisableGlobalLocks = true,
+                SchemaName = "hf"
+            });
 
-            hangfireConfig.UseMemoryStorage();
+            //hangfireConfig.UseMemoryStorage();
 
             hangfireConfig.UseSerializerSettings(new JsonSerializerSettings
             {
