@@ -2,12 +2,12 @@
 
 namespace Sheaft.Infrastructure;
 
-public class MailerSettings : IMailerSettings
+public class EmailingSettings : IEmailingSettings
 {
-        public const string SETTING = "Mailer";
+        public const string SETTING = "Emailing";
         public string ApiId { get; set; }
         public string ApiKey { get; set; }
-        public IMailerSettings.MailerUser Sender { get; set; }
+        public IEmailingSettings.MailerUser Sender { get; set; }
         public string Bounces { get; set; }
         public bool SkipSending { get; set; } = false;
     }

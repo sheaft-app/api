@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IEmailingService, EmailingService>();
 
-        var mailerConfig = configuration.GetSection(MailerSettings.SETTING).Get<MailerSettings>();
+        var mailerConfig = configuration.GetSection(EmailingSettings.SETTING).Get<EmailingSettings>();
         services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ =>
             new AmazonSimpleEmailServiceClient(mailerConfig.ApiId, mailerConfig.ApiKey, RegionEndpoint.EUCentral1));
     }
@@ -90,30 +90,28 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        var appConnectionString = configuration.GetConnectionString("AppDatabase");
+        var appDatabaseConfig =
+            configuration.GetSection(AppDatabaseSettings.SETTING).Get<AppDatabaseSettings>();
+        
         var connectionStrings = new Dictionary<DatabaseConnectionName, string>
         {
-            {DatabaseConnectionName.AppDatabase, appConnectionString}
+            {DatabaseConnectionName.AppDatabase, appDatabaseConfig.ConnectionString}
         };
 
         services.AddSingleton<IDictionary<DatabaseConnectionName, string>>(connectionStrings);
         services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
-
-        services.AddDbContext<IDbContext, AppDbContext>(c =>
+        
+        services.AddDbContext<IDbContext, AppDbContext>(optionsBuilder =>
         {
-            c.UseSqlServer(appConnectionString, builder =>
-            {
-                builder.EnableRetryOnFailure(2);
-                builder.CommandTimeout(30);
-            });
-        }, ServiceLifetime.Scoped);
+            optionsBuilder.UseSqlServer(appDatabaseConfig.ConnectionString);
+        });
     }
 
     private static void RegisterHangfire(IServiceCollection services, IConfiguration configuration)
     {
         var jobsDatabaseConfig =
             configuration.GetSection(JobsDatabaseSettings.SETTING).Get<JobsDatabaseSettings>();
-
+        
         services.AddHangfire(hangfireConfig =>
         {
             // hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions

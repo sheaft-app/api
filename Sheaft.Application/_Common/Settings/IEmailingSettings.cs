@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Application;
 
-public interface IMailerSettings
+public interface IEmailingSettings
 {
     string ApiId { get; set; }
     string ApiKey { get; set; }

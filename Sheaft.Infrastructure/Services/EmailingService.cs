@@ -10,13 +10,13 @@ namespace Sheaft.Infrastructure.Services;
 internal class EmailingService : IEmailingService
 {
     private readonly IAmazonSimpleEmailService _mailer;
-    private readonly IMailerSettings _mailerSettings;
+    private readonly IEmailingSettings _emailingSettings;
 
     public EmailingService(
-        IOptionsSnapshot<IMailerSettings> mailerOptions,
+        IOptionsSnapshot<IEmailingSettings> mailerOptions,
         IAmazonSimpleEmailService mailer)
     {
-        _mailerSettings = mailerOptions.Value;
+        _emailingSettings = mailerOptions.Value;
         _mailer = mailer;
     }
 
@@ -30,8 +30,8 @@ internal class EmailingService : IEmailingService
             {
                 ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
             },
-            Source = $"{_mailerSettings.Sender.Name}<{_mailerSettings.Sender.Email}>",
-            ReturnPath = _mailerSettings.Bounces,
+            Source = $"{_emailingSettings.Sender.Name}<{_emailingSettings.Sender.Email}>",
+            ReturnPath = _emailingSettings.Bounces,
             Message = new Message
             {
                 Subject = new Content(subject),
@@ -39,7 +39,7 @@ internal class EmailingService : IEmailingService
             }
         };
 
-        if (_mailerSettings.SkipSending)
+        if (_emailingSettings.SkipSending)
             return Result.Success();
 
         var response = await _mailer.SendEmailAsync(msg, token);
@@ -57,8 +57,8 @@ internal class EmailingService : IEmailingService
             {
                 ToAddresses = new List<string> {$"=?UTF-8?B?{toName.Base64Encode()}?= <{toEmail}>"}
             },
-            Source = $"{_mailerSettings.Sender.Name}<{_mailerSettings.Sender.Email}>",
-            ReturnPath = _mailerSettings.Bounces,
+            Source = $"{_emailingSettings.Sender.Name}<{_emailingSettings.Sender.Email}>",
+            ReturnPath = _emailingSettings.Bounces,
             Message = new Message
             {
                 Subject = new Content(subject),
@@ -66,7 +66,7 @@ internal class EmailingService : IEmailingService
             }
         };
 
-        if (_mailerSettings.SkipSending)
+        if (_emailingSettings.SkipSending)
             return Result.Success();
 
         var response = await _mailer.SendEmailAsync(msg, token);
