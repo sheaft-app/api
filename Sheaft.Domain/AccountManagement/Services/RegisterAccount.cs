@@ -29,6 +29,6 @@ internal class CreateAccount : ICreateAccount
             return Result.Failure<Account>(ErrorKind.Validation, "The supplied email is already in use.");
 
         var hashedPassword = HashedPassword.Create(password, _passwordHasher);
-        return Result.Success(Account.Create(username, email, hashedPassword, profile));
+        return Result.Success(new Account(username, email, hashedPassword, profile));
     }
 }

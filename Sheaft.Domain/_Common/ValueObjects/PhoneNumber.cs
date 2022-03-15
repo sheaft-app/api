@@ -5,16 +5,16 @@ namespace Sheaft.Domain;
 
 public record PhoneNumber
 {
-    public PhoneNumber(string number)
+    public PhoneNumber(string value)
     {
-        if (string.IsNullOrWhiteSpace(number))
-            throw new ArgumentNullException(nameof(number));
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentNullException(nameof(value));
 
-        if (!Regex.IsMatch(number, @"^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$"))
+        if (!Regex.IsMatch(value, @"^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$"))
             throw new InvalidOperationException("Phone number is invalid");
 
-        Number = number;
+        Value = value;
     }
 
-    public string Number { get; }
+    public string Value { get; }
 }

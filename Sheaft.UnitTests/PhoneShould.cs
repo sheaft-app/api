@@ -23,6 +23,6 @@ public class PhoneShould
         var phoneNumber = new PhoneNumber("0632125456");
         
         Assert.IsNotNull(phoneNumber);
-        Assert.IsNotEmpty(phoneNumber.Number);
+        Assert.IsNotEmpty(phoneNumber.Value);
     }
 }

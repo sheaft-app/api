@@ -51,7 +51,7 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
 
     public async Task<Result<string>> Handle(RegisterAccountCommand request, CancellationToken token)
     {
-        var profile = Profile.Create(
+        var profile = new Profile(
             new CompanyName(request.TradeName), 
             new EmailAddress(request.ContactEmail), 
             new PhoneNumber(request.ContactPhone), 

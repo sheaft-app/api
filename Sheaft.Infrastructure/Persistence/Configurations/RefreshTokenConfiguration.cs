@@ -15,12 +15,12 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.HasKey("Id");
         
         builder.Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValueSql("GETUTCDATE()")
+            .HasDefaultValue(DateTimeOffset.UtcNow)
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAdd();
         
         builder.Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValueSql("GETUTCDATE()")
+            .HasDefaultValue(DateTimeOffset.UtcNow)
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 

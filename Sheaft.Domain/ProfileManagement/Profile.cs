@@ -6,18 +6,14 @@ public class Profile : AggregateRoot
     {
     }
 
-    private Profile(CompanyName name, EmailAddress contactEmail, PhoneNumber contactPhone, Legal legal, UserInfo userInfo)
+    public Profile(CompanyName name, EmailAddress contactEmail, PhoneNumber contactPhone, Legal legal, UserInfo userInfo)
     {
+        Identifier = ProfileId.New();
         Name = name;
         ContactEmail = contactEmail;
         ContactPhone = contactPhone;
         Legal = legal;
         User = userInfo;
-    }
-
-    public static Profile Create(CompanyName name, EmailAddress contactEmail, PhoneNumber contactPhone, Legal legal, UserInfo userInfo)
-    {
-        return new Profile(name, contactEmail, contactPhone, legal, userInfo);
     }
     
     public ProfileId Identifier { get; set;}
@@ -26,12 +22,25 @@ public class Profile : AggregateRoot
     public PhoneNumber ContactPhone { get; set;}
     public UserInfo User { get; set; }
     public Legal Legal { get; set;}
-    public Uri? Picture { get; set; }
-    public CompanyDescription? Description { get; set; }
 }
 
-public record CompanyDescription(string Value);
-public record Legal(LegalName Name, Siret Siret, Address Address);
+public record ProfileDescription(string Value);
+
+public record Legal
+{
+    private Legal(){}
+
+    public Legal(LegalName name, Siret siret, Address address)
+    {
+        Name = name;
+        Siret = siret;
+        Address = address;
+    }
+    
+    public LegalName Name{ get; }
+    public Siret Siret{ get; }
+    public Address Address { get; }
+}
 public record UserInfo(string Firstname, string Lastname);
 
 public record Social

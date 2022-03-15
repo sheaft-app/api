@@ -10,17 +10,12 @@ public class Account : AggregateRoot
     {
     }
 
-    private Account(Username username, EmailAddress email, HashedPassword password, Profile profile)
+    public Account(Username username, EmailAddress email, HashedPassword password, Profile profile)
     {
         Username = username;
         Email = email;
         Password = password;
         Profile = profile;
-    }
-
-    public static Account Create(Username username, EmailAddress email, HashedPassword password, Profile profile)
-    {
-        return new Account(username, email, password, profile);
     }
     
     public Username Username { get; private set; }

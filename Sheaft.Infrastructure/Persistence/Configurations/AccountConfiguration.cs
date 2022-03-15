@@ -18,13 +18,13 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         
         builder
             .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValueSql("GETUTCDATE()")
+            .HasDefaultValue(DateTimeOffset.UtcNow)
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAdd();
         
         builder
             .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValueSql("GETUTCDATE()")
+            .HasDefaultValue(DateTimeOffset.UtcNow)
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 

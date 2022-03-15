@@ -1,9 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
+using Sheaft.Infrastructure.Persistence;
+using Sheaft.IntegrationTests.Fakes;
 
 namespace Sheaft.IntegrationTests.AccountManagement;
 
@@ -36,10 +39,18 @@ public class LoginUserCommandShould
 
     private (string, string, LoginUserHandler) InitHandler()
     {
-        var username = "username";
+        var context = new FakeDbContextFactory().CreateContext();
+        
+        var username = "test@est.com";
+        var password = "password";
+        
         var hasher = new PasswordHasher("my_salt_value");
+        context.Accounts.Add(AccountTestsHelper.GetDefaultAccount(hasher, username, password));
+
+        context.SaveChanges();
+        
         var handler = new LoginUserHandler(
-            null,
+            new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()),
             hasher,
             new SecurityTokensProvider(new JwtSettings
             {
@@ -53,7 +64,7 @@ public class LoginUserCommandShould
                 ResetPasswordTokenValidityInHours = 5,
             }));
         
-        return (username, "password", handler);
+        return (username, password, handler);
     }
 }
 #pragma warning restore CS8767

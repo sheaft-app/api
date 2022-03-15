@@ -7,6 +7,7 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
+using Sheaft.IntegrationTests.Fakes;
 
 namespace Sheaft.IntegrationTests.AccountManagement;
 
@@ -60,6 +61,7 @@ public class RefreshAccessTokenCommandShould
         var securityTokensProvider = new SecurityTokensProvider(new JwtSettings
         {
             Issuer = "http://localhost",
+            Salt = "my_salt_value",
             Secret = "this_is_a_super_long_secret"
         }, new SecuritySettings
         {
@@ -67,14 +69,20 @@ public class RefreshAccessTokenCommandShould
             RefreshTokenExpirationInMinutes = 15
         });
 
-        Profile profile = null;
-        var passwordHasher = new PasswordHasher("this_salt");
-        var account = Account.Create(new Username("test"), new EmailAddress("test@test.com"),
-            HashedPassword.Create("P@ssword", passwordHasher), profile);
-
-        var loginResult = account.Login("P@ssword", passwordHasher, securityTokensProvider);
+        var context = new FakeDbContextFactory().CreateContext();
         
-        var handler = new RefreshAccessTokenHandler(null, securityTokensProvider);
+        var username = "test@est.com";
+        var password = "password";
+        
+        var hasher = new PasswordHasher("my_salt_value");
+        var account = AccountTestsHelper.GetDefaultAccount(hasher, username, password);
+        
+        context.Accounts.Add(account);
+        context.SaveChanges();
+        
+        var loginResult = account.Login(password, hasher, securityTokensProvider);
+
+        var handler = new RefreshAccessTokenHandler(new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()), securityTokensProvider);
             
         return (handler, loginResult.Value, securityTokensProvider);
     }
