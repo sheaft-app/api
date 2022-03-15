@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Sheaft.Domain.ProfileManagement;
+namespace Sheaft.Domain.AccountManagement;
 
 public record Siret
 {

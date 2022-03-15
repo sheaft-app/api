@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.ProfileManagement;
+﻿namespace Sheaft.Domain.AccountManagement;
 
 public record VatNumber
 {

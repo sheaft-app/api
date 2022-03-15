@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Domain;
 
-public interface IEmailService
+public interface IEmailingService
 {
     Task<Result> SendTemplatedEmail<T>(string toEmail, string toName, string subject, string templateId,
         T data, bool isHtml, CancellationToken token);

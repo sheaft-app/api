@@ -9,13 +9,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Sheaft.Application;
-using Sheaft.Application.ProfileManagement;
+using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.ProfileManagement;
 using Sheaft.Infrastructure.Services;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
@@ -66,7 +64,7 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterEmailServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IEmailingService, EmailingService>();
 
         var mailerConfig = configuration.GetSection(MailerSettings.SETTING).Get<MailerSettings>();
         services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailServiceClient>(_ =>

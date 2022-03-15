@@ -3,7 +3,6 @@ using System.Linq;
 using NUnit.Framework;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
 

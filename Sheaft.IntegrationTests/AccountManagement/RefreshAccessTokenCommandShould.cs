@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.IntegrationTests.Fakes;

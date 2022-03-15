@@ -1,6 +1,5 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure.AccountManagement;
 
 namespace Sheaft.IntegrationTests.AccountManagement;

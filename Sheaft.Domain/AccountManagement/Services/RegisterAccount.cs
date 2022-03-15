@@ -1,6 +1,4 @@
-﻿using Sheaft.Domain.ProfileManagement;
-
-namespace Sheaft.Domain.AccountManagement;
+﻿namespace Sheaft.Domain.AccountManagement;
 
 public interface ICreateAccount
 {

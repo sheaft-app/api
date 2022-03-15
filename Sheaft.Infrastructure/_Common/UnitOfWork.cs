@@ -3,10 +3,8 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.ProfileManagement;
 
 namespace Sheaft.Infrastructure;
 

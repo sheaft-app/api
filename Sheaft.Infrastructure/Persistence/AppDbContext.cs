@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 
 namespace Sheaft.Infrastructure.Persistence;

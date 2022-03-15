@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.ProfileManagement;
 
 namespace Sheaft.Application.AccountManagement;
 
