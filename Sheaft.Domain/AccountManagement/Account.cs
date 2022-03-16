@@ -26,7 +26,7 @@ public class Account : AggregateRoot
     public Result ChangeEmail(NewEmailAddress newEmailAddress)
     {
         if (Email.Value == newEmailAddress.Value)
-            return Result.Failure(ErrorKind.Validation, "The new email must be different from the old one.");
+            return Result.Failure(ErrorKind.Validation, "change.email.new.must.differ", "The new email must be different from the old one.");
 
         var oldEmail = Email.Value;
         Email = newEmailAddress;
@@ -39,11 +39,11 @@ public class Account : AggregateRoot
     {
         var oldPasswordIsValid = hasher.PasswordIsValid(changePassword.OldPassword, Password);
         if (!oldPasswordIsValid)
-            return Result.Failure(ErrorKind.Validation, "The old password is invalid.");
+            return Result.Failure(ErrorKind.Validation, "change.password.invalid.old.password", "The old password is invalid.");
 
         var newPasswordIsSameAsOldOne = hasher.PasswordIsValid(changePassword.NewPassword, Password);
         if (newPasswordIsSameAsOldOne)
-            return Result.Failure(ErrorKind.Validation, "The new password must be different from the old one.");
+            return Result.Failure(ErrorKind.Validation, "change.password.new.must.differ","The new password must be different from the old one.");
 
         var (hash, salt) = hasher.CreatePassword(changePassword.NewPassword);
         Password = HashedPassword.FromHashedString(hash, salt);
@@ -69,18 +69,18 @@ public class Account : AggregateRoot
         if(existingToken is {Expired: false} && existingToken.ExpiresOn > DateTimeOffset.UtcNow)
             return GenerateAccessToken(securityTokensProvider);
         
-        InvalideAllRefreshTokens();
+        InvalidateAllRefreshTokens();
         
         if(existingToken == null)
-            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token used does not exists. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "refresh.token.not.found", "The refresh token used does not exists. You need to re-authenticate yourself.");
         
         if(existingToken.Expired)
-            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token used was already deactivated. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "refresh.token.deactivated", "The refresh token used was already deactivated. You need to re-authenticate yourself.");
         
         if(existingToken.ExpiresOn < DateTimeOffset.UtcNow)
-            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "The refresh token is expired. You need to re-authenticate yourself.");
+            return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "refresh.token.expired", "The refresh token is expired. You need to re-authenticate yourself.");
         
-        return Result.Failure<AuthenticationResult>(ErrorKind.Unexpected, "You need to re-authenticate yourself.");
+        return Result.Failure<AuthenticationResult>(ErrorKind.Unexpected, "refresh.token.authentication.required", "You need to reauthenticate yourself");
     }
 
     public Result ForgotPassword(DateTimeOffset currentDate, int tokenValidityInHours)
@@ -123,7 +123,7 @@ public class Account : AggregateRoot
 
     private string InsertNewRefreshToken(ISecurityTokensProvider securityTokensProvider)
     {
-        InvalideAllRefreshTokens();
+        InvalidateAllRefreshTokens();
         
         var data = securityTokensProvider.GenerateRefreshToken(Username);
         _refreshTokens.Add(data.Info);
@@ -131,7 +131,7 @@ public class Account : AggregateRoot
         return data.Token;
     }
 
-    private void InvalideAllRefreshTokens()
+    private void InvalidateAllRefreshTokens()
     {
         foreach (var token in _refreshTokens)
             token.Expire();
