@@ -21,10 +21,8 @@ public class AppDbContext : DbContext, IDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new AccountConfiguration());
-        modelBuilder.ApplyConfiguration(new ProfileConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
     }
 
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<Profile> Profiles { get; set; }
 }

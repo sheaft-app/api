@@ -29,11 +29,11 @@ public class SecurityTokensProvider : ISecurityTokensProvider
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, account.Profile.Identifier.Value),
+            new Claim(JwtRegisteredClaimNames.Sub, account.Identifier.Value),
             new Claim(ClaimTypes.Name, account.Username.Value),
             new Claim(ClaimTypes.Email, account.Email.Value),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-            new Claim(ClaimTypes.NameIdentifier, account.Profile.Identifier.Value),
+            new Claim(ClaimTypes.NameIdentifier, account.Username.Value),
             //TODO new Claim("GroupIdentifier", account.Group.Value),
         };
 
@@ -43,12 +43,12 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         return new AccessToken(accessToken, "Bearer", _securitySettings.AccessTokenExpirationInMinutes);
     }
 
-    public RefreshToken GenerateRefreshToken(Username username)
+    public RefreshToken GenerateRefreshToken(AccountId accountIdentifier)
     {
         var tokenId = RefreshTokenId.New();
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, username.Value),
+            new Claim(JwtRegisteredClaimNames.Sub, accountIdentifier.Value),
             new Claim(JwtRegisteredClaimNames.Jti, tokenId.Value)
         };
         
@@ -58,19 +58,19 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         return new RefreshToken(new RefreshTokenInfo(tokenId, expires), refreshToken);
     }
 
-    public (Username, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken)
+    public (AccountId, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken)
     {
         var result = new JwtSecurityTokenHandler().ReadJwtToken(refreshToken);
         if (result == null)
             throw new InvalidOperationException("Cannot read provided refresh token");
 
-        var usernameClaim = result.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Name);
+        var usernameClaim = result.Claims.SingleOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
         var refreshTokenIdClaim = result.Claims.SingleOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
         
         if(usernameClaim == null || refreshTokenIdClaim == null)
             throw new InvalidOperationException("Provided refresh token malformed");
 
-        return (new Username(usernameClaim.Value), new RefreshTokenId(refreshTokenIdClaim.Value));
+        return (new AccountId(usernameClaim.Value), new RefreshTokenId(refreshTokenIdClaim.Value));
     }
 
     private string CreateToken(List<Claim> claims, DateTimeOffset expires)

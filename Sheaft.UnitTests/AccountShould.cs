@@ -172,7 +172,6 @@ public class AccountShould
         return new Account(
             new Username("testusername"),
             new EmailAddress(email ?? "test@test.com"),
-            HashedPassword.Create(new Password("aaaaaaaa"), _passwordHasher),
-            new Profile(new CompanyName("name"), new EmailAddress("last@test.com"), new PhoneNumber("0600125412"), new Legal(new LegalName("test"), new Siret("15932477173006"), new Address("line1", "line2", "73410", "Albens")), new UserInfo("firstname", "lastname")));
+            HashedPassword.Create(new Password("aaaaaaaa"), _passwordHasher));
     }
 }

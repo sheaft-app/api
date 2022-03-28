@@ -3,6 +3,6 @@
 public interface ISecurityTokensProvider
 {
     AccessToken GenerateAccessToken(Account account);
-    RefreshToken GenerateRefreshToken(Username username);
-    (Username, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken);
+    RefreshToken GenerateRefreshToken(AccountId accountIdentifier);
+    (AccountId, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken);
 }

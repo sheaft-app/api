@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain.AccountManagement;
 
-public record AccountLoggedIn(string AccountId) : DomainEvent;
+public record AccountLoggedIn(string AccountIdentifier) : DomainEvent;

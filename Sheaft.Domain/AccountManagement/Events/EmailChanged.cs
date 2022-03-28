@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain.AccountManagement;
 
-public record EmailChanged(string Username, string OldEmail, string NewEmail) : DomainEvent;
+public record EmailChanged(string AccountIdentifier, string OldEmail, string NewEmail) : DomainEvent;

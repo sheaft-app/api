@@ -1,16 +1,17 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.Logging;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Application.AccountManagement;
 
-public record ResetPasswordCommand(string Username, string ResetToken, string Password, string Confirm) : ICommand<Result>;
+public record ResetPasswordCommand(string Identifier, string ResetToken, string Password, string Confirm) : ICommand<Result>;
 
 internal class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
 {
     public ResetPasswordCommandValidator()
     {
-        RuleFor(c => c.Username).NotEmpty().WithMessage("Username is required");
+        RuleFor(c => c.Identifier).NotEmpty().WithMessage("Identifier is required");
         RuleFor(c => c.ResetToken).NotEmpty().WithMessage("ResetToken is required");
         
         RuleFor(c => c.Password).NotEmpty().WithMessage("New password is required");
@@ -23,18 +24,21 @@ internal class ResetPasswordHandler : ICommandHandler<ResetPasswordCommand, Resu
 {
     private readonly IUnitOfWork _uow;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ILogger<ResetPasswordHandler> _logger;
 
     public ResetPasswordHandler(
         IUnitOfWork uow,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ILogger<ResetPasswordHandler> logger)
     {
         _uow = uow;
         _passwordHasher = passwordHasher;
+        _logger = logger;
     }
 
     public async Task<Result> Handle(ResetPasswordCommand request, CancellationToken token)
     {
-        var accountResult = await _uow.Accounts.Get(new Username(request.Username), token);
+        var accountResult = await _uow.Accounts.Get(new AccountId(request.Identifier), token);
         if (accountResult.IsFailure)
             return accountResult;
 

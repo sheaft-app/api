@@ -24,11 +24,9 @@ internal class UnitOfWork : IUnitOfWork
         _logger = logger;
 
         Accounts = new AccountRepository(_context);
-        Profiles = new ProfileRepository(_context);
     }
 
     public IAccountRepository Accounts { get; }
-    public IProfileRepository Profiles { get; }
     
 
     public async Task<Result<int>> Save(CancellationToken token)

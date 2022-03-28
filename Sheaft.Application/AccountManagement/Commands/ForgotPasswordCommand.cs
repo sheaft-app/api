@@ -35,7 +35,10 @@ internal class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Re
     public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken token)
     {
         var accountResult = await _uow.Accounts.FindByEmail(new EmailAddress(request.Email), token);
-        if (accountResult.IsFailure || accountResult.Value.HasNoValue)
+        if (accountResult.IsFailure)
+            return accountResult;
+        
+        if(accountResult.Value.HasNoValue)
         {
             _logger.LogInformation("{Email} requested a forgot password token, but email was not found", request.Email);
             return Result.Success();

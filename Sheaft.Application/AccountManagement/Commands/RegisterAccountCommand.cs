@@ -50,22 +50,11 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
 
     public async Task<Result<string>> Handle(RegisterAccountCommand request, CancellationToken token)
     {
-        var profile = new Profile(
-            new CompanyName(request.TradeName), 
-            new EmailAddress(request.ContactEmail), 
-            new PhoneNumber(request.ContactPhone), 
-            new Legal(
-                new LegalName(request.CommercialName), 
-                new Siret(request.Siret), 
-                new Address(request.AddressLine1, request.AddressLine2, request.AddressZipcode, request.AddressCity)), 
-            new UserInfo(request.Firstname, request.Lastname));
-
         var email = new EmailAddress(request.Email);
         var accountResult = await _createAccount.Create(
             new Username(request.Email),
             email,
             new NewPassword(request.Password, request.Confirm),
-            profile,
             token);
 
         if (accountResult.IsFailure)
@@ -74,6 +63,6 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
         _uow.Accounts.Add(accountResult.Value);
         var result = await _uow.Save(token);
         
-        return Result.SuccessIf(result, accountResult.Value.Profile.Identifier.Value);
+        return Result.SuccessIf(result, accountResult.Value.Identifier.Value);
     }
 }

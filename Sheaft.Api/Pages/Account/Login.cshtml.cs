@@ -57,11 +57,11 @@ public class Login : PageModel
         
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, accountResult.Value.Profile.Identifier.Value),
+            new Claim(JwtRegisteredClaimNames.Sub, accountResult.Value.Identifier.Value),
             new Claim(ClaimTypes.Name, accountResult.Value.Username.Value),
             new Claim(ClaimTypes.Email, accountResult.Value.Email.Value),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-            new Claim(ClaimTypes.NameIdentifier, accountResult.Value.Profile.Identifier.Value),
+            new Claim(ClaimTypes.NameIdentifier, accountResult.Value.Identifier.Value),
         };
         
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

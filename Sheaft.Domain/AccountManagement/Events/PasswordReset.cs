@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain.AccountManagement;
 
-public record PasswordReset(string Username) : DomainEvent;
+public record PasswordReset(string AccountIdentifier) : DomainEvent;

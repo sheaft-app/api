@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
+using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
@@ -33,7 +34,7 @@ public class RefreshAccessTokenCommandShould
     {
         var (handler, _, securityTokensProvider) = InitHandler();
 
-        var (data, token) = securityTokensProvider.GenerateRefreshToken(new Username("test"));
+        var (data, token) = securityTokensProvider.GenerateRefreshToken(new AccountId("test"));
         var result = await handler.Handle(new RefreshAccessTokenCommand(token),
             CancellationToken.None);
 

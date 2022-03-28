@@ -41,13 +41,11 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterQueries(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IProfileQueries, ProfileQueries>();
     }
 
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
-        services.AddScoped<IProfileRepository, ProfileRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)

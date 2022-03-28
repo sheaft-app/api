@@ -42,10 +42,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasField("_refreshTokens");
         
         builder
-            .HasOne(c => c.Profile)
-            .WithOne()
-            .HasForeignKey<Profile>("AccountId")
-            .OnDelete(DeleteBehavior.Cascade);
+            .Property(p => p.Identifier)
+            .HasConversion(identifier => identifier.Value, value => new AccountId(value));
         
         builder
             .Property(p => p.Username)
@@ -54,7 +52,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder
             .Property(p => p.Email)
             .HasConversion(email => email.Value, value => new EmailAddress(value));
-
+        
         builder
             .HasIndex(c => c.Username)
             .IsUnique();
