@@ -7,18 +7,18 @@ namespace Sheaft.Infrastructure.AccountManagement;
 
 internal class ValidateUniqueness : IValidateUniqueness
 {
-    private readonly IDbContext _connectionFactory;
+    private readonly IDbContext _context;
 
-    public ValidateUniqueness(IDbContext connectionFactory)
+    public ValidateUniqueness(IDbContext context)
     {
-        _connectionFactory = connectionFactory;
+        _context = context;
     }
 
     public virtual async Task<Result<bool>> IsUsernameAlreadyExists(Username username, CancellationToken token)
     {
         try
         {
-            var exists = await _connectionFactory.Set<Account>().AnyAsync(a => a.Username == username, token);
+            var exists = await _context.Set<Account>().AnyAsync(a => a.Username == username, token);
             return Result.Success(exists);
         }
         catch (Exception e)
@@ -31,7 +31,7 @@ internal class ValidateUniqueness : IValidateUniqueness
     {
         try
         {
-            var exists = await _connectionFactory.Set<Account>().AnyAsync(a => a.Email == email, token);
+            var exists = await _context.Set<Account>().AnyAsync(a => a.Email == email, token);
             return Result.Success(exists);
         }
         catch (Exception e)

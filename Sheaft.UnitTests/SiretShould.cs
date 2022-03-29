@@ -8,7 +8,7 @@ public class SiretShould
     [Test]
     public void Throw_If_Null_Or_Empty()
     {
-        Assert.That(() => new Siret(""), Throws.ArgumentNullException);
+        Assert.That(() => new Siret(""), Throws.InvalidOperationException);
     }
 
     [Test]

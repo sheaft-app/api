@@ -8,13 +8,13 @@ public class EmailAddressShould
     [Test]
     public void Throw_If_Null_Or_Empty()
     {
-        Assert.That(() => new EmailAddress(""), Throws.Exception);
+        Assert.That(() => new EmailAddress(""), Throws.InvalidOperationException);
     }
 
     [Test]
     public void Throw_If_Invalid_Pattern()
     {
-        Assert.That(() => new EmailAddress("email,mug@est."), Throws.Exception);
+        Assert.That(() => new EmailAddress("email,mug@est."), Throws.InvalidOperationException);
     }
 
     [Test]

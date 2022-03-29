@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain;
 
-public record Address(string Line1, string? Line2, string Postcode, string City);
+public record Address(string Street, string? Complement, string Postcode, string City);

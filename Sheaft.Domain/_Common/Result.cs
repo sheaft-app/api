@@ -46,6 +46,8 @@ public record Result
     {
         return isSuccess ? Success<T>(data) : Failure<T>(error);
     }
+    public static Result Failure() => Failure(ErrorKind.Unexpected, "error.unexpected");
+    public static Result<T> Failure<T>() => Failure<T>(ErrorKind.Unexpected, "error.unexpected");
     public static Result<T> Failure<T>(Error error) => new Result<T>(error);
     public static Result<T> Failure<T>(Result errorResult) => new Result<T>(errorResult.Error);
     

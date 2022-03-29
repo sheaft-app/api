@@ -12,9 +12,11 @@ using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.Services;
+using Sheaft.Infrastructure.SupplierManagement;
 using WkHtmlToPdfDotNet;
 using WkHtmlToPdfDotNet.Contracts;
 
@@ -46,6 +48,7 @@ public static class ServiceCollectionExtensions
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<ISupplierRepository, SupplierRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)
@@ -82,6 +85,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
         services.AddScoped<IIdentifierService, IdentifierService>();
+        services.AddScoped<ISupplierRegisterer, SupplierRegisterer>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -42,16 +41,8 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasField("_refreshTokens");
         
         builder
-            .Property(p => p.Identifier)
-            .HasConversion(identifier => identifier.Value, value => new AccountId(value));
-        
-        builder
-            .Property(p => p.Username)
-            .HasConversion(username => username.Value, value => new Username(value));
-        
-        builder
-            .Property(p => p.Email)
-            .HasConversion(email => email.Value, value => new EmailAddress(value));
+            .HasIndex(c => c.Identifier)
+            .IsUnique();
         
         builder
             .HasIndex(c => c.Username)
@@ -61,6 +52,6 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasIndex(c => c.Email)
             .IsUnique();
         
-        builder.ToTable("Accounts");
+        builder.ToTable("Account");
     }
 }

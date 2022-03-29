@@ -8,7 +8,7 @@ public class PhoneShould
     [Test]
     public void Throw_If_Null_Or_Empty()
     {
-        Assert.That(() => new PhoneNumber(""), Throws.ArgumentNullException);
+        Assert.That(() => new PhoneNumber(""), Throws.InvalidOperationException);
     }
 
     [Test]

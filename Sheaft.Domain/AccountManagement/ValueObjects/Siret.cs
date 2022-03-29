@@ -4,10 +4,11 @@ namespace Sheaft.Domain.AccountManagement;
 
 public record Siret
 {
+    private Siret(){}
     public Siret(string value)
     {
         if(string.IsNullOrWhiteSpace(value))
-            throw new ArgumentNullException(nameof(value));
+            throw new InvalidOperationException(nameof(value));
             
         if (value.Length != 14)
             throw new InvalidOperationException("Siret must be 14 characters.");

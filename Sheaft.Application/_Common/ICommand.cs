@@ -2,6 +2,8 @@
 
 namespace Sheaft.Application;
 
+public record Unit;
+
 public interface ICommand<out TResponse> : IRequest<TResponse>
 {
 }
