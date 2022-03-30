@@ -54,7 +54,7 @@ public class CreateProductCommandShould
 
         var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value));
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual("1",product.Code.Value);
+        Assert.AreEqual("0000000000017",product.Code.Value);
     }
     
     [Test]
