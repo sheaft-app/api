@@ -61,7 +61,7 @@ public class LoginUserCommandShould
                 AccessTokenExpirationInMinutes = 5,
                 RefreshTokenExpirationInMinutes = 5,
                 ResetPasswordTokenValidityInHours = 5,
-            }));
+            }), new RetrieveProfile(context));
         
         return (username, password, handler);
     }

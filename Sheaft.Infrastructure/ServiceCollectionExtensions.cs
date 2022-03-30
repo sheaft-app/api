@@ -89,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
         services.AddScoped<IValidateSupplierRegistration, ValidateSupplierRegistration>();
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
+        services.AddScoped<IRetrieveProfile, RetrieveProfile>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

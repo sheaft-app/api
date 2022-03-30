@@ -52,7 +52,7 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    public Result<AuthenticationResult> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider)
+    public Result<AuthenticationResult> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider, string? profileIdentifier = null)
     {
         var passwordIsValid = hasher.PasswordIsValid(password, Password);
         if (!passwordIsValid)
@@ -60,14 +60,14 @@ public class Account : AggregateRoot
         
         RaiseEvent(new AccountLoggedIn(Identifier.Value));
 
-        return GenerateAccessToken(securityTokensProvider);
+        return GenerateAccessToken(securityTokensProvider, profileIdentifier);
     }
 
     public Result<AuthenticationResult> RefreshAccessToken(RefreshTokenId refreshTokenId, ISecurityTokensProvider securityTokensProvider)
     {
         var existingToken = _refreshTokens.SingleOrDefault(rt => rt.Identifier == refreshTokenId);
         if(existingToken is {Expired: false} && existingToken.ExpiresOn > DateTimeOffset.UtcNow)
-            return GenerateAccessToken(securityTokensProvider);
+            return GenerateAccessToken(securityTokensProvider, null);
         
         InvalidateAllRefreshTokens();
         
@@ -112,10 +112,10 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    private Result<AuthenticationResult> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider)
+    private Result<AuthenticationResult> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider, string? profileIdentifier)
     {
         var refreshToken = InsertNewRefreshToken(securityTokensProvider);
-        var accessToken = securityTokensProvider.GenerateAccessToken(this);
+        var accessToken = securityTokensProvider.GenerateAccessToken(this, profileIdentifier);
 
         return Result.Success(new AuthenticationResult(accessToken.Value, refreshToken, accessToken.TokenType,
             accessToken.ExpiresIn));

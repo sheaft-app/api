@@ -19,7 +19,7 @@ public class ConfigureAccountAsSupplier : Feature
     [HttpPost("configure")]
     public async Task<ActionResult<string>> Post([FromBody] SupplierInfoRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new ConfigureAccountAsSupplierCommand(data.TradeName, data.CorporateName, data.Siret, data.Email, data.Phone, data.LegalAddress, data.ShippingAddress, CurrentUserId), token);
+        var result = await Mediator.Execute(new ConfigureAccountAsSupplierCommand(data.TradeName, data.CorporateName, data.Siret, data.Email, data.Phone, data.LegalAddress, data.ShippingAddress, CurrentAccountId), token);
         return HandleCommandResult(result);
     }
 }

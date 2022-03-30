@@ -25,7 +25,7 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         _securitySettings = securitySettings;
     }
 
-    public AccessToken GenerateAccessToken(Account account)
+    public AccessToken GenerateAccessToken(Account account, string? profileIdentifier)
     {
         var claims = new List<Claim>
         {
@@ -36,6 +36,9 @@ public class SecurityTokensProvider : ISecurityTokensProvider
             new Claim(ClaimTypes.NameIdentifier, account.Username.Value),
             //TODO new Claim("GroupIdentifier", account.Group.Value),
         };
+        
+        if(!string.IsNullOrWhiteSpace(profileIdentifier))
+            claims.Add(new Claim(CustomClaims.ProfileIdentifier, profileIdentifier));
 
         var expires = DateTimeOffset.UtcNow.AddMinutes(_securitySettings.AccessTokenExpirationInMinutes);
         

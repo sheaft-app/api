@@ -20,15 +20,18 @@ internal class LoginUserHandler : ICommandHandler<LoginUserCommand, Result<Authe
     private readonly IUnitOfWork _uow;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ISecurityTokensProvider _securityTokensProvider;
+    private readonly IRetrieveProfile _retrieveProfile;
 
     public LoginUserHandler(
         IUnitOfWork uow,
         IPasswordHasher passwordHasher,
-        ISecurityTokensProvider securityTokensProvider)
+        ISecurityTokensProvider securityTokensProvider,
+        IRetrieveProfile retrieveProfile)
     {
         _uow = uow;
         _passwordHasher = passwordHasher;
         _securityTokensProvider = securityTokensProvider;
+        _retrieveProfile = retrieveProfile;
     }
 
     public async Task<Result<AuthenticationTokenDto>> Handle(LoginUserCommand request, CancellationToken token)
@@ -36,9 +39,17 @@ internal class LoginUserHandler : ICommandHandler<LoginUserCommand, Result<Authe
         var accountResult = await _uow.Accounts.Get(new Username(request.Username), token);
         if (accountResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(accountResult);
-
+        
         var account = accountResult.Value;
-        var loginResult = account.Login(request.Password, _passwordHasher, _securityTokensProvider);
+        var profileIdentifierResult = await _retrieveProfile.GetAccountProfile(account.Identifier, token);
+        if (profileIdentifierResult.IsFailure)
+            return Result.Failure<AuthenticationTokenDto>(profileIdentifierResult);
+
+        var profileIdentifier = profileIdentifierResult.Value.HasValue
+            ? profileIdentifierResult.Value.Value.Identifier
+            : null;
+        
+        var loginResult = account.Login(request.Password, _passwordHasher, _securityTokensProvider, profileIdentifier);
         if (loginResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(loginResult);
 
