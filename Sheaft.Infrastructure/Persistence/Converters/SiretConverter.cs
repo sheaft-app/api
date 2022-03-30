@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Sheaft.Domain;
+using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Converters;
 
-internal class SupplierIdConverter : ValueConverter<SupplierId, string>
+internal class SiretConverter : ValueConverter<Siret, string>
 {
-    public SupplierIdConverter()
+    public SiretConverter()
         : base(
             v => v.Value,
-            v => new SupplierId(v))
+            v => new Siret(v))
     {
     }
 }

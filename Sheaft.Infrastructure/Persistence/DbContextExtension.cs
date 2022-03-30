@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Sheaft.Infrastructure.Persistence;
 
-public static class DbContextExtension
+internal static class DbContextExtension
 {
     public static bool AllMigrationsApplied(this AppDbContext context)
     {

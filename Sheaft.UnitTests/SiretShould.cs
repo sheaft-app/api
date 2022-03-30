@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.UnitTests;
 

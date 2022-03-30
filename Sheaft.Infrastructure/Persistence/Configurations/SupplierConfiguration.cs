@@ -5,7 +5,7 @@ using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
-public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
+internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 {
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {

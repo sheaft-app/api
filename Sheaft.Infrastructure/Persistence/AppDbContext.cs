@@ -7,12 +7,12 @@ using Sheaft.Infrastructure.Persistence.Converters;
 
 namespace Sheaft.Infrastructure.Persistence;
 
-internal interface IDbContext
+public interface IDbContext
 {
     public DbSet<TEntity> Set<TEntity>() where TEntity : class;
 }
 
-public class AppDbContext : DbContext, IDbContext
+internal class AppDbContext : DbContext, IDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)

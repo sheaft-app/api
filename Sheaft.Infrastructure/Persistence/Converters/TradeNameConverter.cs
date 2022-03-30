@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Sheaft.Domain;
+using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Converters;
 
-internal class SupplierIdConverter : ValueConverter<SupplierId, string>
+internal class TradeNameConverter : ValueConverter<TradeName, string>
 {
-    public SupplierIdConverter()
+    public TradeNameConverter()
         : base(
             v => v.Value,
-            v => new SupplierId(v))
+            v => new TradeName(v))
     {
     }
 }

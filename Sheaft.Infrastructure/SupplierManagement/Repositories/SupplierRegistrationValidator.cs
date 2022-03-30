@@ -5,16 +5,16 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.SupplierManagement;
 
-internal class SupplierRegisterer : ISupplierRegisterer
+internal class SupplierRegistrationValidator : ISupplierRegistrationValidator
 {
     private readonly IDbContext _context;
 
-    public SupplierRegisterer(IDbContext context)
+    public SupplierRegistrationValidator(IDbContext context)
     {
         _context = context;
     }
 
-    public async Task<Result<bool>> CanRegisterAccountAsSupplier(AccountId identifier, CancellationToken token)
+    public async Task<Result<bool>> CanRegisterAccount(AccountId identifier, CancellationToken token)
     {
         try
         {

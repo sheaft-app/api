@@ -3,12 +3,12 @@ using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.Persistence.Converters;
 
-internal class SupplierIdConverter : ValueConverter<SupplierId, string>
+internal class AccountIdConverter : ValueConverter<AccountId, string>
 {
-    public SupplierIdConverter()
+    public AccountIdConverter()
         : base(
             v => v.Value,
-            v => new SupplierId(v))
+            v => new AccountId(v))
     {
     }
 }

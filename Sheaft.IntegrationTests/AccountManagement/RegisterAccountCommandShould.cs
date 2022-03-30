@@ -60,7 +60,7 @@ public class RegisterAccountCommandShould
         
         context.SaveChanges();
         
-        var handler = new RegisterAccountHandler(new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()), new CreateAccount(new ValidateUniqueness(context), new PasswordHasher("this_is_super_salt_sample")));
+        var handler = new RegisterAccountHandler(new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()), new CreateAccount(new UniquenessValidator(context), new PasswordHasher("this_is_super_salt_sample")));
         return handler;
     }
 }

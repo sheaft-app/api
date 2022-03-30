@@ -5,7 +5,7 @@ using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
-public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshTokenInfo>
+internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshTokenInfo>
 {
     public void Configure(EntityTypeBuilder<RefreshTokenInfo> builder)
     {

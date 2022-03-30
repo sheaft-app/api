@@ -2,13 +2,11 @@
 using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Sheaft.Api;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Infrastructure;
-using Sheaft.Infrastructure.Persistence;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -41,15 +39,7 @@ try
     builder.Services.AddRazorPages();
     builder.Services.AddMvc();
 
-
     var app = builder.Build();
-
-    using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-    {
-        var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (!context.AllMigrationsApplied())
-            context.Database.Migrate();
-    }
 
     if (app.Environment.IsDevelopment())
     {
@@ -60,6 +50,8 @@ try
         app.UseHttpsRedirection();
         app.UseHsts();
     }
+
+    app.ApplyMigrations();
 
     app.UseRobotsTxt();
     app.UseCors("CORS");

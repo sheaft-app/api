@@ -1,15 +1,14 @@
 using Amazon;
 using Amazon.SimpleEmail;
 using Hangfire;
-using Hangfire.MemoryStorage;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Sheaft.Application;
-using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -81,11 +80,11 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterServices(IServiceCollection services)
     {
-        services.AddScoped<IValidateUniqueness, ValidateUniqueness>();
+        services.AddScoped<IUniquenessValidator, UniquenessValidator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
         services.AddScoped<IIdentifierService, IdentifierService>();
-        services.AddScoped<ISupplierRegisterer, SupplierRegisterer>();
+        services.AddScoped<ISupplierRegistrationValidator, SupplierRegistrationValidator>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)
@@ -140,5 +139,18 @@ public static class ServiceCollectionExtensions
         RecuringJobs.Register(configuration.GetSection(JobSettings.SETTING).Get<JobSettings>());
 
         services.AddHangfireServer();
+    }
+}
+
+public static class WebApplicationExtensions
+{
+    public static void ApplyMigrations(this WebApplication app)
+    {
+        using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (!context.AllMigrationsApplied())
+                context.Database.Migrate();
+        }
     }
 }

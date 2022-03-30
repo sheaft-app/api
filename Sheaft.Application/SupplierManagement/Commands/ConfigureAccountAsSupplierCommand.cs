@@ -10,16 +10,16 @@ public record ConfigureAccountAsSupplierCommand(string TradeName, string Corpora
 public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccountAsSupplierCommand, Result>
 {
     private readonly IUnitOfWork _uow;
-    private readonly ISupplierRegisterer _supplierRegisterer;
+    private readonly ISupplierRegistrationValidator _supplierRegistrationValidator;
     private readonly ILogger<ConfigureAccountAsSupplierHandler> _logger;
 
     public ConfigureAccountAsSupplierHandler(
         IUnitOfWork uow, 
-        ISupplierRegisterer supplierRegisterer,
+        ISupplierRegistrationValidator supplierRegistrationValidator,
         ILogger<ConfigureAccountAsSupplierHandler> logger)
     {
         _uow = uow;
-        _supplierRegisterer = supplierRegisterer;
+        _supplierRegistrationValidator = supplierRegistrationValidator;
         _logger = logger;
     }
 
@@ -34,7 +34,7 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             : null;
 
         var requireSupplierRegistrationResult =
-            await _supplierRegisterer.CanRegisterAccountAsSupplier(request.AccountIdentifier, token);
+            await _supplierRegistrationValidator.CanRegisterAccount(request.AccountIdentifier, token);
 
         if (requireSupplierRegistrationResult.IsFailure)
             return Result.Failure(requireSupplierRegistrationResult);

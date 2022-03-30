@@ -7,7 +7,7 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.IntegrationTests.Fakes;
 
-public class FakeDbContextFactory : IDisposable
+internal class FakeDbContextFactory : IDisposable
 {
     private DbConnection? _connection;
 
