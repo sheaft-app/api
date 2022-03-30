@@ -11,9 +11,11 @@ using Newtonsoft.Json;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Infrastructure.SupplierManagement;
 using WkHtmlToPdfDotNet;
@@ -48,6 +50,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
+        services.AddScoped<ICatalogRepository, CatalogRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)
@@ -83,8 +87,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUniquenessValidator, UniquenessValidator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
-        services.AddScoped<IIdentifierService, IdentifierService>();
-        services.AddScoped<ISupplierRegistrationValidator, SupplierRegistrationValidator>();
+        services.AddScoped<IValidateSupplierRegistration, ValidateSupplierRegistration>();
+        services.AddScoped<IGenerateProductCode, GenerateProductCode>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)
@@ -146,11 +150,10 @@ public static class WebApplicationExtensions
 {
     public static void ApplyMigrations(this WebApplication app)
     {
-        using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-        {
-            var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-            if (!context.AllMigrationsApplied())
-                context.Database.Migrate();
-        }
+        using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        
+        var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (!context.AllMigrationsApplied())
+            context.Database.Migrate();
     }
 }

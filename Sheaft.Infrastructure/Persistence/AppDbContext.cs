@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 using Sheaft.Infrastructure.Persistence.Converters;
@@ -24,8 +27,13 @@ internal class AppDbContext : DbContext, IDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new AccountConfiguration());
-        modelBuilder.ApplyConfiguration(new SupplierConfiguration());
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new SupplierConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new CatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductConfiguration());
+        modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -51,18 +59,32 @@ internal class AppDbContext : DbContext, IDbContext
             .HaveConversion<PhoneNumberConverter>();
         
         configurationBuilder
-            .Properties<Username>()
-            .HaveConversion<UsernameConverter>();
+            .Properties<CatalogId>()
+            .HaveConversion<CatalogIdConverter>();
         
         configurationBuilder
-            .Properties<TradeName>()
-            .HaveConversion<TradeNameConverter>();
-        
-        configurationBuilder
-            .Properties<CorporateName>()
-            .HaveConversion<CorporateNameConverter>();
+            .Properties<ProductId>()
+            .HaveConversion<ProductIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Catalog> Catalogs { get; set; }
+    public DbSet<Product> Products { get; set; }
+}
+
+internal static class DbContextExtension
+{
+    public static bool AllMigrationsApplied(this AppDbContext context)
+    {
+        var applied = context.GetService<IHistoryRepository>()
+            .GetAppliedMigrations()
+            .Select(m => m.MigrationId);
+
+        var total = context.GetService<IMigrationsAssembly>()
+            .Migrations
+            .Select(m => m.Key);
+            
+        return !total.Except(applied).Any();
+    }
 }

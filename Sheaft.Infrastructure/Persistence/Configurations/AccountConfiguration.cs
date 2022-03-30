@@ -41,6 +41,10 @@ internal class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasField("_refreshTokens");
         
         builder
+            .Property(p => p.Username)
+            .HasConversion(username => username.Value, value => new Username(value));
+
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
         

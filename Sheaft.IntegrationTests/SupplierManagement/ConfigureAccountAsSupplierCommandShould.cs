@@ -52,7 +52,7 @@ public class ConfigureAccountAsSupplierCommandShould
     private (AppDbContext, ConfigureAccountAsSupplierHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<ConfigureAccountAsSupplierHandler>();
-        var handler = new ConfigureAccountAsSupplierHandler(uow, new SupplierRegistrationValidator(context));
+        var handler = new ConfigureAccountAsSupplierHandler(uow, new ValidateSupplierRegistration(context));
         
         return (context, handler);
     }

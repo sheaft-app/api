@@ -46,7 +46,7 @@ public class UpdateSupplierCommandShould
 
     private (SupplierId, AppDbContext, UpdateSupplierHandler) InitHandler()
     {
-        var (context, uow, _) = DependencyHelpers.InitDependencies<ConfigureAccountAsSupplierHandler>();
+        var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateSupplierHandler>();
         var handler = new UpdateSupplierHandler(uow);
 
         var supplier = new Supplier(new TradeName("trade"), new EmailAddress("test@est.com"),

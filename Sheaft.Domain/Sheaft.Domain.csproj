@@ -16,4 +16,9 @@
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features" />
+    <Folder Include="Features\SupplierManagement\DomainServices" />
+  </ItemGroup>
+
 </Project>

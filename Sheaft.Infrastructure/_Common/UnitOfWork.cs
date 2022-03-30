@@ -3,9 +3,11 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.SupplierManagement;
 
 namespace Sheaft.Infrastructure;
@@ -26,11 +28,19 @@ internal class UnitOfWork : IUnitOfWork
         _logger = logger;
 
         Accounts = new AccountRepository(_context);
+        
         Suppliers = new SupplierRepository(_context);
+        
+        Catalogs = new CatalogRepository(_context);
+        Products = new ProductRepository(_context);
     }
 
     public IAccountRepository Accounts { get; }
+    
     public ISupplierRepository Suppliers { get; }
+    
+    public ICatalogRepository Catalogs { get; }
+    public IProductRepository Products { get; }
 
 
     public async Task<Result<int>> Save(CancellationToken token)
