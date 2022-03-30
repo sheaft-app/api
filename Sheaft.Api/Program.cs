@@ -53,7 +53,6 @@ try
 
     app.ApplyMigrations();
 
-    app.UseRobotsTxt();
     app.UseCors("CORS");
     app.UseSerilogRequestLogging();
     app.UseRouting();
