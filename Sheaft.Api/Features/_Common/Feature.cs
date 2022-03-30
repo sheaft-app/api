@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
@@ -11,7 +12,9 @@ namespace Sheaft.Api;
 public class Feature : ControllerBase
 {
     protected readonly ISheaftMediator Mediator;
-    protected string CurrentUserId => HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    protected AccountId? CurrentUserId => HttpContext.User.Identity?.IsAuthenticated == true 
+        ? new AccountId(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)) 
+        : null;
 
     public Feature(ISheaftMediator mediator)
     {
@@ -36,6 +39,13 @@ public class Feature : ControllerBase
     {
         return result.IsSuccess 
             ? new ObjectResult(result.Value){StatusCode = StatusCodes.Status200OK} 
+            : HandleErrorResult(result);
+    }
+
+    protected ActionResult<U> HandleCommandResult<T, U>(Result<T> result)
+    {
+        return result.IsSuccess 
+            ? new ObjectResult(result.Value.Adapt<U>()){StatusCode = StatusCodes.Status200OK} 
             : HandleErrorResult(result);
     }
 

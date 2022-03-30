@@ -1,6 +1,4 @@
-﻿using Sheaft.Domain.AccountManagement;
-
-namespace Sheaft.Domain.SupplierManagement;
+﻿namespace Sheaft.Domain.SupplierManagement;
 
 public class Supplier : AggregateRoot
 {
@@ -8,7 +6,7 @@ public class Supplier : AggregateRoot
     {
     }
 
-    public Supplier(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, Address? shippingAddress,
+    public Supplier(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, ShippingAddress? shippingAddress,
         AccountId accountIdentifier)
     {
         Identifier = SupplierId.New();
@@ -16,7 +14,7 @@ public class Supplier : AggregateRoot
         Legal = legal;
         Email = email;
         Phone = phone;
-        ShippingAddress = shippingAddress ?? new Address(legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
+        ShippingAddress = shippingAddress ?? new ShippingAddress(legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
         AccountIdentifier = accountIdentifier;
     }
 
@@ -25,14 +23,27 @@ public class Supplier : AggregateRoot
     public EmailAddress Email { get; private set; }
     public PhoneNumber Phone { get; private set; }
     public Legal Legal { get; private set; }
-    public Address ShippingAddress { get; private set; }
+    public ShippingAddress ShippingAddress { get; private set; }
     public AccountId AccountIdentifier { get; }
+
+    public void SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, ShippingAddress address)
+    {
+        TradeName = name;
+        Email = email;
+        Phone = phone;
+        ShippingAddress = address;
+    }
+
+    public void SetLegal(CorporateName name, Siret siret, LegalAddress address)
+    {
+        Legal = new Legal(name, siret, address);
+    }
 }
 
 public record Legal
 {
     private Legal(){}
-    public Legal(CorporateName name, Siret siret, Address address)
+    public Legal(CorporateName name, Siret siret, LegalAddress address)
     {
         CorporateName = name;
         Siret = siret;
@@ -41,7 +52,7 @@ public record Legal
     
     public CorporateName CorporateName { get; }
     public Siret Siret{ get; }
-    public Address Address { get; }
+    public LegalAddress Address { get; }
 }
 
 public record CorporateName

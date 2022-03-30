@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Sheaft.Domain;
-using Sheaft.Domain.AccountManagement;
+﻿using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application.SupplierManagement;
@@ -11,25 +9,22 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
 {
     private readonly IUnitOfWork _uow;
     private readonly ISupplierRegistrationValidator _supplierRegistrationValidator;
-    private readonly ILogger<ConfigureAccountAsSupplierHandler> _logger;
 
     public ConfigureAccountAsSupplierHandler(
         IUnitOfWork uow, 
-        ISupplierRegistrationValidator supplierRegistrationValidator,
-        ILogger<ConfigureAccountAsSupplierHandler> logger)
+        ISupplierRegistrationValidator supplierRegistrationValidator)
     {
         _uow = uow;
         _supplierRegistrationValidator = supplierRegistrationValidator;
-        _logger = logger;
     }
 
     public async Task<Result> Handle(ConfigureAccountAsSupplierCommand request, CancellationToken token)
     {
-        var legalAddress = new Address(request.LegalAddress.Street, request.LegalAddress.Complement,
+        var legalAddress = new LegalAddress(request.LegalAddress.Street, request.LegalAddress.Complement,
             request.LegalAddress.Postcode, request.LegalAddress.City);
 
         var shippingAddress = request.ShippingAddress != null
-            ? new Address(request.ShippingAddress.Street, request.ShippingAddress.Complement,
+            ? new ShippingAddress(request.ShippingAddress.Street, request.ShippingAddress.Complement,
                 request.ShippingAddress.Postcode, request.ShippingAddress.City)
             : null;
 

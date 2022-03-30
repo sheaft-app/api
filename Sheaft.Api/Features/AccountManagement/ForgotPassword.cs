@@ -17,11 +17,11 @@ public class ForgotPassword : Feature
 
     [AllowAnonymous]
     [HttpPost("forgot")]
-    public async Task<ActionResult<string>> Post([FromBody] ForgotPasswordDto data, CancellationToken token)
+    public async Task<ActionResult<string>> Post([FromBody] ForgotPasswordRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<ForgotPasswordCommand>(), token);
         return HandleCommandResult(result);
     }
 }
 
-public record ForgotPasswordDto(string Email);
+public record ForgotPasswordRequest(string Email);

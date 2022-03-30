@@ -16,11 +16,11 @@ public class ResetPassword : Feature
 
     [AllowAnonymous]
     [HttpPost("reset")]
-    public async Task<ActionResult<string>> Post([FromBody] ResetPasswordDto data, CancellationToken token)
+    public async Task<ActionResult<string>> Post([FromBody] ResetPasswordRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<ResetPasswordCommand>(), token);
         return HandleCommandResult(result);
     }
 }
 
-public record ResetPasswordDto(string ResetToken, string Password, string Confirm);
+public record ResetPasswordRequest(string ResetToken, string Password, string Confirm);

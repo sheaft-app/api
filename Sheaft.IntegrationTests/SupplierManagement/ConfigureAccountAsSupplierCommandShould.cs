@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.SupplierManagement;
 using Sheaft.Domain;
-using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.SupplierManagement;
@@ -38,7 +37,7 @@ public class ConfigureAccountAsSupplierCommandShould
         var accountIdentifier = AccountId.New();
         var email = new EmailAddress("existing@test.com");
         context.Suppliers.Add(new Supplier(new TradeName("trade"), email, new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new Address("", null, "", "")), null, accountIdentifier));
+            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null, accountIdentifier));
         await context.SaveChangesAsync();
         var command = GetCommand(accountIdentifier);
         
@@ -53,7 +52,7 @@ public class ConfigureAccountAsSupplierCommandShould
     private (AppDbContext, ConfigureAccountAsSupplierHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<ConfigureAccountAsSupplierHandler>();
-        var handler = new ConfigureAccountAsSupplierHandler(uow, new SupplierRegistrationValidator(context), logger);
+        var handler = new ConfigureAccountAsSupplierHandler(uow, new SupplierRegistrationValidator(context));
         
         return (context, handler);
     }
