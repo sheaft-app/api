@@ -24,4 +24,17 @@ internal class SupplierRepository : Repository<Supplier, SupplierId>, ISupplierR
                 : Result.Failure<Supplier>(ErrorKind.NotFound, "supplier.not.found");
         });
     }
+
+    public Task<Result<Supplier>> Get(AccountId identifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .SingleOrDefaultAsync(e => e.AccountIdentifier == identifier, token);
+
+            return result != null
+                ? Result.Success(result)
+                : Result.Failure<Supplier>(ErrorKind.NotFound, "supplier.not.found");
+        });
+    }
 }

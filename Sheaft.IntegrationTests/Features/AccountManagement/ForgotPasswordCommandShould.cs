@@ -55,7 +55,7 @@ public class ForgotPasswordCommandShould
         var password = "password";
         
         var hasher = new PasswordHasher("my_salt_value");
-        context.Accounts.Add(AccountTests.GetDefaultAccount(hasher, username, password));
+        context.Accounts.Add(DataHelpers.GetDefaultAccount(hasher, username, password));
 
         context.SaveChanges();
         

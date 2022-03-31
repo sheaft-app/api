@@ -75,7 +75,7 @@ public class RefreshAccessTokenCommandShould
         var password = "password";
         
         var hasher = new PasswordHasher("my_salt_value");
-        var account = AccountTests.GetDefaultAccount(hasher, username, password);
+        var account = DataHelpers.GetDefaultAccount(hasher, username, password);
         
         context.Accounts.Add(account);
         context.SaveChanges();

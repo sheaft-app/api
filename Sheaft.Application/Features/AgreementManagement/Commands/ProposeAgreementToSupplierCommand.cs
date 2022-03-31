@@ -1,8 +1,9 @@
 ﻿using Sheaft.Domain;
+using Sheaft.Domain.AgreementManagement;
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record ProposeAgreementToSupplierCommand() : ICommand<Result<string>>;
+public record ProposeAgreementToSupplierCommand(SupplierId SupplierIdentifier, AccountId CustomerAccountIdentifier) : ICommand<Result<string>>;
 
 public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreementToSupplierCommand, Result<string>>
 {
@@ -13,8 +14,24 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
         _uow = uow;
     }
 
-    public Task<Result<string>> Handle(ProposeAgreementToSupplierCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(ProposeAgreementToSupplierCommand request, CancellationToken token)
     {
-        throw new NotImplementedException();
+        var catalogResult = await _uow.Catalogs.FindDefault(request.SupplierIdentifier, token);
+        if (catalogResult.IsFailure)
+            return Result.Failure<string>(catalogResult);
+
+        if (catalogResult.Value.HasNoValue)
+            return Result.Failure<string>(ErrorKind.NotFound, "agreement.supplier.catalog.not.found");
+
+        var customerResult = await _uow.Customers.Get(request.CustomerAccountIdentifier, token);
+        if (customerResult.IsFailure)
+            return Result.Failure<string>(customerResult);
+        
+        var agreement = new Agreement(ProfileKind.Customer, request.SupplierIdentifier, customerResult.Value.Identifier, catalogResult.Value.Value.Identifier);
+        
+        _uow.Agreements.Add(agreement);
+        await _uow.Save(token);
+        
+        return Result.Success(agreement.Identifier.Value);
     }
 }

@@ -37,8 +37,8 @@ public class ConfigureAccountAsSupplierCommandShould
         var (context, handler) = InitHandler();
         var accountIdentifier = AccountId.New();
         var email = new EmailAddress("existing@test.com");
-        context.Suppliers.Add(new Supplier(new TradeName("trade"), email, new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null, accountIdentifier));
+        
+        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(accountIdentifier, email.Value));
         await context.SaveChangesAsync();
         var command = GetCommand(accountIdentifier);
         

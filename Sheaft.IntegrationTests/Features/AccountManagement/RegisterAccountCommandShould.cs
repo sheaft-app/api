@@ -54,7 +54,7 @@ public class RegisterAccountCommandShould
 
         foreach (var emailAddress in emails)
         {
-            var account = AccountTests.GetDefaultAccount(hasher, emailAddress.Value, password);
+            var account = DataHelpers.GetDefaultAccount(hasher, emailAddress.Value, password);
             context.Accounts.Add(account);
         }
         

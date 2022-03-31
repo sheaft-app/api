@@ -51,11 +51,11 @@ public record Result
     public static Result<T> Failure<T>(Error error) => new Result<T>(error);
     public static Result<T> Failure<T>(Result errorResult) => new Result<T>(errorResult.Error);
     
-    public static Result<T> Failure<T>(ErrorKind kind, string code, string? message = null, Dictionary<string, object>? extensions = null, [CallerMemberName] string? callerName = null, [CallerLineNumber] int? callerLine = null) 
-        => new Result<T>(new Error(kind, code, message, extensions, $"{callerName}:{callerLine}")); public static Result Failure(Result errorResult) => new Result(errorResult.Error);
+    public static Result<T> Failure<T>(ErrorKind kind, string code, string? message = null, Dictionary<string, object>? extensions = null, [CallerFilePath] string? callerFilePath = null, [CallerMemberName] string? callerName = null, [CallerLineNumber] int? callerLine = null) 
+        => new Result<T>(new Error(kind, code, message, extensions, $"{callerFilePath}:{callerName} at line {callerLine}")); public static Result Failure(Result errorResult) => new Result(errorResult.Error);
     
-    public static Result Failure(ErrorKind kind, string code, string? message = null, Dictionary<string, object>? extensions = null, [CallerMemberName] string? callerName = null, [CallerLineNumber] int? callerLine = null) 
-        => new Result(new Error(kind, code, message, extensions, $"{callerName}:{callerLine}"));
+    public static Result Failure(ErrorKind kind, string code, string? message = null, Dictionary<string, object>? extensions = null, [CallerFilePath] string? callerFilePath = null, [CallerMemberName] string? callerName = null, [CallerLineNumber] int? callerLine = null) 
+        => new Result(new Error(kind, code, message, extensions, $"{callerFilePath}:{callerName} at line {callerLine}"));
 
     public static Result<T> CombineFailure<T>(List<Result<T>> results)
     {

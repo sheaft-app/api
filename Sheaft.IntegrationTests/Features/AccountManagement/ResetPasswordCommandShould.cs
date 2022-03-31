@@ -65,7 +65,7 @@ public class ResetPasswordCommandShould
         var password = "password";
         
         var hasher = new PasswordHasher("my_salt_value");
-        var account = AccountTests.GetDefaultAccount(hasher, username, password);
+        var account = DataHelpers.GetDefaultAccount(hasher, username, password);
         account.ForgotPassword(DateTimeOffset.UtcNow, 2);
         
         context.Accounts.Add(account);

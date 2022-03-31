@@ -17,27 +17,29 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class ProposeAgreementToSupplierCommandShould
+public class ProposeAgreementToCustomerCommandShould
 {
     [Test]
-    public async Task Create_Agreement_Between_Customer_And_Supplier()
+    public async Task Create_Agreement_Between_Supplier_And_Customer()
     {
         var (supplier, customer, context, handler) = InitHandler();
-        var command = GetCommand(supplier.Identifier, customer.AccountIdentifier);
+        var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         var agreement = context.Agreements.Single(a => a.Identifier == new AgreementId(result.Value));
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(agreement);
-        Assert.AreEqual(ProfileKind.Customer, agreement.Owner);
         Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
         Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
+        Assert.AreEqual(ProfileKind.Supplier, agreement.Owner);
+        Assert.AreEqual(2, agreement.DeliveryDays.Count);
+        Assert.AreEqual(24, agreement.OrderDelayInHoursBeforeDeliveryDay);
     }
 
-    private (Supplier, Customer, AppDbContext, ProposeAgreementToSupplierHandler) InitHandler()
+    private (Supplier, Customer, AppDbContext, ProposeAgreementToCustomerHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<ProposeAgreementToSupplierHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<ProposeAgreementToCustomerHandler>();
 
         var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
         var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
@@ -45,16 +47,17 @@ public class ProposeAgreementToSupplierCommandShould
         context.Add(supplier);
         context.Add(customer);
         context.Add(catalog);
+        
         context.SaveChanges();
         
-        var handler = new ProposeAgreementToSupplierHandler(uow);
+        var handler = new ProposeAgreementToCustomerHandler(uow);
         
         return (supplier, customer, context, handler);
     }
 
-    private static ProposeAgreementToSupplierCommand GetCommand(SupplierId supplierIdentifier, AccountId customerAccountIdentifier)
+    private static ProposeAgreementToCustomerCommand GetCommand(CustomerId customerIdentifier, AccountId supplierAccountIdentifier, List<DayOfWeek> deliveryDays, int orderDelayInHoursBeforeDeliveryDay)
     {
-        var command = new ProposeAgreementToSupplierCommand(supplierIdentifier, customerAccountIdentifier);
+        var command = new ProposeAgreementToCustomerCommand(customerIdentifier, deliveryDays, orderDelayInHoursBeforeDeliveryDay, supplierAccountIdentifier);
         return command;
     }
 }

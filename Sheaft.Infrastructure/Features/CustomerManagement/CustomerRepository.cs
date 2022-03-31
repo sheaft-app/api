@@ -24,4 +24,17 @@ internal class CustomerRepository : Repository<Customer, CustomerId>, ICustomerR
                 : Result.Failure<Customer>(ErrorKind.NotFound, "customer.not.found");
         });
     }
+
+    public Task<Result<Customer>> Get(AccountId identifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .SingleOrDefaultAsync(e => e.AccountIdentifier == identifier, token);
+
+            return result != null
+                ? Result.Success(result)
+                : Result.Failure<Customer>(ErrorKind.NotFound, "customer.not.found");
+        });
+    }
 }

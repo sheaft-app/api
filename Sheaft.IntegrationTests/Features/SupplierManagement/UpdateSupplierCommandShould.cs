@@ -35,10 +35,7 @@ public class UpdateSupplierCommandShould
         var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateSupplierHandler>();
         var handler = new UpdateSupplierHandler(uow);
 
-        var supplier = new Supplier(new TradeName("trade"), new EmailAddress("test@est.com"),
-            new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null, AccountId.New());
-        
+        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
         context.Suppliers.Add(supplier);
         context.SaveChanges();
         

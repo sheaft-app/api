@@ -31,6 +31,6 @@ internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken
 
         builder.HasIndex(c => c.Identifier).IsUnique();
         
-        builder.ToTable("RefreshTokens");
+        builder.ToTable("Account_RefreshTokens");
     }
 }

@@ -26,6 +26,18 @@ internal class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 
+        builder.OwnsMany(a => a.DeliveryDays, dd =>
+        {
+            dd.Property(c => c.Value)
+                .HasColumnName("DayOfWeek");
+            
+            dd.WithOwner().HasForeignKey("AgreementId");
+            dd.Property<long>("Id");
+            dd.HasKey("Id");
+            
+            dd.ToTable("Agreement_DeliveryDays");
+        });
+
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
