@@ -51,7 +51,7 @@ try
         app.UseHsts();
     }
 
-    app.ApplyMigrations();
+    app.ApplyMigrations(app.Services.GetService<ILogger<Program>>());
 
     app.UseCors("CORS");
     app.UseSerilogRequestLogging();

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application;
 using Sheaft.Domain;
@@ -149,12 +150,19 @@ public static class ServiceCollectionExtensions
 
 public static class WebApplicationExtensions
 {
-    public static void ApplyMigrations(this WebApplication app)
+    public static void ApplyMigrations(this WebApplication app, ILogger? logger)
     {
-        using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        
-        var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (!context.AllMigrationsApplied())
-            context.Database.Migrate();
+        try
+        {
+            using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+
+            var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (!context.AllMigrationsApplied())
+                context.Database.Migrate();
+        }
+        catch (Exception e)
+        {
+            logger?.LogCritical(e, e.Message);
+        }
     }
 }
