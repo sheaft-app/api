@@ -5,7 +5,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 using Sheaft.Infrastructure.Persistence.Converters;
@@ -32,7 +32,7 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
-        modelBuilder.ApplyConfiguration(new RetailerConfiguration());
+        modelBuilder.ApplyConfiguration(new CustomerConfiguration());
         
         modelBuilder.ApplyConfiguration(new CatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
@@ -48,8 +48,8 @@ internal class AppDbContext : DbContext, IDbContext
             .HaveConversion<SupplierIdConverter>();
         
         configurationBuilder
-            .Properties<RetailerId>()
-            .HaveConversion<RetailerIdConverter>();
+            .Properties<CustomerId>()
+            .HaveConversion<CustomerIdConverter>();
         
         configurationBuilder
             .Properties<AccountId>()
@@ -82,7 +82,7 @@ internal class AppDbContext : DbContext, IDbContext
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
-    public DbSet<Retailer> Retailers { get; set; }
+    public DbSet<Customer> Customers { get; set; }
     public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Agreement> Agreements { get; set; }

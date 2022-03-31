@@ -14,13 +14,13 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
-using Sheaft.Infrastructure.RetailerManagement;
+using Sheaft.Infrastructure.CustomerManagement;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Infrastructure.SupplierManagement;
 using WkHtmlToPdfDotNet;
@@ -55,7 +55,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
-        services.AddScoped<IRetailerRepository, RetailerRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<ICatalogRepository, CatalogRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IAgreementRepository, AgreementRepository>();
@@ -95,7 +95,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
         services.AddScoped<IValidateSupplierRegistration, ValidateSupplierRegistration>();
-        services.AddScoped<IValidateRetailerRegistration, ValidateRetailerRegistration>();
+        services.AddScoped<IValidateCustomerRegistration, ValidateCustomerRegistration>();
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
         services.AddScoped<IRetrieveProfile, RetrieveProfile>();
     }

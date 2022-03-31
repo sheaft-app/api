@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
-internal class RetailerConfiguration : IEntityTypeConfiguration<Retailer>
+internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
-    public void Configure(EntityTypeBuilder<Retailer> builder)
+    public void Configure(EntityTypeBuilder<Customer> builder)
     {
         builder
             .Property<long>("Id")
@@ -52,6 +52,6 @@ internal class RetailerConfiguration : IEntityTypeConfiguration<Retailer>
             .HasIndex(c => c.Identifier)
             .IsUnique();
         
-        builder.ToTable("Retailer");
+        builder.ToTable("Customer");
     }
 }

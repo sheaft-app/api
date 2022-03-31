@@ -1,15 +1,15 @@
-﻿namespace Sheaft.Domain.RetailerManagement;
+﻿namespace Sheaft.Domain.CustomerManagement;
 
-public class Retailer : AggregateRoot
+public class Customer : AggregateRoot
 {
-    private Retailer()
+    private Customer()
     {
     }
 
-    public Retailer(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, DeliveryAddress? deliveryAddress,
+    public Customer(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, DeliveryAddress? deliveryAddress,
         AccountId accountIdentifier)
     {
-        Identifier = RetailerId.New();
+        Identifier = CustomerId.New();
         TradeName = tradeName;
         Legal = legal;
         Email = email;
@@ -18,7 +18,7 @@ public class Retailer : AggregateRoot
         AccountIdentifier = accountIdentifier;
     }
 
-    public RetailerId Identifier { get; }
+    public CustomerId Identifier { get; }
     public TradeName TradeName { get; private set; }
     public EmailAddress Email { get; private set; }
     public PhoneNumber Phone { get; private set; }

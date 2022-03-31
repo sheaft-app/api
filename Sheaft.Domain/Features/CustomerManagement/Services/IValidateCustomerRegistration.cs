@@ -1,6 +1,6 @@
-﻿namespace Sheaft.Domain.RetailerManagement;
+﻿namespace Sheaft.Domain.CustomerManagement;
 
-public interface IValidateRetailerRegistration
+public interface IValidateCustomerRegistration
 {
     Task<Result<bool>> CanRegisterAccount(AccountId identifier, CancellationToken token);
 }

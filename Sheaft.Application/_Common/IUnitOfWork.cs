@@ -2,7 +2,7 @@
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application;
@@ -13,7 +13,7 @@ public interface IUnitOfWork
     
     public ISupplierRepository Suppliers { get; }
     
-    public IRetailerRepository Retailers { get; }
+    public ICustomerRepository Customers { get; }
     
     public ICatalogRepository Catalogs { get; }
     public IProductRepository Products { get; }

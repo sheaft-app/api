@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure.RetailerManagement;
+namespace Sheaft.Infrastructure.CustomerManagement;
 
-internal class ValidateRetailerRegistration : IValidateRetailerRegistration
+internal class ValidateCustomerRegistration : IValidateCustomerRegistration
 {
     private readonly IDbContext _context;
 
-    public ValidateRetailerRegistration(IDbContext context)
+    public ValidateCustomerRegistration(IDbContext context)
     {
         _context = context;
     }
@@ -19,7 +19,7 @@ internal class ValidateRetailerRegistration : IValidateRetailerRegistration
         try
         {
             return Result.Success(
-                await _context.Set<Retailer>().AllAsync(s => s.AccountIdentifier != identifier, token));
+                await _context.Set<Customer>().AllAsync(s => s.AccountIdentifier != identifier, token));
         }
         catch (Exception e)
         {

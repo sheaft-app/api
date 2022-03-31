@@ -5,13 +5,13 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
-using Sheaft.Infrastructure.RetailerManagement;
+using Sheaft.Infrastructure.CustomerManagement;
 using Sheaft.Infrastructure.SupplierManagement;
 
 namespace Sheaft.Infrastructure;
@@ -34,7 +34,7 @@ internal class UnitOfWork : IUnitOfWork
         Accounts = new AccountRepository(_context);
         
         Suppliers = new SupplierRepository(_context);
-        Retailers = new RetailerRepository(_context);
+        Customers = new CustomerRepository(_context);
         
         Catalogs = new CatalogRepository(_context);
         Products = new ProductRepository(_context);
@@ -45,7 +45,7 @@ internal class UnitOfWork : IUnitOfWork
     public IAccountRepository Accounts { get; }
     
     public ISupplierRepository Suppliers { get; }
-    public IRetailerRepository Retailers { get; }
+    public ICustomerRepository Customers { get; }
     
     public ICatalogRepository Catalogs { get; }
     public IProductRepository Products { get; }

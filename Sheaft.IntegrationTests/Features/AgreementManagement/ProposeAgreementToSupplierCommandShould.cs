@@ -13,7 +13,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class ProposeAgreementToSupplierCommandShould
 {
     [Test]
-    public async Task Create_Agreement_Between_Retailer_And_Supplier()
+    public async Task Create_Agreement_Between_Customer_And_Supplier()
     {
         var (context, handler) = InitHandler();
         var command = GetCommand();

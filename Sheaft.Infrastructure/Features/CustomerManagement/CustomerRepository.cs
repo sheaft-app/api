@@ -1,18 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.Domain.RetailerManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure.RetailerManagement;
+namespace Sheaft.Infrastructure.CustomerManagement;
 
-internal class RetailerRepository : Repository<Retailer, RetailerId>, IRetailerRepository
+internal class CustomerRepository : Repository<Customer, CustomerId>, ICustomerRepository
 {
-    public RetailerRepository(IDbContext context)
+    public CustomerRepository(IDbContext context)
         : base(context)
     {
     }
 
-    public override Task<Result<Retailer>> Get(RetailerId identifier, CancellationToken token)
+    public override Task<Result<Customer>> Get(CustomerId identifier, CancellationToken token)
     {
         return QueryAsync(async () =>
         {
@@ -21,7 +21,7 @@ internal class RetailerRepository : Repository<Retailer, RetailerId>, IRetailerR
 
             return result != null
                 ? Result.Success(result)
-                : Result.Failure<Retailer>(ErrorKind.NotFound, "retailer.not.found");
+                : Result.Failure<Customer>(ErrorKind.NotFound, "customer.not.found");
         });
     }
 }
