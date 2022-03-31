@@ -4,7 +4,7 @@ using Sheaft.Domain.AgreementManagement;
 namespace Sheaft.Application.AgreementManagement;
 
 public record ProposeAgreementToCustomerCommand(CustomerId CustomerIdentifier, 
-    List<DayOfWeek> DeliveryDays, int OrderDelayInHoursBeforeDeliveryDay, AccountId SupplierAccountIdentifier) : ICommand<Result<string>>;
+    List<DayOfWeek> DeliveryDays, int? OrderDelayInHoursBeforeDeliveryDay, AccountId SupplierAccountIdentifier) : ICommand<Result<string>>;
 
 public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreementToCustomerCommand, Result<string>>
 {

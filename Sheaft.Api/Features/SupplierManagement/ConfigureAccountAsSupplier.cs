@@ -9,7 +9,7 @@ using Sheaft.Application.SupplierManagement;
 
 namespace Sheaft.Api.SupplierManagement;
 
-[Route(Routes.PROFILES)]
+[Route(Routes.ACCOUNT)]
 public class ConfigureAccountAsSupplier : Feature
 {
     public ConfigureAccountAsSupplier(ISheaftMediator mediator)

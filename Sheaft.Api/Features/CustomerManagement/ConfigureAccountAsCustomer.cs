@@ -5,7 +5,7 @@ using Sheaft.Application.CustomerManagement;
 
 namespace Sheaft.Api.CustomerManagement;
 
-[Route(Routes.PROFILES)]
+[Route(Routes.ACCOUNT)]
 public class ConfigureAccountAsCustomer : Feature
 {
     public ConfigureAccountAsCustomer(ISheaftMediator mediator)

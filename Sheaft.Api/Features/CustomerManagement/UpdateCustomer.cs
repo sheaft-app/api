@@ -5,7 +5,7 @@ using Sheaft.Application.CustomerManagement;
 
 namespace Sheaft.Api.CustomerManagement;
 
-[Route(Routes.PROFILES)]
+[Route(Routes.CUSTOMERS)]
 public class UpdateCustomer : Feature
 {
     public UpdateCustomer(ISheaftMediator mediator)
@@ -13,7 +13,7 @@ public class UpdateCustomer : Feature
     {
     }
 
-    [HttpPut("customers/{id}")]
+    [HttpPut("{id}")]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] CustomerInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<UpdateCustomerCommand>(), token);

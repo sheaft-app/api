@@ -8,7 +8,7 @@ using Sheaft.Application.SupplierManagement;
 
 namespace Sheaft.Api.SupplierManagement;
 
-[Route(Routes.PROFILES)]
+[Route(Routes.SUPPLIERS)]
 public class UpdateSupplier : Feature
 {
     public UpdateSupplier(ISheaftMediator mediator)
@@ -16,7 +16,7 @@ public class UpdateSupplier : Feature
     {
     }
 
-    [HttpPut("suppliers/{id}")]
+    [HttpPut("{id}")]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] SupplierInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<UpdateSupplierCommand>(), token);
