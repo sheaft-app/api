@@ -23,10 +23,10 @@ public class Agreement : AggregateRoot
     public CatalogId CatalogIdentifier { get; private set; }
     public ReadOnlyCollection<DeliveryDay> DeliveryDays { get; private set; } = new ReadOnlyCollection<DeliveryDay>(new List<DeliveryDay>());
 
-    public void SetDelivery(List<DeliveryDay> deliveryDays, int orderDelayInHoursBeforeDeliveryDay)
+    public void SetDelivery(List<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
     {
         DeliveryDays = new ReadOnlyCollection<DeliveryDay>(deliveryDays?.Distinct().ToList() ?? new List<DeliveryDay>());
-        OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay;
+        OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay ?? 0;
     }
 }
 
