@@ -27,7 +27,7 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
         if (customerResult.IsFailure)
             return Result.Failure<string>(customerResult);
         
-        var agreement = new Agreement(ProfileKind.Customer, request.SupplierIdentifier, customerResult.Value.Identifier, catalogResult.Value.Value.Identifier);
+        var agreement = new Agreement(AgreementOwner.Customer, request.SupplierIdentifier, customerResult.Value.Identifier, catalogResult.Value.Value.Identifier);
         
         _uow.Agreements.Add(agreement);
         await _uow.Save(token);

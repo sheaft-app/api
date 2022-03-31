@@ -1,6 +1,6 @@
 ﻿namespace Sheaft.Domain;
 
-public enum ProfileKind
+public enum AgreementOwner
 {
     Supplier,
     Customer

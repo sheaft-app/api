@@ -30,7 +30,7 @@ public class ProposeAgreementToSupplierCommandShould
         var agreement = context.Agreements.Single(a => a.Identifier == new AgreementId(result.Value));
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(agreement);
-        Assert.AreEqual(ProfileKind.Customer, agreement.Owner);
+        Assert.AreEqual(AgreementOwner.Customer, agreement.Owner);
         Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
         Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
     }

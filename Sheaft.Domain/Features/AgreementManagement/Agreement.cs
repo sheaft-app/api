@@ -4,7 +4,7 @@ namespace Sheaft.Domain.AgreementManagement;
 
 public class Agreement : AggregateRoot
 {
-    public Agreement(ProfileKind owner, SupplierId supplierIdentifier, CustomerId customerIdentifier, CatalogId catalogIdentifier)
+    public Agreement(AgreementOwner owner, SupplierId supplierIdentifier, CustomerId customerIdentifier, CatalogId catalogIdentifier)
     {
         Identifier = AgreementId.New();
         Owner = owner;
@@ -16,7 +16,7 @@ public class Agreement : AggregateRoot
     
     public AgreementId Identifier { get; }
     public AgreementStatus Status { get; private set; }
-    public ProfileKind Owner { get; private set; }
+    public AgreementOwner Owner { get; private set; }
     public int OrderDelayInHoursBeforeDeliveryDay { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
     public CustomerId CustomerIdentifier { get; private set; }
