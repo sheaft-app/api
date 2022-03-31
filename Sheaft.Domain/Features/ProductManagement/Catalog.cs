@@ -38,4 +38,13 @@ public class Catalog : AggregateRoot
         if (_products.All(p => p.Product.Identifier != product.Identifier))
             _products.Add(new CatalogProduct(product, productPrice));
     }
+
+    public void RemoveProduct(Product product)
+    {
+        var productToRemove = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
+        if (productToRemove == null)
+            throw new InvalidOperationException("catalog.product.not.found");
+
+        _products.Remove(productToRemove);
+    }
 }

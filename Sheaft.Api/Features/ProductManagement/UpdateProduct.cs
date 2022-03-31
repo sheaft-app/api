@@ -16,9 +16,9 @@ public class UpdateProduct : Feature
     [HttpPut("{id}")]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateProductRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new UpdateProductCommand(new ProductId(data.Identifier), data.Name, data.Code, data.Description, data.Price), token);
+        var result = await Mediator.Execute(new UpdateProductCommand(new ProductId(id), data.Name, data.Code, data.Description, data.Price), token);
         return HandleCommandResult(result);
     }
 }
 
-public record UpdateProductRequest(string Identifier, string Name, string? Code, int Price, string? Description);
+public record UpdateProductRequest(string Name, string? Code, int Price, string? Description);
