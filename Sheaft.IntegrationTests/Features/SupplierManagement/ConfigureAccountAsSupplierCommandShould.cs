@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sheaft.Application.Models;
 using Sheaft.Application.SupplierManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;

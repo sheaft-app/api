@@ -1,4 +1,5 @@
-﻿using Sheaft.Domain;
+﻿using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application.SupplierManagement;

@@ -1,11 +1,12 @@
-﻿using Sheaft.Domain;
+﻿using Sheaft.Application.Models;
+using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application.SupplierManagement;
 
-public record ConfigureAccountAsSupplierCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, AddressDto? ShippingAddress, AccountId AccountIdentifier) : ICommand<Result>;
+public record ConfigureAccountAsSupplierCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, AddressDto? ShippingAddress, AccountId AccountIdentifier) : ICommand<Result<string>>;
 
-public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccountAsSupplierCommand, Result>
+public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccountAsSupplierCommand, Result<string>>
 {
     private readonly IUnitOfWork _uow;
     private readonly IValidateSupplierRegistration _validateSupplierRegistration;
@@ -18,7 +19,7 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
         _validateSupplierRegistration = validateSupplierRegistration;
     }
 
-    public async Task<Result> Handle(ConfigureAccountAsSupplierCommand request, CancellationToken token)
+    public async Task<Result<string>> Handle(ConfigureAccountAsSupplierCommand request, CancellationToken token)
     {
         var legalAddress = new LegalAddress(request.LegalAddress.Street, request.LegalAddress.Complement,
             request.LegalAddress.Postcode, request.LegalAddress.City);
@@ -32,12 +33,12 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             await _validateSupplierRegistration.CanRegisterAccount(request.AccountIdentifier, token);
 
         if (requireSupplierRegistrationResult.IsFailure)
-            return Result.Failure(requireSupplierRegistrationResult);
+            return Result.Failure<string>(requireSupplierRegistrationResult);
 
         if (!requireSupplierRegistrationResult.Value)
-            return Result.Failure(ErrorKind.BadRequest, "supplier.already.exists");
-        
-        _uow.Suppliers.Add(new Supplier(
+            return Result.Failure<string>(ErrorKind.BadRequest, "supplier.already.exists");
+
+        var supplier = new Supplier(
             new TradeName(request.TradeName), 
             new EmailAddress(request.Email), 
             new PhoneNumber(request.Phone), 
@@ -45,9 +46,11 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
                 new CorporateName(request.CorporateName),
                 new Siret(request.Siret), legalAddress),
             shippingAddress, 
-            request.AccountIdentifier));
+            request.AccountIdentifier);
         
+        _uow.Suppliers.Add(supplier);
         await _uow.Save(token);
-        return Result.Success();
+        
+        return Result.Success(supplier.Identifier.Value);
     }
 }

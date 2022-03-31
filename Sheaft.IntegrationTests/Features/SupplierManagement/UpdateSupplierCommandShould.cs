@@ -2,11 +2,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Sheaft.Application.Models;
 using Sheaft.Application.SupplierManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence;
-using Sheaft.Infrastructure.SupplierManagement;
 using Sheaft.IntegrationTests.Helpers;
 
 namespace Sheaft.IntegrationTests.SupplierManagement;
@@ -28,20 +28,6 @@ public class UpdateSupplierCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(supplier);
         Assert.AreEqual("TradeName", supplier.TradeName.Value);
-    }
-
-    [Test]
-    public async Task Fail_To_Supplier_If_Not_Found()
-    {
-        var (supplierId, context, handler) = InitHandler();
-        var command = GetCommand(SupplierId.New());
-        
-        var result = await handler.Handle(command, CancellationToken.None);
-
-        var supplier = context.Suppliers.Single(s => s.Identifier == supplierId);
-        Assert.IsTrue(result.IsFailure);
-        Assert.IsNotNull(supplier);
-        Assert.AreEqual("trade", supplier.TradeName.Value);
     }
 
     private (SupplierId, AppDbContext, UpdateSupplierHandler) InitHandler()

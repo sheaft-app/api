@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Domain.RetailerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 using Sheaft.Infrastructure.Persistence.Converters;
@@ -30,10 +32,13 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
+        modelBuilder.ApplyConfiguration(new RetailerConfiguration());
         
         modelBuilder.ApplyConfiguration(new CatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new AgreementConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -41,6 +46,10 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<SupplierId>()
             .HaveConversion<SupplierIdConverter>();
+        
+        configurationBuilder
+            .Properties<RetailerId>()
+            .HaveConversion<RetailerIdConverter>();
         
         configurationBuilder
             .Properties<AccountId>()
@@ -65,12 +74,18 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<ProductId>()
             .HaveConversion<ProductIdConverter>();
+        
+        configurationBuilder
+            .Properties<AgreementId>()
+            .HaveConversion<AgreementIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Retailer> Retailers { get; set; }
     public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Agreement> Agreements { get; set; }
 }
 
 internal static class DbContextExtension

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.SupplierManagement;
 

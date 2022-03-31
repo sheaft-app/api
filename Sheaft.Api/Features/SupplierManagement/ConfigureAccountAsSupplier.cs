@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
+using Sheaft.Application.Models;
 using Sheaft.Application.SupplierManagement;
 
 namespace Sheaft.Api.SupplierManagement;
 
-[Route(Routes.SUPPLIERS)]
+[Route(Routes.PROFILES)]
 public class ConfigureAccountAsSupplier : Feature
 {
     public ConfigureAccountAsSupplier(ISheaftMediator mediator)
@@ -16,7 +17,7 @@ public class ConfigureAccountAsSupplier : Feature
     {
     }
 
-    [HttpPost("configure")]
+    [HttpPost("configure/supplier")]
     public async Task<ActionResult<string>> Post([FromBody] SupplierInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new ConfigureAccountAsSupplierCommand(data.TradeName, data.CorporateName, data.Siret, data.Email, data.Phone, data.LegalAddress, data.ShippingAddress, CurrentAccountId), token);

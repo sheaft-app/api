@@ -3,11 +3,15 @@ using Microsoft.Extensions.Logging;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Domain.RetailerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
+using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
+using Sheaft.Infrastructure.RetailerManagement;
 using Sheaft.Infrastructure.SupplierManagement;
 
 namespace Sheaft.Infrastructure;
@@ -30,17 +34,23 @@ internal class UnitOfWork : IUnitOfWork
         Accounts = new AccountRepository(_context);
         
         Suppliers = new SupplierRepository(_context);
+        Retailers = new RetailerRepository(_context);
         
         Catalogs = new CatalogRepository(_context);
         Products = new ProductRepository(_context);
+        
+        Agreements = new AgreementRepository(_context);
     }
 
     public IAccountRepository Accounts { get; }
     
     public ISupplierRepository Suppliers { get; }
+    public IRetailerRepository Retailers { get; }
     
     public ICatalogRepository Catalogs { get; }
     public IProductRepository Products { get; }
+    
+    public IAgreementRepository Agreements { get; }
 
 
     public async Task<Result<int>> Save(CancellationToken token)
