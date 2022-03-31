@@ -20,4 +20,15 @@ public class Product : AggregateRoot
     public ProductCode Code { get; private set; }
     public string? Description { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
+
+    public void UpdateInfo(ProductName name, string? description)
+    {
+        Name = name;
+        Description = description;
+    }
+
+    public void UpdateCode(ProductCode code)
+    {
+        Code = code;
+    }
 }

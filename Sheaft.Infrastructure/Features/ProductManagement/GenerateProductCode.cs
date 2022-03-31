@@ -5,7 +5,7 @@ namespace Sheaft.Infrastructure.ProductManagement;
 
 internal class GenerateProductCode : IGenerateProductCode
 {
-    private static int code = 0;
+    private int code = 0;
     public Task<Result<ProductCode>> GenerateNextProductCode(SupplierId supplierIdentifier, CancellationToken token)
     {
         code++;

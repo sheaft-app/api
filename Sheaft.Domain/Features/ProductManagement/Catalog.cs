@@ -28,7 +28,7 @@ public class Catalog : AggregateRoot
 
     public void AddOrUpdateProductPrice(Product product, int productPrice)
     {
-        var existingProduct = _products.SingleOrDefault(p => p.Product.Identifier != product.Identifier);
+        var existingProduct = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
         if (existingProduct != null)
         {
             existingProduct.SetPrice(productPrice);

@@ -17,6 +17,8 @@ internal class CatalogRepository : Repository<Catalog, CatalogId>, ICatalogRepos
         return QueryAsync(async () =>
         {
             var result = await Values
+                .Include(c => c.Products)
+                    .ThenInclude(cp => cp.Product)
                 .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
 
             return result != null
@@ -29,6 +31,8 @@ internal class CatalogRepository : Repository<Catalog, CatalogId>, ICatalogRepos
     {
         return QueryAsync(async () =>
             Result.Success(await Values
+                .Include(c => c.Products)
+                    .ThenInclude(cp => cp.Product)
                 .SingleOrDefaultAsync(e => e.SupplierIdentifier == supplierIdentifier && e.IsDefault, token)?? Maybe<Catalog>.None));
     }
 }
