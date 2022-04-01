@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -24,6 +25,10 @@ internal class CatalogProductConfiguration : IEntityTypeConfiguration<CatalogPro
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
         
+        builder
+            .Property(p => p.Price)
+            .HasConversion(price => price.Value, value => new ProductPrice(value));
+
         builder.HasOne(c => c.Product)
             .WithMany()
             .HasForeignKey("ProductId");

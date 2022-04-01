@@ -29,7 +29,7 @@ public class UpdateProductCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual("newcode", product.Code.Value);
         Assert.AreEqual("desc", product.Description);
-        Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Identifier == productId).Price);
+        Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Identifier == productId).Price.Value);
     }
     
     [Test]
@@ -52,7 +52,7 @@ public class UpdateProductCommandShould
         var supplierIdentifier = SupplierId.New();
         var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
         var product = new Product(new ProductName("product"), new ProductCode("test"), null, supplierIdentifier);
-        catalog.AddOrUpdateProductPrice(product, 2000);
+        catalog.AddOrUpdateProductPrice(product, new ProductPrice(2000));
 
         context.Add(catalog);
         context.SaveChanges();

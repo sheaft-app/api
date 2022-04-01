@@ -42,7 +42,7 @@ public class DeleteProductCommandShould
         var supplierIdentifier = SupplierId.New();
         var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
         var product = new Product(new ProductName("product"), new ProductCode("test"), null, supplierIdentifier);
-        catalog.AddOrUpdateProductPrice(product, 2000);
+        catalog.AddOrUpdateProductPrice(product, new ProductPrice(2000));
 
         context.Add(catalog);
         context.SaveChanges();

@@ -1,29 +1,84 @@
-﻿using Sheaft.Domain;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
-using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.IntegrationTests.Helpers;
 
-public static class DataHelpers
+internal static class DataHelpers
 {
-    public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com", string password = "P@ssword")
+    public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com",
+        string password = "P@ssword")
     {
         return new Account(new Username(email), new EmailAddress(email), HashedPassword.Create(password, hasher));
     }
 
     public static Supplier GetDefaultSupplier(AccountId accountIdentifier, string emailAddress = "test@test.com")
     {
-        return new Supplier(new TradeName("trade"), new EmailAddress(emailAddress), new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null,
+        return new Supplier(new TradeName(accountIdentifier.Value), new EmailAddress($"{accountIdentifier.Value}.{emailAddress}"), new PhoneNumber("0664566565"),
+            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), new ShippingAddress(accountIdentifier.Value, null, "70000", "Test"),
             accountIdentifier);
     }
 
     public static Customer GetDefaultCustomer(AccountId accountIdentifier, string emailAddress = "test@test.com")
     {
-        return new Customer(new TradeName("trade"), new EmailAddress(emailAddress), new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null,
+        return new Customer(new TradeName(accountIdentifier.Value), new EmailAddress($"{accountIdentifier.Value}.{emailAddress}"), new PhoneNumber("0664566565"),
+            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), new DeliveryAddress(accountIdentifier.Value, null, "70000", "Test"),
             accountIdentifier);
+    }
+
+    public static AppDbContext InitContext(AppDbContext context, 
+        List<AccountId> customerIds,
+        Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> suppliers,
+        Dictionary<AccountId, Dictionary<string, int>> suppliersProducts)
+    {
+        foreach (var customerId in customerIds)
+        {
+            var customer = GetDefaultCustomer(customerId);
+            context.Add(customer);
+        }
+
+        context.SaveChanges();
+
+        foreach (var supplierInfo in suppliers)
+        {
+            var supplier = GetDefaultSupplier(supplierInfo.Key);
+            context.Add(supplier);
+
+            var catalog = Catalog.CreateDefaultCatalog(supplier.Identifier);
+            context.Add(catalog);
+            
+            foreach (var agreementInfo in supplierInfo.Value)
+            {
+                var customer = context.Customers.Single(s => s.AccountIdentifier == agreementInfo.Key);
+            
+                var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+                    catalog.Identifier,
+                    new List<DeliveryDay> {agreementInfo.Value}, 2);
+
+                agreement.Accept();
+                context.Add(agreement);
+            }
+
+            if (!suppliersProducts.TryGetValue(supplierInfo.Key, out var productsInfo)) 
+                continue;
+            
+            foreach (var productInfo in productsInfo)
+            {
+                var product = new Product(new ProductName(productInfo.Key), new ProductCode(productInfo.Key), null,
+                    supplier.Identifier);
+                
+                catalog.AddOrUpdateProductPrice(product, new ProductPrice(productInfo.Value));
+                context.Add(product);
+            }
+        }
+
+        context.SaveChanges();
+        return context;
     }
 }

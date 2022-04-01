@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.CustomerManagement;
+﻿namespace Sheaft.Domain;
 
 public interface ICustomerRepository : IRepository<Customer, CustomerId>
 {

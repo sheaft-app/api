@@ -37,7 +37,7 @@ internal class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
             
             dd.ToTable("Agreement_DeliveryDays");
         });
-
+        
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();

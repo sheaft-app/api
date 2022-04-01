@@ -14,7 +14,6 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.AgreementManagement;

@@ -21,14 +21,16 @@ public class Product : AggregateRoot
     public string? Description { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
 
-    public void UpdateInfo(ProductName name, string? description)
+    public Result UpdateInfo(ProductName name, string? description)
     {
         Name = name;
         Description = description;
+        return Result.Success();
     }
 
-    public void UpdateCode(ProductCode code)
+    public Result UpdateCode(ProductCode code)
     {
         Code = code;
+        return Result.Success();
     }
 }

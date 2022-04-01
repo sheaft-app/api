@@ -87,11 +87,3 @@ public class Agreement : AggregateRoot
         return Result.Success();
     }
 }
-
-public enum AgreementStatus
-{
-    Pending,
-    Active,
-    Refused,
-    Revoked
-}

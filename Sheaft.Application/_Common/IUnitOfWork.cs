@@ -2,7 +2,7 @@
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application;
@@ -19,6 +19,7 @@ public interface IUnitOfWork
     public IProductRepository Products { get; }
     
     public IAgreementRepository Agreements { get; }
+    public IOrderRepository Orders { get; }
     
     public Task<Result<int>> Save(CancellationToken token);
 }

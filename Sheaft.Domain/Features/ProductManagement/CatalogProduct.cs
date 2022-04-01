@@ -4,20 +4,18 @@ public class CatalogProduct
 {
     private CatalogProduct(){}
     
-    public CatalogProduct(Product product, int price)
+    public CatalogProduct(Product product, ProductPrice price)
     {
         Product = product;
         SetPrice(price);
     }
 
     public Product Product { get; private set; }
-    public int Price { get; private set; }
+    public ProductPrice Price { get; private set; }
 
-    public void SetPrice(int newPrice)
+    public Result SetPrice(ProductPrice newPrice)
     {
-        if (newPrice <= 0)
-            throw new InvalidOperationException("Catalog Product new price must be greater than 0");
-        
         Price = newPrice;
+        return Result.Success();
     }
 }

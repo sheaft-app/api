@@ -1,6 +1,5 @@
 ﻿using Sheaft.Application.Models;
 using Sheaft.Domain;
-using Sheaft.Domain.CustomerManagement;
 
 namespace Sheaft.Application.CustomerManagement;
 

@@ -3,7 +3,7 @@
 public class Catalog : AggregateRoot
 {
     private List<CatalogProduct> _products = new List<CatalogProduct>();
-    
+
     private Catalog()
     {
     }
@@ -26,25 +26,24 @@ public class Catalog : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public IReadOnlyCollection<CatalogProduct> Products => _products.AsReadOnly();
 
-    public void AddOrUpdateProductPrice(Product product, int productPrice)
+    public Result AddOrUpdateProductPrice(Product product, ProductPrice price)
     {
         var existingProduct = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
         if (existingProduct != null)
-        {
-            existingProduct.SetPrice(productPrice);
-            return;
-        }
-
-        if (_products.All(p => p.Product.Identifier != product.Identifier))
-            _products.Add(new CatalogProduct(product, productPrice));
+            existingProduct.SetPrice(price);
+        else
+            _products.Add(new CatalogProduct(product, price));
+        
+        return Result.Success();
     }
 
-    public void RemoveProduct(Product product)
+    public Result RemoveProduct(Product product)
     {
         var productToRemove = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
         if (productToRemove == null)
-            throw new InvalidOperationException("catalog.product.not.found");
+            return Result.Failure(ErrorKind.NotFound, "catalog.product.not.found");
 
         _products.Remove(productToRemove);
+        return Result.Success();
     }
 }

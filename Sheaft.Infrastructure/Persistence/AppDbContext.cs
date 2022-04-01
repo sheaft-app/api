@@ -5,7 +5,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.ProductManagement;
-using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 using Sheaft.Infrastructure.Persistence.Converters;
@@ -39,6 +39,8 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
         
         modelBuilder.ApplyConfiguration(new AgreementConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -78,6 +80,10 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<AgreementId>()
             .HaveConversion<AgreementIdConverter>();
+        
+        configurationBuilder
+            .Properties<OrderId>()
+            .HaveConversion<OrderIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
@@ -86,6 +92,7 @@ internal class AppDbContext : DbContext, IDbContext
     public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Agreement> Agreements { get; set; }
+    public DbSet<Order> Orders { get; set; }
 }
 
 internal static class DbContextExtension

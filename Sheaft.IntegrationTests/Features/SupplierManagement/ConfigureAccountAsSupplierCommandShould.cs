@@ -36,9 +36,8 @@ public class ConfigureAccountAsSupplierCommandShould
     {
         var (context, handler) = InitHandler();
         var accountIdentifier = AccountId.New();
-        var email = new EmailAddress("existing@test.com");
         
-        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(accountIdentifier, email.Value));
+        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(accountIdentifier));
         await context.SaveChangesAsync();
         var command = GetCommand(accountIdentifier);
         
@@ -47,7 +46,6 @@ public class ConfigureAccountAsSupplierCommandShould
         var supplier = context.Suppliers.Single(s => s.AccountIdentifier == accountIdentifier);
         Assert.IsTrue(result.IsFailure);
         Assert.IsNotNull(supplier);
-        Assert.AreEqual(email, supplier.Email);
     }
 
     private (AppDbContext, ConfigureAccountAsSupplierHandler) InitHandler()
