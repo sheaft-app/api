@@ -28,8 +28,12 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
         if (catalogResult.Value.HasNoValue)
             return Result.Failure<string>(ErrorKind.NotFound, "agreement.supplier.catalog.not.found");
 
-        var agreement = new Agreement(AgreementOwner.Supplier, supplierResult.Value.Identifier, request.CustomerIdentifier, catalogResult.Value.Value.Identifier);
-        agreement.SetDelivery(request.DeliveryDays?.Select(d => new DeliveryDay(d)).ToList() ?? new List<DeliveryDay>(), request.OrderDelayInHoursBeforeDeliveryDay);
+        var agreement = Agreement.CreateSupplierAgreement(
+            supplierResult.Value.Identifier, 
+            request.CustomerIdentifier, 
+            catalogResult.Value.Value.Identifier, 
+            request.DeliveryDays?.Select(d => new DeliveryDay(d)).ToList() ?? new List<DeliveryDay>(), 
+            request.OrderDelayInHoursBeforeDeliveryDay);
         
         _uow.Agreements.Add(agreement);
         await _uow.Save(token);

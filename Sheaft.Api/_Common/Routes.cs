@@ -9,4 +9,5 @@ public static class Routes
     public const string PRODUCTS = $"{API}/products";
     public const string SUPPLIERS = $"{API}/suppliers";
     public const string CUSTOMERS = $"{API}/customers";
+    public const string AGREEMENTS = $"{API}/agreements";
 }
