@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.ProductManagement;
+﻿namespace Sheaft.Domain;
 
 public record ProductName
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;

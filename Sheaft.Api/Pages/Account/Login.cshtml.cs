@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
+using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Api.Pages;

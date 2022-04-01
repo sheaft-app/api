@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Sheaft.Domain.AccountManagement;
+namespace Sheaft.Domain;
 
 public record Password
 {

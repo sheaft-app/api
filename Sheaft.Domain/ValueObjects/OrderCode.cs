@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain;
 
 public record OrderCode
 {

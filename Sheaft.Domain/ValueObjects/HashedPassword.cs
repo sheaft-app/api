@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Domain.AccountManagement;
+﻿using Sheaft.Domain.AccountManagement;
+
+namespace Sheaft.Domain;
 
 public record HashedPassword
 {

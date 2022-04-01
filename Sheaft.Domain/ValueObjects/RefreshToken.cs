@@ -1,3 +1,3 @@
-﻿namespace Sheaft.Domain.AccountManagement;
+﻿namespace Sheaft.Domain;
 
 public record RefreshToken(RefreshTokenInfo Info, string Token);

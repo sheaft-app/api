@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Extensions.Options;
+using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Infrastructure.AccountManagement;
