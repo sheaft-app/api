@@ -18,7 +18,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class AcceptAgreementFromCustomerCommandShould
+public class AcceptAgreementCommandShould
 {
     [Test]
     public async Task As_Customer_Accept_Agreement_From_Supplier()

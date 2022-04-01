@@ -38,18 +38,26 @@ public class Agreement : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public CustomerId CustomerIdentifier { get; private set; }
     public CatalogId CatalogIdentifier { get; private set; }
+    public string? RevokedReason { get; private set; }
     public ReadOnlyCollection<DeliveryDay> DeliveryDays { get; private set; } = new ReadOnlyCollection<DeliveryDay>(new List<DeliveryDay>());
 
     public Result SetDelivery(List<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
     {
-        DeliveryDays = new ReadOnlyCollection<DeliveryDay>(deliveryDays?.Distinct().ToList() ?? new List<DeliveryDay>());
+        var days = deliveryDays?.Distinct().ToList()  ?? new List<DeliveryDay>();
+        if (days.Count == 0)
+            return Result.Failure(ErrorKind.Validation, "agreement.delivery.days.required");
+        
+        DeliveryDays = new ReadOnlyCollection<DeliveryDay>(days);
         OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay ?? 0;
 
         return Result.Success();
     }
 
-    public Result Accept(List<DeliveryDay>? deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
+    public Result Accept(List<DeliveryDay>? deliveryDays = null, int? orderDelayInHoursBeforeDeliveryDay = null)
     {
+        if (Status != AgreementStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "agreement.accept.requires.pending");
+
         Status = AgreementStatus.Active;
         if (Owner == AgreementOwner.Supplier) 
             return Result.Success();
@@ -59,11 +67,31 @@ public class Agreement : AggregateRoot
                 
         return SetDelivery(deliveryDays, orderDelayInHoursBeforeDeliveryDay);
     }
+
+    public Result Revoke(string reason)
+    {
+        if (Status != AgreementStatus.Active)
+            return Result.Failure(ErrorKind.BadRequest, "agreement.revoke.requires.active");
+        
+        Status = AgreementStatus.Revoked;
+        RevokedReason = reason;
+        return Result.Success();
+    }
+
+    public Result Refuse()
+    {
+        if (Status != AgreementStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "agreement.refuse.requires.pending");
+
+        Status = AgreementStatus.Refused;
+        return Result.Success();
+    }
 }
 
 public enum AgreementStatus
 {
     Pending,
     Active,
+    Refused,
     Revoked
 }

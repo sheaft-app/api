@@ -9,10 +9,14 @@ public record ProposeAgreementToCustomerCommand(CustomerId CustomerIdentifier,
 public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreementToCustomerCommand, Result<string>>
 {
     private readonly IUnitOfWork _uow;
+    private readonly IValidateAgreementProposal _validateAgreementPoposal;
 
-    public ProposeAgreementToCustomerHandler(IUnitOfWork uow)
+    public ProposeAgreementToCustomerHandler(
+        IUnitOfWork uow,
+        IValidateAgreementProposal validateAgreementPoposal)
     {
         _uow = uow;
+        _validateAgreementPoposal = validateAgreementPoposal;
     }
 
     public async Task<Result<string>> Handle(ProposeAgreementToCustomerCommand request, CancellationToken token)
@@ -20,6 +24,14 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
         var supplierResult = await _uow.Suppliers.Get(request.SupplierAccountIdentifier, token);
         if (supplierResult.IsFailure)
             return Result.Failure<string>(supplierResult);
+
+        var canCreateAgreementBetweenResult =
+            await _validateAgreementPoposal.CanCreateAgreementBetween(supplierResult.Value.Identifier.Value, request.CustomerIdentifier.Value, token);
+        if (canCreateAgreementBetweenResult.IsFailure)
+            return Result.Failure<string>(canCreateAgreementBetweenResult);
+        
+        if(!canCreateAgreementBetweenResult.Value)
+            return Result.Failure<string>(ErrorKind.BadRequest, "agreement.already.exists");
         
         var catalogResult = await _uow.Catalogs.FindDefault(supplierResult.Value.Identifier, token);
         if (catalogResult.IsFailure)
