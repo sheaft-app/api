@@ -56,6 +56,9 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
             l
                 .Property(p => p.Vat)
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
+            
+            l.WithOwner().HasForeignKey("OrderId");
+            l.HasKey("OrderId", "ProductIdentifier");
 
             l.ToTable("Order_Lines");
         });
@@ -70,7 +73,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder
             .Property(p => p.DeliveryDate)
-            .HasConversion(deliveryDate => deliveryDate.Value, value => new OrderDeliveryDate(new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, DateTimeKind.Utc)));
+            .HasConversion(deliveryDate => deliveryDate.Value, value => new OrderDeliveryDate(new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, DateTimeKind.Utc), new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(-1)));
         
         builder
             .HasIndex(c => c.Identifier)

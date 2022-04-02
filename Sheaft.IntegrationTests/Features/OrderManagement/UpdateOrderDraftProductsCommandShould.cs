@@ -41,6 +41,40 @@ public class UpdateOrderDraftProductsCommandShould
         Assert.IsNotNull(order);
         Assert.AreEqual(2, order.Lines.Count);
     }
+    
+    [Test]
+    public async Task Remove_Lines_To_Order()
+    {
+        var (context, handler) = InitHandler();
+        
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
+            new BillingAddress("", null, "", ""));
+        
+        order.UpdateDraftLines(new List<OrderLine>
+        {
+            new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"), new Quantity(1),
+                new Price(2000), new VatRate(2000)),
+            new OrderLine(new ProductId("test 2"), new ProductCode("test 2"), new ProductName("test 2"), new Quantity(1),
+                new Price(2000), new VatRate(2000))
+        });
+
+        context.Add(order);
+        context.SaveChanges();
+
+        var line = context.Products
+            .Where(p => p.SupplierIdentifier == supplier.Identifier)
+            .Select(p => new ProductQuantityDto(p.Identifier.Value, 2))
+            .FirstOrDefault();
+        
+        var result = await handler.Handle(new UpdateOrderDraftProductsCommand(order.Identifier, new List<ProductQuantityDto>{line}), CancellationToken.None);
+        Assert.IsTrue(result.IsSuccess);
+        
+        Assert.IsNotNull(order);
+        Assert.AreEqual(1, order.Lines.Count);
+    }
 
     private (AppDbContext, UpdateOrderDraftProductsHandler) InitHandler()
     {

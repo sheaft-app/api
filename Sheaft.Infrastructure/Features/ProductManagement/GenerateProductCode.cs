@@ -6,7 +6,7 @@ namespace Sheaft.Infrastructure.ProductManagement;
 internal class GenerateProductCode : IGenerateProductCode
 {
     private int code = 0;
-    public Task<Result<ProductCode>> GenerateNextProductCode(SupplierId supplierIdentifier, CancellationToken token)
+    public Task<Result<ProductCode>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
     {
         code++;
         return Task.FromResult(Result.Success(new ProductCode(GenerateEanIdentifier(code, 13))));
