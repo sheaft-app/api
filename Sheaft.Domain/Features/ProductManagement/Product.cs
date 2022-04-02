@@ -6,13 +6,14 @@ public class Product : AggregateRoot
     {
     }
 
-    public Product(ProductName name, ProductCode code, string? description, SupplierId supplierIdentifier)
+    public Product(ProductName name, ProductCode code, VatRate vat, string? description, SupplierId supplierIdentifier)
     {
         Identifier = ProductId.New();
         Name = name;
         Code = code;
         Description = description;
         SupplierIdentifier = supplierIdentifier;
+        Vat = vat;
     }
 
     public ProductId Identifier { get; }
@@ -20,11 +21,13 @@ public class Product : AggregateRoot
     public ProductCode Code { get; private set; }
     public string? Description { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
+    public VatRate Vat { get; private set; }
 
-    public Result UpdateInfo(ProductName name, string? description)
+    public Result UpdateInfo(ProductName name, VatRate vat, string? description)
     {
         Name = name;
         Description = description;
+        Vat = vat;
         return Result.Success();
     }
 

@@ -13,6 +13,7 @@ using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
@@ -20,6 +21,7 @@ using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
+using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Infrastructure.SupplierManagement;
 using WkHtmlToPdfDotNet;
@@ -97,6 +99,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidateCustomerRegistration, ValidateCustomerRegistration>();
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
         services.AddScoped<IRetrieveProfile, RetrieveProfile>();
+        services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

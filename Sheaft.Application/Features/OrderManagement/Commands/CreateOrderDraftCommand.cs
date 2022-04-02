@@ -16,6 +16,11 @@ public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, 
 
     public async Task<Result<string>> Handle(CreateOrderDraftCommand request, CancellationToken token)
     {
+        var agreementResult =
+            await _uow.Agreements.FindAgreementFor(request.SupplierIdentifier, request.CustomerIdentifier, token);
+        if (agreementResult.IsFailure)
+            return Result.Failure<string>(agreementResult);
+        
         var orderDraftResult =
             await _uow.Orders.FindExistingDraft(request.CustomerIdentifier, request.SupplierIdentifier, token);
         if (orderDraftResult.IsFailure)
@@ -27,6 +32,9 @@ public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, 
         var customerResult = await _uow.Customers.Get(request.CustomerIdentifier, token);
         if (customerResult.IsFailure)
             return Result.Failure<string>(customerResult);
+
+        if (agreementResult.Value.HasNoValue)
+            return Result.Failure<string>(ErrorKind.BadRequest, "order.requires.agreement");
 
         var deliveryAddress = customerResult.Value.DeliveryAddress;
         var billingAddress = customerResult.Value.Legal.Address;

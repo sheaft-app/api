@@ -15,9 +15,9 @@ public class CreateProduct : Feature
     [HttpPost("")]
     public async Task<ActionResult<string>> Post([FromBody] CreateProductRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateProductCommand(data.Name, data.Code, data.Description, data.Price, CurrentSupplierId), token);
+        var result = await Mediator.Execute(new CreateProductCommand(data.Name, data.Code, data.Description, data.Price, data.Vat, CurrentSupplierId), token);
         return HandleCommandResult(result);
     }
 }
 
-public record CreateProductRequest(string Name, string? Code, int Price, string? Description);
+public record CreateProductRequest(string Name, string? Code, int Price, int Vat, string? Description);

@@ -36,6 +36,10 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(code => code.Value, value => new ProductCode(value));
 
         builder
+            .Property(p => p.Vat)
+            .HasConversion(vat => vat.Value, value => new VatRate(value));
+
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
         

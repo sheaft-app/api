@@ -38,3 +38,5 @@ public record OrderLine
         return new Price(unitPrice.Value * quantity.Value, unitPrice.Currency);
     }
 }
+
+public record ProductsQuantities(ProductId ProductIdentifier, Quantity Quantity);

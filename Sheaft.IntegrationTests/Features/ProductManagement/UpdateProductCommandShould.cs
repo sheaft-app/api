@@ -51,7 +51,7 @@ public class UpdateProductCommandShould
 
         var supplierIdentifier = SupplierId.New();
         var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
-        var product = new Product(new ProductName("product"), new ProductCode("test"), null, supplierIdentifier);
+        var product = new Product(new ProductName("product"), new ProductCode("test"),  new VatRate(2000),null, supplierIdentifier);
         catalog.AddOrUpdateProductPrice(product, new ProductPrice(2000));
 
         context.Add(catalog);
@@ -64,7 +64,7 @@ public class UpdateProductCommandShould
 
     private static UpdateProductCommand GetCommand(ProductId identifier, int price = 1200, string? code = "Code")
     {
-        var command = new UpdateProductCommand(identifier, "Test", code, "desc", price);
+        var command = new UpdateProductCommand(identifier, "Test", 2000, code, "desc", price);
         return command;
     }
 }

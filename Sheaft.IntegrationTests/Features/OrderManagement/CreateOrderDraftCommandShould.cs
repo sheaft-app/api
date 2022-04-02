@@ -34,7 +34,7 @@ public class CreateOrderDraftCommandShould
     }
     
     [Test]
-    public async Task Return_Existing_Order_Draft()
+    public async Task Return_Existing_Order_Draft_When_Trying_Create_A_New_One()
     {
         var (context, handler) = InitHandler();
         
@@ -53,17 +53,36 @@ public class CreateOrderDraftCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(order.Identifier.Value, result.Value);
     }
+    
+    [Test]
+    public async Task Fail_If_No_Agreement_Exists_Between_Customer_And_Supplier()
+    {
+        var (context, handler) = InitHandler(false);
+        
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+        
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+    
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.requires.agreement", result.Error.Code);
+    }
 
-    private (AppDbContext, CreateOrderDraftHandler) InitHandler()
+    private (AppDbContext, CreateOrderDraftHandler) InitHandler(bool addAgreement = true)
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<CreateOrderDraftHandler>();
 
         var supplier = AccountId.New();
         var customer = AccountId.New();
+
+        var agreements = new Dictionary<AccountId, DeliveryDay>();
+        if (addAgreement)
+            agreements.Add(customer, new DeliveryDay(DayOfWeek.Friday));
         
         DataHelpers.InitContext(context,
             new List<AccountId>{customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, new Dictionary<AccountId, DeliveryDay>{{customer, new DeliveryDay(DayOfWeek.Friday)}}}},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>>
                 {{supplier, new Dictionary<string, int> {{"001", 2000}, {"002", 3500}}}});
         

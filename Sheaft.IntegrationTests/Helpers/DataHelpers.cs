@@ -70,7 +70,7 @@ internal static class DataHelpers
             
             foreach (var productInfo in productsInfo)
             {
-                var product = new Product(new ProductName(productInfo.Key), new ProductCode(productInfo.Key), null,
+                var product = new Product(new ProductName(productInfo.Key), new ProductCode(productInfo.Key), new VatRate(2000), null,
                     supplier.Identifier);
                 
                 catalog.AddOrUpdateProductPrice(product, new ProductPrice(productInfo.Value));
