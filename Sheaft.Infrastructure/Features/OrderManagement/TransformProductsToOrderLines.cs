@@ -14,10 +14,14 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
     {
         _context = context;
     }
+    
     public async Task<Result<IEnumerable<OrderLine>>> Transform(IEnumerable<ProductsQuantities> products, SupplierId supplierIdentifier, CancellationToken token)
     {
         try
         {
+            if (!products.Any())
+                return Result.Success(new List<OrderLine>().AsEnumerable());
+            
             var catalog = await _context.Set<Catalog>()
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
@@ -41,7 +45,8 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                         cp.Product.Name, 
                         GetProductQuantity(cp.Product.Identifier, products), 
                         cp.Price, 
-                        cp.Product.Vat));
+                        cp.Product.Vat))
+                .Where(l => l.Quantity.Value > 0);
 
             return Result.Success(lines);
         }
