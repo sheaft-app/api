@@ -2,7 +2,8 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record AcceptOrderCommand(OrderId OrderIdentifier, Maybe<OrderDeliveryDate> NewOrderDeliveryDate) : ICommand<Result>;
+public record AcceptOrderCommand(OrderId OrderIdentifier, Maybe<OrderDeliveryDate> NewOrderDeliveryDate,
+    DateTimeOffset? CurrentDateTime = null) : ICommand<Result>;
     
 public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
 {
@@ -20,7 +21,7 @@ public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
-        var acceptResult = order.Accept(request.NewOrderDeliveryDate);
+        var acceptResult = order.Accept(request.NewOrderDeliveryDate, request.CurrentDateTime);
         if (acceptResult.IsFailure)
             return Result.Failure(acceptResult);
 

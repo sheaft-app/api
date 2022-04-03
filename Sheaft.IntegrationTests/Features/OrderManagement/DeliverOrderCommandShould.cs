@@ -15,31 +15,30 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class RefuseOrderCommandShould
+public class DeliverOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Refused()
+    public async Task Switch_Order_Status_To_Delivered()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var currentDateTime = DateTimeOffset.UtcNow;
+        var deliveredOn = DateTimeOffset.UtcNow;
         var result =
             await handler.Handle(
-                new RefuseOrderCommand(order.Identifier, "reason", currentDateTime),
+                new DeliverOrderCommand(order.Identifier, deliveredOn),
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
 
         Assert.IsNotNull(order);
-        Assert.AreEqual(OrderStatus.Refused, order.Status);
-        Assert.AreEqual("reason", order.FailureReason);
-        Assert.AreEqual(currentDateTime, order.RefusedOn);
+        Assert.AreEqual(OrderStatus.Delivered, order.Status);
+        Assert.AreEqual(deliveredOn, order.DeliveredOn);
     }
 
-    private (AppDbContext, RefuseOrderHandler) InitHandler()
+    private (AppDbContext, DeliverOrderHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<RefuseOrderHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<DeliverOrderHandler>();
 
         var supplier = AccountId.New();
         var customer = AccountId.New();
@@ -52,7 +51,7 @@ public class RefuseOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new RefuseOrderHandler(uow);
+        var handler = new DeliverOrderHandler(uow);
 
         return (context, handler);
     }
@@ -73,6 +72,9 @@ public class RefuseOrderCommandShould
                     new Price(2000), new VatRate(2000))
             }, "externalCode");
 
+        order.Accept(Maybe<OrderDeliveryDate>.None);
+        order.Complete(Maybe<OrderDeliveryDate>.None);
+        
         context.Add(order);
         context.SaveChanges();
         

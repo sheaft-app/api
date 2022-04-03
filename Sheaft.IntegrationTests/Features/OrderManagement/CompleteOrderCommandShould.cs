@@ -24,9 +24,10 @@ public class CompleteOrderCommandShould
         var order = InitOrder(context);
 
         var newDeliveryDate = DateTimeOffset.UtcNow.AddDays(2);
+        var currentDateTime = DateTimeOffset.UtcNow;
         var result =
             await handler.Handle(
-                new CompleteOrderCommand(order.Identifier, Maybe.From(new OrderDeliveryDate(newDeliveryDate))),
+                new CompleteOrderCommand(order.Identifier, Maybe.From(new OrderDeliveryDate(newDeliveryDate)), currentDateTime),
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
@@ -34,6 +35,7 @@ public class CompleteOrderCommandShould
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Ready, order.Status);
         Assert.AreEqual(newDeliveryDate, order.DeliveryDate.Value);
+        Assert.AreEqual(currentDateTime, order.CompletedOn);
     }
 
     private (AppDbContext, CompleteOrderHandler) InitHandler()

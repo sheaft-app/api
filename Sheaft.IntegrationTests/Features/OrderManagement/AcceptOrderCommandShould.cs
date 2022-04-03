@@ -24,10 +24,11 @@ public class AcceptOrderCommandShould
         var order = InitOrder(context);
 
         var newDeliveryDate = DateTimeOffset.UtcNow.AddDays(4);
+        var currentDateTime = DateTimeOffset.UtcNow;
         var result =
             await handler.Handle(
                 new AcceptOrderCommand(order.Identifier, 
-                    new OrderDeliveryDate(newDeliveryDate)),
+                    new OrderDeliveryDate(newDeliveryDate, currentDateTime), currentDateTime),
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
@@ -35,6 +36,7 @@ public class AcceptOrderCommandShould
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Accepted, order.Status);
         Assert.AreEqual(newDeliveryDate, order.DeliveryDate.Value);
+        Assert.AreEqual(currentDateTime, order.AcceptedOn);
     }
 
     private (AppDbContext, AcceptOrderHandler) InitHandler()

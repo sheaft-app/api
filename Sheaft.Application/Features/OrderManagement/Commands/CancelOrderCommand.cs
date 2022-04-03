@@ -2,7 +2,8 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record CancelOrderCommand(OrderId OrderIdentifier, string? CancelReason = null) : ICommand<Result>;
+public record CancelOrderCommand(OrderId OrderIdentifier, string? CancelReason = null,
+    DateTimeOffset? CurrentDateTime = null) : ICommand<Result>;
     
 public class CancelOrderHandler : ICommandHandler<CancelOrderCommand, Result>
 {
@@ -20,7 +21,7 @@ public class CancelOrderHandler : ICommandHandler<CancelOrderCommand, Result>
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
-        var refuseResult = order.Cancel(request.CancelReason);
+        var refuseResult = order.Cancel(request.CancelReason, request.CurrentDateTime);
         if (refuseResult.IsFailure)
             return Result.Failure(refuseResult);
 

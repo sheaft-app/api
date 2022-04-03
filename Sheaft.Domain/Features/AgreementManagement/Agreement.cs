@@ -43,9 +43,12 @@ public class Agreement : AggregateRoot
 
     public Result SetDelivery(List<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
     {
+        if (Status != AgreementStatus.Pending && Status != AgreementStatus.Active)
+            return Result.Failure(ErrorKind.BadRequest, "agreement.delivery.requires.pending.or.active.status");
+        
         var days = deliveryDays?.Distinct().ToList()  ?? new List<DeliveryDay>();
         if (days.Count == 0)
-            return Result.Failure(ErrorKind.Validation, "agreement.delivery.days.required");
+            return Result.Failure(ErrorKind.BadRequest, "agreement.delivery.days.required");
         
         DeliveryDays = new ReadOnlyCollection<DeliveryDay>(days);
         OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay ?? 0;

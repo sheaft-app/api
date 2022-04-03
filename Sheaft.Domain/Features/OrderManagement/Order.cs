@@ -43,6 +43,11 @@ public class Order : AggregateRoot
     public DeliveryAddress DeliveryAddress { get; private set; }
     public BillingAddress BillingAddress { get; private set; }
     public Price TotalPrice { get; private set; }
+    public DateTimeOffset? DeliveredOn { get; private set; }
+    public DateTimeOffset? CompletedOn { get; private set; }
+    public DateTimeOffset? AcceptedOn { get; private set; }
+    public DateTimeOffset? RefusedOn { get; private set; }
+    public DateTimeOffset? CancelledOn { get; private set; }
     public int ProductsCount { get; private set; }
 
     public string? FailureReason { get; private set; }
@@ -75,7 +80,7 @@ public class Order : AggregateRoot
         return Result.Success();
     }
 
-    public Result Accept(Maybe<OrderDeliveryDate> newOrderDeliveryDate)
+    public Result Accept(Maybe<OrderDeliveryDate> newOrderDeliveryDate, DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "order.accept.requires.pending.status");
@@ -83,11 +88,12 @@ public class Order : AggregateRoot
         if (newOrderDeliveryDate.HasValue)
             DeliveryDate = newOrderDeliveryDate.Value;
 
+        AcceptedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Accepted;
         return Result.Success();
     }
 
-    public Result Complete(Maybe<OrderDeliveryDate> newDeliveryDate)
+    public Result Complete(Maybe<OrderDeliveryDate> newDeliveryDate, DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Accepted)
             return Result.Failure(ErrorKind.BadRequest, "order.complete.requires.accepted.status");
@@ -95,27 +101,40 @@ public class Order : AggregateRoot
         if (newDeliveryDate.HasValue)
             DeliveryDate = newDeliveryDate.Value;
 
+        CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Ready;
         return Result.Success();
     }
 
-    public Result Refuse(string? refusalReason)
+    public Result Refuse(string? refusalReason, DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "order.refuse.requires.pending.status");
         
         Status = OrderStatus.Refused;
+        RefusedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = refusalReason;
         return Result.Success();
     }
 
-    public Result Cancel(string? cancelReason)
+    public Result Cancel(string? cancelReason, DateTimeOffset? currentDateTime)
     {
         if (Status != OrderStatus.Accepted && Status != OrderStatus.Ready)
             return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.ready.status");
         
         Status = OrderStatus.Cancelled;
+        CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = cancelReason;
+        return Result.Success();
+    }
+
+    public Result Deliver(DateTimeOffset? currentDateTime = null)
+    {
+        if (Status != OrderStatus.Ready)
+            return Result.Failure(ErrorKind.BadRequest, "order.deliver.requires.ready.status");
+        
+        Status = OrderStatus.Delivered;
+        DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
