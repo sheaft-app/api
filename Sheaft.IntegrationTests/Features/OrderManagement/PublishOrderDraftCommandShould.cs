@@ -7,7 +7,6 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
-using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;

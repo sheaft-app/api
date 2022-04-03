@@ -44,6 +44,8 @@ public class Order : AggregateRoot
     public BillingAddress BillingAddress { get; private set; }
     public Price TotalPrice { get; private set; }
     public int ProductsCount { get; private set; }
+
+    public string? FailureReason { get; private set; }
     public ReadOnlyCollection<OrderLine> Lines { get; private set; }
     
     internal Result Publish(OrderCode code, OrderDeliveryDate deliveryDate, IEnumerable<OrderLine>? lines = null)
@@ -72,7 +74,51 @@ public class Order : AggregateRoot
         SetLines(lines);
         return Result.Success();
     }
-    
+
+    public Result Accept(Maybe<OrderDeliveryDate> newOrderDeliveryDate)
+    {
+        if (Status != OrderStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "order.accept.requires.pending.status");
+        
+        if (newOrderDeliveryDate.HasValue)
+            DeliveryDate = newOrderDeliveryDate.Value;
+
+        Status = OrderStatus.Accepted;
+        return Result.Success();
+    }
+
+    public Result Complete(Maybe<OrderDeliveryDate> newDeliveryDate)
+    {
+        if (Status != OrderStatus.Accepted)
+            return Result.Failure(ErrorKind.BadRequest, "order.complete.requires.accepted.status");
+        
+        if (newDeliveryDate.HasValue)
+            DeliveryDate = newDeliveryDate.Value;
+
+        Status = OrderStatus.Ready;
+        return Result.Success();
+    }
+
+    public Result Refuse(string? refusalReason)
+    {
+        if (Status != OrderStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "order.refuse.requires.pending.status");
+        
+        Status = OrderStatus.Refused;
+        FailureReason = refusalReason;
+        return Result.Success();
+    }
+
+    public Result Cancel(string? cancelReason)
+    {
+        if (Status != OrderStatus.Accepted && Status != OrderStatus.Ready)
+            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.ready.status");
+        
+        Status = OrderStatus.Cancelled;
+        FailureReason = cancelReason;
+        return Result.Success();
+    }
+
     private void SetLines(IEnumerable<OrderLine>? lines)
     {
         var orderLines = lines?.ToList() ?? new List<OrderLine>();

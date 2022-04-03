@@ -6,7 +6,7 @@ public enum OrderStatus
     Pending,
     Accepted,
     Ready,
-    Completed,
+    Delivered,
     Refused,
     Cancelled
 }
