@@ -40,7 +40,7 @@ public class CreateOrderDraftCommandShould
         
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
-
+        
         var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
             new BillingAddress(customer.Legal.Address.Street, customer.Legal.Address.Complement,
                 customer.Legal.Address.Postcode, customer.Legal.Address.City));

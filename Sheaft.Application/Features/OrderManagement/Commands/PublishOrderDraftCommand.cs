@@ -8,17 +8,14 @@ public record PublishOrderDraftCommand(OrderId OrderIdentifier, OrderDeliveryDat
 public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand, Result>
 {
     private readonly IUnitOfWork _uow;
-    private readonly IGenerateOrderCode _generateOrderCode;
-    private readonly ITransformProductsToOrderLines _transformProductsToOrderLines;
+    private readonly IPublishOrders _publishOrders;
 
     public PublishOrderDraftHandler(
         IUnitOfWork uow,
-        IGenerateOrderCode generateOrderCode,
-        ITransformProductsToOrderLines transformProductsToOrderLines)
+        IPublishOrders publishOrders)
     {
         _uow = uow;
-        _generateOrderCode = generateOrderCode;
-        _transformProductsToOrderLines = transformProductsToOrderLines;
+        _publishOrders = publishOrders;
     }
 
     public async Task<Result> Handle(PublishOrderDraftCommand request, CancellationToken token)
@@ -28,26 +25,14 @@ public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
-        IEnumerable<OrderLine>? lines = null;
-
-        if (request.Products != null && request.Products.Any())
-        {
-            var orderProducts = request.Products?
-                .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new Quantity(l.Quantity)))
-                .ToList() ?? new List<ProductsQuantities>();
-            
-            var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierIdentifier, token);
-            if (linesResult.IsFailure)
-                return Result.Failure(linesResult);
-
-            lines = linesResult.Value;
-        }
-
-        var codeResult = await _generateOrderCode.GenerateNextCode(order.SupplierIdentifier, token);
-        if (codeResult.IsFailure)
-            return Result.Failure(codeResult);
         
-        var result = order.Publish(codeResult.Value, request.OrderDeliveryDate, lines);
+        var orderProducts = request.Products?
+            .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new Quantity(l.Quantity)))
+            .ToList() ?? new List<ProductsQuantities>();
+        
+        var orderDeliveryDate = request.OrderDeliveryDate;
+        
+        var result = await _publishOrders.Publish(order, orderDeliveryDate, orderProducts, token);
         if (result.IsFailure)
             return result;
 

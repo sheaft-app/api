@@ -8,6 +8,7 @@ using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
+using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
@@ -29,7 +30,7 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(-1))),
+                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
@@ -47,7 +48,7 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(DateTimeOffset.UtcNow.AddDays(1), DateTimeOffset.UtcNow.AddDays(-1))),
+                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
         Assert.IsTrue(result.IsFailure);
 
@@ -57,22 +58,22 @@ public class PublishOrderDraftCommandShould
     }
 
     [Test]
-    public async Task Fail_If_Invalid_DeliveryDate()
+    public async Task Fail_If_DeliveryDate_Day_Not_In_Agreement_DeliveryDay()
     {
         var (context, handler) = InitHandler();
 
-        var order = InitDraft(context, false);
+        var order = InitDraft(context, true);
 
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(DateTimeOffset.UtcNow.AddDays(-3), DateTimeOffset.UtcNow.AddDays(-4))),
+                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,2, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
+        
         Assert.IsTrue(result.IsFailure);
-
         Assert.IsNotNull(order);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
-        Assert.AreEqual("order.publish.requires.upcoming.deliverydate", result.Error.Code);
+        Assert.AreEqual("validate.order.deliveryday.not.in.agreement", result.Error.Code);
     }
 
     private (AppDbContext, PublishOrderDraftHandler) InitHandler()
@@ -91,7 +92,11 @@ public class PublishOrderDraftCommandShould
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
         var handler =
-            new PublishOrderDraftHandler(uow, new GenerateOrderCode(), new TransformProductsToOrderLines(context));
+            new PublishOrderDraftHandler(uow, 
+                new PublishOrders(
+                    new GenerateOrderCode(), 
+                    new TransformProductsToOrderLines(context), 
+                    new ValidateOrderDeliveryDate(new AgreementRepository(context))));
 
         return (context, handler);
     }

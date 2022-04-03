@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Domain;
@@ -11,6 +12,7 @@ public static class ServiceCollectionInitializers
         services.AddScoped<ICreateAccount, CreateAccount>();
         services.AddScoped<IHandleProductCode, HandleProductCode>();
         services.AddScoped<IRetrieveDefaultCatalog, RetrieveDefaultCatalog>();
+        services.AddScoped<IPublishOrders, PublishOrders>();
 
         return services;
     }

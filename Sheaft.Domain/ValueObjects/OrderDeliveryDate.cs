@@ -14,8 +14,8 @@ public record OrderDeliveryDate
         if (value.Date < currentDateTime.Date)
             throw new InvalidOperationException("Order delivery date must be in future");
         
-        Value = DateOnly.FromDateTime(value.UtcDateTime);
+        Value = value.ToUniversalTime();
     }
 
-    public DateOnly Value { get; }
+    public DateTimeOffset Value { get; }
 }

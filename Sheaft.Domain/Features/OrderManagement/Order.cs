@@ -46,13 +46,10 @@ public class Order : AggregateRoot
     public int ProductsCount { get; private set; }
     public ReadOnlyCollection<OrderLine> Lines { get; private set; }
     
-    public Result Publish(OrderCode code, OrderDeliveryDate deliveryDate, IEnumerable<OrderLine>? lines = null)
+    internal Result Publish(OrderCode code, OrderDeliveryDate deliveryDate, IEnumerable<OrderLine>? lines = null)
     {
         if (Status != OrderStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.draft");
-
-        if (deliveryDate.Value.ToDateTime(new TimeOnly(), DateTimeKind.Utc) < DateTimeOffset.UtcNow.Date)
-            return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.upcoming.deliverydate");
         
         if (lines != null && !lines.Any() || !Lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.lines");
