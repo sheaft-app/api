@@ -41,6 +41,7 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new AgreementConfiguration());
         
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
+        modelBuilder.ApplyConfiguration(new DeliveryConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -84,15 +85,24 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<OrderId>()
             .HaveConversion<OrderIdConverter>();
+        
+        configurationBuilder
+            .Properties<DeliveryId>()
+            .HaveConversion<DeliveryIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
+    
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    
     public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Product> Products { get; set; }
+    
     public DbSet<Agreement> Agreements { get; set; }
+    
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Delivery> Deliveries { get; set; }
 }
 
 internal static class DbContextExtension

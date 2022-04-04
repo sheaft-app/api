@@ -26,7 +26,7 @@ public class UpdateOrderDraftProductsCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress, new BillingAddress("", null, "", ""));
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
         context.Add(order);
         context.SaveChanges();
 
@@ -50,8 +50,7 @@ public class UpdateOrderDraftProductsCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""));
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
         
         order.UpdateDraftLines(new List<OrderLine>
         {

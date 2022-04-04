@@ -10,4 +10,6 @@ public static class Routes
     public const string SUPPLIERS = $"{API}/suppliers";
     public const string CUSTOMERS = $"{API}/customers";
     public const string AGREEMENTS = $"{API}/agreements";
+    public const string ORDERS = $"{API}/orders";
+    public const string DELIVERIES = $"{API}/deliveries";
 }

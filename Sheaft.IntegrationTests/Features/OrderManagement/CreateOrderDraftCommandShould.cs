@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -41,9 +42,7 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress(customer.Legal.Address.Street, customer.Legal.Address.Complement,
-                customer.Legal.Address.Postcode, customer.Legal.Address.City));
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
         
         context.Orders.Add(order);
         context.SaveChanges();
@@ -86,7 +85,7 @@ public class CreateOrderDraftCommandShould
             new Dictionary<AccountId, Dictionary<string, int>>
                 {{supplier, new Dictionary<string, int> {{"001", 2000}, {"002", 3500}}}});
         
-        var handler = new CreateOrderDraftHandler(uow);
+        var handler = new CreateOrderDraftHandler(uow, new CreateOrderDraft(new OrderRepository(context), new RetrieveAgreementForOrder(context)));
         
         return (context, handler);
     }

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -23,19 +24,21 @@ public class FulfillOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var newDeliveryDate = DateTimeOffset.UtcNow.AddDays(2);
-        var currentDateTime = DateTimeOffset.UtcNow;
+        var fulfillOrderCommand = new FulfillOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+        
         var result =
             await handler.Handle(
-                new FulfillOrderCommand(order.Identifier, Maybe.From(new OrderDeliveryDate(newDeliveryDate)), currentDateTime),
+                fulfillOrderCommand,
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsSuccess);
+
+        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
 
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Fulfilled, order.Status);
-        Assert.AreEqual(newDeliveryDate, order.DeliveryDate.Value);
-        Assert.AreEqual(currentDateTime, order.CompletedOn);
+        Assert.AreEqual(fulfillOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
+        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order.FulfilledOn);
     }
 
     private (AppDbContext, FulfillOrderHandler) InitHandler()
@@ -53,7 +56,7 @@ public class FulfillOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new FulfillOrderHandler(uow);
+        var handler = new FulfillOrderHandler(uow, new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context), new GenerateDeliveryCode()));
 
         return (context, handler);
     }
@@ -63,8 +66,8 @@ public class FulfillOrderCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.Create(new OrderCode("test"), new OrderDeliveryDate(DateTimeOffset.UtcNow), supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""),new List<OrderLine>
+        var order = Order.Create(new OrderCode("test"), supplier.Identifier, customer.Identifier,
+            new List<OrderLine>
             {
                 new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"),
                     new Quantity(1),
@@ -74,9 +77,14 @@ public class FulfillOrderCommandShould
                     new Price(2000), new VatRate(2000))
             }, "externalCode");
 
-        order.Accept(Maybe<OrderDeliveryDate>.None);
-        
+        order.Accept();
+
+        var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
+            new DeliveryAddress("", "", "", ""), new List<OrderId> {order.Identifier}, order.SupplierIdentifier);
+
         context.Add(order);
+        context.Add(delivery);
+        
         context.SaveChanges();
         
         return order;

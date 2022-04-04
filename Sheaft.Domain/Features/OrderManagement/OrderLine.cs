@@ -1,6 +1,4 @@
-﻿using Sheaft.Domain.ProductManagement;
-
-namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain.OrderManagement;
 
 public record OrderLine
 {

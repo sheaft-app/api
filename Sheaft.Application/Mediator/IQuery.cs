@@ -5,9 +5,9 @@ namespace Sheaft.Application;
 
 public interface IQuery<out TResponse> : IRequest<TResponse>{}
 
-public interface IQueryHandler<in TQuery, TResponse> : IRequestHandler<TQuery, TResponse>
-    where TQuery : IQuery<TResponse>
+public record Query<TResponse> : IQuery<TResponse>
 {
+    public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
 }
 
 public record PagedResult<T>

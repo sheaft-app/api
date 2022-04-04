@@ -76,8 +76,8 @@ public class CancelOrderCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.Create(new OrderCode("test"), new OrderDeliveryDate(DateTimeOffset.UtcNow), supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""),new List<OrderLine>
+        var order = Order.Create(new OrderCode("test"), supplier.Identifier, customer.Identifier, 
+            new List<OrderLine>
             {
                 new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"),
                     new Quantity(1),
@@ -88,7 +88,7 @@ public class CancelOrderCommandShould
             }, "externalCode");
 
         if(accept)
-            order.Accept(Maybe<OrderDeliveryDate>.None);
+            order.Accept();
         
         context.Add(order);
         context.SaveChanges();

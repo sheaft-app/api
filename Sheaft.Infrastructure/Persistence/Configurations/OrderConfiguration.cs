@@ -27,9 +27,6 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasDefaultValue(DateTimeOffset.UtcNow)
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
-
-        builder.OwnsOne(o => o.BillingAddress);
-        builder.OwnsOne(o => o.DeliveryAddress);
         
         builder.OwnsMany(o => o.Lines, l =>
         {
@@ -65,15 +62,11 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder
             .Property(p => p.Code)
-            .HasConversion(code => code.Value, value => new OrderCode(value));
+            .HasConversion(code => code != null ? code.Value : null, value => value != null ? new OrderCode(value) : null);
         
         builder
             .Property(p => p.TotalPrice)
             .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
-        
-        builder
-            .Property(p => p.DeliveryDate)
-            .HasConversion(deliveryDate => deliveryDate.Value, value => new OrderDeliveryDate(new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, DateTimeKind.Utc), new DateTime(value.Year, value.Month, value.Day, 0, 0, 0, DateTimeKind.Utc).AddDays(-1)));
         
         builder
             .HasIndex(c => c.Identifier)

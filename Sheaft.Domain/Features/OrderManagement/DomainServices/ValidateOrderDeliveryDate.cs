@@ -4,30 +4,30 @@ namespace Sheaft.Domain.OrderManagement;
 
 public interface IValidateOrderDeliveryDate
 {
-    Task<Result> Validate(OrderDeliveryDate orderDeliveryDate, CustomerId customerIdentifier, SupplierId supplierIdentifier, CancellationToken token);
+    Task<Result> Validate(DeliveryDate deliveryDate, CustomerId customerIdentifier, SupplierId supplierIdentifier, CancellationToken token);
 }
 
 public class ValidateOrderDeliveryDate : IValidateOrderDeliveryDate
 {
-    private readonly IAgreementRepository _agreementRepository;
+    private readonly IRetrieveDeliveryDays _retrieveDeliveryDays;
 
-    public ValidateOrderDeliveryDate(IAgreementRepository agreementRepository)
+    public ValidateOrderDeliveryDate(IRetrieveDeliveryDays retrieveDeliveryDays)
     {
-        _agreementRepository = agreementRepository;
+        _retrieveDeliveryDays = retrieveDeliveryDays;
     }
     
-    public async Task<Result> Validate(OrderDeliveryDate orderDeliveryDate, CustomerId customerIdentifier, SupplierId supplierIdentifier,
+    public async Task<Result> Validate(DeliveryDate deliveryDate, CustomerId customerIdentifier, SupplierId supplierIdentifier,
         CancellationToken token)
     {
-        var agreementResult = await _agreementRepository.FindAgreementFor(supplierIdentifier, customerIdentifier, token);
-        if (agreementResult.IsFailure)
-            return Result.Failure(agreementResult);
+        var deliveryDaysResult = await _retrieveDeliveryDays.ForAgreementBetween(supplierIdentifier, customerIdentifier, token);
+        if (deliveryDaysResult.IsFailure)
+            return Result.Failure(deliveryDaysResult);
 
-        if(agreementResult.Value.HasNoValue)
+        if(deliveryDaysResult.Value.HasNoValue)
             return Result.Failure(ErrorKind.BadRequest, "validate.order.no.agreement");
 
-        var agreement = agreementResult.Value.Value;
-        if (!agreement.DeliveryDays.Contains(new DeliveryDay(orderDeliveryDate.Value.DayOfWeek)))
+        var deliveryDays = deliveryDaysResult.Value.Value;
+        if (!deliveryDays.Contains(new DeliveryDay(deliveryDate.Value.DayOfWeek)))
             return Result.Failure(ErrorKind.BadRequest, "validate.order.deliveryday.not.in.agreement");
 
         return Result.Success();

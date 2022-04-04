@@ -8,42 +8,23 @@ public record CreateOrderDraftCommand(SupplierId SupplierIdentifier, CustomerId 
 public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, Result<string>>
 {
     private readonly IUnitOfWork _uow;
+    private readonly ICreateOrderDraft _createOrderDraft;
 
-    public CreateOrderDraftHandler(IUnitOfWork uow)
+    public CreateOrderDraftHandler(
+        IUnitOfWork uow,
+        ICreateOrderDraft createOrderDraft)
     {
         _uow = uow;
+        _createOrderDraft = createOrderDraft;
     }
 
     public async Task<Result<string>> Handle(CreateOrderDraftCommand request, CancellationToken token)
     {
-        var agreementResult =
-            await _uow.Agreements.FindAgreementFor(request.SupplierIdentifier, request.CustomerIdentifier, token);
-        if (agreementResult.IsFailure)
-            return Result.Failure<string>(agreementResult);
-        
-        var orderDraftResult =
-            await _uow.Orders.FindExistingDraft(request.CustomerIdentifier, request.SupplierIdentifier, token);
-        if (orderDraftResult.IsFailure)
-            return Result.Failure<string>(orderDraftResult);
+        var createOrderDraftResult = await _createOrderDraft.Create(request.SupplierIdentifier, request.CustomerIdentifier, token);
+        if (createOrderDraftResult.IsFailure)
+            return Result.Failure<string>(createOrderDraftResult);
 
-        if (orderDraftResult.Value.HasValue)
-            return Result.Success(orderDraftResult.Value.Value.Identifier.Value);
-        
-        var customerResult = await _uow.Customers.Get(request.CustomerIdentifier, token);
-        if (customerResult.IsFailure)
-            return Result.Failure<string>(customerResult);
-
-        if (agreementResult.Value.HasNoValue)
-            return Result.Failure<string>(ErrorKind.BadRequest, "order.requires.agreement");
-
-        var deliveryAddress = customerResult.Value.DeliveryAddress;
-        var billingAddress = customerResult.Value.Legal.Address;
-        
-        var order = Order.CreateDraft(
-            request.SupplierIdentifier, 
-            request.CustomerIdentifier, 
-            deliveryAddress, 
-            new BillingAddress(billingAddress.Street, billingAddress.Complement, billingAddress.Postcode, billingAddress.City));
+        var order = createOrderDraftResult.Value;
         
         _uow.Orders.Add(order);
         await _uow.Save(token);

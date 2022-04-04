@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.AgreementManagement;
+﻿namespace Sheaft.Domain;
 
 public enum AgreementStatus
 {

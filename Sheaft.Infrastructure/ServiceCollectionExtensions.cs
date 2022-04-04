@@ -60,6 +60,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICatalogRepository, CatalogRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IAgreementRepository, AgreementRepository>();
+        
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IDeliveryRepository, DeliveryRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)
@@ -92,13 +95,22 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterServices(IServiceCollection services)
     {
+        services.AddScoped<IRetrieveProfile, RetrieveProfile>();
+        
         services.AddScoped<IUniquenessValidator, UniquenessValidator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
+        
         services.AddScoped<IValidateSupplierRegistration, ValidateSupplierRegistration>();
         services.AddScoped<IValidateCustomerRegistration, ValidateCustomerRegistration>();
+        
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
-        services.AddScoped<IRetrieveProfile, RetrieveProfile>();
+        
+        services.AddScoped<IGenerateDeliveryCode, GenerateDeliveryCode>();
+        services.AddScoped<IGenerateOrderCode, GenerateOrderCode>();
+        services.AddScoped<IRetrieveAgreementForOrder, RetrieveAgreementForOrder>();
+        services.AddScoped<IRetrieveDeliveryDays, RetrieveDeliveryDays>();
+        services.AddScoped<IRetrieveOrderCustomer, RetrieveOrderCustomer>();
         services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
     }
 

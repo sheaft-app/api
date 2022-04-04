@@ -1,31 +1,34 @@
 ﻿using Sheaft.Domain;
+using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record DeliverOrderCommand(OrderId OrderIdentifier,
-    DateTimeOffset? CurrentDateTime = null) : ICommand<Result>;
+public record DeliverOrderCommand(DeliveryId DeliveryIdentifier) : Command<Result>;
     
 public class DeliverOrderHandler : ICommandHandler<DeliverOrderCommand, Result>
 {
     private readonly IUnitOfWork _uow;
+    private readonly IDeliverOrders _deliverOrders;
 
-    public DeliverOrderHandler(IUnitOfWork uow)
+    public DeliverOrderHandler(
+        IUnitOfWork uow,
+        IDeliverOrders deliverOrders)
     {
         _uow = uow;
+        _deliverOrders = deliverOrders;
     }
 
     public async Task<Result> Handle(DeliverOrderCommand request, CancellationToken token)
     {
-        var orderResult = await _uow.Orders.Get(request.OrderIdentifier, token);
-        if (orderResult.IsFailure)
-            return Result.Failure(orderResult);
+        var result = await _deliverOrders.Deliver(request.DeliveryIdentifier, request.CreatedAt, token);
+        if (result.IsFailure)
+            return result;
 
-        var order = orderResult.Value;
-        var refuseResult = order.Deliver(request.CurrentDateTime);
-        if (refuseResult.IsFailure)
-            return Result.Failure(refuseResult);
-
-        _uow.Orders.Update(order);
+        _uow.Deliveries.Update(result.Value.Delivery);
+        
+        foreach (var order in result.Value.Orders)
+            _uow.Orders.Update(order);
+        
         await _uow.Save(token);
         
         return Result.Success();

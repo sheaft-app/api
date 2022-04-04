@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain;
 
 public enum OrderStatus
 {
@@ -6,8 +6,6 @@ public enum OrderStatus
     Pending,
     Accepted,
     Fulfilled,
-    Delivered,
-    Billed,
     Completed,
     Refused,
     Cancelled

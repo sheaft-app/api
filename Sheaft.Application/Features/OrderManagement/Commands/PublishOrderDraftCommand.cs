@@ -3,7 +3,7 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record PublishOrderDraftCommand(OrderId OrderIdentifier, OrderDeliveryDate OrderDeliveryDate, IEnumerable<ProductQuantityDto>? Products = null) : ICommand<Result>;
+public record PublishOrderDraftCommand(OrderId OrderIdentifier, DeliveryDate DeliveryDate, IEnumerable<ProductQuantityDto>? Products = null) : Command<Result>;
     
 public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand, Result>
 {
@@ -20,23 +20,19 @@ public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand
 
     public async Task<Result> Handle(PublishOrderDraftCommand request, CancellationToken token)
     {
-        var orderResult = await _uow.Orders.Get(request.OrderIdentifier, token);
-        if (orderResult.IsFailure)
-            return Result.Failure(orderResult);
-
-        var order = orderResult.Value;
-        
         var orderProducts = request.Products?
             .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new Quantity(l.Quantity)))
             .ToList() ?? new List<ProductsQuantities>();
         
-        var orderDeliveryDate = request.OrderDeliveryDate;
-        
-        var result = await _publishOrders.Publish(order, orderDeliveryDate, orderProducts, token);
+        var result = await _publishOrders.Publish(request.OrderIdentifier, request.DeliveryDate, orderProducts, token);
         if (result.IsFailure)
             return result;
 
-        _uow.Orders.Update(order);
+        if(result.Value.Delivery != null)
+            _uow.Deliveries.Add(result.Value.Delivery);
+        
+        _uow.Orders.Update(result.Value.Order);
+        
         await _uow.Save(token);
         
         return Result.Success();

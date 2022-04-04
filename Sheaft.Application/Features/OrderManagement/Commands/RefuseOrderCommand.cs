@@ -2,8 +2,7 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record RefuseOrderCommand(OrderId OrderIdentifier, string? RefusalReason = null,
-    DateTimeOffset? CurrentDateTime = null) : ICommand<Result>;
+public record RefuseOrderCommand(OrderId OrderIdentifier, string? RefusalReason = null) : Command<Result>;
     
 public class RefuseOrderHandler : ICommandHandler<RefuseOrderCommand, Result>
 {
@@ -21,7 +20,7 @@ public class RefuseOrderHandler : ICommandHandler<RefuseOrderCommand, Result>
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
-        var refuseResult = order.Refuse(request.RefusalReason, request.CurrentDateTime);
+        var refuseResult = order.Refuse(request.RefusalReason, request.CreatedAt);
         if (refuseResult.IsFailure)
             return Result.Failure(refuseResult);
 

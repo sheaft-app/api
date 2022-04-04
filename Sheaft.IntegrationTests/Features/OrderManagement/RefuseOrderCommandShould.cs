@@ -23,10 +23,10 @@ public class RefuseOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var currentDateTime = DateTimeOffset.UtcNow;
+        var refuseOrderCommand = new RefuseOrderCommand(order.Identifier, "reason");
         var result =
             await handler.Handle(
-                new RefuseOrderCommand(order.Identifier, "reason", currentDateTime),
+                refuseOrderCommand,
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
@@ -34,7 +34,7 @@ public class RefuseOrderCommandShould
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Refused, order.Status);
         Assert.AreEqual("reason", order.FailureReason);
-        Assert.AreEqual(currentDateTime, order.RefusedOn);
+        Assert.AreEqual(refuseOrderCommand.CreatedAt, order.RefusedOn);
     }
 
     private (AppDbContext, RefuseOrderHandler) InitHandler()
@@ -62,8 +62,8 @@ public class RefuseOrderCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.Create(new OrderCode("test"), new OrderDeliveryDate(DateTimeOffset.UtcNow), supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""),new List<OrderLine>
+        var order = Order.Create(new OrderCode("test"),  supplier.Identifier, customer.Identifier, 
+            new List<OrderLine>
             {
                 new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"),
                     new Quantity(1),

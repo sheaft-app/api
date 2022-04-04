@@ -19,7 +19,9 @@ public interface IUnitOfWork
     public IProductRepository Products { get; }
     
     public IAgreementRepository Agreements { get; }
+    
     public IOrderRepository Orders { get; }
+    public IDeliveryRepository Deliveries { get; }
     
     public Task<Result<int>> Save(CancellationToken token);
 }

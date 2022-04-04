@@ -24,13 +24,4 @@ internal class AgreementRepository : Repository<Agreement, AgreementId>, IAgreem
                 : Result.Failure<Agreement>(ErrorKind.NotFound, "agreement.not.found");
         });
     }
-
-    public Task<Result<Maybe<Agreement>>> FindAgreementFor(SupplierId supplierIdentifier, CustomerId customerIdentifier, CancellationToken token)
-    {
-        return QueryAsync(async () =>
-        {
-            return Result.Success(await Values
-                .SingleOrDefaultAsync(e => e.CustomerIdentifier == customerIdentifier && e.SupplierIdentifier == supplierIdentifier, token) ?? Maybe<Agreement>.None);
-        });
-    }
 }

@@ -29,7 +29,7 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
@@ -47,7 +47,7 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
         Assert.IsTrue(result.IsFailure);
 
@@ -66,7 +66,7 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new OrderDeliveryDate(new DateTimeOffset(new DateTime(2022,4,2, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,2, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
@@ -93,9 +93,11 @@ public class PublishOrderDraftCommandShould
         var handler =
             new PublishOrderDraftHandler(uow, 
                 new PublishOrders(
+                    new OrderRepository(context),
                     new GenerateOrderCode(), 
                     new TransformProductsToOrderLines(context), 
-                    new ValidateOrderDeliveryDate(new AgreementRepository(context))));
+                    new ValidateOrderDeliveryDate(new RetrieveDeliveryDays(context)),
+                    new RetrieveOrderCustomer(context)));
 
         return (context, handler);
     }
@@ -105,8 +107,7 @@ public class PublishOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""));
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
 
         if (addProducts)
             order.UpdateDraftLines(new List<OrderLine>

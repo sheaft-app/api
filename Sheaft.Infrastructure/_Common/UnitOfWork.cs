@@ -41,7 +41,9 @@ internal class UnitOfWork : IUnitOfWork
         Products = new ProductRepository(_context);
         
         Agreements = new AgreementRepository(_context);
+        
         Orders = new OrderRepository(_context);
+        Deliveries = new DeliveryRepository(_context);
     }
 
     public IAccountRepository Accounts { get; }
@@ -55,6 +57,7 @@ internal class UnitOfWork : IUnitOfWork
     public IAgreementRepository Agreements { get; }
     
     public IOrderRepository Orders { get; }
+    public IDeliveryRepository Deliveries { get; }
 
 
     public async Task<Result<int>> Save(CancellationToken token)

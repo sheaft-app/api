@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -21,19 +22,22 @@ public class DeliverOrderCommandShould
     public async Task Switch_Order_Status_To_Delivered()
     {
         var (context, handler) = InitHandler();
-        var order = InitOrder(context);
+        var delivery = InitOrder(context);
 
-        var deliveredOn = DateTimeOffset.UtcNow;
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier);
         var result =
             await handler.Handle(
-                new DeliverOrderCommand(order.Identifier, deliveredOn),
+                deliverOrderCommand,
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
 
+        var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
+
         Assert.IsNotNull(order);
-        Assert.AreEqual(OrderStatus.Delivered, order.Status);
-        Assert.AreEqual(deliveredOn, order.DeliveredOn);
+        Assert.AreEqual(OrderStatus.Completed, order.Status);
+        Assert.AreEqual(DeliveryStatus.Delivered, delivery.Status);
+        Assert.AreEqual(deliverOrderCommand.CreatedAt, delivery.DeliveredOn);
     }
 
     private (AppDbContext, DeliverOrderHandler) InitHandler()
@@ -51,18 +55,18 @@ public class DeliverOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new DeliverOrderHandler(uow);
+        var handler = new DeliverOrderHandler(uow, new DeliverOrders(new OrderRepository(context), new DeliveryRepository(context)));
 
         return (context, handler);
     }
 
-    private static Order InitOrder(AppDbContext context)
+    private static Delivery InitOrder(AppDbContext context)
     {
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.Create(new OrderCode("test"), new OrderDeliveryDate(DateTimeOffset.UtcNow), supplier.Identifier, customer.Identifier, customer.DeliveryAddress,
-            new BillingAddress("", null, "", ""),new List<OrderLine>
+        var order = Order.Create(new OrderCode("test"), supplier.Identifier, customer.Identifier, 
+            new List<OrderLine>
             {
                 new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"),
                     new Quantity(1),
@@ -72,13 +76,21 @@ public class DeliverOrderCommandShould
                     new Price(2000), new VatRate(2000))
             }, "externalCode");
 
-        order.Accept(Maybe<OrderDeliveryDate>.None);
-        order.Fulfill(Maybe<OrderDeliveryDate>.None);
+        order.Accept();
+        order.Fulfill();
+        
+        var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
+            new DeliveryAddress("", "", "", ""), new List<OrderId> {order.Identifier}, order.SupplierIdentifier);
+
+        delivery.Schedule(new DeliveryCode("test"), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
+            DateTimeOffset.UtcNow);
         
         context.Add(order);
+        context.Add(delivery);
+        
         context.SaveChanges();
         
-        return order;
+        return delivery;
     }
 }
 #pragma warning restore CS8767

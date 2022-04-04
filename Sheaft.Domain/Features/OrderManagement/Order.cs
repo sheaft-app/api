@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Sheaft.Domain.AgreementManagement;
 
 namespace Sheaft.Domain.OrderManagement;
 
@@ -6,7 +7,7 @@ public class Order : AggregateRoot
 {
     private Order(){}
     
-    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, DeliveryAddress deliveryAddress, BillingAddress billingAddress, IEnumerable<OrderLine>? lines = null, OrderDeliveryDate? deliveryDate = null, OrderCode? code = null, string? externalCode = null)
+    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderCode? code = null, string? externalCode = null)
     {
         Identifier = OrderId.New();
         Code = code;
@@ -14,46 +15,36 @@ public class Order : AggregateRoot
         Status = status;
         SupplierIdentifier = supplierIdentifier;
         CustomerIdentifier = customerIdentifier;
-        BillingAddress = billingAddress;
-        DeliveryAddress = deliveryAddress;
-        DeliveryDate = deliveryDate;
         
         SetLines(lines);
     }
 
-    public static Order CreateDraft(SupplierId supplierIdentifier, CustomerId customerIdentifier,
-        DeliveryAddress deliveryAddress, BillingAddress billingAddress)
+    internal static Order CreateDraft(SupplierId supplierIdentifier, CustomerId customerIdentifier)
     {
-        return new Order(OrderStatus.Draft, supplierIdentifier, customerIdentifier, deliveryAddress, billingAddress);
+        return new Order(OrderStatus.Draft, supplierIdentifier, customerIdentifier);
     }
 
-    public static Order Create(OrderCode code, OrderDeliveryDate deliveryDate, SupplierId supplierIdentifier, CustomerId customerIdentifier,
-        DeliveryAddress deliveryAddress, BillingAddress billingAddress, IEnumerable<OrderLine> lines, string? externalCode = null)
+    public static Order Create(OrderCode code, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine> lines, string? externalCode = null)
     {
-        return new Order(OrderStatus.Pending, supplierIdentifier, customerIdentifier, deliveryAddress, billingAddress, lines, deliveryDate, code, externalCode);
+        return new Order(OrderStatus.Pending, supplierIdentifier, customerIdentifier, lines, code, externalCode);
     }
 
     public OrderId Identifier { get; }
     public OrderCode? Code { get; private set; }
     public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
-    public OrderDeliveryDate? DeliveryDate { get; private set; }
-    public CustomerId CustomerIdentifier { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
-    public DeliveryAddress DeliveryAddress { get; private set; }
-    public BillingAddress BillingAddress { get; private set; }
     public Price TotalPrice { get; private set; }
-    public DateTimeOffset? DeliveredOn { get; private set; }
-    public DateTimeOffset? CompletedOn { get; private set; }
+    public DateTimeOffset? FulfilledOn { get; private set; }
     public DateTimeOffset? AcceptedOn { get; private set; }
     public DateTimeOffset? RefusedOn { get; private set; }
     public DateTimeOffset? CancelledOn { get; private set; }
     public int ProductsCount { get; private set; }
-
     public string? FailureReason { get; private set; }
+    public CustomerId CustomerIdentifier { get; private set; }
+    public SupplierId SupplierIdentifier { get; private set; }
     public ReadOnlyCollection<OrderLine> Lines { get; private set; }
     
-    internal Result Publish(OrderCode code, OrderDeliveryDate deliveryDate, IEnumerable<OrderLine>? lines = null)
+    internal Result Publish(OrderCode code, IEnumerable<OrderLine>? lines = null)
     {
         if (Status != OrderStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.draft");
@@ -62,7 +53,6 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.lines");
         
         Code = code;
-        DeliveryDate = deliveryDate;
 
         if(lines != null)
             SetLines(lines);
@@ -80,28 +70,22 @@ public class Order : AggregateRoot
         return Result.Success();
     }
 
-    public Result Accept(Maybe<OrderDeliveryDate> newOrderDeliveryDate, DateTimeOffset? currentDateTime = null)
+    public Result Accept(DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "order.accept.requires.pending.status");
         
-        if (newOrderDeliveryDate.HasValue)
-            DeliveryDate = newOrderDeliveryDate.Value;
-
         AcceptedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Accepted;
         return Result.Success();
     }
 
-    public Result Fulfill(Maybe<OrderDeliveryDate> newDeliveryDate, DateTimeOffset? currentDateTime = null)
+    internal Result Fulfill(DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Accepted)
             return Result.Failure(ErrorKind.BadRequest, "order.fulfill.requires.accepted.status");
         
-        if (newDeliveryDate.HasValue)
-            DeliveryDate = newDeliveryDate.Value;
-
-        CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        FulfilledOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Fulfilled;
         return Result.Success();
     }
@@ -128,13 +112,12 @@ public class Order : AggregateRoot
         return Result.Success();
     }
 
-    public Result Deliver(DateTimeOffset? currentDateTime = null)
+    internal Result MarkAsCompleted()
     {
         if (Status != OrderStatus.Fulfilled)
-            return Result.Failure(ErrorKind.BadRequest, "order.deliver.requires.ready.status");
+            return Result.Failure(ErrorKind.BadRequest, "order.deliver.requires.fulfilled.status");
         
-        Status = OrderStatus.Delivered;
-        DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        Status = OrderStatus.Completed;
         return Result.Success();
     }
 
