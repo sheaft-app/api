@@ -21,4 +21,4 @@ public class UpdateOrderDraftProducts : Feature
     }
 }
 
-public record UpdateDraftProductsRequest(string SupplierIdentifier, IEnumerable<ProductQuantityDto> Products);
+public record UpdateDraftProductsRequest(IEnumerable<ProductQuantityDto> Products);
