@@ -2,26 +2,26 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record CompleteOrderCommand(OrderId OrderIdentifier, Maybe<OrderDeliveryDate> NewDeliveryDate,
+public record FulfillOrderCommand(OrderId OrderIdentifier, Maybe<OrderDeliveryDate> NewDeliveryDate,
     DateTimeOffset? CurrentDateTime = null) : ICommand<Result>;
     
-public class CompleteOrderHandler : ICommandHandler<CompleteOrderCommand, Result>
+public class FulfillOrderHandler : ICommandHandler<FulfillOrderCommand, Result>
 {
     private readonly IUnitOfWork _uow;
 
-    public CompleteOrderHandler(IUnitOfWork uow)
+    public FulfillOrderHandler(IUnitOfWork uow)
     {
         _uow = uow;
     }
 
-    public async Task<Result> Handle(CompleteOrderCommand request, CancellationToken token)
+    public async Task<Result> Handle(FulfillOrderCommand request, CancellationToken token)
     {
         var orderResult = await _uow.Orders.Get(request.OrderIdentifier, token);
         if (orderResult.IsFailure)
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
-        var completeResult = order.Complete(request.NewDeliveryDate, request.CurrentDateTime);
+        var completeResult = order.Fulfill(request.NewDeliveryDate, request.CurrentDateTime);
         if (completeResult.IsFailure)
             return Result.Failure(completeResult);
 

@@ -5,8 +5,10 @@ public enum OrderStatus
     Draft,
     Pending,
     Accepted,
-    Ready,
+    Fulfilled,
     Delivered,
+    Billed,
+    Completed,
     Refused,
     Cancelled
 }

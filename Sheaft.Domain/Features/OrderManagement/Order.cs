@@ -93,16 +93,16 @@ public class Order : AggregateRoot
         return Result.Success();
     }
 
-    public Result Complete(Maybe<OrderDeliveryDate> newDeliveryDate, DateTimeOffset? currentDateTime = null)
+    public Result Fulfill(Maybe<OrderDeliveryDate> newDeliveryDate, DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Accepted)
-            return Result.Failure(ErrorKind.BadRequest, "order.complete.requires.accepted.status");
+            return Result.Failure(ErrorKind.BadRequest, "order.fulfill.requires.accepted.status");
         
         if (newDeliveryDate.HasValue)
             DeliveryDate = newDeliveryDate.Value;
 
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
-        Status = OrderStatus.Ready;
+        Status = OrderStatus.Fulfilled;
         return Result.Success();
     }
 
@@ -119,7 +119,7 @@ public class Order : AggregateRoot
 
     public Result Cancel(string? cancelReason, DateTimeOffset? currentDateTime)
     {
-        if (Status != OrderStatus.Accepted && Status != OrderStatus.Ready)
+        if (Status != OrderStatus.Accepted && Status != OrderStatus.Fulfilled)
             return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.ready.status");
         
         Status = OrderStatus.Cancelled;
@@ -130,7 +130,7 @@ public class Order : AggregateRoot
 
     public Result Deliver(DateTimeOffset? currentDateTime = null)
     {
-        if (Status != OrderStatus.Ready)
+        if (Status != OrderStatus.Fulfilled)
             return Result.Failure(ErrorKind.BadRequest, "order.deliver.requires.ready.status");
         
         Status = OrderStatus.Delivered;

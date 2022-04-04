@@ -73,7 +73,7 @@ public class DeliverOrderCommandShould
             }, "externalCode");
 
         order.Accept(Maybe<OrderDeliveryDate>.None);
-        order.Complete(Maybe<OrderDeliveryDate>.None);
+        order.Fulfill(Maybe<OrderDeliveryDate>.None);
         
         context.Add(order);
         context.SaveChanges();

@@ -15,10 +15,10 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class CompleteOrderCommandShould
+public class FulfillOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Ready()
+    public async Task Switch_Order_Status_To_Fulfilled()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
@@ -27,20 +27,20 @@ public class CompleteOrderCommandShould
         var currentDateTime = DateTimeOffset.UtcNow;
         var result =
             await handler.Handle(
-                new CompleteOrderCommand(order.Identifier, Maybe.From(new OrderDeliveryDate(newDeliveryDate)), currentDateTime),
+                new FulfillOrderCommand(order.Identifier, Maybe.From(new OrderDeliveryDate(newDeliveryDate)), currentDateTime),
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
 
         Assert.IsNotNull(order);
-        Assert.AreEqual(OrderStatus.Ready, order.Status);
+        Assert.AreEqual(OrderStatus.Fulfilled, order.Status);
         Assert.AreEqual(newDeliveryDate, order.DeliveryDate.Value);
         Assert.AreEqual(currentDateTime, order.CompletedOn);
     }
 
-    private (AppDbContext, CompleteOrderHandler) InitHandler()
+    private (AppDbContext, FulfillOrderHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<CompleteOrderHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<FulfillOrderHandler>();
 
         var supplier = AccountId.New();
         var customer = AccountId.New();
@@ -53,7 +53,7 @@ public class CompleteOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new CompleteOrderHandler(uow);
+        var handler = new FulfillOrderHandler(uow);
 
         return (context, handler);
     }
