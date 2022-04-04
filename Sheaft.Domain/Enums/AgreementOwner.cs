@@ -3,5 +3,5 @@
 public enum AgreementOwner
 {
     Supplier,
-    Customer
+    Customer,
 }

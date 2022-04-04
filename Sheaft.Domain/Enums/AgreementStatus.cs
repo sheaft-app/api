@@ -5,5 +5,5 @@ public enum AgreementStatus
     Pending,
     Active,
     Refused,
-    Revoked
+    Revoked,
 }

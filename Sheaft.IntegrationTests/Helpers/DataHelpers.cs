@@ -3,6 +3,7 @@ using System.Linq;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
@@ -30,6 +31,39 @@ internal static class DataHelpers
         return new Customer(new TradeName(accountIdentifier.Value), new EmailAddress($"{accountIdentifier.Value}.{emailAddress}"), new PhoneNumber("0664566565"),
             new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), new DeliveryAddress(accountIdentifier.Value, null, "70000", "Test"),
             accountIdentifier);
+    }
+    
+    public static Order CreateOrderWithLines(Supplier supplier, Customer customer, bool isDraft, bool addProducts = true)
+    {
+        if (!isDraft)
+        {
+            var order = Order.Create(new OrderCode("test"), supplier.Identifier, customer.Identifier,
+                addProducts ? new List<OrderLine>
+                {
+                    OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
+                        new Quantity(1),
+                        new ProductPrice(2000), new VatRate(2000)),
+                    OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
+                        new Quantity(1),
+                        new ProductPrice(2000), new VatRate(2000))
+                } : new List<OrderLine>(), "externalCode");
+            return order;
+        }
+
+        var orderDraft = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+        if(addProducts)
+            orderDraft.UpdateDraftLines(
+                new List<OrderLine>
+                    {
+                        OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
+                            new Quantity(1),
+                            new ProductPrice(2000), new VatRate(2000)),
+                        OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
+                            new Quantity(1),
+                            new ProductPrice(2000), new VatRate(2000))
+                    });
+        
+        return orderDraft;
     }
 
     public static AppDbContext InitContext(AppDbContext context, 

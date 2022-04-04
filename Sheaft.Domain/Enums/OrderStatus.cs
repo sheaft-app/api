@@ -8,5 +8,5 @@ public enum OrderStatus
     Fulfilled,
     Completed,
     Refused,
-    Cancelled
+    Cancelled,
 }

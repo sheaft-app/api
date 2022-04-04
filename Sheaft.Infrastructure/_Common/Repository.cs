@@ -5,7 +5,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure;
 
 internal abstract class Repository<T, TU> : IRepository<T, TU>
-    where T : class, IAggregateRoot
+    where T : class, IEntity
 {
     protected readonly DbSet<T> Values;
 

@@ -37,6 +37,7 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new CatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
         modelBuilder.ApplyConfiguration(new CatalogProductConfiguration());
+        modelBuilder.ApplyConfiguration(new ReturnableConfiguration());
         
         modelBuilder.ApplyConfiguration(new AgreementConfiguration());
         
@@ -89,6 +90,10 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<DeliveryId>()
             .HaveConversion<DeliveryIdConverter>();
+        
+        configurationBuilder
+            .Properties<ReturnableId>()
+            .HaveConversion<ReturnableIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
@@ -98,6 +103,7 @@ internal class AppDbContext : DbContext, IDbContext
     
     public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<Returnable> Returnables { get; set; }
     
     public DbSet<Agreement> Agreements { get; set; }
     

@@ -31,14 +31,6 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.OwnsMany(o => o.Lines, l =>
         {
             l
-                .Property(p => p.Code)
-                .HasConversion(code => code.Value, value => new ProductCode(value));
-            
-            l
-                .Property(p => p.Name)
-                .HasConversion(name => name.Value, value => new ProductName(value));
-
-            l
                 .Property(p => p.UnitPrice)
                 .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
 
@@ -55,7 +47,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("OrderId");
-            l.HasKey("OrderId", "ProductIdentifier");
+            l.HasKey("OrderId", "Identifier");
 
             l.ToTable("Order_Lines");
         });

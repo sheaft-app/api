@@ -6,7 +6,7 @@ public class Product : AggregateRoot
     {
     }
 
-    public Product(ProductName name, ProductCode code, VatRate vat, string? description, SupplierId supplierIdentifier)
+    public Product(ProductName name, ProductCode code, VatRate vat, string? description, SupplierId supplierIdentifier, Returnable? returnable = null)
     {
         Identifier = ProductId.New();
         Name = name;
@@ -14,6 +14,7 @@ public class Product : AggregateRoot
         Description = description;
         SupplierIdentifier = supplierIdentifier;
         Vat = vat;
+        Returnable = returnable;
     }
 
     public ProductId Identifier { get; }
@@ -22,6 +23,7 @@ public class Product : AggregateRoot
     public string? Description { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
     public VatRate Vat { get; private set; }
+    public Returnable? Returnable { get; private set; }
 
     public Result UpdateInfo(ProductName name, VatRate vat, string? description)
     {
@@ -34,6 +36,12 @@ public class Product : AggregateRoot
     public Result UpdateCode(ProductCode code)
     {
         Code = code;
+        return Result.Success();
+    }
+
+    public Result SetReturnable(Returnable? returnable)
+    {
+        Returnable = returnable;
         return Result.Success();
     }
 }

@@ -8,5 +8,5 @@ public enum ErrorKind
     BadRequest,
     Unauthorized,
     Forbidden,
-    Unexpected
+    Unexpected,
 }

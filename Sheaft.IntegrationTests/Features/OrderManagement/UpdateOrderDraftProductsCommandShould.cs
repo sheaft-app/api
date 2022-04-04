@@ -50,15 +50,7 @@ public class UpdateOrderDraftProductsCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
-        
-        order.UpdateDraftLines(new List<OrderLine>
-        {
-            new OrderLine(new ProductId("test 1"), new ProductCode("test 1"), new ProductName("test 1"), new Quantity(1),
-                new Price(2000), new VatRate(2000)),
-            new OrderLine(new ProductId("test 2"), new ProductCode("test 2"), new ProductName("test 2"), new Quantity(1),
-                new Price(2000), new VatRate(2000))
-        });
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, true);
 
         context.Add(order);
         context.SaveChanges();

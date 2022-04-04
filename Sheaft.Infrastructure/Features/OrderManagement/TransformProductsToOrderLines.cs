@@ -19,36 +19,50 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
     {
         try
         {
-            if (!products.Any())
+            var productsToProcess = products.Where(p => p.Quantity.Value > 0);
+            if (!productsToProcess.Any())
                 return Result.Success(new List<OrderLine>().AsEnumerable());
             
             var catalog = await _context.Set<Catalog>()
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
+                        .ThenInclude(p => p.Returnable)
                 .SingleOrDefaultAsync(c => c.SupplierIdentifier == supplierIdentifier && c.IsDefault, token);
             
             if (catalog == null)
                 return Result.Failure<IEnumerable<OrderLine>>(ErrorKind.NotFound, "supplier.catalog.not.found");
 
-            var productsIdentifiers = products
+            var productsIdentifiers = productsToProcess
                 .Select(p => p.ProductIdentifier)
                 .ToList();
             
             var productsToTransform = catalog.Products
                 .Where(cp => productsIdentifiers.Contains(cp.Product.Identifier));
             
-            var lines = productsToTransform
+            var lines = new List<OrderLine>();
+            
+            lines.AddRange(productsToTransform
                 .Select(cp => 
-                    new OrderLine(
+                    OrderLine.CreateProductLine(
                         cp.Product.Identifier, 
                         cp.Product.Code, 
                         cp.Product.Name, 
-                        GetProductQuantity(cp.Product.Identifier, products), 
+                        GetProductQuantity(cp.Product.Identifier, productsToProcess), 
                         cp.Price, 
-                        cp.Product.Vat))
-                .Where(l => l.Quantity.Value > 0);
+                        cp.Product.Vat)));
+            
+            lines.AddRange(productsToTransform
+                .Where(p => p.Product.Returnable != null)
+                .Select(cp => 
+                    OrderLine.CreateReturnableLine(
+                        cp.Product.Returnable.Identifier, 
+                        cp.Product.Returnable.Reference, 
+                        cp.Product.Returnable.Name, 
+                        GetProductQuantity(cp.Product.Identifier, productsToProcess), 
+                        cp.Product.Returnable.Price, 
+                        cp.Product.Returnable.Vat)));
 
-            return Result.Success(lines);
+            return Result.Success(lines.AsEnumerable());
         }
         catch (Exception e)
         {

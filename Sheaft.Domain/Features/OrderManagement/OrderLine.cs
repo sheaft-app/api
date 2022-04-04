@@ -6,34 +6,42 @@ public record OrderLine
     {
     }
 
-    public OrderLine(ProductId productIdentifier, ProductCode code, ProductName name, Quantity quantity, Price unitPrice, VatRate vat)
+    private OrderLine(string identifier, OrderLineKind lineKind, string reference, string name, Quantity quantity, Price unitPrice, VatRate vat)
     {
-        ProductIdentifier = productIdentifier;
-        Code = code;
+        Identifier = identifier;
+        LineKind = lineKind;
+        Reference = reference;
         Name = name;
         Quantity = quantity;
         UnitPrice = unitPrice;
         Vat = vat;
-        TotalPrice = GetTotalPrice(Quantity, UnitPrice);;
+        TotalPrice = GetTotalPrice(Quantity, UnitPrice);
     }
-    public ProductId ProductIdentifier { get; private set; }
-    public ProductCode Code { get; private set; }
-    public ProductName Name { get; private set; }
+
+    public static OrderLine CreateProductLine(ProductId productIdentifier, ProductCode reference, ProductName name,
+        Quantity quantity, ProductPrice unitPrice, VatRate vat)
+    {
+        return new OrderLine(productIdentifier.Value, OrderLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat);
+    }
+
+    public static OrderLine CreateReturnableLine(ReturnableId returnableIdentifier, ReturnableReference reference, ReturnableName name,
+        Quantity quantity, Price unitPrice, VatRate vat)
+    {
+        return new OrderLine(returnableIdentifier.Value, OrderLineKind.Returnable, reference.Value, name.Value, quantity, unitPrice, vat);
+    }
+
+    public string Identifier { get; private set; }
+    public OrderLineKind LineKind { get; private set; }
+    public string Reference { get; private set; }
+    public string Name { get; private set; }
     public Quantity Quantity { get; private set; }
     public Price UnitPrice { get; private set; }
     public VatRate Vat { get; private set; }
     public Price TotalPrice { get; private set; }
 
-    public Result UpdateQuantity(Quantity quantity)
+    private static Price GetTotalPrice(Quantity quantity, Price? unitPrice)
     {
-        Quantity = quantity;
-        TotalPrice = GetTotalPrice(Quantity, UnitPrice);
-        return Result.Success();
-    }
-    
-    private static Price GetTotalPrice(Quantity quantity, Price unitPrice)
-    {
-        return new Price(unitPrice.Value * quantity.Value, unitPrice.Currency);
+        return new Price((unitPrice?.Value ?? 0) * quantity.Value, unitPrice?.Currency ?? Currency.Euro);
     }
 }
 

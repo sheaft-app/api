@@ -5,16 +5,13 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
-internal class ProductConfiguration : IEntityTypeConfiguration<Product>
+internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public void Configure(EntityTypeBuilder<Returnable> builder)
     {
         builder
             .Property<long>("Id")
             .ValueGeneratedOnAdd();
-
-        builder
-            .Property<long?>("ReturnableId");
 
         builder.HasKey("Id");
         
@@ -30,18 +27,18 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 
-        builder.HasOne(c => c.Returnable)
-            .WithMany()
-            .HasForeignKey("ReturnableId");
-
         builder
             .Property(p => p.Name)
-            .HasConversion(name => name.Value, value => new ProductName(value));
+            .HasConversion(name => name.Value, value => new ReturnableName(value));
 
         builder
-            .Property(p => p.Code)
-            .HasConversion(code => code.Value, value => new ProductCode(value));
+            .Property(p => p.Reference)
+            .HasConversion(reference => reference.Value, value => new ReturnableReference(value));
 
+        builder
+            .Property(p => p.Price)
+            .HasConversion(price => price.Value, value => new Price(value));
+        
         builder
             .Property(p => p.Vat)
             .HasConversion(vat => vat.Value, value => new VatRate(value));
@@ -50,10 +47,6 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasIndex(c => c.Identifier)
             .IsUnique();
         
-        builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Code})
-            .IsUnique();
-        
-        builder.ToTable("Product");
+        builder.ToTable("Returnable");
     }
 }

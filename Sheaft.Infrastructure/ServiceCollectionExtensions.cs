@@ -55,10 +55,14 @@ public static class ServiceCollectionExtensions
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
+        
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
+        
         services.AddScoped<ICatalogRepository, CatalogRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IReturnableRepository, ReturnableRepository>();
+        
         services.AddScoped<IAgreementRepository, AgreementRepository>();
         
         services.AddScoped<IOrderRepository, OrderRepository>();

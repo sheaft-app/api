@@ -39,6 +39,7 @@ internal class UnitOfWork : IUnitOfWork
         
         Catalogs = new CatalogRepository(_context);
         Products = new ProductRepository(_context);
+        Returnables = new ReturnableRepository(_context);
         
         Agreements = new AgreementRepository(_context);
         
@@ -53,6 +54,7 @@ internal class UnitOfWork : IUnitOfWork
     
     public ICatalogRepository Catalogs { get; }
     public IProductRepository Products { get; }
+    public IReturnableRepository Returnables { get; }
     
     public IAgreementRepository Agreements { get; }
     

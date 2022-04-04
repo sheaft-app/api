@@ -17,6 +17,7 @@ public interface IUnitOfWork
     
     public ICatalogRepository Catalogs { get; }
     public IProductRepository Products { get; }
+    public IReturnableRepository Returnables { get; }
     
     public IAgreementRepository Agreements { get; }
     
