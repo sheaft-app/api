@@ -106,6 +106,8 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
         
+        services.AddScoped<IValidateAgreementProposal, ValidateAgreementProposal>();
+        
         services.AddScoped<IGenerateDeliveryCode, GenerateDeliveryCode>();
         services.AddScoped<IGenerateOrderCode, GenerateOrderCode>();
         services.AddScoped<IRetrieveAgreementForOrder, RetrieveAgreementForOrder>();

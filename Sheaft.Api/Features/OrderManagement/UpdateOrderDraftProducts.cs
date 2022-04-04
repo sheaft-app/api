@@ -6,9 +6,9 @@ using Sheaft.Domain;
 namespace Sheaft.Api.OrderManagement;
 
 [Route(Routes.ORDERS)]
-public class UpdateDraftProducts : Feature
+public class UpdateOrderDraftProducts : Feature
 {
-    public UpdateDraftProducts(ISheaftMediator mediator)
+    public UpdateOrderDraftProducts(ISheaftMediator mediator)
         : base(mediator)
     {
     }
