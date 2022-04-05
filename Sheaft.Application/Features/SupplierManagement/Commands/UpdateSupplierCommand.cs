@@ -33,8 +33,6 @@ public class UpdateSupplierHandler : ICommandHandler<UpdateSupplierCommand, Resu
         supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
         
         _uow.Suppliers.Update(supplier);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

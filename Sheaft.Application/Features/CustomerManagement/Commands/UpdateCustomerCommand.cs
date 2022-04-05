@@ -32,8 +32,6 @@ public class UpdateCustomerHandler : ICommandHandler<UpdateCustomerCommand, Resu
         customer.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
         
         _uow.Customers.Update(customer);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

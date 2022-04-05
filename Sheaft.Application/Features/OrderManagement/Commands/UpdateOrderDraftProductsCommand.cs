@@ -36,8 +36,6 @@ public class UpdateOrderDraftProductsHandler : ICommandHandler<UpdateOrderDraftP
         order.UpdateDraftLines(linesResult.Value);
 
         _uow.Orders.Update(order);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

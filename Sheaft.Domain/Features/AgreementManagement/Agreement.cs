@@ -39,9 +39,9 @@ public class Agreement : AggregateRoot
     public CustomerId CustomerIdentifier { get; private set; }
     public CatalogId CatalogIdentifier { get; private set; }
     public string? RevokedReason { get; private set; }
-    public ReadOnlyCollection<DeliveryDay> DeliveryDays { get; private set; } = new ReadOnlyCollection<DeliveryDay>(new List<DeliveryDay>());
+    public IEnumerable<DeliveryDay> DeliveryDays { get; private set; } = new List<DeliveryDay>();
 
-    public Result SetDelivery(List<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
+    public Result SetDelivery(IEnumerable<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
     {
         if (Status != AgreementStatus.Pending && Status != AgreementStatus.Active)
             return Result.Failure(ErrorKind.BadRequest, "agreement.delivery.requires.pending.or.active.status");
@@ -50,13 +50,13 @@ public class Agreement : AggregateRoot
         if (days.Count == 0)
             return Result.Failure(ErrorKind.BadRequest, "agreement.delivery.days.required");
         
-        DeliveryDays = new ReadOnlyCollection<DeliveryDay>(days);
+        DeliveryDays = new List<DeliveryDay>(days);
         OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay ?? 0;
 
         return Result.Success();
     }
 
-    public Result Accept(List<DeliveryDay>? deliveryDays = null, int? orderDelayInHoursBeforeDeliveryDay = null)
+    public Result Accept(IEnumerable<DeliveryDay>? deliveryDays = null, int? orderDelayInHoursBeforeDeliveryDay = null)
     {
         if (Status != AgreementStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "agreement.accept.requires.pending");

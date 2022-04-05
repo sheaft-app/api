@@ -24,11 +24,13 @@ public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, 
         if (createOrderDraftResult.IsFailure)
             return Result.Failure<string>(createOrderDraftResult);
 
-        var order = createOrderDraftResult.Value;
+        if(createOrderDraftResult.Value.Order != null)
+            _uow.Orders.Add(createOrderDraftResult.Value.Order);
         
-        _uow.Orders.Add(order);
-        await _uow.Save(token);
+        var result = await _uow.Save(token);
+        if (result.IsFailure)
+            return Result.Failure<string>(result);
         
-        return Result.Success(order.Identifier.Value);
+        return Result.Success(createOrderDraftResult.Value.OrderIdentifier);
     }
 }

@@ -25,8 +25,6 @@ public class RevokeAgreementHandler : ICommandHandler<RevokeAgreementCommand, Re
             return result;
         
         _uow.Agreements.Update(agreement);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

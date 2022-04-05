@@ -49,7 +49,9 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             request.AccountIdentifier);
         
         _uow.Suppliers.Add(supplier);
-        await _uow.Save(token);
+        var result = await _uow.Save(token);
+        if (result.IsFailure)
+            return Result.Failure<string>(result);
         
         return Result.Success(supplier.Identifier.Value);
     }

@@ -29,8 +29,6 @@ public class DeliverOrderHandler : ICommandHandler<DeliverOrderCommand, Result>
         foreach (var order in result.Value.Orders)
             _uow.Orders.Update(order);
         
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

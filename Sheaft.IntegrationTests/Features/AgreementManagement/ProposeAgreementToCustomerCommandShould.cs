@@ -34,7 +34,7 @@ public class ProposeAgreementToCustomerCommandShould
         Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
         Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
         Assert.AreEqual(AgreementOwner.Supplier, agreement.Owner);
-        Assert.AreEqual(2, agreement.DeliveryDays.Count);
+        Assert.AreEqual(2, agreement.DeliveryDays.Count());
         Assert.AreEqual(24, agreement.OrderDelayInHoursBeforeDeliveryDay);
     }
     

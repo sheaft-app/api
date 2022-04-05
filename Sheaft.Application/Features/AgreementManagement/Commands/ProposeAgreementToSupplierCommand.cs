@@ -45,7 +45,9 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
             catalogResult.Value.Value.Identifier);
         
         _uow.Agreements.Add(agreement);
-        await _uow.Save(token);
+        var result = await _uow.Save(token);
+        if (result.IsFailure)
+            return Result.Failure<string>(result);
         
         return Result.Success(agreement.Identifier.Value);
     }

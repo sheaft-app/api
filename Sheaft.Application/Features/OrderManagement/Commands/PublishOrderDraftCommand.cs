@@ -33,8 +33,6 @@ public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand
         
         _uow.Orders.Update(result.Value.Order);
         
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

@@ -48,7 +48,9 @@ public class ConfigureAccountAsCustomerHandler : ICommandHandler<ConfigureAccoun
             request.AccountIdentifier);
         
         _uow.Customers.Add(customer);
-        await _uow.Save(token);
+        var result = await _uow.Save(token);
+        if (result.IsFailure)
+            return Result.Failure<string>(result);
         
         return Result.Success(customer.Identifier.Value);
     }

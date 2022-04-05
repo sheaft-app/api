@@ -16,7 +16,7 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class FulfillOrderCommandShould
+public class FulfillOrdersCommandShould
 {
     [Test]
     public async Task Switch_Order_Status_To_Fulfilled()
@@ -24,7 +24,7 @@ public class FulfillOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var fulfillOrderCommand = new FulfillOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId>{order.Identifier}, new List<CustomerDeliveryDate>{new CustomerDeliveryDate(order.CustomerIdentifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)))});
         
         var result =
             await handler.Handle(
@@ -37,13 +37,13 @@ public class FulfillOrderCommandShould
 
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Fulfilled, order.Status);
-        Assert.AreEqual(fulfillOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
+        Assert.AreEqual(fulfillOrderCommand.CustomersNewDeliveryDate.First().DeliveryDate.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order.FulfilledOn);
     }
 
-    private (AppDbContext, FulfillOrderHandler) InitHandler()
+    private (AppDbContext, FulfillOrdersHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<FulfillOrderHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<FulfillOrdersHandler>();
 
         var supplier = AccountId.New();
         var customer = AccountId.New();
@@ -56,7 +56,7 @@ public class FulfillOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new FulfillOrderHandler(uow, new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context), new GenerateDeliveryCode()));
+        var handler = new FulfillOrdersHandler(uow, new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context), new GenerateDeliveryCode()));
 
         return (context, handler);
     }

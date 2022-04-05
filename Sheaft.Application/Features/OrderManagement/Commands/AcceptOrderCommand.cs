@@ -28,8 +28,6 @@ public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
             _uow.Deliveries.Update(result.Value.Delivery);
         
         _uow.Orders.Update(result.Value.Order);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

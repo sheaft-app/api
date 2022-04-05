@@ -25,8 +25,6 @@ public class CancelOrderHandler : ICommandHandler<CancelOrderCommand, Result>
             return Result.Failure(refuseResult);
 
         _uow.Orders.Update(order);
-        await _uow.Save(token);
-        
-        return Result.Success();
+        return await _uow.Save(token);
     }
 }

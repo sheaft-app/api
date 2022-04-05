@@ -42,7 +42,7 @@ public class Order : AggregateRoot
     public string? FailureReason { get; private set; }
     public CustomerId CustomerIdentifier { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
-    public ReadOnlyCollection<OrderLine> Lines { get; private set; }
+    public IEnumerable<OrderLine> Lines { get; private set; } = new List<OrderLine>();
     
     internal Result Publish(OrderCode code, IEnumerable<OrderLine>? lines = null)
     {
@@ -124,7 +124,7 @@ public class Order : AggregateRoot
     private void SetLines(IEnumerable<OrderLine>? lines)
     {
         var orderLines = lines?.ToList() ?? new List<OrderLine>();
-        Lines = new ReadOnlyCollection<OrderLine>(orderLines);
+        Lines = new List<OrderLine>(orderLines);
         TotalPrice = GetTotalPrice();
         ProductsCount = GetProductsCount();
     }

@@ -39,7 +39,7 @@ public class UpdateOrderDraftProductsCommandShould
         Assert.IsTrue(result.IsSuccess);
         
         Assert.IsNotNull(order);
-        Assert.AreEqual(2, order.Lines.Count);
+        Assert.AreEqual(2, order.Lines.Count());
     }
     
     [Test]
@@ -64,7 +64,7 @@ public class UpdateOrderDraftProductsCommandShould
         Assert.IsTrue(result.IsSuccess);
         
         Assert.IsNotNull(order);
-        Assert.AreEqual(1, order.Lines.Count);
+        Assert.AreEqual(1, order.Lines.Count());
     }
 
     private (AppDbContext, UpdateOrderDraftProductsHandler) InitHandler()
