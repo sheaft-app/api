@@ -13,6 +13,7 @@ public class PublishOrders : IPublishOrders
     private readonly ITransformProductsToOrderLines _transformProductsToOrderLines;
     private readonly IValidateOrderDeliveryDate _validateOrderDeliveryDate;
     private readonly IRetrieveOrderCustomer _retrieveOrderCustomer;
+    private readonly IRetrieveAgreementForOrder _retrieveAgreementForOrder;
 
     public PublishOrders(
         IOrderRepository orderRepository,
@@ -20,7 +21,8 @@ public class PublishOrders : IPublishOrders
         IGenerateOrderCode generateOrderCode,
         ITransformProductsToOrderLines transformProductsToOrderLines,
         IValidateOrderDeliveryDate validateOrderDeliveryDate,
-        IRetrieveOrderCustomer retrieveOrderCustomer)
+        IRetrieveOrderCustomer retrieveOrderCustomer,
+        IRetrieveAgreementForOrder retrieveAgreementForOrder)
     {
         _orderRepository = orderRepository;
         _deliveryRepository = deliveryRepository;
@@ -28,6 +30,7 @@ public class PublishOrders : IPublishOrders
         _transformProductsToOrderLines = transformProductsToOrderLines;
         _validateOrderDeliveryDate = validateOrderDeliveryDate;
         _retrieveOrderCustomer = retrieveOrderCustomer;
+        _retrieveAgreementForOrder = retrieveAgreementForOrder;
     }
 
     public async Task<Result> Publish(OrderId orderIdentifier, DeliveryDate deliveryDate, IEnumerable<ProductsQuantities> orderProducts, CancellationToken token)
@@ -38,9 +41,9 @@ public class PublishOrders : IPublishOrders
 
         var order = orderResult.Value;
         
-        var customerResult = await _retrieveOrderCustomer.GetDeliveryAddress(order.Identifier, token);
-        if (customerResult.IsFailure)
-            return Result.Failure(customerResult);
+        var agreementExistsForOrder = await _retrieveAgreementForOrder.IsExistingBetweenSupplierAndCustomer(order.SupplierIdentifier, order.CustomerIdentifier, token);
+        if (agreementExistsForOrder.IsFailure)
+            return Result.Failure(agreementExistsForOrder);
         
         var deliveryDateValidityResult = await _validateOrderDeliveryDate.Validate(deliveryDate, order.CustomerIdentifier, order.SupplierIdentifier, token);
         if (deliveryDateValidityResult.IsFailure)
@@ -65,6 +68,11 @@ public class PublishOrders : IPublishOrders
             return Result.Failure(publishResult);
         
         _orderRepository.Update(order);
+        
+        var customerResult = await _retrieveOrderCustomer.GetDeliveryAddress(order.Identifier, token);
+        if (customerResult.IsFailure)
+            return Result.Failure(customerResult);
+        
         _deliveryRepository.Add(new Delivery(deliveryDate, customerResult.Value, order.SupplierIdentifier, new List<Order> {order}));
 
         return Result.Success();

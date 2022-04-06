@@ -25,9 +25,12 @@ public class RetrieveAgreementForOrder : IRetrieveAgreementForOrder
                     c => c.SupplierIdentifier == supplierIdentifier && c.CustomerIdentifier == customerIdentifier,
                     token);
 
-            return agreement != null
-                ? Result.Success(true)
-                : Result.Failure<bool>(ErrorKind.BadRequest, "order.requires.agreement");
+            return agreement?.Status switch
+            {
+                AgreementStatus.Active => Result.Success(true),
+                AgreementStatus.Pending => Result.Failure<bool>(ErrorKind.BadRequest, "order.agreement.pending"),
+                _ => Result.Failure<bool>(ErrorKind.BadRequest, "order.requires.agreement")
+            };
         }
         catch (Exception e)
         {

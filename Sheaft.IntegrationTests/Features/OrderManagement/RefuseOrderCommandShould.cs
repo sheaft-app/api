@@ -36,6 +36,23 @@ public class RefuseOrderCommandShould
         Assert.AreEqual("reason", order.FailureReason);
         Assert.AreEqual(refuseOrderCommand.CreatedAt, order.RefusedOn);
     }
+    
+    [Test]
+    public async Task Fail_To_Refuse_If_Not_In_Valid_Status()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitOrder(context, true);
+
+        var refuseOrderCommand = new RefuseOrderCommand(order.Identifier, "reason");
+        var result =
+            await handler.Handle(
+                refuseOrderCommand,
+                CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.refuse.requires.pending.status", result.Error.Code);
+    }
 
     private (AppDbContext, RefuseOrderHandler) InitHandler()
     {
@@ -57,12 +74,15 @@ public class RefuseOrderCommandShould
         return (context, handler);
     }
 
-    private static Order InitOrder(AppDbContext context)
+    private static Order InitOrder(AppDbContext context, bool accept = false)
     {
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+
+        if (accept)
+            order.Accept();
         
         context.Add(order);
         context.SaveChanges();

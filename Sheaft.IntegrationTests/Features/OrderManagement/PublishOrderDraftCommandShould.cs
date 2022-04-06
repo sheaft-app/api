@@ -7,7 +7,6 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
-using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
@@ -33,12 +32,28 @@ public class PublishOrderDraftCommandShould
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(OrderStatus.Pending, order.Status);
+    }
+    
+    [Test]
+    public async Task Create_Delivery_With_Order_Lines()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitDraft(context, true);
+
+        var result =
+            await handler.Handle(
+                new PublishOrderDraftCommand(order.Identifier,
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
 
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
-        
+
         Assert.IsNotNull(delivery);
-        Assert.AreEqual(OrderStatus.Pending, order.Status);
         Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
+        Assert.AreEqual(2, delivery.Lines.Count());
     }
 
     [Test]
@@ -80,6 +95,29 @@ public class PublishOrderDraftCommandShould
         Assert.AreEqual("validate.order.deliveryday.not.in.agreement", result.Error.Code);
     }
 
+    [Test]
+    public async Task Fail_If_No_Active_Agreement()
+    {
+        var (context, handler) = InitHandler();
+
+        var order = InitDraft(context, true);
+        
+        var agreement = context.Agreements.Single();
+        agreement.Revoke("reason");
+        context.SaveChanges();
+
+        var result =
+            await handler.Handle(
+                new PublishOrderDraftCommand(order.Identifier,
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.IsNotNull(order);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.requires.agreement", result.Error.Code);
+    }
+
     private (AppDbContext, PublishOrderDraftHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<PublishOrderDraftHandler>();
@@ -103,7 +141,8 @@ public class PublishOrderDraftCommandShould
                     new GenerateOrderCode(), 
                     new TransformProductsToOrderLines(context), 
                     new ValidateOrderDeliveryDate(new RetrieveDeliveryDays(context)),
-                    new RetrieveOrderCustomer(context)));
+                    new RetrieveOrderCustomer(context),
+                    new RetrieveAgreementForOrder(context)));
 
         return (context, handler);
     }

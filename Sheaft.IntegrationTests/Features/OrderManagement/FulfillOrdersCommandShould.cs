@@ -98,6 +98,8 @@ public class FulfillOrdersCommandShould
         Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
+        Assert.AreEqual(2, delivery.Lines.Count());
+        Assert.AreEqual(4, delivery.Lines.Sum(l => l.Quantity.Value));
     }
 
     [Test]
@@ -122,10 +124,14 @@ public class FulfillOrdersCommandShould
         Assert.IsNotNull(delivery1);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery1.Status);
         Assert.AreEqual(1, delivery1.Orders.Count());
+        Assert.AreEqual(2, delivery1.Lines.Count());
+        Assert.AreEqual(2, delivery1.Lines.Sum(l => l.Quantity.Value));
         
         Assert.IsNotNull(delivery2);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery2.Status);
         Assert.AreEqual(1, delivery2.Orders.Count());
+        Assert.AreEqual(2, delivery2.Lines.Count());
+        Assert.AreEqual(2, delivery2.Lines.Sum(l => l.Quantity.Value));
         
         Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
         Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);

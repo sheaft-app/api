@@ -25,7 +25,7 @@ public class AcceptOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, Maybe<DeliveryDate>.None);
 
         var result =
             await handler.Handle(
@@ -33,18 +33,12 @@ public class AcceptOrderCommandShould
                 CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
-
-        Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Accepted, order.Status);
-        Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
-        Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
     }
     
     [Test]
-    public async Task Create_Delivery_With_Order_Lines()
+    public async Task Switch_Order_Status_To_Accepted_And_Reschedule()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
@@ -61,9 +55,26 @@ public class AcceptOrderCommandShould
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
 
         Assert.IsNotNull(delivery);
-        Assert.AreEqual(OrderStatus.Accepted, order.Status);
-        Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
-        Assert.AreEqual(2, delivery.Lines.Count());
+        Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
+        Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
+    }
+    
+    [Test]
+    public async Task Fail_To_Accept_Order_If_Not_In_Valid_Status()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitOrder(context, true);
+
+        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+
+        var result =
+            await handler.Handle(
+                acceptOrderCommand,
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.accept.requires.pending.status", result.Error.Code);
     }
 
     private (AppDbContext, AcceptOrderHandler) InitHandler()
@@ -86,12 +97,14 @@ public class AcceptOrderCommandShould
         return (context, handler);
     }
 
-    private static Order InitOrder(AppDbContext context)
+    private static Order InitOrder(AppDbContext context, bool accept = false)
     {
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+        if (accept)
+            order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("", "", "", ""), order.SupplierIdentifier, new List<Order> {order});
