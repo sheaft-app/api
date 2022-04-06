@@ -34,7 +34,7 @@ public class RefuseOrderCommandShould
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Refused, order.Status);
         Assert.AreEqual("reason", order.FailureReason);
-        Assert.AreEqual(refuseOrderCommand.CreatedAt, order.RefusedOn);
+        Assert.AreEqual(refuseOrderCommand.CreatedAt, order.CompletedOn);
     }
     
     [Test]

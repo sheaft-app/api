@@ -10,13 +10,19 @@ public class DeliverOrders : IDeliverOrders
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IDeliveryRepository _deliveryRepository;
+    private readonly IRetrieveProductsToAdjust _retrieveProductsToAdjust;
+    private readonly IRetrieveReturnedReturnables _retrieveReturnedReturnables;
 
     public DeliverOrders(
         IOrderRepository orderRepository,
-        IDeliveryRepository deliveryRepository)
+        IDeliveryRepository deliveryRepository,
+        IRetrieveProductsToAdjust retrieveProductsToAdjust,
+        IRetrieveReturnedReturnables retrieveReturnedReturnables)
     {
         _orderRepository = orderRepository;
         _deliveryRepository = deliveryRepository;
+        _retrieveProductsToAdjust = retrieveProductsToAdjust;
+        _retrieveReturnedReturnables = retrieveReturnedReturnables;
     }
 
     public async Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, 
@@ -26,11 +32,26 @@ public class DeliverOrders : IDeliverOrders
         if (deliveryResult.IsFailure)
             return Result.Failure(deliveryResult);
 
-        var adjustmentLines = new List<DeliveryLine>();
-        
-        //TODO retrieve product adjustments and returnedReturnables
-        
         var delivery = deliveryResult.Value;
+        var adjustmentLines = new List<DeliveryLine>();
+        if (productAdjustments != null && productAdjustments.Any())
+        {
+            var productsToAdjustResult = await _retrieveProductsToAdjust.Get(delivery.SupplierIdentifier, productAdjustments, token);
+            if (productsToAdjustResult.IsFailure)
+                return Result.Failure(productsToAdjustResult);
+            
+            adjustmentLines.AddRange(productsToAdjustResult.Value);
+        }
+        
+        if (returnedReturnables != null && returnedReturnables.Any())
+        {
+            var returnedReturnablesResult = await _retrieveReturnedReturnables.Get(delivery.SupplierIdentifier, returnedReturnables, token);
+            if (returnedReturnablesResult.IsFailure)
+                return Result.Failure(returnedReturnablesResult);
+            
+            adjustmentLines.AddRange(returnedReturnablesResult.Value);
+        }
+
         var deliverResult = delivery.Deliver(adjustmentLines, currentDateTime);
         if (deliverResult.IsFailure)
             return Result.Failure(deliverResult);

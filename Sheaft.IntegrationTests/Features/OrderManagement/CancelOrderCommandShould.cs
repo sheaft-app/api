@@ -23,15 +23,17 @@ public class CancelOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
+        var cancelOrderCommand = new CancelOrderCommand(order.Identifier, "reason");
         var result =
             await handler.Handle(
-                new CancelOrderCommand(order.Identifier, "reason"),
+                cancelOrderCommand,
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
 
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Cancelled, order.Status);
+        Assert.AreEqual(cancelOrderCommand.CreatedAt, order.CompletedOn);
         Assert.AreEqual("reason", order.FailureReason);
     }
     

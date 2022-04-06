@@ -26,8 +26,8 @@ internal class CatalogProductConfiguration : IEntityTypeConfiguration<CatalogPro
             .ValueGeneratedOnAddOrUpdate();
         
         builder
-            .Property(p => p.Price)
-            .HasConversion(price => price.Value, value => new ProductPrice(value));
+            .Property(p => p.UnitPrice)
+            .HasConversion(price => price.Value, value => new ProductUnitPrice(value));
 
         builder.HasOne(c => c.Product)
             .WithMany()

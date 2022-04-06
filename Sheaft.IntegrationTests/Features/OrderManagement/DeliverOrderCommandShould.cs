@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
@@ -29,7 +30,7 @@ public class DeliverOrderCommandShould
             await handler.Handle(
                 deliverOrderCommand,
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsSuccess);
 
         var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
@@ -40,13 +41,58 @@ public class DeliverOrderCommandShould
         Assert.AreEqual(deliverOrderCommand.CreatedAt, delivery.DeliveredOn);
     }
 
+    [Test]
+    public async Task Add_Products_Adjustments_To_Delivery()
+    {
+        var (context, handler) = InitHandler();
+        var delivery = InitOrder(context);
+
+        var products = context.Products.ToList();
+        
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier,
+            new List<ProductAdjustment>
+            {
+                new ProductAdjustment(products.First().Identifier, new Quantity(1)),
+                new ProductAdjustment(products.Skip(1).First().Identifier, new Quantity(-2))
+            }, null);
+        var result =
+            await handler.Handle(
+                deliverOrderCommand,
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(2, delivery.Adjustments.Count());
+    }
+
+    [Test]
+    public async Task Add_Returned_Returnables_To_Delivery()
+    {
+        var (context, handler) = InitHandler();
+        var delivery = InitOrder(context);
+
+        var returnable = context.Returnables.First();
+        
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null,
+            new List<ReturnedReturnable>
+            {
+                new ReturnedReturnable(returnable.Identifier, new Quantity(-1))
+            });
+        var result =
+            await handler.Handle(
+                deliverOrderCommand,
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(1, delivery.Adjustments.Count());
+    }
+
     private (AppDbContext, DeliverOrderHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<DeliverOrderHandler>();
 
         var supplier = AccountId.New();
         var customer = AccountId.New();
-
+        
         var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
@@ -55,7 +101,18 @@ public class DeliverOrderCommandShould
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
 
-        var handler = new DeliverOrderHandler(uow, new DeliverOrders(new OrderRepository(context), new DeliveryRepository(context)));
+        var supplier1 = context.Suppliers.First();
+        context.Returnables.Add(new Returnable(new ReturnableName("test"), new ReturnableReference("re"),
+            new UnitPrice(2000), new VatRate(2000), supplier1.Identifier));
+
+        context.SaveChanges();
+            
+        var handler = new DeliverOrderHandler(uow,
+            new DeliverOrders(
+                new OrderRepository(context),
+                new DeliveryRepository(context),
+                new RetrieveProductsToAdjust(context),
+                new RetrieveReturnedReturnables(context)));
 
         return (context, handler);
     }
@@ -69,18 +126,19 @@ public class DeliverOrderCommandShould
 
         order.Accept();
         order.Fulfill();
-        
+
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
-        delivery.Schedule(new DeliveryCode(Guid.NewGuid().ToString("N")), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
+        delivery.Schedule(new DeliveryCode(Guid.NewGuid().ToString("N")),
+            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
             DateTimeOffset.UtcNow);
-        
+
         context.Add(order);
         context.Add(delivery);
-        
+
         context.SaveChanges();
-        
+
         return delivery;
     }
 }

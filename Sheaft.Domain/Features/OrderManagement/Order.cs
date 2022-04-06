@@ -33,11 +33,10 @@ public class Order : AggregateRoot
     public OrderCode? Code { get; private set; }
     public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
-    public Price TotalPrice { get; private set; }
+    public UnitPrice TotalPrice { get; private set; }
     public DateTimeOffset? FulfilledOn { get; private set; }
     public DateTimeOffset? AcceptedOn { get; private set; }
-    public DateTimeOffset? RefusedOn { get; private set; }
-    public DateTimeOffset? CancelledOn { get; private set; }
+    public DateTimeOffset? CompletedOn { get; private set; }
     public int ProductsCount { get; private set; }
     public string? FailureReason { get; private set; }
     public CustomerId CustomerIdentifier { get; private set; }
@@ -96,7 +95,7 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.refuse.requires.pending.status");
         
         Status = OrderStatus.Refused;
-        RefusedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = refusalReason;
         return Result.Success();
     }
@@ -107,7 +106,7 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.ready.status");
         
         Status = OrderStatus.Cancelled;
-        CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = cancelReason;
         return Result.Success();
     }
@@ -134,8 +133,8 @@ public class Order : AggregateRoot
         return Lines.Sum(l => l.Quantity.Value);
     }
 
-    private Price GetTotalPrice()
+    private UnitPrice GetTotalPrice()
     {
-        return new Price(Lines.Sum(l => l.TotalPrice.Value));
+        return new UnitPrice(Lines.Sum(l => l.TotalPrice.Value));
     }
 }

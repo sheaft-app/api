@@ -51,8 +51,8 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.OwnsMany(o => o.Lines, l =>
         {
             l
-                .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
+                .Property(p => p.UnitUnitPrice)
+                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
             l
                 .Property(p => p.Quantity)
@@ -60,7 +60,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
             l
                 .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
 
             l
                 .Property(p => p.Vat)
@@ -75,8 +75,8 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.OwnsMany(o => o.Adjustments, l =>
         {
             l
-                .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
+                .Property(p => p.UnitUnitPrice)
+                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
             l
                 .Property(p => p.Quantity)
@@ -84,7 +84,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
             l
                 .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
 
             l
                 .Property(p => p.Vat)

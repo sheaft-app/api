@@ -32,7 +32,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         {
             l
                 .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
+                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
             l
                 .Property(p => p.Quantity)
@@ -40,7 +40,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
 
             l
                 .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
 
             l
                 .Property(p => p.Vat)
@@ -58,7 +58,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder
             .Property(p => p.TotalPrice)
-            .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+            .HasConversion(totalPrice => totalPrice.Value, value => new UnitPrice(value));
         
         builder
             .HasIndex(c => c.Identifier)

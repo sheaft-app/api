@@ -26,13 +26,13 @@ public class Catalog : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public IReadOnlyCollection<CatalogProduct> Products => _products.AsReadOnly();
 
-    public Result AddOrUpdateProductPrice(Product product, ProductPrice price)
+    public Result AddOrUpdateProductPrice(Product product, ProductUnitPrice unitPrice)
     {
         var existingProduct = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
         if (existingProduct != null)
-            existingProduct.SetPrice(price);
+            existingProduct.SetPrice(unitPrice);
         else
-            _products.Add(new CatalogProduct(product, price));
+            _products.Add(new CatalogProduct(product, unitPrice));
         
         return Result.Success();
     }

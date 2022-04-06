@@ -118,6 +118,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRetrieveDeliveryDays, RetrieveDeliveryDays>();
         services.AddScoped<IRetrieveOrderCustomer, RetrieveOrderCustomer>();
         services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
+        services.AddScoped<IRetrieveReturnedReturnables, RetrieveReturnedReturnables>();
+        services.AddScoped<IRetrieveProductsToAdjust, RetrieveProductsToAdjust>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

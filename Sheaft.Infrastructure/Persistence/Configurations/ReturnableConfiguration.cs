@@ -36,8 +36,8 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
             .HasConversion(reference => reference.Value, value => new ReturnableReference(value));
 
         builder
-            .Property(p => p.Price)
-            .HasConversion(price => price.Value, value => new Price(value));
+            .Property(p => p.UnitPrice)
+            .HasConversion(price => price.Value, value => new UnitPrice(value));
         
         builder
             .Property(p => p.Vat)

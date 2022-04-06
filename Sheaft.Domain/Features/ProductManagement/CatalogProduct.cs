@@ -4,18 +4,18 @@ public class CatalogProduct
 {
     private CatalogProduct(){}
     
-    public CatalogProduct(Product product, ProductPrice price)
+    public CatalogProduct(Product product, ProductUnitPrice unitPrice)
     {
         Product = product;
-        SetPrice(price);
+        SetPrice(unitPrice);
     }
 
     public Product Product { get; private set; }
-    public ProductPrice Price { get; private set; }
+    public ProductUnitPrice UnitPrice { get; private set; }
 
-    public Result SetPrice(ProductPrice newPrice)
+    public Result SetPrice(ProductUnitPrice newUnitPrice)
     {
-        Price = newPrice;
+        UnitPrice = newUnitPrice;
         return Result.Success();
     }
 }

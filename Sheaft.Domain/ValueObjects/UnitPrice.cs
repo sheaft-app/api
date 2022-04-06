@@ -1,12 +1,12 @@
 ﻿namespace Sheaft.Domain;
 
-public record Price
+public record UnitPrice
 {
-    public Price(int value) : this(value, Currency.Euro)
+    public UnitPrice(int value) : this(value, Currency.Euro)
     {
     }
     
-    public Price(int value, Currency currency)
+    public UnitPrice(int value, Currency currency)
     {
         if (value < 0)
             throw new InvalidOperationException("Price cannot be lower than 0");

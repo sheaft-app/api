@@ -48,7 +48,7 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                         cp.Product.Code, 
                         cp.Product.Name, 
                         GetProductQuantity(cp.Product.Identifier, productsToProcess), 
-                        cp.Price, 
+                        cp.UnitPrice, 
                         cp.Product.Vat)));
             
             lines.AddRange(productsToTransform
@@ -59,7 +59,7 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                         cp.Product.Returnable.Reference, 
                         cp.Product.Returnable.Name, 
                         GetProductQuantity(cp.Product.Identifier, productsToProcess), 
-                        cp.Product.Returnable.Price, 
+                        cp.Product.Returnable.UnitPrice, 
                         cp.Product.Returnable.Vat)));
 
             return Result.Success(lines.AsEnumerable());

@@ -6,7 +6,7 @@ public record OrderLine
     {
     }
 
-    internal OrderLine(string identifier, OrderLineKind lineKind, string reference, string name, OrderedQuantity quantity, Price unitPrice, VatRate vat)
+    internal OrderLine(string identifier, OrderLineKind lineKind, string reference, string name, OrderedQuantity quantity, UnitPrice unitPrice, VatRate vat)
     {
         Identifier = identifier;
         LineKind = lineKind;
@@ -19,13 +19,13 @@ public record OrderLine
     }
 
     public static OrderLine CreateProductLine(ProductId productIdentifier, ProductCode reference, ProductName name,
-        OrderedQuantity quantity, ProductPrice unitPrice, VatRate vat)
+        OrderedQuantity quantity, ProductUnitPrice unitPrice, VatRate vat)
     {
         return new OrderLine(productIdentifier.Value, OrderLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat);
     }
 
     public static OrderLine CreateReturnableLine(ReturnableId returnableIdentifier, ReturnableReference reference, ReturnableName name,
-        OrderedQuantity quantity, Price unitPrice, VatRate vat)
+        OrderedQuantity quantity, UnitPrice unitPrice, VatRate vat)
     {
         return new OrderLine(returnableIdentifier.Value, OrderLineKind.Returnable, reference.Value, name.Value, quantity, unitPrice, vat);
     }
@@ -35,12 +35,12 @@ public record OrderLine
     public string Reference { get; private set; }
     public string Name { get; private set; }
     public OrderedQuantity Quantity { get; private set; }
-    public Price UnitPrice { get; private set; }
+    public UnitPrice UnitPrice { get; private set; }
     public VatRate Vat { get; private set; }
-    public Price TotalPrice { get; private set; }
+    public TotalPrice TotalPrice { get; private set; }
 
-    private static Price GetTotalPrice(OrderedQuantity quantity, Price? unitPrice)
+    private static TotalPrice GetTotalPrice(OrderedQuantity quantity, UnitPrice? unitPrice)
     {
-        return new Price((unitPrice?.Value ?? 0) * quantity.Value, unitPrice?.Currency ?? Currency.Euro);
+        return new TotalPrice((unitPrice?.Value ?? 0) * quantity.Value, unitPrice?.Currency ?? Currency.Euro);
     }
 }

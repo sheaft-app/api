@@ -42,10 +42,10 @@ internal static class DataHelpers
                 {
                     OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
                         new OrderedQuantity(1),
-                        new ProductPrice(2000), new VatRate(2000)),
+                        new ProductUnitPrice(2000), new VatRate(2000)),
                     OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
                         new OrderedQuantity(1),
-                        new ProductPrice(2000), new VatRate(2000))
+                        new ProductUnitPrice(2000), new VatRate(2000))
                 } : new List<OrderLine>(), "externalCode");
             return order;
         }
@@ -57,10 +57,10 @@ internal static class DataHelpers
                     {
                         OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
                             new OrderedQuantity(1),
-                            new ProductPrice(2000), new VatRate(2000)),
+                            new ProductUnitPrice(2000), new VatRate(2000)),
                         OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
                             new OrderedQuantity(1),
-                            new ProductPrice(2000), new VatRate(2000))
+                            new ProductUnitPrice(2000), new VatRate(2000))
                     });
         
         return orderDraft;
@@ -107,7 +107,7 @@ internal static class DataHelpers
                 var product = new Product(new ProductName(productInfo.Key), new ProductCode(productInfo.Key), new VatRate(2000), null,
                     supplier.Identifier);
                 
-                catalog.AddOrUpdateProductPrice(product, new ProductPrice(productInfo.Value));
+                catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(productInfo.Value));
                 context.Add(product);
             }
         }
