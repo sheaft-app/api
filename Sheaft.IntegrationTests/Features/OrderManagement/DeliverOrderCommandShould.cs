@@ -24,7 +24,7 @@ public class DeliverOrderCommandShould
         var (context, handler) = InitHandler();
         var delivery = InitOrder(context);
 
-        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier);
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
         var result =
             await handler.Handle(
                 deliverOrderCommand,
@@ -71,9 +71,9 @@ public class DeliverOrderCommandShould
         order.Fulfill();
         
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("", "", "", ""), new List<OrderId> {order.Identifier}, order.SupplierIdentifier);
+            new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
-        delivery.Schedule(new DeliveryCode("test"), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
+        delivery.Schedule(new DeliveryCode(Guid.NewGuid().ToString("N")), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
             DateTimeOffset.UtcNow);
         
         context.Add(order);

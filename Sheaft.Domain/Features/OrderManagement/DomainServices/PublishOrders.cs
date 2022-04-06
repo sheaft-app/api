@@ -65,8 +65,7 @@ public class PublishOrders : IPublishOrders
             return Result.Failure(publishResult);
         
         _orderRepository.Update(order);
-        _deliveryRepository.Add(new Delivery(deliveryDate, customerResult.Value, new List<OrderId> {order.Identifier},
-            order.SupplierIdentifier));
+        _deliveryRepository.Add(new Delivery(deliveryDate, customerResult.Value, order.SupplierIdentifier, new List<Order> {order}));
 
         return Result.Success();
     }

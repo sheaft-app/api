@@ -2,7 +2,7 @@
 
 public interface IDeliverOrders
 {
-    Task<Result> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
+    Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, IEnumerable<ReturnedReturnable>? returnedReturnables, DateTimeOffset currentDateTime,
         CancellationToken token);
 }
 
@@ -19,15 +19,19 @@ public class DeliverOrders : IDeliverOrders
         _deliveryRepository = deliveryRepository;
     }
 
-    public async Task<Result> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
-        CancellationToken token)
+    public async Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, 
+        IEnumerable<ReturnedReturnable>? returnedReturnables, DateTimeOffset currentDateTime, CancellationToken token)
     {
         var deliveryResult = await _deliveryRepository.Get(deliveryIdentifier, token);
         if (deliveryResult.IsFailure)
             return Result.Failure(deliveryResult);
 
+        var adjustmentLines = new List<DeliveryLine>();
+        
+        //TODO retrieve product adjustments and returnedReturnables
+        
         var delivery = deliveryResult.Value;
-        var deliverResult = delivery.Deliver(currentDateTime);
+        var deliverResult = delivery.Deliver(adjustmentLines, currentDateTime);
         if (deliverResult.IsFailure)
             return Result.Failure(deliverResult);
         
@@ -50,3 +54,6 @@ public class DeliverOrders : IDeliverOrders
         return Result.Success();
     }
 }
+
+public record ProductAdjustment(ProductId Identifier, Quantity Quantity);
+public record ReturnedReturnable(ReturnableId Identifier, Quantity Quantity);

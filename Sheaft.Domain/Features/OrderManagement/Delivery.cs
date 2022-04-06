@@ -1,12 +1,12 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain.OrderManagement;
 
 public class Delivery : AggregateRoot
 {
-    private Delivery(){}
-    
-    public Delivery(DeliveryDate date, DeliveryAddress address, IEnumerable<OrderId> orderIdentifiers, SupplierId supplierIdentifier)
+    private Delivery()
+    {
+    }
+
+    public Delivery(DeliveryDate date, DeliveryAddress address, SupplierId supplierIdentifier, IEnumerable<Order> orders)
     {
         Identifier = DeliveryId.New();
         ScheduledAt = date;
@@ -14,7 +14,9 @@ public class Delivery : AggregateRoot
         Status = DeliveryStatus.Pending;
         SupplierIdentifier = supplierIdentifier;
 
-        SetOrders(orderIdentifiers);
+        var result = SetOrders(orders);
+        if (result.IsFailure)
+            throw new InvalidOperationException(result.Error.Code);
     }
 
     public DeliveryId Identifier { get; }
@@ -24,11 +26,31 @@ public class Delivery : AggregateRoot
     public DateTimeOffset? DeliveredOn { get; private set; }
     public DeliveryAddress Address { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
-    public ReadOnlyCollection<DeliveryOrder> Orders { get; private set; }
-    
-    public Result SetOrders(IEnumerable<OrderId> orderIdentifiers)
+    public IEnumerable<DeliveryOrder> Orders { get; private set; }
+    public IEnumerable<DeliveryLine> Lines { get; private set; }
+    public IEnumerable<DeliveryLine> Adjustments { get; private set; }
+
+    public Result SetOrders(IEnumerable<Order> orders)
     {
-        Orders = new ReadOnlyCollection<DeliveryOrder>(orderIdentifiers.Select(o => new DeliveryOrder(o)).ToList());
+        if (orders.GroupBy(o => o.CustomerIdentifier).Count() > 1)
+            return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.customer");
+        
+        Orders = orders.Select(o => new DeliveryOrder(o.Identifier)).ToList();
+
+        var lines = orders
+            .SelectMany(o => o.Lines.Select(l => l))
+            .GroupBy(o => o.Identifier)
+            .Select(gr =>
+            {
+                var orderLine = gr.First();
+                return new DeliveryLine(orderLine.Identifier,
+                    orderLine.LineKind == OrderLineKind.Product
+                        ? DeliveryLineKind.Product
+                        : DeliveryLineKind.Returnable, orderLine.Reference, orderLine.Reference,
+                    new OrderedQuantity(gr.Sum(g => g.Quantity.Value)), orderLine.UnitPrice, orderLine.Vat);
+            }).ToList();
+
+        Lines = lines;
         return Result.Success();
     }
 
@@ -36,8 +58,9 @@ public class Delivery : AggregateRoot
     {
         if (Status != DeliveryStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.pending.delivery");
-        
+
         Code = code;
+        Status = DeliveryStatus.Scheduled;
         return Reschedule(scheduledOn, currentDateTime);
     }
 
@@ -45,17 +68,17 @@ public class Delivery : AggregateRoot
     {
         if (newDeliveryDate.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
             return Result.Failure(ErrorKind.BadRequest, "delivery.confirm.requires.incoming.deliverydate");
-        
+
         ScheduledAt = newDeliveryDate;
-        Status = DeliveryStatus.Scheduled;
         return Result.Success();
     }
 
-    internal Result Deliver(DateTimeOffset? currentDateTime = null)
+    internal Result Deliver(IEnumerable<DeliveryLine> linesAdjustments, DateTimeOffset? currentDateTime = null)
     {
         if (Status != DeliveryStatus.Scheduled)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.scheduled.delivery");
-        
+
+        Adjustments = linesAdjustments;
         DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = DeliveryStatus.Delivered;
         return Result.Success();

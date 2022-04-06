@@ -70,10 +70,10 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
         }
     }
 
-    private Quantity GetProductQuantity(ProductId productIdentifier,
+    private OrderedQuantity GetProductQuantity(ProductId productIdentifier,
         IEnumerable<ProductsQuantities> productsQuantities)
     {
         var productQuantity = productsQuantities.SingleOrDefault(p => p.ProductIdentifier == productIdentifier);
-        return productQuantity == null ? new Quantity(0) : productQuantity.Quantity;
+        return productQuantity == null ? new OrderedQuantity(0) : productQuantity.Quantity;
     }
 }

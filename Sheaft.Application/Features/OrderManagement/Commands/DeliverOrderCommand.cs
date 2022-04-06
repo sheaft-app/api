@@ -3,8 +3,8 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record DeliverOrderCommand(DeliveryId DeliveryIdentifier) : Command<Result>;
-    
+public record DeliverOrderCommand(DeliveryId DeliveryIdentifier, IEnumerable<ProductAdjustment>? Products, IEnumerable<ReturnedReturnable>? ReturnedReturnables) : Command<Result>;
+
 public class DeliverOrderHandler : ICommandHandler<DeliverOrderCommand, Result>
 {
     private readonly IUnitOfWork _uow;
@@ -20,7 +20,7 @@ public class DeliverOrderHandler : ICommandHandler<DeliverOrderCommand, Result>
 
     public async Task<Result> Handle(DeliverOrderCommand request, CancellationToken token)
     {
-        var result = await _deliverOrders.Deliver(request.DeliveryIdentifier, request.CreatedAt, token);
+        var result = await _deliverOrders.Deliver(request.DeliveryIdentifier, request.Products, request.ReturnedReturnables, request.CreatedAt, token);
         if (result.IsFailure)
             return result;
         

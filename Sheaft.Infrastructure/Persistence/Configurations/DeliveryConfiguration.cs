@@ -48,6 +48,54 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             .HasIndex(c => c.Identifier)
             .IsUnique();
         
+        builder.OwnsMany(o => o.Lines, l =>
+        {
+            l
+                .Property(p => p.UnitPrice)
+                .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
+
+            l
+                .Property(p => p.Quantity)
+                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+
+            l
+                .Property(p => p.TotalPrice)
+                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+
+            l
+                .Property(p => p.Vat)
+                .HasConversion(vat => vat.Value, value => new VatRate(value));
+            
+            l.WithOwner().HasForeignKey("DeliveryId");
+            l.HasKey("DeliveryId", "Identifier");
+
+            l.ToTable("Delivery_Lines");
+        });
+        
+        builder.OwnsMany(o => o.Adjustments, l =>
+        {
+            l
+                .Property(p => p.UnitPrice)
+                .HasConversion(unitPrice => unitPrice.Value, value => new Price(value));
+
+            l
+                .Property(p => p.Quantity)
+                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+
+            l
+                .Property(p => p.TotalPrice)
+                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+
+            l
+                .Property(p => p.Vat)
+                .HasConversion(vat => vat.Value, value => new VatRate(value));
+            
+            l.WithOwner().HasForeignKey("DeliveryId");
+            l.HasKey("DeliveryId", "Identifier");
+
+            l.ToTable("Delivery_Adjustments");
+        });
+        
         builder.ToTable("Delivery");
     }
 }

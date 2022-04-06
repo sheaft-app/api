@@ -42,6 +42,7 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new AgreementConfiguration());
         
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new DeliveryConfiguration());
     }
     

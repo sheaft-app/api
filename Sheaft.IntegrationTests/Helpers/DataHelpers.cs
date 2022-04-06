@@ -41,10 +41,10 @@ internal static class DataHelpers
                 addProducts ? new List<OrderLine>
                 {
                     OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
-                        new Quantity(1),
+                        new OrderedQuantity(1),
                         new ProductPrice(2000), new VatRate(2000)),
                     OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
-                        new Quantity(1),
+                        new OrderedQuantity(1),
                         new ProductPrice(2000), new VatRate(2000))
                 } : new List<OrderLine>(), "externalCode");
             return order;
@@ -56,10 +56,10 @@ internal static class DataHelpers
                 new List<OrderLine>
                     {
                         OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
-                            new Quantity(1),
+                            new OrderedQuantity(1),
                             new ProductPrice(2000), new VatRate(2000)),
                         OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
-                            new Quantity(1),
+                            new OrderedQuantity(1),
                             new ProductPrice(2000), new VatRate(2000))
                     });
         

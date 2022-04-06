@@ -21,7 +21,7 @@ public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand
     public async Task<Result> Handle(PublishOrderDraftCommand request, CancellationToken token)
     {
         var orderProducts = request.Products?
-            .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new Quantity(l.Quantity)))
+            .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new OrderedQuantity(l.Quantity)))
             .ToList() ?? new List<ProductsQuantities>();
         
         var result = await _publishOrders.Publish(request.OrderIdentifier, request.DeliveryDate, orderProducts, token);

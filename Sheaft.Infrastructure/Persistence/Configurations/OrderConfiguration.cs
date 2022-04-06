@@ -36,7 +36,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
 
             l
                 .Property(p => p.Quantity)
-                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+                .HasConversion(quantity => quantity.Value, value => new OrderedQuantity(value));
 
             l
                 .Property(p => p.TotalPrice)

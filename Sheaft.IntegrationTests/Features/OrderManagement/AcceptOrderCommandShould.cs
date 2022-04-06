@@ -38,8 +38,32 @@ public class AcceptOrderCommandShould
 
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Accepted, order.Status);
+        Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
         Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
+    }
+    
+    [Test]
+    public async Task Create_Delivery_With_Order_Lines()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitOrder(context);
+
+        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+
+        var result =
+            await handler.Handle(
+                acceptOrderCommand,
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+
+        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+
+        Assert.IsNotNull(delivery);
+        Assert.AreEqual(OrderStatus.Accepted, order.Status);
+        Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
+        Assert.AreEqual(2, delivery.Lines.Count());
     }
 
     private (AppDbContext, AcceptOrderHandler) InitHandler()
@@ -70,7 +94,7 @@ public class AcceptOrderCommandShould
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("", "", "", ""), new List<OrderId> {order.Identifier}, order.SupplierIdentifier);
+            new DeliveryAddress("", "", "", ""), order.SupplierIdentifier, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

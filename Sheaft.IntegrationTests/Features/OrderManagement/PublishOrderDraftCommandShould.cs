@@ -31,6 +31,7 @@ public class PublishOrderDraftCommandShould
                 new PublishOrderDraftCommand(order.Identifier,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
+        
         Assert.IsTrue(result.IsSuccess);
 
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));

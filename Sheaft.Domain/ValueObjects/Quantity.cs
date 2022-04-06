@@ -6,8 +6,8 @@ public record Quantity
     {
         Value = value switch
         {
-            < 0 => throw new InvalidOperationException("Quantity cannot be lower than 0"),
-            > 10000 => throw new InvalidOperationException("Quantity cannot be greater than 1000"),
+            > 1000 => throw new InvalidOperationException("Quantity cannot be greater than 1000"),
+            < -1000 => throw new InvalidOperationException("Quantity cannot be lower than 1000"),
             _ => value
         };
 

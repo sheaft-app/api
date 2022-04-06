@@ -26,7 +26,7 @@ public class UpdateOrderDraftProductsHandler : ICommandHandler<UpdateOrderDraftP
 
         var order = orderResult.Value;
         var orderProducts = request.Products?
-            .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new Quantity(l.Quantity)))
+            .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new OrderedQuantity(l.Quantity)))
             .ToList() ?? new List<ProductsQuantities>();
         
         var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierIdentifier, token);
