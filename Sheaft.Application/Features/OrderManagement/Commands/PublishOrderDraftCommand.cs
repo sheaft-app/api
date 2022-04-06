@@ -27,11 +27,6 @@ public class PublishOrderDraftHandler : ICommandHandler<PublishOrderDraftCommand
         var result = await _publishOrders.Publish(request.OrderIdentifier, request.DeliveryDate, orderProducts, token);
         if (result.IsFailure)
             return result;
-
-        if(result.Value.Delivery != null)
-            _uow.Deliveries.Add(result.Value.Delivery);
-        
-        _uow.Orders.Update(result.Value.Order);
         
         return await _uow.Save(token);
     }

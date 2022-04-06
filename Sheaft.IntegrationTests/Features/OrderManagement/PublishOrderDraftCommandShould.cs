@@ -33,8 +33,11 @@ public class PublishOrderDraftCommandShould
                 CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
-        Assert.IsNotNull(order);
+        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        
+        Assert.IsNotNull(delivery);
         Assert.AreEqual(OrderStatus.Pending, order.Status);
+        Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
     }
 
     [Test]
@@ -95,6 +98,7 @@ public class PublishOrderDraftCommandShould
             new PublishOrderDraftHandler(uow, 
                 new PublishOrders(
                     new OrderRepository(context),
+                    new DeliveryRepository(context),
                     new GenerateOrderCode(), 
                     new TransformProductsToOrderLines(context), 
                     new ValidateOrderDeliveryDate(new RetrieveDeliveryDays(context)),

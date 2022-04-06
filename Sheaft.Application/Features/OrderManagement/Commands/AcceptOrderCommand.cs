@@ -23,11 +23,7 @@ public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
         var result = await _acceptOrders.Accept(request.OrderIdentifier, request.NewDeliveryDate, request.CreatedAt, token);
         if (result.IsFailure)
             return result;
-
-        if(result.Value.Delivery != null)
-            _uow.Deliveries.Update(result.Value.Delivery);
         
-        _uow.Orders.Update(result.Value.Order);
         return await _uow.Save(token);
     }
 }

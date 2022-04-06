@@ -2,7 +2,7 @@
 
 public interface IAcceptOrders
 {
-    Task<Result<OrderDeliveryResult>> Accept(OrderId orderIdentifier, Maybe<DeliveryDate> newDeliveryDate,
+    Task<Result> Accept(OrderId orderIdentifier, Maybe<DeliveryDate> newDeliveryDate,
         DateTimeOffset currentDateTime, CancellationToken token);
 }
 
@@ -19,28 +19,32 @@ public class AcceptOrders : IAcceptOrders
         _deliveryRepository = deliveryRepository;
     }
     
-    public async Task<Result<OrderDeliveryResult>> Accept(OrderId orderIdentifier, Maybe<DeliveryDate> newDeliveryDate, DateTimeOffset currentDateTime, CancellationToken token)
+    public async Task<Result> Accept(OrderId orderIdentifier, Maybe<DeliveryDate> newDeliveryDate, DateTimeOffset currentDateTime, CancellationToken token)
     {
         var orderResult = await _orderRepository.Get(orderIdentifier, token);
         if (orderResult.IsFailure)
-            return Result.Failure<OrderDeliveryResult>(orderResult);
+            return Result.Failure(orderResult);
 
         var order = orderResult.Value;
         var acceptResult = order.Accept(currentDateTime);
         if (acceptResult.IsFailure)
-            return Result.Failure<OrderDeliveryResult>(acceptResult);
+            return Result.Failure(acceptResult);
+        
+        _orderRepository.Update(order);
 
         Delivery? delivery = null;
         if (!newDeliveryDate.HasValue) 
-            return Result.Success(new OrderDeliveryResult(order, delivery));
+            return Result.Success();
         
         var deliveryResult = await _deliveryRepository.GetDeliveryForOrder(orderIdentifier, token);
         if (deliveryResult.IsFailure)
-            return Result.Failure<OrderDeliveryResult>(deliveryResult);
+            return Result.Failure(deliveryResult);
             
         delivery = deliveryResult.Value;
         delivery.Reschedule(newDeliveryDate.Value, currentDateTime);
+        
+        _deliveryRepository.Update(delivery);
 
-        return Result.Success(new OrderDeliveryResult(order, delivery));
+        return Result.Success();
     }
 }

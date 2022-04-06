@@ -2,7 +2,7 @@
 
 public interface ICreateOrderDraft
 {
-    Task<Result<OrderDraftResult>> Create(SupplierId supplierIdentifier, CustomerId customerIdentifier, CancellationToken token);
+    Task<Result<string>> Create(SupplierId supplierIdentifier, CustomerId customerIdentifier, CancellationToken token);
 }
 
 public class CreateOrderDraft : ICreateOrderDraft
@@ -18,28 +18,28 @@ public class CreateOrderDraft : ICreateOrderDraft
         _retrieveAgreementForOrder = retrieveAgreementForOrder;
     }
 
-    public async Task<Result<OrderDraftResult>> Create(SupplierId supplierIdentifier, CustomerId customerIdentifier, CancellationToken token)
+    public async Task<Result<string>> Create(SupplierId supplierIdentifier, CustomerId customerIdentifier, CancellationToken token)
     {
         var agreementExistsForOrder = await _retrieveAgreementForOrder.IsExistingBetweenSupplierAndCustomer(supplierIdentifier, customerIdentifier, token);
         if (agreementExistsForOrder.IsFailure)
-            return Result.Failure<OrderDraftResult>(agreementExistsForOrder);
+            return Result.Failure<string>(agreementExistsForOrder);
         
         if (!agreementExistsForOrder.Value)
-            return Result.Failure<OrderDraftResult>(ErrorKind.BadRequest, "order.requires.agreement");
+            return Result.Failure<string>(ErrorKind.BadRequest, "order.requires.agreement");
         
         var orderDraftResult = await _orderRepository.FindExistingDraft(customerIdentifier, supplierIdentifier, token);
         if (orderDraftResult.IsFailure)
-            return Result.Failure<OrderDraftResult>(orderDraftResult);
+            return Result.Failure<string>(orderDraftResult);
 
         if (orderDraftResult.Value.HasValue)
-            return Result.Success(new OrderDraftResult(orderDraftResult.Value.Value.Identifier.Value));
+            return Result.Success<string>(orderDraftResult.Value.Value.Identifier.Value);
 
         var order = Order.CreateDraft(
             supplierIdentifier,
             customerIdentifier);
         
-        return Result.Success(new OrderDraftResult(order.Identifier.Value, order));
+        _orderRepository.Add(order);
+        
+        return Result.Success<string>(order.Identifier.Value);
     }
 }
-
-public record OrderDraftResult(string OrderIdentifier, Order? Order = null);

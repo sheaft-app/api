@@ -2,7 +2,7 @@
 
 public interface IDeliverOrders
 {
-    Task<Result<DeliveryOrdersResult>> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
+    Task<Result> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
         CancellationToken token);
 }
 
@@ -19,33 +19,34 @@ public class DeliverOrders : IDeliverOrders
         _deliveryRepository = deliveryRepository;
     }
 
-    public async Task<Result<DeliveryOrdersResult>> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
+    public async Task<Result> Deliver(DeliveryId deliveryIdentifier, DateTimeOffset currentDateTime,
         CancellationToken token)
     {
         var deliveryResult = await _deliveryRepository.Get(deliveryIdentifier, token);
         if (deliveryResult.IsFailure)
-            return Result.Failure<DeliveryOrdersResult>(deliveryResult);
+            return Result.Failure(deliveryResult);
 
         var delivery = deliveryResult.Value;
         var deliverResult = delivery.Deliver(currentDateTime);
         if (deliverResult.IsFailure)
-            return Result.Failure<DeliveryOrdersResult>(deliverResult);
+            return Result.Failure(deliverResult);
+        
+        _deliveryRepository.Update(delivery);
 
-        var orders = new List<Order>();
         foreach (var orderIdentifier in delivery.Orders.Select(o => o.OrderIdentifier))
         {
             var orderResult = await _orderRepository.Get(orderIdentifier, token);
             if (orderResult.IsFailure)
-                return Result.Failure<DeliveryOrdersResult>(orderResult);
+                return Result.Failure(orderResult);
 
             var order = orderResult.Value;
             var markAsDeliveredResult = order.MarkAsCompleted();
             if (markAsDeliveredResult.IsFailure)
-                return Result.Failure<DeliveryOrdersResult>(markAsDeliveredResult);
+                return Result.Failure(markAsDeliveredResult);
             
-            orders.Add(order);
+            _orderRepository.Update(order);
         }
 
-        return Result.Success(new DeliveryOrdersResult(delivery, orders));
+        return Result.Success();
     }
 }

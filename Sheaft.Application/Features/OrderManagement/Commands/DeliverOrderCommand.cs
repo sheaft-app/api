@@ -23,11 +23,6 @@ public class DeliverOrderHandler : ICommandHandler<DeliverOrderCommand, Result>
         var result = await _deliverOrders.Deliver(request.DeliveryIdentifier, request.CreatedAt, token);
         if (result.IsFailure)
             return result;
-
-        _uow.Deliveries.Update(result.Value.Delivery);
-        
-        foreach (var order in result.Value.Orders)
-            _uow.Orders.Update(order);
         
         return await _uow.Save(token);
     }

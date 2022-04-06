@@ -2,7 +2,7 @@
 
 public interface IFulfillOrders
 {
-    Task<Result<OrdersDeliveriesFullfiledResult>> Fulfill(IEnumerable<OrderId> orderIdentifiers, IEnumerable<CustomerDeliveryDate>? customersDeliveryDate,
+    Task<Result> Fulfill(IEnumerable<OrderId> orderIdentifiers, IEnumerable<CustomerDeliveryDate>? customersDeliveryDate,
         DateTimeOffset currentDateTime, CancellationToken token);
 }
 
@@ -22,42 +22,36 @@ public class FulfillOrders : IFulfillOrders
         _generateDeliveryCode = generateDeliveryCode;
     }
 
-    public async Task<Result<OrdersDeliveriesFullfiledResult>> Fulfill(IEnumerable<OrderId> orderIdentifiers, IEnumerable<CustomerDeliveryDate>? customersDeliveryDate,
+    public async Task<Result> Fulfill(IEnumerable<OrderId> orderIdentifiers, IEnumerable<CustomerDeliveryDate>? customersDeliveryDate,
         DateTimeOffset currentDateTime, CancellationToken token)
     {
-        var orders = new List<Order>();
         var deliveries = new List<Delivery>();
         
         foreach (var orderIdentifier in orderIdentifiers)
         {
             var orderResult = await _orderRepository.Get(orderIdentifier, token);
             if (orderResult.IsFailure)
-                return Result.Failure<OrdersDeliveriesFullfiledResult>(orderResult);
+                return Result.Failure(orderResult);
 
             var order = orderResult.Value;
             var fulfillResult = order.Fulfill(currentDateTime);
             if (fulfillResult.IsFailure)
-                return Result.Failure<OrdersDeliveriesFullfiledResult>(fulfillResult);
-            
-            orders.Add(order);
+                return Result.Failure(fulfillResult);
             
             var deliveryResult = await _deliveryRepository.GetDeliveryForOrder(order.Identifier, token);
             if (deliveryResult.IsFailure)
-                return Result.Failure<OrdersDeliveriesFullfiledResult>(deliveryResult);
+                return Result.Failure(deliveryResult);
 
             var delivery = deliveryResult.Value;
             
             var deliveryDate = customersDeliveryDate?.FirstOrDefault(c => c.CustomerId == order.CustomerIdentifier)?.DeliveryDate ?? delivery.ScheduledAt;
             var deliveryScheduledResult = delivery.Reschedule(deliveryDate, currentDateTime);
             if (deliveryScheduledResult.IsFailure)
-                return Result.Failure<OrdersDeliveriesFullfiledResult>(deliveryScheduledResult);
+                return Result.Failure(deliveryScheduledResult);
             
             deliveries.Add(delivery);
         }
 
-        var deliveriesToAdd = new List<Delivery>();
-        var deliveriesToRemove = new List<Delivery>();
-        var deliveriesToUpdate = new List<Delivery>();
         var groupedDeliveries = deliveries.GroupBy(d => new {d.ScheduledAt, d.Address, d.SupplierIdentifier});
         
         foreach (var groupedDelivery in groupedDeliveries)
@@ -65,7 +59,9 @@ public class FulfillOrders : IFulfillOrders
             var groupedOrders = groupedDelivery.SelectMany(gd => gd.Orders.Select(o => o.OrderIdentifier));
             if (groupedDelivery.Count() > 1)
             {
-                deliveriesToRemove.AddRange(groupedDelivery.ToList());
+                foreach (var deliveryToRemove in groupedDelivery)
+                    _deliveryRepository.Add(deliveryToRemove);
+                
                 var delivery = new Delivery(groupedDelivery.Key.ScheduledAt, groupedDelivery.Key.Address, groupedOrders, groupedDelivery.Key.SupplierIdentifier);
                 
                 var deliveryCodeResult = await _generateDeliveryCode.GenerateNextCode(delivery.SupplierIdentifier, token);
@@ -73,7 +69,7 @@ public class FulfillOrders : IFulfillOrders
                     return Result.Failure<OrdersDeliveriesFullfiledResult>(deliveryCodeResult);
 
                 delivery.Schedule(deliveryCodeResult.Value, groupedDelivery.Key.ScheduledAt, currentDateTime);
-                deliveriesToAdd.Add(delivery);
+                _deliveryRepository.Add(delivery);
             }
             else
             {
@@ -83,11 +79,11 @@ public class FulfillOrders : IFulfillOrders
                     return Result.Failure<OrdersDeliveriesFullfiledResult>(deliveryCodeResult);
 
                 delivery.Schedule(deliveryCodeResult.Value, groupedDelivery.Key.ScheduledAt, currentDateTime);
-                deliveriesToUpdate.Add(delivery);
+                _deliveryRepository.Update(delivery);
             }
         }
         
-        return Result.Success(new OrdersDeliveriesFullfiledResult(orders, deliveriesToAdd, deliveriesToRemove, deliveriesToUpdate));
+        return Result.Success();
     }
 }
 
