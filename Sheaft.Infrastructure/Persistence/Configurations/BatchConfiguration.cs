@@ -28,8 +28,12 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
             .ValueGeneratedOnAddOrUpdate();
         
         builder
+            .Property(p => p.Number)
+            .HasConversion(number => number.Value, value => new BatchNumber(value));
+
+        builder
             .Property(p => p.SupplierIdentifier)
-            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+            .HasConversion(supplierIdentifier => supplierIdentifier.Value, value => new SupplierId(value));
 
         builder
             .HasIndex(c => c.Identifier)

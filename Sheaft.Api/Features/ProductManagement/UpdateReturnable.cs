@@ -14,7 +14,7 @@ public class UpdateReturnable : Feature
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<string>> Post([FromRoute] string id, [FromBody] UpdateReturnableRequest data, CancellationToken token)
+    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateReturnableRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new UpdateReturnableCommand(new ReturnableId(id), data.Name, data.Code,  data.Price, data.Vat), token);
         return HandleCommandResult(result);

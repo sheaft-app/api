@@ -25,8 +25,4 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\BatchManagement" />
-  </ItemGroup>
-
 </Project>
