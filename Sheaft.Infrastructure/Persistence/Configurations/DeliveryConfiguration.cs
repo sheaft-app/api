@@ -51,7 +51,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.OwnsMany(o => o.Lines, l =>
         {
             l
-                .Property(p => p.UnitUnitPrice)
+                .Property(p => p.UnitPrice)
                 .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
             l
@@ -75,7 +75,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder.OwnsMany(o => o.Adjustments, l =>
         {
             l
-                .Property(p => p.UnitUnitPrice)
+                .Property(p => p.UnitPrice)
                 .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
             l

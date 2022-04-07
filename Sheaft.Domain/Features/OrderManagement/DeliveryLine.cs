@@ -13,9 +13,9 @@ public record DeliveryLine
         Reference = reference;
         Name = name;
         Quantity = quantity;
-        UnitUnitPrice = unitPrice;
+        UnitPrice = unitPrice;
         Vat = vat;
-        TotalPrice = GetTotalPrice(Quantity, UnitUnitPrice);
+        TotalPrice = GetTotalPrice(Quantity, UnitPrice);
     }
 
     public static DeliveryLine CreateProductLine(ProductId identifier, ProductCode reference, ProductName name,
@@ -41,7 +41,7 @@ public record DeliveryLine
     public string Reference { get; private set; }
     public string Name { get; private set; }
     public Quantity Quantity { get; private set; }
-    public UnitPrice UnitUnitPrice { get; private set; }
+    public UnitPrice UnitPrice { get; private set; }
     public VatRate Vat { get; private set; }
     public TotalPrice TotalPrice { get; private set; }
 

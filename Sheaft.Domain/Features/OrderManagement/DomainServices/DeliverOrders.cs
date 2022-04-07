@@ -36,7 +36,7 @@ public class DeliverOrders : IDeliverOrders
         var adjustmentLines = new List<DeliveryLine>();
         if (productAdjustments != null && productAdjustments.Any())
         {
-            var productsToAdjustResult = await _retrieveProductsToAdjust.Get(delivery.SupplierIdentifier, productAdjustments, token);
+            var productsToAdjustResult = await _retrieveProductsToAdjust.Get(delivery, productAdjustments, token);
             if (productsToAdjustResult.IsFailure)
                 return Result.Failure(productsToAdjustResult);
             

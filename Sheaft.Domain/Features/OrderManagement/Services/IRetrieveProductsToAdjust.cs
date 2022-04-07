@@ -2,5 +2,5 @@
 
 public interface IRetrieveProductsToAdjust
 {
-    Task<Result<IEnumerable<DeliveryLine>>> Get(SupplierId supplierIdentifier, IEnumerable<ProductAdjustment> productAdjustments, CancellationToken token);
+    Task<Result<IEnumerable<DeliveryLine>>> Get(Delivery delivery, IEnumerable<ProductAdjustment> productAdjustments, CancellationToken token);
 }

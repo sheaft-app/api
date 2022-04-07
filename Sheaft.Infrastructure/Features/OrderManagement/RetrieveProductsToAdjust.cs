@@ -15,9 +15,8 @@ public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
         _context = context;
     }
 
-    public async Task<Result<IEnumerable<DeliveryLine>>> Get(SupplierId supplierIdentifier,
-        IEnumerable<ProductAdjustment> productAdjustments,
-        CancellationToken token)
+    public async Task<Result<IEnumerable<DeliveryLine>>> Get(Delivery delivery,
+        IEnumerable<ProductAdjustment> productAdjustments, CancellationToken token)
     {
         try
         {
@@ -26,7 +25,7 @@ public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
                         .ThenInclude(p => p.Returnable)
-                .SingleOrDefaultAsync(c => c.IsDefault && c.SupplierIdentifier == supplierIdentifier, token);
+                .SingleOrDefaultAsync(c => c.IsDefault && c.SupplierIdentifier == delivery.SupplierIdentifier, token);
 
             var productsToAdjust = productAdjustments.Select(p => p.Identifier).ToList();
             var products = catalog.Products.Where(p => productsToAdjust.Contains(p.Product.Identifier))
@@ -37,16 +36,56 @@ public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
                     "delivery.products.to.adjust.not.found");
 
             var adjustedProducts = products.Select(p =>
-                DeliveryLine.CreateProductLine(p.Product.Identifier, p.Product.Code, p.Product.Name,
-                    GetProductQuantity(p.Product.Identifier, productAdjustments), p.UnitPrice,
-                    p.Product.Vat)).ToList();
+                {
+                    var existingProduct =
+                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Identifier.Value);
+
+                    var price = p.UnitPrice;
+                    var vat = p.Product.Vat;
+                    var name = p.Product.Name;
+                    var reference = p.Product.Code;
+                    var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
+
+                    if (existingProduct != null)
+                    {
+                        price = new ProductUnitPrice(existingProduct.UnitPrice);
+                        vat = existingProduct.Vat;
+                        name = new ProductName(existingProduct.Name);
+                        reference = new ProductCode(existingProduct.Reference);
+
+                        if (existingProduct.Quantity.Value < Math.Abs(quantity.Value))
+                            throw new InvalidOperationException("delivery.adjusted.product.invalid.quantity");
+                    }
+
+                    return DeliveryLine.CreateProductLine(p.Product.Identifier, reference, name, quantity, price, vat);
+                }).ToList();
             
             adjustedProducts.AddRange(products
                 .Where(p => p.Product.Returnable != null)
                 .Select(p =>
-                    DeliveryLine.CreateReturnableLine(p.Product.Returnable.Identifier, p.Product.Returnable.Reference, p.Product.Returnable.Name,
-                        GetProductQuantity(p.Product.Identifier, productAdjustments), p.Product.Returnable.UnitPrice,
-                        p.Product.Returnable.Vat)));
+                {
+                    var existingReturnable =
+                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Returnable.Identifier.Value);
+
+                    var price = p.Product.Returnable.UnitPrice;
+                    var vat = p.Product.Returnable.Vat;
+                    var name = p.Product.Returnable.Name;
+                    var reference = p.Product.Returnable.Reference;
+                    var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
+
+                    if (existingReturnable != null)
+                    {
+                        price = new ProductUnitPrice(existingReturnable.UnitPrice);
+                        vat = existingReturnable.Vat;
+                        name = new ReturnableName(existingReturnable.Name);
+                        reference = new ReturnableReference(existingReturnable.Reference);
+
+                        if (existingReturnable.Quantity.Value < Math.Abs(quantity.Value))
+                            throw new InvalidOperationException("delivery.adjusted.returnable.invalid.quantity");
+                    }
+
+                    return DeliveryLine.CreateReturnableLine(p.Product.Returnable.Identifier, reference, name, quantity, price, vat);
+                }));
 
             return Result.Success(adjustedProducts.AsEnumerable());
         }
