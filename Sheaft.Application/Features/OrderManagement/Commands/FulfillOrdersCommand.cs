@@ -3,7 +3,8 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record FulfillOrdersCommand(IEnumerable<OrderId> OrderIdentifiers, bool RegroupOrders, IEnumerable<CustomerDeliveryDate>? CustomersNewDeliveryDate) : Command<Result>;
+public record FulfillOrdersCommand(IEnumerable<OrderId> OrderIdentifiers, bool RegroupOrders, IEnumerable<CustomerDeliveryDate>? CustomersNewDeliveryDate,
+    IEnumerable<ProductBatches>? ProductsBatches) : Command<Result>;
     
 public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result>
 {
@@ -19,7 +20,7 @@ public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result
 
     public async Task<Result> Handle(FulfillOrdersCommand request, CancellationToken token)
     {
-        var result = await _fulfillOrders.Fulfill(request.OrderIdentifiers, request.CustomersNewDeliveryDate, request.RegroupOrders, request.CreatedAt, token);
+        var result = await _fulfillOrders.Fulfill(request.OrderIdentifiers, request.CustomersNewDeliveryDate, request.ProductsBatches, request.RegroupOrders, request.CreatedAt, token);
         if (result.IsFailure)
             return Result.Failure(result);
         

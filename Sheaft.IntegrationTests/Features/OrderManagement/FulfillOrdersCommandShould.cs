@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.OData.Edm;
 using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
@@ -25,7 +24,8 @@ public class FulfillOrdersCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order.Identifier}, true, new List<CustomerDeliveryDate>());
+        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order.Identifier}, true,
+            new List<CustomerDeliveryDate>(), new List<ProductBatches>());
 
         var result =
             await handler.Handle(
@@ -41,7 +41,7 @@ public class FulfillOrdersCommandShould
         Assert.AreEqual(OrderStatus.Fulfilled, order.Status);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order.FulfilledOn);
     }
-    
+
     [Test]
     public async Task Switch_Order_Status_To_Fulfilled_And_Reschedule_Delivery()
     {
@@ -53,7 +53,7 @@ public class FulfillOrdersCommandShould
             new List<CustomerDeliveryDate>
             {
                 new CustomerDeliveryDate(order.CustomerIdentifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)))
-            });
+            }, new List<ProductBatches>());
 
         var result =
             await handler.Handle(
@@ -81,8 +81,7 @@ public class FulfillOrdersCommandShould
         var order2 = InitOrder(context, false, deliveryDate);
 
         var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
-            true,
-            new List<CustomerDeliveryDate>());
+            true, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
 
         var result =
             await handler.Handle(
@@ -113,8 +112,7 @@ public class FulfillOrdersCommandShould
         var order2 = InitOrder(context, false, deliveryDate);
 
         var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
-            false,
-            new List<CustomerDeliveryDate>());
+            false, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
 
         var result =
             await handler.Handle(
@@ -131,16 +129,16 @@ public class FulfillOrdersCommandShould
         Assert.AreEqual(1, delivery1.Orders.Count());
         Assert.AreEqual(2, delivery1.Lines.Count());
         Assert.AreEqual(2, delivery1.Lines.Sum(l => l.Quantity.Value));
-        
+
         Assert.IsNotNull(delivery2);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery2.Status);
         Assert.AreEqual(1, delivery2.Orders.Count());
         Assert.AreEqual(2, delivery2.Lines.Count());
         Assert.AreEqual(2, delivery2.Lines.Sum(l => l.Quantity.Value));
-        
+
         Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
         Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
-        
+
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
     }
@@ -152,7 +150,8 @@ public class FulfillOrdersCommandShould
         var order1 = InitOrder(context, false);
         var order2 = InitOrder(context, true);
 
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier}, true, new List<CustomerDeliveryDate>());
+        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
+            true, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
 
         var result =
             await handler.Handle(
@@ -169,16 +168,16 @@ public class FulfillOrdersCommandShould
         Assert.AreEqual(1, delivery1.Orders.Count());
         Assert.AreEqual(2, delivery1.Lines.Count());
         Assert.AreEqual(2, delivery1.Lines.Sum(l => l.Quantity.Value));
-        
+
         Assert.IsNotNull(delivery2);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery2.Status);
         Assert.AreEqual(1, delivery2.Orders.Count());
         Assert.AreEqual(2, delivery2.Lines.Count());
         Assert.AreEqual(2, delivery2.Lines.Sum(l => l.Quantity.Value));
-        
+
         Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
         Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
-        
+
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
     }
@@ -191,7 +190,8 @@ public class FulfillOrdersCommandShould
         var customer1 = AccountId.New();
         var customer2 = AccountId.New();
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customer1, new DeliveryDay(DayOfWeek.Friday)}, {customer2, new DeliveryDay(DayOfWeek.Monday)}};
+        var agreements = new Dictionary<AccountId, DeliveryDay>
+            {{customer1, new DeliveryDay(DayOfWeek.Friday)}, {customer2, new DeliveryDay(DayOfWeek.Monday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
@@ -201,7 +201,7 @@ public class FulfillOrdersCommandShould
 
         var handler = new FulfillOrdersHandler(uow,
             new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context),
-                new GenerateDeliveryCode()));
+                new GenerateDeliveryCode(), new RetrieveDeliveryBatches(context)));
 
         return (context, handler);
     }
@@ -209,7 +209,9 @@ public class FulfillOrdersCommandShould
     private static Order InitOrder(AppDbContext context, bool otherCustomer, DateTimeOffset? deliveryDate = null)
     {
         var supplier = context.Suppliers.First();
-        var customer = !otherCustomer ? context.Customers.OrderBy(c => c.AccountIdentifier).First() : context.Customers.OrderBy(c => c.AccountIdentifier).Last();
+        var customer = !otherCustomer
+            ? context.Customers.OrderBy(c => c.AccountIdentifier).First()
+            : context.Customers.OrderBy(c => c.AccountIdentifier).Last();
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
 

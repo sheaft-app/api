@@ -22,4 +22,8 @@
       <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\BatchManagement" />
+    </ItemGroup>
+
 </Project>

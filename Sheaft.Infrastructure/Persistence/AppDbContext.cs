@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -42,8 +43,8 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new AgreementConfiguration());
         
         modelBuilder.ApplyConfiguration(new OrderConfiguration());
-        modelBuilder.ApplyConfiguration(new OrderConfiguration());
         modelBuilder.ApplyConfiguration(new DeliveryConfiguration());
+        modelBuilder.ApplyConfiguration(new BatchConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -95,6 +96,10 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<ReturnableId>()
             .HaveConversion<ReturnableIdConverter>();
+        
+        configurationBuilder
+            .Properties<BatchId>()
+            .HaveConversion<BatchIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
@@ -110,6 +115,8 @@ internal class AppDbContext : DbContext, IDbContext
     
     public DbSet<Order> Orders { get; set; }
     public DbSet<Delivery> Deliveries { get; set; }
+    
+    public DbSet<Batch> Batches { get; set; }
 }
 
 internal static class DbContextExtension

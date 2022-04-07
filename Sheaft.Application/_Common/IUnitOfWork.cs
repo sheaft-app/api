@@ -1,6 +1,7 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -23,6 +24,8 @@ public interface IUnitOfWork
     
     public IOrderRepository Orders { get; }
     public IDeliveryRepository Deliveries { get; }
+    
+    public IBatchRepository Batches { get; }
     
     public Task<Result<int>> Save(CancellationToken token);
 }

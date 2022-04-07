@@ -29,11 +29,15 @@ public class Delivery : AggregateRoot
     public IEnumerable<DeliveryOrder> Orders { get; private set; }
     public IEnumerable<DeliveryLine> Lines { get; private set; }
     public IEnumerable<DeliveryLine> Adjustments { get; private set; }
+    public IEnumerable<DeliveryBatch> Batches { get; private set; }
 
-    public Result SetOrders(IEnumerable<Order> orders)
+    private Result SetOrders(IEnumerable<Order> orders)
     {
         if (orders.GroupBy(o => o.CustomerIdentifier).Count() > 1)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.customer");
+        
+        if (orders.GroupBy(o => o.SupplierIdentifier).Count() > 1)
+            return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.supplier");
         
         Orders = orders.Select(o => new DeliveryOrder(o.Identifier)).ToList();
 
@@ -54,11 +58,12 @@ public class Delivery : AggregateRoot
         return Result.Success();
     }
 
-    internal Result Schedule(DeliveryReference reference, DeliveryDate scheduledOn, DateTimeOffset? currentDateTime = null)
+    internal Result Schedule(DeliveryReference reference, DeliveryDate scheduledOn, IEnumerable<DeliveryBatch>? batches, DateTimeOffset? currentDateTime = null)
     {
         if (Status != DeliveryStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.pending.delivery");
 
+        Batches = batches ?? new List<DeliveryBatch>();
         Reference = reference;
         Status = DeliveryStatus.Scheduled;
         return Reschedule(scheduledOn, currentDateTime);
@@ -84,5 +89,3 @@ public class Delivery : AggregateRoot
         return Result.Success();
     }
 }
-
-public record DeliveryOrder(OrderId OrderIdentifier);

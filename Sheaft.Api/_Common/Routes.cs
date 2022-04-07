@@ -12,4 +12,6 @@ public static class Routes
     public const string AGREEMENTS = $"{API}/agreements";
     public const string ORDERS = $"{API}/orders";
     public const string DELIVERIES = $"{API}/deliveries";
+    public const string RETURNABLES = $"{API}/returnables";
+    public const string BATCHES = $"{API}/batches";
 }

@@ -68,6 +68,14 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             l.ToTable("Delivery_Lines");
         });
         
+        builder.OwnsMany(b => b.Batches, b =>
+        {
+            b.WithOwner().HasForeignKey("DeliveryId");
+            b.HasKey("DeliveryId", "BatchIdentifier", "ProductIdentifier");
+                
+            b.ToTable("Delivery_Batches");
+        });
+        
         builder.OwnsMany(o => o.Adjustments, l =>
         {
             l

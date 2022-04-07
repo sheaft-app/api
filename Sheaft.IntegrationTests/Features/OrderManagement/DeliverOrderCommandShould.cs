@@ -131,8 +131,7 @@ public class DeliverOrderCommandShould
             new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
         delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
-            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
-            DateTimeOffset.UtcNow);
+            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
 
         context.Add(order);
         context.Add(delivery);

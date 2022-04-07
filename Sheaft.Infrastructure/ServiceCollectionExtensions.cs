@@ -13,11 +13,13 @@ using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.AgreementManagement;
+using Sheaft.Infrastructure.BatchManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
@@ -67,6 +69,8 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+        
+        services.AddScoped<IBatchRepository, BatchRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)
@@ -120,6 +124,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
         services.AddScoped<IRetrieveReturnedReturnables, RetrieveReturnedReturnables>();
         services.AddScoped<IRetrieveProductsToAdjust, RetrieveProductsToAdjust>();
+        services.AddScoped<IRetrieveDeliveryBatches, RetrieveDeliveryBatches>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)
