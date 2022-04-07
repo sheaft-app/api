@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record CreateProductCommand(string Name, string? Code, string? Description, int Price, int Vat, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
+public record CreateProductCommand(string Name, string? Code, string? Description, int Price, int Vat, ReturnableId? ReturnableIdentifier, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
 
 internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Result<string>>
 {
@@ -31,7 +31,17 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
         if (catalogResult.IsFailure)
             return Result.Failure<string>(catalogResult);
 
-        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat), request.Description, request.SupplierIdentifier);
+        Returnable? returnable = null;
+        if (request.ReturnableIdentifier != null)
+        {
+            var returnableResult = await _uow.Returnables.Get(request.ReturnableIdentifier, token);
+            if (returnableResult.IsFailure)
+                return Result.Failure<string>(returnableResult);
+
+            returnable = returnableResult.Value;
+        }
+        
+        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat), request.Description, request.SupplierIdentifier, returnable);
         _uow.Products.Add(product);
 
         var catalog = catalogResult.Value;

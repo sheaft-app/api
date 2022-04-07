@@ -3,13 +3,14 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateProductCommand(ProductId Identifier, string Name, int Vat, string? Code, string? Description, int Price) : ICommand<Result>;
+public record UpdateProductCommand(ProductId Identifier, string Name, int Vat, string? Code, string? Description, int Price, ReturnableId? ReturnableIdentifier) : ICommand<Result>;
 
 internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Result>
 {
     private readonly IUnitOfWork _uow;
     private readonly IRetrieveDefaultCatalog _retrieveDefaultCatalog;
     private readonly IHandleProductCode _handleProductCode;
+    private readonly IReturnableRepository _returnableRepository;
 
     public UpdateProductHandler(
         IUnitOfWork uow,
@@ -41,7 +42,18 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
             
             product.UpdateCode(codeResult.Value);
         }
+
+        Returnable? returnable = null;
+        if (request.ReturnableIdentifier != null)
+        {
+            var returnableResult = await _uow.Returnables.Get(request.ReturnableIdentifier, token);
+            if (returnableResult.IsFailure)
+                return Result.Failure(returnableResult);
+
+            returnable = returnableResult.Value;
+        }
         
+        product.SetReturnable(returnable);
         _uow.Products.Update(product);
         
         var catalog = catalogResult.Value;
