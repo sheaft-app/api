@@ -1,10 +1,10 @@
 ﻿namespace Sheaft.Domain;
 
-public record OrderCode
+public record OrderReference
 {
-    private OrderCode(){}
+    private OrderReference(){}
     
-    public OrderCode(string value)
+    public OrderReference(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new InvalidOperationException("Order code is required");

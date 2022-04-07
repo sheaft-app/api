@@ -24,4 +24,10 @@ internal class ReturnableRepository : Repository<Returnable, ReturnableId>, IRet
                 : Result.Failure<Returnable>(ErrorKind.NotFound, "returnable.not.found");
         });
     }
+
+    public Task<Result<Maybe<Returnable>>> FindWithReference(ReturnableReference reference, SupplierId supplierIdentifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+            Result.Success(await Values.SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierIdentifier == supplierIdentifier, token) ?? Maybe<Returnable>.None));
+    }
 }

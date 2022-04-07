@@ -7,10 +7,10 @@ public class Order : AggregateRoot
 {
     private Order(){}
     
-    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderCode? code = null, string? externalCode = null)
+    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderReference? reference = null, string? externalCode = null)
     {
         Identifier = OrderId.New();
-        Code = code;
+        Reference = reference;
         ExternalCode = externalCode;
         Status = status;
         SupplierIdentifier = supplierIdentifier;
@@ -24,13 +24,13 @@ public class Order : AggregateRoot
         return new Order(OrderStatus.Draft, supplierIdentifier, customerIdentifier);
     }
 
-    public static Order Create(OrderCode code, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine> lines, string? externalCode = null)
+    public static Order Create(OrderReference reference, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine> lines, string? externalCode = null)
     {
-        return new Order(OrderStatus.Pending, supplierIdentifier, customerIdentifier, lines, code, externalCode);
+        return new Order(OrderStatus.Pending, supplierIdentifier, customerIdentifier, lines, reference, externalCode);
     }
 
     public OrderId Identifier { get; }
-    public OrderCode? Code { get; private set; }
+    public OrderReference? Reference { get; private set; }
     public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
     public UnitPrice TotalPrice { get; private set; }
@@ -43,7 +43,7 @@ public class Order : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public IEnumerable<OrderLine> Lines { get; private set; } = new List<OrderLine>();
     
-    internal Result Publish(OrderCode code, IEnumerable<OrderLine>? lines = null)
+    internal Result Publish(OrderReference reference, IEnumerable<OrderLine>? lines = null)
     {
         if (Status != OrderStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.draft");
@@ -51,7 +51,7 @@ public class Order : AggregateRoot
         if (lines != null && !lines.Any() || !Lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.lines");
         
-        Code = code;
+        Reference = reference;
 
         if(lines != null)
             SetLines(lines);

@@ -18,7 +18,7 @@ public record DeliveryLine
         TotalPrice = GetTotalPrice(Quantity, UnitPrice);
     }
 
-    public static DeliveryLine CreateProductLine(ProductId identifier, ProductCode reference, ProductName name,
+    public static DeliveryLine CreateProductLine(ProductId identifier, ProductReference reference, ProductName name,
         Quantity quantity, ProductUnitPrice unitPrice, VatRate vat)
     {
         return new DeliveryLine(identifier.Value, DeliveryLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat);

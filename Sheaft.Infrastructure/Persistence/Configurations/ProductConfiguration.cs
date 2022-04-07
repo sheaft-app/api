@@ -39,19 +39,23 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasConversion(name => name.Value, value => new ProductName(value));
 
         builder
-            .Property(p => p.Code)
-            .HasConversion(code => code.Value, value => new ProductCode(value));
+            .Property(p => p.Reference)
+            .HasConversion(code => code.Value, value => new ProductReference(value));
 
         builder
             .Property(p => p.Vat)
             .HasConversion(vat => vat.Value, value => new VatRate(value));
 
         builder
+            .Property(p => p.SupplierIdentifier)
+            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
         
         builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Code})
+            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
             .IsUnique();
         
         builder.ToTable("Product");

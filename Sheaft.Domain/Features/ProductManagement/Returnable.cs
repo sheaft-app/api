@@ -21,5 +21,15 @@ public class Returnable : Entity
     public ReturnableReference Reference { get; private set; }
     public UnitPrice UnitPrice { get; private set; }
     public VatRate Vat { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
+    public SupplierId SupplierIdentifier { get; }
+
+    public Result UpdateInfo(ReturnableName name, ReturnableReference reference, UnitPrice price, VatRate vat)
+    {
+        Name = name;
+        Reference = reference;
+        UnitPrice = price;
+        Vat = vat;
+
+        return Result.Success();
+    }
 }

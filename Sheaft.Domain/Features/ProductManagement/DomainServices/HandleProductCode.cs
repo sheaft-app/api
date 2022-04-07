@@ -2,11 +2,11 @@
 
 public interface IHandleProductCode
 {
-    Task<Result<ProductCode>> ValidateOrGenerateNextCodeForProduct(string? code, ProductId productIdentifier, 
+    Task<Result<ProductReference>> ValidateOrGenerateNextCodeForProduct(string? code, ProductId productIdentifier, 
         SupplierId supplierIdentifier,
         CancellationToken token);
     
-    Task<Result<ProductCode>> ValidateOrGenerateNextCodeForProduct(string? code, 
+    Task<Result<ProductReference>> ValidateOrGenerateNextCode(string? code, 
         SupplierId supplierIdentifier,
         CancellationToken token);
 }
@@ -24,33 +24,33 @@ internal class HandleProductCode : IHandleProductCode
         _generateProductCode = generateProductCode;
     }
 
-    public async Task<Result<ProductCode>> ValidateOrGenerateNextCodeForProduct(string? code, ProductId productIdentifier, 
+    public async Task<Result<ProductReference>> ValidateOrGenerateNextCodeForProduct(string? code, ProductId productIdentifier, 
         SupplierId supplierIdentifier, CancellationToken token)
     {
         return await GenerateNextProductCode(code, productIdentifier, supplierIdentifier, token);
     }
 
-    public async Task<Result<ProductCode>> ValidateOrGenerateNextCodeForProduct(string? code, 
+    public async Task<Result<ProductReference>> ValidateOrGenerateNextCode(string? code, 
         SupplierId supplierIdentifier, CancellationToken token)
     {
         return await GenerateNextProductCode(code, null, supplierIdentifier, token);
     }
 
-    private async Task<Result<ProductCode>> GenerateNextProductCode(string? code, ProductId? productIdentifier, SupplierId supplierIdentifier, CancellationToken token)
+    private async Task<Result<ProductReference>> GenerateNextProductCode(string? code, ProductId? productIdentifier, SupplierId supplierIdentifier, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(code))
             return await _generateProductCode.GenerateNextCode(supplierIdentifier, token);
 
-        var existingProductResult = await _productRepository.FindWithCode(new ProductCode(code), supplierIdentifier, token);
+        var existingProductResult = await _productRepository.FindWithCode(new ProductReference(code), supplierIdentifier, token);
         if (existingProductResult.IsFailure)
-            return Result.Failure<ProductCode>(existingProductResult);
+            return Result.Failure<ProductReference>(existingProductResult);
 
         if (existingProductResult.Value.HasNoValue)
-            return Result.Success(new ProductCode(code));
+            return Result.Success(new ProductReference(code));
 
         if(productIdentifier != null && existingProductResult.Value.Value.Identifier == productIdentifier)
-            return Result.Success(new ProductCode(code));
+            return Result.Success(new ProductReference(code));
 
-        return Result.Failure<ProductCode>(ErrorKind.Conflict, "product.code.already.exists");
+        return Result.Failure<ProductReference>(ErrorKind.Conflict, "product.code.already.exists");
     }
 }

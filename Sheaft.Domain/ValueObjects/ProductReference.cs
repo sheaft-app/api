@@ -1,10 +1,10 @@
 ﻿namespace Sheaft.Domain;
 
-public record ProductCode
+public record ProductReference
 {
-    private ProductCode(){}
+    private ProductReference(){}
     
-    public ProductCode(string value)
+    public ProductReference(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new InvalidOperationException("Product code is required");

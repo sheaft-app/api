@@ -41,6 +41,10 @@ internal class CatalogConfiguration : IEntityTypeConfiguration<Catalog>
             .HasConversion(name => name.Value, value => new CatalogName(value));
 
         builder
+            .Property(p => p.SupplierIdentifier)
+            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
         

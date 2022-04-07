@@ -2,5 +2,5 @@
 
 public interface IGenerateProductCode
 {
-    Task<Result<ProductCode>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token);
+    Task<Result<ProductReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token);
 }

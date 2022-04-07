@@ -45,7 +45,7 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                 .Select(cp => 
                     OrderLine.CreateProductLine(
                         cp.Product.Identifier, 
-                        cp.Product.Code, 
+                        cp.Product.Reference, 
                         cp.Product.Name, 
                         GetProductQuantity(cp.Product.Identifier, productsToProcess), 
                         cp.UnitPrice, 

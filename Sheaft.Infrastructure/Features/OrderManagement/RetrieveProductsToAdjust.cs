@@ -43,7 +43,7 @@ public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
                     var price = p.UnitPrice;
                     var vat = p.Product.Vat;
                     var name = p.Product.Name;
-                    var reference = p.Product.Code;
+                    var reference = p.Product.Reference;
                     var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
 
                     if (existingProduct != null)
@@ -51,7 +51,7 @@ public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
                         price = new ProductUnitPrice(existingProduct.UnitPrice);
                         vat = existingProduct.Vat;
                         name = new ProductName(existingProduct.Name);
-                        reference = new ProductCode(existingProduct.Reference);
+                        reference = new ProductReference(existingProduct.Reference);
 
                         if (existingProduct.Quantity.Value < Math.Abs(quantity.Value))
                             throw new InvalidOperationException("delivery.adjusted.product.invalid.quantity");

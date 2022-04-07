@@ -37,16 +37,12 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         });
         
         builder
-            .Property(p => p.Code)
-            .HasConversion(code => code != null ? code.Value : null, value => value != null ? new DeliveryCode(value) : null);
+            .Property(p => p.Reference)
+            .HasConversion(code => code != null ? code.Value : null, value => value != null ? new DeliveryReference(value) : null);
         
         builder
             .Property(p => p.ScheduledAt)
             .HasConversion(scheduledOn => scheduledOn.Value, value => new DeliveryDate(value, value));
-        
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
         
         builder.OwnsMany(o => o.Lines, l =>
         {
@@ -95,6 +91,18 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
             l.ToTable("Delivery_Adjustments");
         });
+        
+        builder
+            .Property(p => p.SupplierIdentifier)
+            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
+            .HasIndex(c => c.Identifier)
+            .IsUnique();
+        
+        builder
+            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
+            .IsUnique();
         
         builder.ToTable("Delivery");
     }

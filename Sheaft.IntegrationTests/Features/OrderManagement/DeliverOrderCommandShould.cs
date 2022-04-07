@@ -130,7 +130,7 @@ public class DeliverOrderCommandShould
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
-        delivery.Schedule(new DeliveryCode(Guid.NewGuid().ToString("N")),
+        delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
             new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)),
             DateTimeOffset.UtcNow);
 

@@ -53,15 +53,27 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         });
         
         builder
-            .Property(p => p.Code)
-            .HasConversion(code => code != null ? code.Value : null, value => value != null ? new OrderCode(value) : null);
+            .Property(p => p.Reference)
+            .HasConversion(code => code != null ? code.Value : null, value => value != null ? new OrderReference(value) : null);
         
         builder
             .Property(p => p.TotalPrice)
             .HasConversion(totalPrice => totalPrice.Value, value => new UnitPrice(value));
         
         builder
+            .Property(p => p.SupplierIdentifier)
+            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
+            .Property(p => p.CustomerIdentifier)
+            .HasConversion(vat => vat.Value, value => new CustomerId(value));
+        
+        builder
             .HasIndex(c => c.Identifier)
+            .IsUnique();
+        
+        builder
+            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
             .IsUnique();
         
         builder.ToTable("Order");

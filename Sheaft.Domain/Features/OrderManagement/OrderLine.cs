@@ -18,7 +18,7 @@ public record OrderLine
         TotalPrice = GetTotalPrice(Quantity, UnitPrice);
     }
 
-    public static OrderLine CreateProductLine(ProductId productIdentifier, ProductCode reference, ProductName name,
+    public static OrderLine CreateProductLine(ProductId productIdentifier, ProductReference reference, ProductName name,
         OrderedQuantity quantity, ProductUnitPrice unitPrice, VatRate vat)
     {
         return new OrderLine(productIdentifier.Value, OrderLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat);

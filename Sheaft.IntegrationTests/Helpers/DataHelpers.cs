@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
@@ -37,13 +38,13 @@ internal static class DataHelpers
     {
         if (!isDraft)
         {
-            var order = Order.Create(new OrderCode("test"), supplier.Identifier, customer.Identifier,
+            var order = Order.Create(new OrderReference(Guid.NewGuid().ToString("N")), supplier.Identifier, customer.Identifier,
                 addProducts ? new List<OrderLine>
                 {
-                    OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
+                    OrderLine.CreateProductLine(new ProductId("test1"), new ProductReference("test1"), new ProductName("test1"),
                         new OrderedQuantity(1),
                         new ProductUnitPrice(2000), new VatRate(2000)),
-                    OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
+                    OrderLine.CreateProductLine(new ProductId("test2"), new ProductReference("test2"), new ProductName("test2"),
                         new OrderedQuantity(1),
                         new ProductUnitPrice(2000), new VatRate(2000))
                 } : new List<OrderLine>(), "externalCode");
@@ -55,10 +56,10 @@ internal static class DataHelpers
             orderDraft.UpdateDraftLines(
                 new List<OrderLine>
                     {
-                        OrderLine.CreateProductLine(new ProductId("test1"), new ProductCode("test1"), new ProductName("test1"),
+                        OrderLine.CreateProductLine(new ProductId("test1"), new ProductReference("test1"), new ProductName("test1"),
                             new OrderedQuantity(1),
                             new ProductUnitPrice(2000), new VatRate(2000)),
-                        OrderLine.CreateProductLine(new ProductId("test2"), new ProductCode("test2"), new ProductName("test2"),
+                        OrderLine.CreateProductLine(new ProductId("test2"), new ProductReference("test2"), new ProductName("test2"),
                             new OrderedQuantity(1),
                             new ProductUnitPrice(2000), new VatRate(2000))
                     });
@@ -104,7 +105,7 @@ internal static class DataHelpers
             
             foreach (var productInfo in productsInfo)
             {
-                var product = new Product(new ProductName(productInfo.Key), new ProductCode(productInfo.Key), new VatRate(2000), null,
+                var product = new Product(new ProductName(productInfo.Key), new ProductReference(productInfo.Key), new VatRate(2000), null,
                     supplier.Identifier);
                 
                 catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(productInfo.Value));

@@ -2,5 +2,5 @@
 
 public interface IGenerateOrderCode
 {
-    Task<Result<OrderCode>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token);
+    Task<Result<OrderReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token);
 }

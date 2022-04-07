@@ -7,9 +7,9 @@ namespace Sheaft.Infrastructure.OrderManagement;
 internal class GenerateOrderCode : IGenerateOrderCode
 {
     private int code = 0;
-    public Task<Result<OrderCode>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
+    public Task<Result<OrderReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
     {
         code++;
-        return Task.FromResult(Result.Success(new OrderCode(code.ToString("0000000"))));
+        return Task.FromResult(Result.Success(new OrderReference(code.ToString("0000000"))));
     }
 }

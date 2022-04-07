@@ -25,10 +25,10 @@ internal class ProductRepository : Repository<Product, ProductId>, IProductRepos
         });
     }
 
-    public Task<Result<Maybe<Product>>> FindWithCode(ProductCode code, SupplierId supplierIdentifier,
+    public Task<Result<Maybe<Product>>> FindWithCode(ProductReference reference, SupplierId supplierIdentifier,
         CancellationToken token)
     {
         return QueryAsync(async () =>
-            Result.Success(await Values.SingleOrDefaultAsync(v => v.Code == code && v.SupplierIdentifier == supplierIdentifier, token) ?? Maybe<Product>.None));
+            Result.Success(await Values.SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierIdentifier == supplierIdentifier, token) ?? Maybe<Product>.None));
     }
 }

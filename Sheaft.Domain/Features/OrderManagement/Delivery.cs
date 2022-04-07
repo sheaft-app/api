@@ -20,7 +20,7 @@ public class Delivery : AggregateRoot
     }
 
     public DeliveryId Identifier { get; }
-    public DeliveryCode? Code { get; private set; }
+    public DeliveryReference? Reference { get; private set; }
     public DeliveryStatus Status { get; private set; }
     public DeliveryDate ScheduledAt { get; private set; }
     public DateTimeOffset? DeliveredOn { get; private set; }
@@ -54,12 +54,12 @@ public class Delivery : AggregateRoot
         return Result.Success();
     }
 
-    internal Result Schedule(DeliveryCode code, DeliveryDate scheduledOn, DateTimeOffset? currentDateTime = null)
+    internal Result Schedule(DeliveryReference reference, DeliveryDate scheduledOn, DateTimeOffset? currentDateTime = null)
     {
         if (Status != DeliveryStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.pending.delivery");
 
-        Code = code;
+        Reference = reference;
         Status = DeliveryStatus.Scheduled;
         return Reschedule(scheduledOn, currentDateTime);
     }

@@ -27,7 +27,7 @@ public class UpdateProductCommandShould
         var product = context.Products.Single(s => s.Identifier == productId);
         var catalog = context.Catalogs.Single(c => c.Products.Any(cp => cp.Product.Identifier == productId));
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual("newcode", product.Code.Value);
+        Assert.AreEqual("newcode", product.Reference.Value);
         Assert.AreEqual("desc", product.Description);
         Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Identifier == productId).UnitPrice.Value);
     }
@@ -42,7 +42,7 @@ public class UpdateProductCommandShould
 
         var product = context.Products.Single(s => s.Identifier == productId);
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual("0000000000017", product.Code.Value);
+        Assert.AreEqual("0000000000017", product.Reference.Value);
     }
 
     [Test]
@@ -94,7 +94,7 @@ public class UpdateProductCommandShould
 
         var supplierIdentifier = SupplierId.New();
         var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
-        var product = new Product(new ProductName("product"), new ProductCode("test"),  new VatRate(2000),null, supplierIdentifier);
+        var product = new Product(new ProductName("product"), new ProductReference("test"),  new VatRate(2000),null, supplierIdentifier);
         catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(2000));
 
         var returnable = new Returnable(new ReturnableName("Test"), new ReturnableReference("code"), new UnitPrice(2000),

@@ -34,7 +34,7 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
             return Result.Failure(catalogResult);
 
         product.UpdateInfo(new ProductName(request.Name), new VatRate(request.Vat), request.Description);
-        if (request.Code != product.Code.Value)
+        if (request.Code != product.Reference.Value)
         {
             var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Identifier, product.SupplierIdentifier, token);
             if (codeResult.IsFailure)

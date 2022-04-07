@@ -42,9 +42,17 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
         builder
             .Property(p => p.Vat)
             .HasConversion(vat => vat.Value, value => new VatRate(value));
+        
+        builder
+            .Property(p => p.SupplierIdentifier)
+            .HasConversion(vat => vat.Value, value => new SupplierId(value));
 
         builder
             .HasIndex(c => c.Identifier)
+            .IsUnique();
+        
+        builder
+            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
             .IsUnique();
         
         builder.ToTable("Returnable");

@@ -33,7 +33,7 @@ public class CreateProductCommandShould
     public async Task Insert_Product_With_Same_Code_But_Different_Supplier()
     {
         var (supplierId, context, handler) = InitHandler();
-        context.Products.Add(new Product(new ProductName("tess"), new ProductCode("Code"), new VatRate(2000), null,
+        context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(2000), null,
             SupplierId.New()));
         context.SaveChanges();
         var command = GetCommand(supplierId);
@@ -55,7 +55,7 @@ public class CreateProductCommandShould
 
         var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value));
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual("0000000000017", product.Code.Value);
+        Assert.AreEqual("0000000000017", product.Reference.Value);
     }
 
     [Test]
@@ -91,7 +91,7 @@ public class CreateProductCommandShould
     public async Task Fail_When_Inserting_Product_With_Already_Existing_Product_Code()
     {
         var (supplierId, context, handler) = InitHandler();
-        context.Products.Add(new Product(new ProductName("tess"), new ProductCode("Code"), new VatRate(2000), null,
+        context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(2000), null,
             supplierId));
         
         context.SaveChanges();

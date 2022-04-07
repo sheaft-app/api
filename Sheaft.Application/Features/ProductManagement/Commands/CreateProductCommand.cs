@@ -23,7 +23,7 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
     
     public async Task<Result<string>> Handle(CreateProductCommand request, CancellationToken token)
     {
-        var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, request.SupplierIdentifier, token);
+        var codeResult = await _handleProductCode.ValidateOrGenerateNextCode(request.Code, request.SupplierIdentifier, token);
         if (codeResult.IsFailure)
             return Result.Failure<string>(codeResult);
         

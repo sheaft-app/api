@@ -1,10 +1,10 @@
 ﻿namespace Sheaft.Domain;
 
-public record DeliveryCode
+public record DeliveryReference
 {
-    private DeliveryCode(){}
+    private DeliveryReference(){}
     
-    public DeliveryCode(string value)
+    public DeliveryReference(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new InvalidOperationException("Delivery code is required");

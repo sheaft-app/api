@@ -6,10 +6,10 @@ namespace Sheaft.Infrastructure.ProductManagement;
 internal class GenerateProductCode : IGenerateProductCode
 {
     private int code = 0;
-    public Task<Result<ProductCode>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
+    public Task<Result<ProductReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
     {
         code++;
-        return Task.FromResult(Result.Success(new ProductCode(GenerateEanIdentifier(code, 13))));
+        return Task.FromResult(Result.Success(new ProductReference(GenerateEanIdentifier(code, 13))));
     }
 
     private string GenerateEanIdentifier(long value, int length)
