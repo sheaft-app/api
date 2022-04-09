@@ -23,12 +23,12 @@ public class AcceptOrders : IAcceptOrders
     {
         var orderResult = await _orderRepository.Get(orderIdentifier, token);
         if (orderResult.IsFailure)
-            return Result.Failure(orderResult);
+            return orderResult;
 
         var order = orderResult.Value;
         var acceptResult = order.Accept(currentDateTime);
         if (acceptResult.IsFailure)
-            return Result.Failure(acceptResult);
+            return acceptResult;
         
         _orderRepository.Update(order);
 
@@ -38,10 +38,12 @@ public class AcceptOrders : IAcceptOrders
         
         var deliveryResult = await _deliveryRepository.GetDeliveryForOrder(orderIdentifier, token);
         if (deliveryResult.IsFailure)
-            return Result.Failure(deliveryResult);
+            return deliveryResult;
             
         delivery = deliveryResult.Value;
-        delivery.Reschedule(newDeliveryDate.Value, currentDateTime);
+        var result = delivery.ChangeDeliveryDate(newDeliveryDate.Value, currentDateTime);
+        if (result.IsFailure)
+            return result;
         
         _deliveryRepository.Update(delivery);
 

@@ -24,8 +24,9 @@ public class FulfillOrdersCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order.Identifier}, true,
-            new List<CustomerDeliveryDate>(), new List<ProductBatches>());
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+            order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
+                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
 
         var result =
             await handler.Handle(
@@ -48,12 +49,10 @@ public class FulfillOrdersCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order.Identifier},
-            true,
-            new List<CustomerDeliveryDate>
-            {
-                new CustomerDeliveryDate(order.CustomerIdentifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)))
-            }, new List<ProductBatches>());
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+            order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
+                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())),
+            DateTimeOffset.UtcNow.AddDays(4));
 
         var result =
             await handler.Handle(
@@ -67,119 +66,8 @@ public class FulfillOrdersCommandShould
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
         Assert.AreEqual(OrderStatus.Fulfilled, order.Status);
-        Assert.AreEqual(fulfillOrderCommand.CustomersNewDeliveryDate.First().DeliveryDate.Value,
-            delivery.ScheduledAt.Value);
+        Assert.AreEqual(fulfillOrderCommand.NewDeliveryDate.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(fulfillOrderCommand.CreatedAt, order.FulfilledOn);
-    }
-
-    [Test]
-    public async Task Regroup_Orders_Into_Same_Delivery_If_Customer_Are_Identical()
-    {
-        var (context, handler) = InitHandler();
-        var deliveryDate = DateTimeOffset.UtcNow.AddDays(2);
-        var order1 = InitOrder(context, false, deliveryDate);
-        var order2 = InitOrder(context, false, deliveryDate);
-
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
-            true, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
-
-        var result =
-            await handler.Handle(
-                fulfillOrderCommand,
-                CancellationToken.None);
-
-        Assert.IsTrue(result.IsSuccess);
-
-        var delivery = context.Deliveries.Single();
-
-        Assert.IsNotNull(delivery);
-        Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
-        Assert.AreEqual(2, delivery.Orders.Count());
-        Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
-        Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
-        Assert.AreEqual(2, delivery.Lines.Count());
-        Assert.AreEqual(4, delivery.Lines.Sum(l => l.Quantity.Value));
-    }
-
-    [Test]
-    public async Task Not_Regroup_Orders_Into_Same_Delivery_If_Customer_Are_Identical()
-    {
-        var (context, handler) = InitHandler();
-        var deliveryDate = DateTimeOffset.UtcNow.AddDays(2);
-        var order1 = InitOrder(context, false, deliveryDate);
-        var order2 = InitOrder(context, false, deliveryDate);
-
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
-            false, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
-
-        var result =
-            await handler.Handle(
-                fulfillOrderCommand,
-                CancellationToken.None);
-
-        Assert.IsTrue(result.IsSuccess);
-
-        var delivery1 = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order1.Identifier));
-        var delivery2 = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order2.Identifier));
-
-        Assert.IsNotNull(delivery1);
-        Assert.AreEqual(DeliveryStatus.Scheduled, delivery1.Status);
-        Assert.AreEqual(1, delivery1.Orders.Count());
-        Assert.AreEqual(2, delivery1.Lines.Count());
-        Assert.AreEqual(2, delivery1.Lines.Sum(l => l.Quantity.Value));
-
-        Assert.IsNotNull(delivery2);
-        Assert.AreEqual(DeliveryStatus.Scheduled, delivery2.Status);
-        Assert.AreEqual(1, delivery2.Orders.Count());
-        Assert.AreEqual(2, delivery2.Lines.Count());
-        Assert.AreEqual(2, delivery2.Lines.Sum(l => l.Quantity.Value));
-
-        Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
-        Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
-
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
-    }
-
-    [Test]
-    public async Task Not_Regroup_Orders_Into_Same_Delivery_If_Customer_Are_Different()
-    {
-        var (context, handler) = InitHandler();
-        var order1 = InitOrder(context, false);
-        var order2 = InitOrder(context, true);
-
-        var fulfillOrderCommand = new FulfillOrdersCommand(new List<OrderId> {order1.Identifier, order2.Identifier},
-            true, new List<CustomerDeliveryDate>(), new List<ProductBatches>());
-
-        var result =
-            await handler.Handle(
-                fulfillOrderCommand,
-                CancellationToken.None);
-
-        Assert.IsTrue(result.IsSuccess);
-
-        var delivery1 = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order1.Identifier));
-        var delivery2 = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order2.Identifier));
-
-        Assert.IsNotNull(delivery1);
-        Assert.AreEqual(DeliveryStatus.Scheduled, delivery1.Status);
-        Assert.AreEqual(1, delivery1.Orders.Count());
-        Assert.AreEqual(2, delivery1.Lines.Count());
-        Assert.AreEqual(2, delivery1.Lines.Sum(l => l.Quantity.Value));
-
-        Assert.IsNotNull(delivery2);
-        Assert.AreEqual(DeliveryStatus.Scheduled, delivery2.Status);
-        Assert.AreEqual(1, delivery2.Orders.Count());
-        Assert.AreEqual(2, delivery2.Lines.Count());
-        Assert.AreEqual(2, delivery2.Lines.Sum(l => l.Quantity.Value));
-
-        Assert.AreEqual(OrderStatus.Fulfilled, order1.Status);
-        Assert.AreEqual(OrderStatus.Fulfilled, order2.Status);
-
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order1.FulfilledOn);
-        Assert.AreEqual(fulfillOrderCommand.CreatedAt, order2.FulfilledOn);
     }
 
     private (AppDbContext, FulfillOrdersHandler) InitHandler()
@@ -201,7 +89,7 @@ public class FulfillOrdersCommandShould
 
         var handler = new FulfillOrdersHandler(uow,
             new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context),
-                new GenerateDeliveryCode(), new RetrieveDeliveryBatches(context)));
+                new GenerateDeliveryCode(), new CreateDeliveryBatches(context), new CreateDeliveryLines(context)));
 
         return (context, handler);
     }
@@ -213,7 +101,7 @@ public class FulfillOrdersCommandShould
             ? context.Customers.OrderBy(c => c.AccountIdentifier).First()
             : context.Customers.OrderBy(c => c.AccountIdentifier).Last();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
 
         order.Accept();
 

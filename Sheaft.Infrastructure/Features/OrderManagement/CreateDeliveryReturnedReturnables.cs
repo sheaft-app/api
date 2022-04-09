@@ -6,11 +6,11 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.OrderManagement;
 
-public class RetrieveReturnedReturnables : IRetrieveReturnedReturnables
+public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnables
 {
     private readonly IDbContext _context;
 
-    public RetrieveReturnedReturnables(IDbContext context)
+    public CreateDeliveryReturnedReturnables(IDbContext context)
     {
         _context = context;
     }

@@ -3,9 +3,9 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record FulfillOrdersCommand(IEnumerable<OrderId> OrderIdentifiers, bool RegroupOrders, IEnumerable<CustomerDeliveryDate>? CustomersNewDeliveryDate,
-    IEnumerable<ProductBatches>? ProductsBatches) : Command<Result>;
-    
+public record FulfillOrdersCommand(OrderId OrderIdentifier, IEnumerable<DeliveryLineDto> DeliveryLines,
+    DateTimeOffset? NewDeliveryDate) : Command<Result>;
+
 public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result>
 {
     private readonly IUnitOfWork _uow;
@@ -20,10 +20,15 @@ public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result
 
     public async Task<Result> Handle(FulfillOrdersCommand request, CancellationToken token)
     {
-        var result = await _fulfillOrders.Fulfill(request.OrderIdentifiers, request.CustomersNewDeliveryDate, request.ProductsBatches, request.RegroupOrders, request.CreatedAt, token);
+        var result = await _fulfillOrders.Fulfill(request.OrderIdentifier, request.DeliveryLines.Select(
+                dl => new DeliveryProductBatches(new ProductId(dl.ProductIdentifier), new Quantity(dl.Quantity),
+                    dl.BatchIdentifiers?.Select(b => new BatchId(b)) ?? new List<BatchId>())),
+            request.NewDeliveryDate != null ? new DeliveryDate(request.NewDeliveryDate.Value) : null,
+            request.CreatedAt, token);
+        
         if (result.IsFailure)
             return Result.Failure(result);
-        
+
         return await _uow.Save(token);
     }
 }

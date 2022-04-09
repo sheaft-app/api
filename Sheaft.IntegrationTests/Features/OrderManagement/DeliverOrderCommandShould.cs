@@ -23,7 +23,7 @@ public class DeliverOrderCommandShould
     public async Task Switch_Order_Status_To_Delivered()
     {
         var (context, handler) = InitHandler();
-        var delivery = InitOrder(context);
+        var delivery = InitDelivery(context);
 
         var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
         var result =
@@ -45,7 +45,7 @@ public class DeliverOrderCommandShould
     public async Task Add_Products_Adjustments_To_Delivery()
     {
         var (context, handler) = InitHandler();
-        var delivery = InitOrder(context);
+        var delivery = InitDelivery(context);
 
         var products = context.Products.ToList();
         
@@ -53,8 +53,9 @@ public class DeliverOrderCommandShould
             new List<ProductAdjustment>
             {
                 new ProductAdjustment(products.First().Identifier, new Quantity(1)),
-                new ProductAdjustment(products.Skip(1).First().Identifier, new Quantity(-2))
+                new ProductAdjustment(products.Skip(1).First().Identifier, new Quantity(-1))
             }, null);
+        
         var result =
             await handler.Handle(
                 deliverOrderCommand,
@@ -68,7 +69,7 @@ public class DeliverOrderCommandShould
     public async Task Add_Returned_Returnables_To_Delivery()
     {
         var (context, handler) = InitHandler();
-        var delivery = InitOrder(context);
+        var delivery = InitDelivery(context);
 
         var returnable = context.Returnables.First();
         
@@ -111,18 +112,18 @@ public class DeliverOrderCommandShould
             new DeliverOrders(
                 new OrderRepository(context),
                 new DeliveryRepository(context),
-                new RetrieveProductsToAdjust(context),
-                new RetrieveReturnedReturnables(context)));
+                new CreateDeliveryProductAdjustments(context),
+                new CreateDeliveryReturnedReturnables(context)));
 
         return (context, handler);
     }
 
-    private static Delivery InitOrder(AppDbContext context)
+    private static Delivery InitDelivery(AppDbContext context)
     {
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
 
         order.Accept();
         order.Fulfill();
@@ -131,7 +132,8 @@ public class DeliverOrderCommandShould
             new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
         delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
-            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
+            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
+                .Select(l => new DeliveryLine(l.Identifier, DeliveryLineKind.Product, l.Reference, l.Name, l.Quantity, l.UnitPrice, l.Vat)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
 
         context.Add(order);
         context.Add(delivery);

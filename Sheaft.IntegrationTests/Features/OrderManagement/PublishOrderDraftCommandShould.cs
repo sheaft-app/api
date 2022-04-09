@@ -53,7 +53,6 @@ public class PublishOrderDraftCommandShould
 
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
-        Assert.AreEqual(2, delivery.Lines.Count());
     }
 
     [Test]
@@ -152,7 +151,7 @@ public class PublishOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, true, addProducts);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, true, addProducts ? context.Products.ToList() : null);
 
         context.Add(order);
         context.SaveChanges();

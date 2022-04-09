@@ -10,19 +10,19 @@ public class DeliverOrders : IDeliverOrders
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IDeliveryRepository _deliveryRepository;
-    private readonly IRetrieveProductsToAdjust _retrieveProductsToAdjust;
-    private readonly IRetrieveReturnedReturnables _retrieveReturnedReturnables;
+    private readonly ICreateDeliveryProductAdjustments _createDeliveryProductAdjustments;
+    private readonly ICreateDeliveryReturnedReturnables _createDeliveryReturnedReturnables;
 
     public DeliverOrders(
         IOrderRepository orderRepository,
         IDeliveryRepository deliveryRepository,
-        IRetrieveProductsToAdjust retrieveProductsToAdjust,
-        IRetrieveReturnedReturnables retrieveReturnedReturnables)
+        ICreateDeliveryProductAdjustments createDeliveryProductAdjustments,
+        ICreateDeliveryReturnedReturnables createDeliveryReturnedReturnables)
     {
         _orderRepository = orderRepository;
         _deliveryRepository = deliveryRepository;
-        _retrieveProductsToAdjust = retrieveProductsToAdjust;
-        _retrieveReturnedReturnables = retrieveReturnedReturnables;
+        _createDeliveryProductAdjustments = createDeliveryProductAdjustments;
+        _createDeliveryReturnedReturnables = createDeliveryReturnedReturnables;
     }
 
     public async Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, 
@@ -36,7 +36,7 @@ public class DeliverOrders : IDeliverOrders
         var adjustmentLines = new List<DeliveryLine>();
         if (productAdjustments != null && productAdjustments.Any())
         {
-            var productsToAdjustResult = await _retrieveProductsToAdjust.Get(delivery, productAdjustments, token);
+            var productsToAdjustResult = await _createDeliveryProductAdjustments.Get(delivery, productAdjustments, token);
             if (productsToAdjustResult.IsFailure)
                 return Result.Failure(productsToAdjustResult);
             
@@ -45,7 +45,7 @@ public class DeliverOrders : IDeliverOrders
         
         if (returnedReturnables != null && returnedReturnables.Any())
         {
-            var returnedReturnablesResult = await _retrieveReturnedReturnables.Get(delivery.SupplierIdentifier, returnedReturnables, token);
+            var returnedReturnablesResult = await _createDeliveryReturnedReturnables.Get(delivery.SupplierIdentifier, returnedReturnables, token);
             if (returnedReturnablesResult.IsFailure)
                 return Result.Failure(returnedReturnablesResult);
             

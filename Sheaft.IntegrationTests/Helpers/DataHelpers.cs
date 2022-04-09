@@ -34,35 +34,22 @@ internal static class DataHelpers
             accountIdentifier);
     }
     
-    public static Order CreateOrderWithLines(Supplier supplier, Customer customer, bool isDraft, bool addProducts = true)
+    public static Order CreateOrderWithLines(Supplier supplier, Customer customer, bool isDraft, IEnumerable<Product>? products = null)
     {
         if (!isDraft)
         {
-            var order = Order.Create(new OrderReference(Guid.NewGuid().ToString("N")), supplier.Identifier, customer.Identifier,
-                addProducts ? new List<OrderLine>
-                {
-                    OrderLine.CreateProductLine(new ProductId("test1"), new ProductReference("test1"), new ProductName("test1"),
-                        new OrderedQuantity(1),
-                        new ProductUnitPrice(2000), new VatRate(2000)),
-                    OrderLine.CreateProductLine(new ProductId("test2"), new ProductReference("test2"), new ProductName("test2"),
-                        new OrderedQuantity(1),
-                        new ProductUnitPrice(2000), new VatRate(2000))
-                } : new List<OrderLine>(), "externalCode");
+            var order = Order.Create(new OrderReference(Guid.NewGuid().ToString("N")), supplier.Identifier,
+                customer.Identifier,
+                products?.Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                        new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)).ToList() ?? new List<OrderLine>(), "externalCode");
             return order;
         }
 
         var orderDraft = Order.CreateDraft(supplier.Identifier, customer.Identifier);
-        if(addProducts)
+        if(products != null && products.Any())
             orderDraft.UpdateDraftLines(
-                new List<OrderLine>
-                    {
-                        OrderLine.CreateProductLine(new ProductId("test1"), new ProductReference("test1"), new ProductName("test1"),
-                            new OrderedQuantity(1),
-                            new ProductUnitPrice(2000), new VatRate(2000)),
-                        OrderLine.CreateProductLine(new ProductId("test2"), new ProductReference("test2"), new ProductName("test2"),
-                            new OrderedQuantity(1),
-                            new ProductUnitPrice(2000), new VatRate(2000))
-                    });
+                products.Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                    new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
         
         return orderDraft;
     }

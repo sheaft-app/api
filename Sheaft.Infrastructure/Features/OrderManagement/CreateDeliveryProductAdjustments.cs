@@ -6,11 +6,11 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.OrderManagement;
 
-public class RetrieveProductsToAdjust : IRetrieveProductsToAdjust
+public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustments
 {
     private readonly IDbContext _context;
 
-    public RetrieveProductsToAdjust(IDbContext context)
+    public CreateDeliveryProductAdjustments(IDbContext context)
     {
         _context = context;
     }

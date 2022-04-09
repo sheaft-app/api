@@ -24,8 +24,8 @@ public class Delivery : AggregateRoot
     public DeliveryStatus Status { get; private set; }
     public DeliveryDate ScheduledAt { get; private set; }
     public DateTimeOffset? DeliveredOn { get; private set; }
-    public DeliveryAddress Address { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
+    public DeliveryAddress Address { get; }
+    public SupplierId SupplierIdentifier { get; }
     public IEnumerable<DeliveryOrder> Orders { get; private set; }
     public IEnumerable<DeliveryLine> Lines { get; private set; }
     public IEnumerable<DeliveryLine> Adjustments { get; private set; }
@@ -40,41 +40,47 @@ public class Delivery : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.supplier");
         
         Orders = orders.Select(o => new DeliveryOrder(o.Identifier)).ToList();
-
-        var lines = orders
-            .SelectMany(o => o.Lines.Select(l => l))
-            .GroupBy(o => o.Identifier)
-            .Select(gr =>
-            {
-                var orderLine = gr.First();
-                return new DeliveryLine(orderLine.Identifier,
-                    orderLine.LineKind == OrderLineKind.Product
-                        ? DeliveryLineKind.Product
-                        : DeliveryLineKind.Returnable, orderLine.Reference, orderLine.Reference,
-                    new OrderedQuantity(gr.Sum(g => g.Quantity.Value)), orderLine.UnitPrice, orderLine.Vat);
-            }).ToList();
-
-        Lines = lines;
         return Result.Success();
     }
 
-    internal Result Schedule(DeliveryReference reference, DeliveryDate scheduledOn, IEnumerable<DeliveryBatch>? batches, DateTimeOffset? currentDateTime = null)
+    internal Result Schedule(DeliveryReference reference, DeliveryDate scheduledOn, IEnumerable<DeliveryLine> lines, IEnumerable<DeliveryBatch>? batches, DateTimeOffset? currentDateTime = null)
+    {
+        var result = CanScheduleDelivery(scheduledOn, lines, currentDateTime);
+        if (result.IsFailure) 
+            return result;
+
+        Lines = lines.ToList();
+        Batches = batches?.ToList() ?? new List<DeliveryBatch>();
+        Reference = reference;
+        Status = DeliveryStatus.Scheduled;
+        
+        ScheduledAt = scheduledOn;
+        return Result.Success();
+    }
+
+    internal Result CanScheduleDelivery(DeliveryDate scheduledOn, IEnumerable<DeliveryLine> lines, DateTimeOffset? currentDateTime)
     {
         if (Status != DeliveryStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.pending.delivery");
 
-        Batches = batches ?? new List<DeliveryBatch>();
-        Reference = reference;
-        Status = DeliveryStatus.Scheduled;
-        return Reschedule(scheduledOn, currentDateTime);
-    }
+        if (!lines.Any())
+            return Result.Failure(ErrorKind.BadRequest, "delivery.requires.lines");
 
-    internal Result Reschedule(DeliveryDate newDeliveryDate, DateTimeOffset? currentDateTime = null)
-    {
-        if (newDeliveryDate.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
+        if (scheduledOn.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
             return Result.Failure(ErrorKind.BadRequest, "delivery.confirm.requires.incoming.deliverydate");
 
-        ScheduledAt = newDeliveryDate;
+        return Result.Success();
+    }
+
+    internal Result ChangeDeliveryDate(DeliveryDate scheduledOn, DateTimeOffset? currentDateTime)
+    {
+        if (Status != DeliveryStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.pending.delivery");
+
+        if (scheduledOn.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
+            return Result.Failure(ErrorKind.BadRequest, "delivery.confirm.requires.incoming.deliverydate");
+
+        ScheduledAt = scheduledOn;
         return Result.Success();
     }
 
@@ -83,7 +89,7 @@ public class Delivery : AggregateRoot
         if (Status != DeliveryStatus.Scheduled)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.scheduled.delivery");
 
-        Adjustments = linesAdjustments;
+        Adjustments = linesAdjustments.ToList();
         DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = DeliveryStatus.Delivered;
         return Result.Success();

@@ -6,16 +6,16 @@ using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.OrderManagement;
 
-public class RetrieveDeliveryBatches : IRetrieveDeliveryBatches
+public class CreateDeliveryBatches : ICreateDeliveryBatches
 {
     private readonly IDbContext _context;
 
-    public RetrieveDeliveryBatches(IDbContext context)
+    public CreateDeliveryBatches(IDbContext context)
     {
         _context = context;
     }
 
-    public async Task<Result<IEnumerable<DeliveryBatch>>> Get(Delivery delivery, IEnumerable<ProductBatches>? productsBatches, CancellationToken token)
+    public async Task<Result<IEnumerable<DeliveryBatch>>> Get(Delivery delivery, IEnumerable<DeliveryProductBatches>? productsBatches, CancellationToken token)
     {
         try
         {

@@ -122,9 +122,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRetrieveDeliveryDays, RetrieveDeliveryDays>();
         services.AddScoped<IRetrieveOrderCustomer, RetrieveOrderCustomer>();
         services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
-        services.AddScoped<IRetrieveReturnedReturnables, RetrieveReturnedReturnables>();
-        services.AddScoped<IRetrieveProductsToAdjust, RetrieveProductsToAdjust>();
-        services.AddScoped<IRetrieveDeliveryBatches, RetrieveDeliveryBatches>();
+        services.AddScoped<ICreateDeliveryReturnedReturnables, CreateDeliveryReturnedReturnables>();
+        services.AddScoped<ICreateDeliveryProductAdjustments, CreateDeliveryProductAdjustments>();
+        services.AddScoped<ICreateDeliveryBatches, CreateDeliveryBatches>();
         
         services.AddScoped<IValidateAlteringBatchFeasability, ValidateAlteringBatchFeasability>();
     }
