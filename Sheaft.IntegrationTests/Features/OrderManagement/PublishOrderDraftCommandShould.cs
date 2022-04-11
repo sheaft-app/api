@@ -28,13 +28,14 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(OrderStatus.Pending, order.Status);
     }
-    
+
     [Test]
     public async Task Create_Pending_Delivery()
     {
@@ -44,7 +45,8 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -57,6 +59,27 @@ public class PublishOrderDraftCommandShould
     }
 
     [Test]
+    public async Task Update_Order_With_Products_From_Order_Supplier_Only()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitDraft(context, true);
+
+        var lines = context.Products
+            .Select(p => new ProductQuantityDto(p.Identifier.Value, 2))
+            .ToList();
+
+        var result =
+            await handler.Handle(
+                new PublishOrderDraftCommand(order.Identifier,
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc))), lines),
+                CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(2, order.Lines.Count());
+    }
+
+    [Test]
     public async Task Fail_If_Order_Is_Not_A_Draft()
     {
         var (context, handler) = InitHandler();
@@ -64,13 +87,14 @@ public class PublishOrderDraftCommandShould
         var order = InitDraft(context, true);
         order.Publish(new OrderReference("test"), order.Lines);
         context.SaveChanges();
-        
+
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.publish.requires.draft", result.Error.Code);
@@ -86,9 +110,10 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.publish.requires.lines", result.Error.Code);
@@ -104,9 +129,10 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,2, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 2, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("validate.order.deliveryday.not.in.agreement", result.Error.Code);
@@ -118,7 +144,7 @@ public class PublishOrderDraftCommandShould
         var (context, handler) = InitHandler();
 
         var order = InitDraft(context, true);
-        
+
         var agreement = context.Agreements.Single();
         agreement.Revoke("reason");
         context.SaveChanges();
@@ -126,9 +152,10 @@ public class PublishOrderDraftCommandShould
         var result =
             await handler.Handle(
                 new PublishOrderDraftCommand(order.Identifier,
-                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
+                        new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
-        
+
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.requires.agreement", result.Error.Code);
@@ -139,23 +166,27 @@ public class PublishOrderDraftCommandShould
         var (context, uow, logger) = DependencyHelpers.InitDependencies<PublishOrderDraftHandler>();
 
         var supplier = AccountId.New();
+        var supplier1 = AccountId.New();
         var customer = AccountId.New();
 
         var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
+        var supplier1Products = new Dictionary<string, int> {{"T1", 1000}, {"T2", 5000}};
 
         DataHelpers.InitContext(context,
             new List<AccountId> {customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>>
+                {{supplier, agreements}, {supplier1, new Dictionary<AccountId, DeliveryDay>()}},
+            new Dictionary<AccountId, Dictionary<string, int>>
+                {{supplier, supplierProducts}, {supplier1, supplier1Products}});
 
         var handler =
-            new PublishOrderDraftHandler(uow, 
+            new PublishOrderDraftHandler(uow,
                 new PublishOrders(
                     new OrderRepository(context),
                     new DeliveryRepository(context),
-                    new GenerateOrderCode(), 
-                    new TransformProductsToOrderLines(context), 
+                    new GenerateOrderCode(),
+                    new TransformProductsToOrderLines(context),
                     new ValidateOrderDeliveryDate(new RetrieveDeliveryDays(context)),
                     new RetrieveOrderCustomer(context),
                     new RetrieveAgreementForOrder(context)));
@@ -168,11 +199,12 @@ public class PublishOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, true, addProducts ? context.Products.ToList() : null);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, true,
+            addProducts ? context.Products.ToList() : null);
 
         context.Add(order);
         context.SaveChanges();
-        
+
         return order;
     }
 }

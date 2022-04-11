@@ -40,7 +40,7 @@ internal static class DataHelpers
         {
             var order = Order.Create(new OrderReference(Guid.NewGuid().ToString("N")), supplier.Identifier,
                 customer.Identifier,
-                products?.Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                products?.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
                         new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)).ToList() ?? new List<OrderLine>(), "externalCode");
             return order;
         }
@@ -48,7 +48,7 @@ internal static class DataHelpers
         var orderDraft = Order.CreateDraft(supplier.Identifier, customer.Identifier);
         if(products != null && products.Any())
             orderDraft.UpdateDraftLines(
-                products.Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                products.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
                     new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
         
         return orderDraft;
