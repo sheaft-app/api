@@ -26,16 +26,19 @@ public class Customer : AggregateRoot
     public DeliveryAddress DeliveryAddress { get; private set; }
     public AccountId AccountIdentifier { get; }
 
-    public void SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, DeliveryAddress address)
+    public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, DeliveryAddress address)
     {
         TradeName = name;
         Email = email;
         Phone = phone;
         DeliveryAddress = address;
+
+        return Result.Success();
     }
 
-    public void SetLegal(CorporateName name, Siret siret, LegalAddress address)
+    public Result SetLegal(CorporateName name, Siret siret, LegalAddress address)
     {
         Legal = new Legal(name, siret, address);
+        return Result.Success();
     }
 }

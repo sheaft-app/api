@@ -36,6 +36,10 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
             .HasConversion(supplierIdentifier => supplierIdentifier.Value, value => new SupplierId(value));
 
         builder
+            .Property(p => p.Date)
+            .HasConversion(date => new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc), value => DateOnly.FromDateTime(value));
+
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
         

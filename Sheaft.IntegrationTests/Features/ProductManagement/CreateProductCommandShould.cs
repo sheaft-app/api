@@ -24,8 +24,8 @@ public class CreateProductCommandShould
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value));
         Assert.IsTrue(result.IsSuccess);
+        var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value) && s.SupplierIdentifier == supplierId);
         Assert.IsNotNull(product);
     }
 
@@ -40,8 +40,8 @@ public class CreateProductCommandShould
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value));
         Assert.IsTrue(result.IsSuccess);
+        var product = context.Products.Single(s => s.Identifier == new ProductId(result.Value));
         Assert.IsNotNull(product);
     }
 
@@ -59,7 +59,7 @@ public class CreateProductCommandShould
     }
 
     [Test]
-    public async Task Insert_Product_With_Returnable()
+    public async Task Insert_Product_With_Attached_Returnable()
     {
         var (supplierId, context, handler) = InitHandler();
 
@@ -100,7 +100,8 @@ public class CreateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
-        Assert.IsTrue(result.Error.Kind == ErrorKind.Conflict);
+        Assert.AreEqual(ErrorKind.Conflict, result.Error.Kind);
+        Assert.AreEqual("product.code.already.exists", result.Error.Code);
     }
 
     [Test]

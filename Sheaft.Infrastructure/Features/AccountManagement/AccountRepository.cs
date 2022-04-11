@@ -12,14 +12,6 @@ internal class AccountRepository : Repository<Account, AccountId>, IAccountRepos
     {
     }
 
-    public Task<Result<Maybe<Account>>> FindByEmail(EmailAddress email, CancellationToken token)
-    {
-        return QueryAsync(async () =>
-            Result.Success(await Values
-                .Include(c => c.RefreshTokens)
-                .SingleOrDefaultAsync(e => e.Email == email, token) ?? Maybe<Account>.None));
-    }
-
     public override Task<Result<Account>> Get(AccountId identifier, CancellationToken token)
     {
         return QueryAsync(async () =>
@@ -46,5 +38,13 @@ internal class AccountRepository : Repository<Account, AccountId>, IAccountRepos
                 ? Result.Success(result)
                 : Result.Failure<Account>(ErrorKind.NotFound, "account.not.found");
         });
+    }
+
+    public Task<Result<Maybe<Account>>> Find(EmailAddress email, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+            Result.Success(await Values
+                .Include(c => c.RefreshTokens)
+                .SingleOrDefaultAsync(e => e.Email == email, token) ?? Maybe<Account>.None));
     }
 }

@@ -38,7 +38,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
                 .ToListAsync(token);
             
             if (products.Count != productIdentifiers.Count())
-                return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.BadRequest,
+                return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound,
                     "delivery.lines.products.not.found");
 
             var deliveryProductLines = products.Select(p =>

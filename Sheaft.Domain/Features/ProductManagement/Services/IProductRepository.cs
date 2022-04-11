@@ -2,5 +2,5 @@
 
 public interface IProductRepository : IRepository<Product, ProductId>
 {
-    Task<Result<Maybe<Product>>> FindWithCode(ProductReference reference, SupplierId supplierIdentifier, CancellationToken token);
+    Task<Result<Maybe<Product>>> Find(ProductReference reference, SupplierId supplierIdentifier, CancellationToken token);
 }

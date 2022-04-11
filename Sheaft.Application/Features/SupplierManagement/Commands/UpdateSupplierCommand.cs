@@ -29,8 +29,13 @@ public class UpdateSupplierHandler : ICommandHandler<UpdateSupplierCommand, Resu
             return Result.Failure(supplierResult);
 
         var supplier = supplierResult.Value;
-        supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone), shippingAddress);
-        supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
+        var setInfoResult = supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone), shippingAddress);
+        if (setInfoResult.IsFailure)
+            return setInfoResult;
+        
+        var setLegalResult = supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
+        if (setLegalResult.IsFailure)
+            return setLegalResult;
         
         _uow.Suppliers.Update(supplier);
         return await _uow.Save(token);

@@ -20,23 +20,33 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class DeliverOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Delivered()
+    public async Task Set_Order_Status_To_Completed_And_CompletedOn()
     {
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
 
         var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
-        var result =
-            await handler.Handle(
-                deliverOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-
         var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
-
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Completed, order.Status);
+        Assert.AreEqual(deliverOrderCommand.CreatedAt, order.CompletedOn);
+    }
+    
+    [Test]
+    public async Task Set_Delivery_Status_To_Delivered_And_DeliveredOn()
+    {
+        var (context, handler) = InitHandler();
+        var delivery = InitDelivery(context);
+
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
+        var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
+        Assert.IsNotNull(order);
         Assert.AreEqual(DeliveryStatus.Delivered, delivery.Status);
         Assert.AreEqual(deliverOrderCommand.CreatedAt, delivery.DeliveredOn);
     }
@@ -46,9 +56,7 @@ public class DeliverOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
-
         var products = context.Products.ToList();
-        
         var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier,
             new List<ProductAdjustment>
             {
@@ -56,13 +64,22 @@ public class DeliverOrderCommandShould
                 new ProductAdjustment(products.Skip(1).First().Identifier, new Quantity(-1))
             }, null);
         
-        var result =
-            await handler.Handle(
-                deliverOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(2, delivery.Adjustments.Count());
+        Assert.AreEqual(3, delivery.Adjustments.Count());
+        var firstProduct = delivery.Adjustments.First(a => a.Identifier == products.First().Identifier.Value);
+        Assert.IsNotNull(firstProduct);
+        Assert.AreEqual(DeliveryLineKind.Product, firstProduct.LineKind);
+        Assert.AreEqual(1, firstProduct.Quantity.Value);
+        var firstReturnable = delivery.Adjustments.First(a => a.Identifier == products.First().Returnable.Identifier.Value);
+        Assert.IsNotNull(firstReturnable);
+        Assert.AreEqual(DeliveryLineKind.Returnable, firstReturnable.LineKind);
+        Assert.AreEqual(1, firstReturnable.Quantity.Value);
+        var secondProduct = delivery.Adjustments.First(a => a.Identifier == products.Skip(1).First().Identifier.Value);
+        Assert.IsNotNull(secondProduct);
+        Assert.AreEqual(DeliveryLineKind.Product, secondProduct.LineKind);
+        Assert.AreEqual(-1, secondProduct.Quantity.Value);
     }
 
     [Test]
@@ -70,21 +87,21 @@ public class DeliverOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
-
         var returnable = context.Returnables.First();
-        
         var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null,
             new List<ReturnedReturnable>
             {
                 new ReturnedReturnable(returnable.Identifier, new Quantity(-1))
             });
-        var result =
-            await handler.Handle(
-                deliverOrderCommand,
-                CancellationToken.None);
+        
+        var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(1, delivery.Adjustments.Count());
+        var deliveryLine = delivery.Adjustments.First();
+        Assert.AreEqual(DeliveryLineKind.ReturnedReturnable, deliveryLine.LineKind);
+        Assert.AreEqual(returnable.Identifier.Value, deliveryLine.Identifier);
+        Assert.AreEqual(-1, deliveryLine.Quantity.Value);
     }
 
     private (AppDbContext, DeliverOrderHandler) InitHandler()
@@ -138,6 +155,13 @@ public class DeliverOrderCommandShould
         context.Add(order);
         context.Add(delivery);
 
+        var returnable = new Returnable(new ReturnableName("er"), new ReturnableReference("code"), new UnitPrice(2000),
+            new VatRate(2000), supplier.Identifier);
+        context.Add(returnable);
+
+        var product = context.Products.First();
+        product.SetReturnable(returnable);
+        
         context.SaveChanges();
 
         return delivery;

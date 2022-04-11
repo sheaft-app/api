@@ -41,7 +41,7 @@ internal class HandleProductCode : IHandleProductCode
         if (string.IsNullOrWhiteSpace(code))
             return await _generateProductCode.GenerateNextCode(supplierIdentifier, token);
 
-        var existingProductResult = await _productRepository.FindWithCode(new ProductReference(code), supplierIdentifier, token);
+        var existingProductResult = await _productRepository.Find(new ProductReference(code), supplierIdentifier, token);
         if (existingProductResult.IsFailure)
             return Result.Failure<ProductReference>(existingProductResult);
 

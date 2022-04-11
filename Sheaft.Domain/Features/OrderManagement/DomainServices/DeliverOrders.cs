@@ -65,7 +65,7 @@ public class DeliverOrders : IDeliverOrders
                 return Result.Failure(orderResult);
 
             var order = orderResult.Value;
-            var markAsDeliveredResult = order.MarkAsCompleted();
+            var markAsDeliveredResult = order.Complete(currentDateTime);
             if (markAsDeliveredResult.IsFailure)
                 return Result.Failure(markAsDeliveredResult);
             

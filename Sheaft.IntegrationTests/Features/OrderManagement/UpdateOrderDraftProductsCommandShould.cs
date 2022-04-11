@@ -19,7 +19,7 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class UpdateOrderDraftProductsCommandShould
 {
     [Test]
-    public async Task Add_Lines_To_Order()
+    public async Task Add_Lines_On_Order()
     {
         var (context, handler) = InitHandler();
         
@@ -43,7 +43,39 @@ public class UpdateOrderDraftProductsCommandShould
     }
     
     [Test]
-    public async Task Remove_Lines_To_Order()
+    public async Task Update_Lines_Quantity_On_Order()
+    {
+        var (context, handler) = InitHandler();
+        
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+
+        var product = context.Products.First();
+        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+        order.UpdateDraftLines(new List<OrderLine>
+        {
+            OrderLine.CreateProductLine(product.Identifier, product.Reference, product.Name, new OrderedQuantity(1),
+                new ProductUnitPrice(1000), new VatRate(1000))
+        });
+        
+        context.Add(order);
+        context.SaveChanges();
+
+        var lines = context.Products
+            .Where(p => p.SupplierIdentifier == supplier.Identifier)
+            .Select(p => new ProductQuantityDto(p.Identifier.Value, 2))
+            .ToList();
+        
+        var result = await handler.Handle(new UpdateOrderDraftProductsCommand(order.Identifier, lines), CancellationToken.None);
+        Assert.IsTrue(result.IsSuccess);
+        
+        Assert.IsNotNull(order);
+        Assert.AreEqual(2, order.Lines.Count());
+        Assert.AreEqual(2, order.Lines.First(l => l.Identifier == product.Identifier.Value).Quantity.Value);
+    }
+    
+    [Test]
+    public async Task Remove_Lines_On_Order()
     {
         var (context, handler) = InitHandler();
         

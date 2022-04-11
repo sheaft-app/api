@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record RefuseAgreementCommand(AgreementId AgreementIdentifier) : ICommand<Result>;
+public record RefuseAgreementCommand(AgreementId AgreementIdentifier, string? RefusalReason = null) : ICommand<Result>;
 
 public class RefuseAgreementHandler : ICommandHandler<RefuseAgreementCommand, Result>
 {
@@ -20,7 +20,7 @@ public class RefuseAgreementHandler : ICommandHandler<RefuseAgreementCommand, Re
             return Result.Failure(agreementResult);
 
         var agreement = agreementResult.Value;
-        var result = agreement.Refuse();
+        var result = agreement.Refuse(request.RefusalReason);
         if (result.IsFailure)
             return result;
         

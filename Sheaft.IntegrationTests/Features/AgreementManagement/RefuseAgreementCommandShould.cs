@@ -20,7 +20,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class RefuseAgreementCommandShould
 {
     [Test]
-    public async Task Refuse_Agreement_And_Set_Status_To_Refused()
+    public async Task Set_Status_To_Refused()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
@@ -34,6 +34,23 @@ public class RefuseAgreementCommandShould
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Refused, agreement.Status);
+    }
+    
+    [Test]
+    public async Task Set_RefusedReason()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Identifier, "reason"), CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual("reason", agreement.FailureReason);
     }
     
     [Test]

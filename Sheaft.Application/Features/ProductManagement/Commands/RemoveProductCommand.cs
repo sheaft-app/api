@@ -30,15 +30,13 @@ internal class RemoveProductHandler : ICommandHandler<RemoveProductCommand, Resu
             return Result.Failure(catalogResult);
         
         var catalog = catalogResult.Value;
-        catalog.RemoveProduct(product);
+        var removeResult = catalog.RemoveProduct(product);
+        if (removeResult.IsFailure)
+            return removeResult;
         
         _uow.Products.Remove(product);
         _uow.Catalogs.Update(catalog);
         
-        var result = await _uow.Save(token);
-        
-        return result.IsSuccess 
-            ? Result.Success() 
-            : Result.Failure(result);
+        return await _uow.Save(token);
     }
 }

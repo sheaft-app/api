@@ -19,7 +19,7 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class PublishOrderDraftCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Pending()
+    public async Task Set_Order_Status_To_Pending()
     {
         var (context, handler) = InitHandler();
 
@@ -36,7 +36,7 @@ public class PublishOrderDraftCommandShould
     }
     
     [Test]
-    public async Task Create_Delivery_With_Order_Lines()
+    public async Task Create_Pending_Delivery()
     {
         var (context, handler) = InitHandler();
         var order = InitDraft(context, true);
@@ -52,11 +52,32 @@ public class PublishOrderDraftCommandShould
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
 
         Assert.IsNotNull(delivery);
+        Assert.AreEqual(OrderStatus.Pending, order.Status);
         Assert.AreEqual(DeliveryStatus.Pending, delivery.Status);
     }
 
     [Test]
-    public async Task Fail_If_No_Products()
+    public async Task Fail_If_Order_Is_Not_A_Draft()
+    {
+        var (context, handler) = InitHandler();
+
+        var order = InitDraft(context, true);
+        order.Publish(new OrderReference("test"), order.Lines);
+        context.SaveChanges();
+        
+        var result =
+            await handler.Handle(
+                new PublishOrderDraftCommand(order.Identifier,
+                    new DeliveryDate(new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)), new DateTimeOffset(new DateTime(2022,4,1, 0, 0, 0, DateTimeKind.Utc)))),
+                CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.publish.requires.draft", result.Error.Code);
+    }
+
+    [Test]
+    public async Task Fail_If_Order_Has_No_Products()
     {
         var (context, handler) = InitHandler();
 
@@ -69,8 +90,6 @@ public class PublishOrderDraftCommandShould
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
-
-        Assert.IsNotNull(order);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.publish.requires.lines", result.Error.Code);
     }
@@ -89,7 +108,6 @@ public class PublishOrderDraftCommandShould
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
-        Assert.IsNotNull(order);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("validate.order.deliveryday.not.in.agreement", result.Error.Code);
     }
@@ -112,7 +130,6 @@ public class PublishOrderDraftCommandShould
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
-        Assert.IsNotNull(order);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.requires.agreement", result.Error.Code);
     }
@@ -155,6 +172,7 @@ public class PublishOrderDraftCommandShould
 
         context.Add(order);
         context.SaveChanges();
+        
         return order;
     }
 }

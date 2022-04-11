@@ -27,15 +27,30 @@ public class CreateOrderDraftCommandShould
         var customer = context.Customers.First();
         
         var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
-        Assert.IsTrue(result.IsSuccess);
         
+        Assert.IsTrue(result.IsSuccess);
         var order = context.Orders.Single(c => c.Identifier == new OrderId(result.Value));
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Draft, order.Status);
     }
     
     [Test]
-    public async Task Return_Existing_Order_Draft_When_Trying_Create_A_New_One()
+    public async Task Not_Create_Delivery_Related_To_Order()
+    {
+        var (context, handler) = InitHandler();
+        
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+        
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+        
+        Assert.IsTrue(result.IsSuccess);
+        var delivery = context.Deliveries.SingleOrDefault(c => c.Orders.Any(o => o.OrderIdentifier == new OrderId(result.Value)));
+        Assert.IsNull(delivery);
+    }
+    
+    [Test]
+    public async Task Return_Existing_Order_Draft_If_A_Draft_Already_Exists()
     {
         var (context, handler) = InitHandler();
         
@@ -54,7 +69,7 @@ public class CreateOrderDraftCommandShould
     }
     
     [Test]
-    public async Task Fail_If_No_Agreement_Exists_Between_Customer_And_Supplier()
+    public async Task Fail_If_No_Agreement_Exists()
     {
         var (context, handler) = InitHandler(false);
         

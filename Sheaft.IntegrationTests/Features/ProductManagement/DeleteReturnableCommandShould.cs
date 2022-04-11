@@ -20,14 +20,25 @@ public class DeleteReturnableCommandShould
     [Test]
     public async Task Remove_Returnable()
     {
-        var (productId, context, handler) = InitHandler();
+        var (returnableId, context, handler) = InitHandler();
 
-        var result = await handler.Handle(new RemoveReturnableCommand(productId), CancellationToken.None);
+        var result = await handler.Handle(new RemoveReturnableCommand(returnableId), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
         
-        var returnable = context.Returnables.SingleOrDefault(s => s.Identifier == productId);
+        var returnable = context.Returnables.SingleOrDefault(s => s.Identifier == returnableId);
         Assert.IsNull(returnable);
+    }
+    
+    [Test]
+    public async Task Fail_To_Remove_Returnable_If_Identifier_Not_Exists()
+    {
+        var (productId, context, handler) = InitHandler();
+
+        var result = await handler.Handle(new RemoveReturnableCommand(ReturnableId.New()), CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);
     }
 
     private (ReturnableId, AppDbContext, RemoveReturnableHandler) InitHandler()

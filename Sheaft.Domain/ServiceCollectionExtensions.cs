@@ -21,6 +21,7 @@ public static class ServiceCollectionInitializers
         services.AddScoped<IFulfillOrders, FulfillOrders>();
         services.AddScoped<IDeliverOrders, DeliverOrders>();
         services.AddScoped<IValidateOrderDeliveryDate, ValidateOrderDeliveryDate>();
+        
 
         return services;
     }

@@ -45,7 +45,10 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
         _uow.Products.Add(product);
 
         var catalog = catalogResult.Value;
-        catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
+        var priceResult = catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
+        if (priceResult.IsFailure)
+            return Result.Failure<string>(priceResult);
+        
         _uow.Catalogs.Update(catalog);
         
         var result = await _uow.Save(token);

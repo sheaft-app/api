@@ -18,36 +18,40 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class RefuseOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Refused()
+    public async Task Set_Status_To_Refused_And_Set_CompletedOn_Date()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitOrder(context);
+
+        var refuseOrderCommand = new RefuseOrderCommand(order.Identifier);
+        var result = await handler.Handle(refuseOrderCommand, CancellationToken.None);
+        
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(OrderStatus.Refused, order.Status);
+        Assert.AreEqual(refuseOrderCommand.CreatedAt, order.CompletedOn);
+    }
+    
+    [Test]
+    public async Task Set_FailureReason_If_Provided()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
         var refuseOrderCommand = new RefuseOrderCommand(order.Identifier, "reason");
-        var result =
-            await handler.Handle(
-                refuseOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(refuseOrderCommand, CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-
-        Assert.IsNotNull(order);
-        Assert.AreEqual(OrderStatus.Refused, order.Status);
         Assert.AreEqual("reason", order.FailureReason);
-        Assert.AreEqual(refuseOrderCommand.CreatedAt, order.CompletedOn);
     }
     
     [Test]
-    public async Task Fail_To_Refuse_If_Not_In_Valid_Status()
+    public async Task Fail_If_Not_In_Pending_Status()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context, true);
 
         var refuseOrderCommand = new RefuseOrderCommand(order.Identifier, "reason");
-        var result =
-            await handler.Handle(
-                refuseOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(refuseOrderCommand, CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);

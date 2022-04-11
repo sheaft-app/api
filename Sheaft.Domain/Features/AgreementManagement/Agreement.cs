@@ -38,7 +38,7 @@ public class Agreement : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public CustomerId CustomerIdentifier { get; private set; }
     public CatalogId CatalogIdentifier { get; private set; }
-    public string? RevokedReason { get; private set; }
+    public string? FailureReason { get; private set; }
     public IEnumerable<DeliveryDay> DeliveryDays { get; private set; } = new List<DeliveryDay>();
 
     public Result SetDelivery(IEnumerable<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay)
@@ -71,22 +71,26 @@ public class Agreement : AggregateRoot
         return SetDelivery(deliveryDays, orderDelayInHoursBeforeDeliveryDay);
     }
 
-    public Result Revoke(string reason)
+    public Result Revoke(string revokeReason)
     {
+        if(string.IsNullOrWhiteSpace(revokeReason))
+            return Result.Failure(ErrorKind.BadRequest, "agreement.revoke.requires.reason");
+
         if (Status != AgreementStatus.Active)
             return Result.Failure(ErrorKind.BadRequest, "agreement.revoke.requires.active");
         
         Status = AgreementStatus.Revoked;
-        RevokedReason = reason;
+        FailureReason = revokeReason;
         return Result.Success();
     }
 
-    public Result Refuse()
+    public Result Refuse(string? refusalReason = null)
     {
         if (Status != AgreementStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "agreement.refuse.requires.pending");
 
         Status = AgreementStatus.Refused;
+        FailureReason = refusalReason;
         return Result.Success();
     }
 }

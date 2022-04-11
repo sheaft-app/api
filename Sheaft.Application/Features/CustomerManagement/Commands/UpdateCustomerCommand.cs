@@ -28,9 +28,14 @@ public class UpdateCustomerHandler : ICommandHandler<UpdateCustomerCommand, Resu
             return Result.Failure(customerResult);
 
         var customer = customerResult.Value;
-        customer.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone), deliveryAddress);
-        customer.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
+        var setInfoResult = customer.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone), deliveryAddress);
+        if (setInfoResult.IsFailure)
+            return setInfoResult;
         
+        var setLegalResult = customer.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
+        if (setLegalResult.IsFailure)
+            return setLegalResult;
+
         _uow.Customers.Update(customer);
         return await _uow.Save(token);
     }

@@ -27,7 +27,7 @@ public class CreateOrderDraft : ICreateOrderDraft
         if (!agreementExistsForOrder.Value)
             return Result.Failure<string>(ErrorKind.BadRequest, "order.requires.agreement");
         
-        var orderDraftResult = await _orderRepository.FindExistingDraft(customerIdentifier, supplierIdentifier, token);
+        var orderDraftResult = await _orderRepository.FindDraft(customerIdentifier, supplierIdentifier, token);
         if (orderDraftResult.IsFailure)
             return Result.Failure<string>(orderDraftResult);
 

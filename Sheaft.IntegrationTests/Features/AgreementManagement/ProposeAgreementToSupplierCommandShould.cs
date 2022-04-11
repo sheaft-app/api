@@ -21,7 +21,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class ProposeAgreementToSupplierCommandShould
 {
     [Test]
-    public async Task Create_Agreement_From_Customer_Without_Delivery_Info()
+    public async Task Create_Agreement_With_Customer_As_Owner()
     {
         var (_, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(supplier.Identifier, customer.AccountIdentifier);
@@ -32,13 +32,10 @@ public class ProposeAgreementToSupplierCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(agreement);
         Assert.AreEqual(AgreementOwner.Customer, agreement.Owner);
-        Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
-        Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
-        Assert.AreEqual(0, agreement.DeliveryDays.Count());
     }
     
     [Test]
-    public async Task Fail_If_Customer_Have_Already_A_Pending_Or_Active_Agreement()
+    public async Task Fail_If_Customer_Has_Already_A_Pending_Or_Active_Agreement_For_Supplier()
     {
         var (catalog, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(supplier.Identifier, customer.AccountIdentifier);

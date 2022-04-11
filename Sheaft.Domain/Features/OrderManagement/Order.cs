@@ -43,19 +43,16 @@ public class Order : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public IEnumerable<OrderLine> Lines { get; private set; } = new List<OrderLine>();
     
-    internal Result Publish(OrderReference reference, IEnumerable<OrderLine>? lines = null)
+    internal Result Publish(OrderReference reference, IEnumerable<OrderLine> lines)
     {
         if (Status != OrderStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.draft");
         
-        if (lines != null && !lines.Any() || !Lines.Any())
+        if (lines == null || !lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.lines");
         
         Reference = reference;
-
-        if(lines != null)
-            SetLines(lines);
-        
+        SetLines(lines);
         Status = OrderStatus.Pending;
         return Result.Success();
     }
@@ -103,7 +100,7 @@ public class Order : AggregateRoot
     public Result Cancel(string? cancelReason, DateTimeOffset? currentDateTime)
     {
         if (Status != OrderStatus.Accepted && Status != OrderStatus.Fulfilled)
-            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.ready.status");
+            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.fulfilled.status");
         
         Status = OrderStatus.Cancelled;
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
@@ -111,12 +108,13 @@ public class Order : AggregateRoot
         return Result.Success();
     }
 
-    internal Result MarkAsCompleted()
+    internal Result Complete(DateTimeOffset? currentDateTime)
     {
         if (Status != OrderStatus.Fulfilled)
             return Result.Failure(ErrorKind.BadRequest, "order.deliver.requires.fulfilled.status");
         
         Status = OrderStatus.Completed;
+        CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
     }
 

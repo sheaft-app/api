@@ -17,7 +17,7 @@ namespace Sheaft.IntegrationTests.ProductManagement;
 public class UpdateProductCommandShould
 {
     [Test]
-    public async Task Update_Product_With_Specified_Reference_And_Price()
+    public async Task Set_Specified_Reference_And_Price()
     {
         var (productId, context, handler) = InitHandler();
         var command = GetCommand(productId, 1000, "newcode");
@@ -32,7 +32,7 @@ public class UpdateProductCommandShould
     }
     
     [Test]
-    public async Task Generate_New_Reference_If_None_Provided_When_Updating()
+    public async Task Generate_New_Reference_If_None_Provided()
     {
         var (productId, context, handler) = InitHandler();
         var command = GetCommand(productId, code: null);

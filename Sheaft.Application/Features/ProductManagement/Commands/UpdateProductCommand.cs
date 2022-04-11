@@ -33,14 +33,19 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
         if (catalogResult.IsFailure)
             return Result.Failure(catalogResult);
 
-        product.UpdateInfo(new ProductName(request.Name), new VatRate(request.Vat), request.Description);
+        var updateResult = product.UpdateInfo(new ProductName(request.Name), new VatRate(request.Vat), request.Description);
+        if (updateResult.IsFailure)
+            return updateResult;
+        
         if (request.Code != product.Reference.Value)
         {
             var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Identifier, product.SupplierIdentifier, token);
             if (codeResult.IsFailure)
                 return Result.Failure(codeResult);
             
-            product.UpdateCode(codeResult.Value);
+            var updateCodeResult = product.UpdateCode(codeResult.Value);
+            if (updateCodeResult.IsFailure)
+                return updateCodeResult;
         }
 
         Returnable? returnable = null;
@@ -53,17 +58,18 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
             returnable = returnableResult.Value;
         }
         
-        product.SetReturnable(returnable);
+        var assignResult = product.SetReturnable(returnable);
+        if (assignResult.IsFailure)
+            return assignResult;
+        
         _uow.Products.Update(product);
         
         var catalog = catalogResult.Value;
-        catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
+        var catalogPriceResult = catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
+        if (catalogPriceResult.IsFailure)
+            return catalogPriceResult;
         
         _uow.Catalogs.Update(catalog);
-        var result = await _uow.Save(token);
-        
-        return result.IsSuccess 
-            ? Result.Success() 
-            : Result.Failure(result);
+        return await _uow.Save(token);
     }
 }

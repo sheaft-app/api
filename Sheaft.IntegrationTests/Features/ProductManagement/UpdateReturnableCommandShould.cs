@@ -16,7 +16,7 @@ namespace Sheaft.IntegrationTests.ProductManagement;
 public class UpdateReturnableCommandShould
 {
     [Test]
-    public async Task Update_Returnable_Code()
+    public async Task Set_Reference()
     {
         var (returnableId, context, handler) = InitHandler();
         var command = GetCommand(returnableId);
@@ -30,7 +30,7 @@ public class UpdateReturnableCommandShould
     }
 
     [Test]
-    public async Task Fail_To_Update_Returnable_If_New_Reference_Already_Exists()
+    public async Task Fail_To_Update_If_New_Reference_Already_Exists()
     {
         var (supplierId, context, handler) = InitHandler();
         var command = GetCommand(supplierId, 1200, "Existing");

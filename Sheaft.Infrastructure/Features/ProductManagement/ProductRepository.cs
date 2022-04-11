@@ -25,7 +25,7 @@ internal class ProductRepository : Repository<Product, ProductId>, IProductRepos
         });
     }
 
-    public Task<Result<Maybe<Product>>> FindWithCode(ProductReference reference, SupplierId supplierIdentifier,
+    public Task<Result<Maybe<Product>>> Find(ProductReference reference, SupplierId supplierIdentifier,
         CancellationToken token)
     {
         return QueryAsync(async () =>

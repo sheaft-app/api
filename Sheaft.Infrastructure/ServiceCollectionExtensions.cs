@@ -125,8 +125,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateDeliveryReturnedReturnables, CreateDeliveryReturnedReturnables>();
         services.AddScoped<ICreateDeliveryProductAdjustments, CreateDeliveryProductAdjustments>();
         services.AddScoped<ICreateDeliveryBatches, CreateDeliveryBatches>();
+        services.AddScoped<ICreateDeliveryLines, CreateDeliveryLines>();
         
-        services.AddScoped<IValidateAlteringBatchFeasability, ValidateAlteringBatchFeasability>();
+        services.AddScoped<IValidateAlteringBatchCapability, ValidateAlteringBatchCapability>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

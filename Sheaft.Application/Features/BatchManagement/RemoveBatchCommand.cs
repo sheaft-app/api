@@ -1,6 +1,5 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
-using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.BatchManagement;
 
@@ -9,19 +8,19 @@ public record RemoveBatchCommand(BatchId BatchIdentifier) : ICommand<Result>;
 internal class RemoveBatchHandler : ICommandHandler<RemoveBatchCommand, Result>
 {
     private readonly IUnitOfWork _uow;
-    private readonly IValidateAlteringBatchFeasability _validateAlteringBatchFeasability;
+    private readonly IValidateAlteringBatchCapability _validateAlteringBatchCapability;
 
     public RemoveBatchHandler(
         IUnitOfWork uow,
-        IValidateAlteringBatchFeasability validateAlteringBatchFeasability)
+        IValidateAlteringBatchCapability validateAlteringBatchCapability)
     {
         _uow = uow;
-        _validateAlteringBatchFeasability = validateAlteringBatchFeasability;
+        _validateAlteringBatchCapability = validateAlteringBatchCapability;
     }
     
     public async Task<Result> Handle(RemoveBatchCommand request, CancellationToken token)
     {
-        var canAlterBatchResult = await _validateAlteringBatchFeasability.CanAlterBatch(request.BatchIdentifier, token);
+        var canAlterBatchResult = await _validateAlteringBatchCapability.CanAlterBatch(request.BatchIdentifier, token);
         if (canAlterBatchResult.IsFailure)
             return canAlterBatchResult;
 

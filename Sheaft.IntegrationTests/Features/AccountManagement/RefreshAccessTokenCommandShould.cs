@@ -30,7 +30,7 @@ public class RefreshAccessTokenCommandShould
     }
     
     [Test]
-    public async Task Should_Fail_If_UserId_In_Token_NotFound()
+    public async Task Fail_If_UserId_In_Token_NotFound()
     {
         var (handler, _, securityTokensProvider) = InitHandler();
 
@@ -42,7 +42,7 @@ public class RefreshAccessTokenCommandShould
     }
     
     [Test]
-    public async Task Should_Cancel_All_RefreshToken_If_AlreadyExpired_Token_Provided()
+    public async Task Cancel_All_RefreshToken_If_Provided_Token_Is_Expired()
     {
         var (handler, authenticationToken, _) = InitHandler();
 

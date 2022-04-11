@@ -1,6 +1,5 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
-using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.BatchManagement;
 
@@ -17,6 +16,13 @@ internal class CreateBatchHandler : ICommandHandler<CreateBatchCommand, Result<s
     
     public async Task<Result<string>> Handle(CreateBatchCommand request, CancellationToken token)
     {
+        var existingBatchResult = await _uow.Batches.Find(new BatchNumber(request.Number), token);
+        if (existingBatchResult.IsFailure)
+            return Result.Failure<string>(existingBatchResult);
+        
+        if (existingBatchResult.Value.HasValue)
+            return Result.Failure<string>(ErrorKind.Conflict, "batch.number.already.exists");
+        
         var batch = new Batch(new BatchNumber(request.Number), request.DateKind, request.Date, request.SupplierIdentifier);
         _uow.Batches.Add(batch);
         var result = await _uow.Save(token);

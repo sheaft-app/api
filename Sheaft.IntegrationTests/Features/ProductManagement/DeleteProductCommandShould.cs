@@ -18,20 +18,18 @@ namespace Sheaft.IntegrationTests.ProductManagement;
 public class DeleteProductCommandShould
 {
     [Test]
-    public async Task Remove_Product()
+    public async Task Remove_Product_And_Update_Catalog()
     {
         var (productId, context, handler) = InitHandler();
 
         var result = await handler.Handle(new RemoveProductCommand(productId), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-
         var product = context.Products.SingleOrDefault(s => s.Identifier == productId);
         var catalog = context.Catalogs
             .Include(c => c.Products)
             .ThenInclude(cp => cp.Product)
             .Single(s => s.IsDefault);
-        
         Assert.IsNull(product);
         Assert.AreEqual(0, catalog.Products.Count);
     }

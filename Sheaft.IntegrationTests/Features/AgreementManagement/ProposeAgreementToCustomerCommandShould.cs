@@ -21,7 +21,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class ProposeAgreementToCustomerCommandShould
 {
     [Test]
-    public async Task Create_Agreement_From_Supplier()
+    public async Task Create_Agreement_With_Supplier_As_Owner()
     {
         var (_, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
@@ -34,12 +34,10 @@ public class ProposeAgreementToCustomerCommandShould
         Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
         Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
         Assert.AreEqual(AgreementOwner.Supplier, agreement.Owner);
-        Assert.AreEqual(2, agreement.DeliveryDays.Count());
-        Assert.AreEqual(24, agreement.OrderDelayInHoursBeforeDeliveryDay);
     }
     
     [Test]
-    public async Task Fail_If_Supplier_Have_Already_A_Pending_Or_Active_Agreement()
+    public async Task Fail_If_Supplier_Has_Already_A_Pending_Or_Active_Agreement_For_Customer()
     {
         var (catalog, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);

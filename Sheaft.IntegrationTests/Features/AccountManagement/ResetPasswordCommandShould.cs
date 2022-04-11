@@ -23,7 +23,7 @@ namespace Sheaft.IntegrationTests.AccountManagement;
 public class ResetPasswordCommandShould
 {
     [Test]
-    public async Task Reset_Account_Password()
+    public async Task Assign_ResetPasswordInfo()
     {
         var (account, handler) = InitHandler();
 

@@ -26,16 +26,18 @@ public class Supplier : AggregateRoot
     public ShippingAddress ShippingAddress { get; private set; }
     public AccountId AccountIdentifier { get; }
 
-    public void SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, ShippingAddress address)
+    public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, ShippingAddress address)
     {
         TradeName = name;
         Email = email;
         Phone = phone;
         ShippingAddress = address;
+        return Result.Success();
     }
 
-    public void SetLegal(CorporateName name, Siret siret, LegalAddress address)
+    public Result SetLegal(CorporateName name, Siret siret, LegalAddress address)
     {
         Legal = new Legal(name, siret, address);
+        return Result.Success();
     }
 }

@@ -20,7 +20,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class UpdateAgreementDeliveryCommandShould
 {
     [Test]
-    public async Task Update_Agreement_Delivery()
+    public async Task Update_Agreement_DeliveryDays_And_Delay()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         

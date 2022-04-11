@@ -49,7 +49,7 @@ public class PublishOrders : IPublishOrders
         if (deliveryDateValidityResult.IsFailure)
             return Result.Failure(deliveryDateValidityResult);
         
-        IEnumerable<OrderLine>? lines = null;
+        var lines = order.Lines;
         if (orderProducts.Any())
         {
             var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierIdentifier, token);

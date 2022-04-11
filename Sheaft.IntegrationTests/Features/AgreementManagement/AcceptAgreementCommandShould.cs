@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class AcceptAgreementCommandShould
 {
     [Test]
-    public async Task Accept_Agreement_From_Supplier_And_Set_As_Active()
+    public async Task Set_As_Active_Agreement_Sent_By_Supplier()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
@@ -36,7 +37,7 @@ public class AcceptAgreementCommandShould
     }
     
     [Test]
-    public async Task Accept_Agreement_From_Customer_And_Set_As_Active()
+    public async Task Set_As_Active_Agreement_Sent_By_Customer()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
@@ -51,6 +52,25 @@ public class AcceptAgreementCommandShould
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Active, agreement.Status);
+    }
+    
+    
+    [Test]
+    public async Task Assign_DeliveryDay_Agreement_Sent_By_Customer()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Identifier, customer.Identifier, catalog.Identifier);
+        context.Add(agreement);
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Identifier, new List<DayOfWeek>
+        {
+            DayOfWeek.Monday
+        }, 24), CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual(DayOfWeek.Monday, agreement.DeliveryDays.First().Value);
     }
     
     [Test]

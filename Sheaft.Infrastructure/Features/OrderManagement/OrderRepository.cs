@@ -25,7 +25,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         });
     }
 
-    public Task<Result<Maybe<Order>>> FindExistingDraft(CustomerId customerIdentifier, SupplierId supplierIdentifier, CancellationToken token)
+    public Task<Result<Maybe<Order>>> FindDraft(CustomerId customerIdentifier, SupplierId supplierIdentifier, CancellationToken token)
     {
         return QueryAsync(async () =>
         {

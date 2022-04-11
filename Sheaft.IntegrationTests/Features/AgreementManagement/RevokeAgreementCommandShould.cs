@@ -35,7 +35,7 @@ public class RevokeAgreementCommandShould
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Revoked, agreement.Status);
-        Assert.AreEqual("raison valable", agreement.RevokedReason);
+        Assert.AreEqual("raison valable", agreement.FailureReason);
     }
     
     [Test]
@@ -56,6 +56,26 @@ public class RevokeAgreementCommandShould
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("agreement.revoke.requires.active", result.Error.Code);
+    }
+    
+    [Test]
+    public async Task Fail_To_Revoke_Agreement_If_No_Reason_Provided()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        agreement.Accept();
+        
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Identifier, null), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.revoke.requires.reason", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, RevokeAgreementHandler) InitHandler()

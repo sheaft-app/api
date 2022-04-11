@@ -18,7 +18,7 @@ namespace Sheaft.IntegrationTests.AccountManagement;
 public class RegisterAccountCommandShould
 {
     [Test]
-    public async Task Register_Account()
+    public async Task Create_Account()
     {
         var handler = InitHandler(new List<EmailAddress>());
 

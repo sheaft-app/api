@@ -20,17 +20,13 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class AcceptOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Accepted()
+    public async Task Set_Status_As_Accepted_And_AcceptedOn()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-
         var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, Maybe<DeliveryDate>.None);
 
-        var result =
-            await handler.Handle(
-                acceptOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(OrderStatus.Accepted, order.Status);
@@ -38,39 +34,29 @@ public class AcceptOrderCommandShould
     }
     
     [Test]
-    public async Task Switch_Order_Status_To_Accepted_And_Reschedule()
+    public async Task Accept_And_Reschedule_To_Specified_Date()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-
         var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
 
-        var result =
-            await handler.Handle(
-                acceptOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
-
         Assert.IsNotNull(delivery);
         Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
     }
     
     [Test]
-    public async Task Fail_To_Accept_Order_If_Not_In_Valid_Status()
+    public async Task Fail_If_Not_In_Pending_Status()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context, true);
-
         var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
 
-        var result =
-            await handler.Handle(
-                acceptOrderCommand,
-                CancellationToken.None);
+        var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);

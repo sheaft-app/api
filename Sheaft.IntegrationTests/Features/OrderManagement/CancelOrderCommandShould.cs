@@ -18,39 +18,46 @@ namespace Sheaft.IntegrationTests.OrderManagement;
 public class CancelOrderCommandShould
 {
     [Test]
-    public async Task Switch_Order_Status_To_Refused()
+    public async Task Set_Status_As_Cancelled_And_CompletedOn()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var cancelOrderCommand = new CancelOrderCommand(order.Identifier, "reason");
+        var cancelOrderCommand = new CancelOrderCommand(order.Identifier);
         var result =
             await handler.Handle(
                 cancelOrderCommand,
                 CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-
-        Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Cancelled, order.Status);
         Assert.AreEqual(cancelOrderCommand.CreatedAt, order.CompletedOn);
+    }
+    
+    [Test]
+    public async Task Set_FailureReason()
+    {
+        var (context, handler) = InitHandler();
+        var order = InitOrder(context);
+
+        var cancelOrderCommand = new CancelOrderCommand(order.Identifier, "reason");
+        var result = await handler.Handle(cancelOrderCommand, CancellationToken.None);
+        
+        Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual("reason", order.FailureReason);
     }
     
     [Test]
-    public async Task Fail_To_Cancel_If_Not_In_Valid_Status()
+    public async Task Fail_If_Not_In_Accepted_Status()
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var result =
-            await handler.Handle(
-                new CancelOrderCommand(order.Identifier, "reason"),
-                CancellationToken.None);
+        var result = await handler.Handle(new CancelOrderCommand(order.Identifier), CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
-        Assert.AreEqual("order.cancel.requires.accepted.or.ready.status", result.Error.Code);
+        Assert.AreEqual("order.cancel.requires.accepted.or.fulfilled.status", result.Error.Code);
     }
 
     private (AppDbContext, CancelOrderHandler) InitHandler()
@@ -73,7 +80,7 @@ public class CancelOrderCommandShould
         return (context, handler);
     }
 
-    private static Order InitOrder(AppDbContext context, bool accept = true)
+    private static Order InitOrder(AppDbContext context, bool accept = true, bool fulfill = false)
     {
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
@@ -82,6 +89,9 @@ public class CancelOrderCommandShould
 
         if(accept)
             order.Accept();
+
+        if(fulfill)
+            order.Fulfill();
         
         context.Add(order);
         context.SaveChanges();
