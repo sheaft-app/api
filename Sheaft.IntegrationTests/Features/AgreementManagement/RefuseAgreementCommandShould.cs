@@ -20,11 +20,11 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class RefuseAgreementCommandShould
 {
     [Test]
-    public async Task Refuse_Agreement_Between_Customer_And_Supplier()
+    public async Task Refuse_Agreement_And_Set_Status_To_Refused()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
             catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         context.Add(agreement); 
@@ -34,6 +34,26 @@ public class RefuseAgreementCommandShould
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Refused, agreement.Status);
+    }
+    
+    [Test]
+    public async Task Fail_To_Refuse_Agreement_If_Not_In_Pending_Status()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        agreement.Accept();
+        
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Identifier), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.refuse.requires.pending", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, RefuseAgreementHandler) InitHandler()

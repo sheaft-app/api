@@ -24,7 +24,7 @@ public class UpdateAgreementDeliveryCommandShould
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
             catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         context.Add(agreement); 
@@ -47,7 +47,7 @@ public class UpdateAgreementDeliveryCommandShould
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
             catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         agreement.Refuse();
@@ -59,6 +59,25 @@ public class UpdateAgreementDeliveryCommandShould
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.delivery.requires.pending.or.active.status", result.Error.Code);
+    }
+    
+    [Test]
+    public async Task Fail_If_Agreement_No_Delivery_Days_Provided()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+        
+        context.Add(agreement);
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new UpdateAgreementDeliveryCommand(agreement.Identifier, new List<DayOfWeek>()), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.delivery.days.required", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, UpdateAgreementDeliveryHandler) InitHandler()

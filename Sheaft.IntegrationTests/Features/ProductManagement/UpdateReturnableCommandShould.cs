@@ -22,15 +22,15 @@ public class UpdateReturnableCommandShould
         var command = GetCommand(returnableId);
 
         var result = await handler.Handle(command, CancellationToken.None);
-        Assert.IsTrue(result.IsSuccess);
         
+        Assert.IsTrue(result.IsSuccess);
         var returnable = context.Returnables.Single(s => s.Identifier == returnableId);
         Assert.IsNotNull(returnable);
         Assert.AreEqual("Code", returnable.Reference.Value);
     }
 
     [Test]
-    public async Task Fail_When_Inserting_Returnable_With_Duplicated_Reference()
+    public async Task Fail_To_Update_Returnable_If_New_Reference_Already_Exists()
     {
         var (supplierId, context, handler) = InitHandler();
         var command = GetCommand(supplierId, 1200, "Existing");

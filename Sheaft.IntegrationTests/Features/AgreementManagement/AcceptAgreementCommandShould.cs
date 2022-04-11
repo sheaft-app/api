@@ -19,11 +19,11 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class AcceptAgreementCommandShould
 {
     [Test]
-    public async Task As_Customer_Accept_Agreement_From_Supplier()
+    public async Task Accept_Agreement_From_Supplier_And_Set_As_Active()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
             catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         context.Add(agreement); 
@@ -36,11 +36,11 @@ public class AcceptAgreementCommandShould
     }
     
     [Test]
-    public async Task As_Supplier_Accept_Agreement_From_Customer()
+    public async Task Accept_Agreement_From_Customer_And_Set_As_Active()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateCustomerAgreement(supplier.Identifier, customer.Identifier, catalog.Identifier);
+        var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Identifier, customer.Identifier, catalog.Identifier);
         context.Add(agreement);
         context.SaveChanges();
         
@@ -54,11 +54,11 @@ public class AcceptAgreementCommandShould
     }
     
     [Test]
-    public async Task Fail_If_As_Supplier_Accept_Agreement_From_Customer_Without_DeliveryDays_Or_Delay()
+    public async Task Fail_If_Supplier_Accept_Agreement_From_Customer_Without_DeliveryDays_Or_Delay()
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateCustomerAgreement(supplier.Identifier, customer.Identifier, catalog.Identifier);
+        var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Identifier, customer.Identifier, catalog.Identifier);
         context.Add(agreement);
         context.SaveChanges();
         
@@ -66,6 +66,26 @@ public class AcceptAgreementCommandShould
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+    }
+    
+    [Test]
+    public async Task Fail_To_Accept_Agreement_If_Not_In_Pending_Status()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        agreement.Accept();
+        
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Identifier), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.accept.requires.pending", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, AcceptAgreementHandler) InitHandler()

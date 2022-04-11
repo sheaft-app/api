@@ -21,7 +21,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class ProposeAgreementToSupplierCommandShould
 {
     [Test]
-    public async Task Create_Agreement_Between_Customer_And_Supplier()
+    public async Task Create_Agreement_From_Customer_Without_Delivery_Info()
     {
         var (_, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(supplier.Identifier, customer.AccountIdentifier);
@@ -34,6 +34,7 @@ public class ProposeAgreementToSupplierCommandShould
         Assert.AreEqual(AgreementOwner.Customer, agreement.Owner);
         Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
         Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
+        Assert.AreEqual(0, agreement.DeliveryDays.Count());
     }
     
     [Test]
@@ -42,7 +43,7 @@ public class ProposeAgreementToSupplierCommandShould
         var (catalog, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(supplier.Identifier, customer.AccountIdentifier);
 
-        context.Add(Agreement.CreateCustomerAgreement(supplier.Identifier, customer.Identifier, catalog.Identifier));
+        context.Add(Agreement.CreateAndSendAgreementToSupplier(supplier.Identifier, customer.Identifier, catalog.Identifier));
         context.SaveChanges();
 
         var result = await handler.Handle(command, CancellationToken.None);

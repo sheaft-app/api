@@ -21,7 +21,7 @@ namespace Sheaft.IntegrationTests.AgreementManagement;
 public class ProposeAgreementToCustomerCommandShould
 {
     [Test]
-    public async Task Create_Agreement_Between_Supplier_And_Customer()
+    public async Task Create_Agreement_From_Supplier()
     {
         var (_, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
@@ -44,7 +44,7 @@ public class ProposeAgreementToCustomerCommandShould
         var (catalog, supplier, customer, context, handler) = InitHandler();
         var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
 
-        context.Add(Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier, catalog.Identifier, new List<DeliveryDay>(), 0));
+        context.Add(Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier, catalog.Identifier, new List<DeliveryDay>(), 0));
         context.SaveChanges();
 
         var result = await handler.Handle(command, CancellationToken.None);

@@ -40,7 +40,7 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
         if (catalogResult.Value.HasNoValue)
             return Result.Failure<string>(ErrorKind.NotFound, "agreement.supplier.catalog.not.found");
 
-        var agreement = Agreement.CreateSupplierAgreement(
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(
             supplierResult.Value.Identifier, 
             request.CustomerIdentifier, 
             catalogResult.Value.Value.Identifier, 

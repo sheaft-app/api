@@ -17,72 +17,69 @@ namespace Sheaft.IntegrationTests.ProductManagement;
 public class UpdateProductCommandShould
 {
     [Test]
-    public async Task Update_Product()
+    public async Task Update_Product_With_Specified_Reference_And_Price()
     {
         var (productId, context, handler) = InitHandler();
         var command = GetCommand(productId, 1000, "newcode");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
+        Assert.IsTrue(result.IsSuccess);
         var product = context.Products.Single(s => s.Identifier == productId);
         var catalog = context.Catalogs.Single(c => c.Products.Any(cp => cp.Product.Identifier == productId));
-        Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual("newcode", product.Reference.Value);
-        Assert.AreEqual("desc", product.Description);
         Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Identifier == productId).UnitPrice.Value);
     }
     
     [Test]
-    public async Task Update_Product_With_Generated_Code()
+    public async Task Generate_New_Reference_If_None_Provided_When_Updating()
     {
         var (productId, context, handler) = InitHandler();
         var command = GetCommand(productId, code: null);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        var product = context.Products.Single(s => s.Identifier == productId);
         Assert.IsTrue(result.IsSuccess);
+        var product = context.Products.Single(s => s.Identifier == productId);
         Assert.AreEqual("0000000000017", product.Reference.Value);
     }
 
     [Test]
-    public async Task Update_Product_With_Returnable()
+    public async Task Assign_Returnable_To_Product()
     {
         var (productId, context, handler) = InitHandler();
-
         var returnableId = context.Returnables.First().Identifier;
         var command = GetCommand(productId, returnableId: returnableId);
 
         var result = await handler.Handle(command, CancellationToken.None);
+        
         Assert.IsTrue(result.IsSuccess);
-
         var product = context.Products.Single(s => s.Identifier == productId);
         Assert.IsNotNull(product?.Returnable);
         Assert.AreEqual(returnableId.Value, product?.Returnable.Identifier.Value);
     }
 
     [Test]
-    public async Task Update_Product_Remove_Returnable_Link()
+    public async Task Remove_Returnable_On_Product()
     {
         var (productId, context, handler) = InitHandler(true);
-
         var command = GetCommand(productId);
 
         var result = await handler.Handle(command, CancellationToken.None);
+        
         Assert.IsTrue(result.IsSuccess);
-
         var product = context.Products.Single(s => s.Identifier == productId);
         Assert.IsNull(product.Returnable);
     }
 
     [Test]
-    public async Task Fail_Update_Product_With_Not_Found_Returnable()
+    public async Task Fail_To_Assign_Returnable_If_Not_Found()
     {
         var (productId, context, handler) = InitHandler();
-
         var command = GetCommand(productId, returnableId: ReturnableId.New());
 
         var result = await handler.Handle(command, CancellationToken.None);
+        
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);
         Assert.AreEqual("returnable.not.found", result.Error.Code);

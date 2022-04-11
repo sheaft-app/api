@@ -29,7 +29,7 @@ public class CreateReturnableCommandShould
     }
 
     [Test]
-    public async Task Fail_When_Inserting_Returnable_With_Duplicated_Reference()
+    public async Task Fail_To_Insert_Returnable_If_Reference_Already_Exists()
     {
         var (supplierId, context, handler) = InitHandler();
         var command = GetCommand(supplierId, 1200, "Existing");

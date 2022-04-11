@@ -79,7 +79,7 @@ internal static class DataHelpers
             {
                 var customer = context.Customers.Single(s => s.AccountIdentifier == agreementInfo.Key);
             
-                var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+                var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
                     catalog.Identifier,
                     new List<DeliveryDay> {agreementInfo.Value}, 2);
 

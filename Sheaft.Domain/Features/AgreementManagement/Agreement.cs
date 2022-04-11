@@ -16,13 +16,13 @@ public class Agreement : AggregateRoot
         Status = AgreementStatus.Pending;
     }
 
-    public static Agreement CreateCustomerAgreement(SupplierId supplierIdentifier, CustomerId customerIdentifier,
+    public static Agreement CreateAndSendAgreementToSupplier(SupplierId supplierIdentifier, CustomerId customerIdentifier,
         CatalogId catalogIdentifier)
     {
         return new Agreement(AgreementOwner.Customer, supplierIdentifier, customerIdentifier, catalogIdentifier);
     }
 
-    public static Agreement CreateSupplierAgreement(SupplierId supplierIdentifier, CustomerId customerIdentifier,
+    public static Agreement CreateAndSendAgreementToCustomer(SupplierId supplierIdentifier, CustomerId customerIdentifier,
         CatalogId catalogIdentifier, List<DeliveryDay> deliveryDays, int? orderDelayInHoursBeforeDeliveryDay = 0)
     {
         var agreement = new Agreement(AgreementOwner.Supplier, supplierIdentifier, customerIdentifier, catalogIdentifier);

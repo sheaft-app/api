@@ -23,6 +23,8 @@ public class DeleteProductCommandShould
         var (productId, context, handler) = InitHandler();
 
         var result = await handler.Handle(new RemoveProductCommand(productId), CancellationToken.None);
+        
+        Assert.IsTrue(result.IsSuccess);
 
         var product = context.Products.SingleOrDefault(s => s.Identifier == productId);
         var catalog = context.Catalogs
@@ -30,9 +32,19 @@ public class DeleteProductCommandShould
             .ThenInclude(cp => cp.Product)
             .Single(s => s.IsDefault);
         
-        Assert.IsTrue(result.IsSuccess);
         Assert.IsNull(product);
         Assert.AreEqual(0, catalog.Products.Count);
+    }
+    
+    [Test]
+    public async Task Fail_To_Remove_Product_If_Identifier_Not_Exists()
+    {
+        var (productId, context, handler) = InitHandler();
+
+        var result = await handler.Handle(new RemoveProductCommand(ProductId.New()), CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);
     }
 
     private (ProductId, AppDbContext, RemoveProductHandler) InitHandler()

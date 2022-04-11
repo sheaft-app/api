@@ -23,10 +23,10 @@ public class DeleteReturnableCommandShould
         var (productId, context, handler) = InitHandler();
 
         var result = await handler.Handle(new RemoveReturnableCommand(productId), CancellationToken.None);
-
-        var returnable = context.Returnables.SingleOrDefault(s => s.Identifier == productId);
         
         Assert.IsTrue(result.IsSuccess);
+        
+        var returnable = context.Returnables.SingleOrDefault(s => s.Identifier == productId);
         Assert.IsNull(returnable);
     }
 

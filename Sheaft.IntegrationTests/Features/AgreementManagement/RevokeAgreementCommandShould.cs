@@ -24,7 +24,7 @@ public class RevokeAgreementCommandShould
     {
         var (supplier, customer, catalog, context, handler) = InitHandler();
         
-        var agreement = Agreement.CreateSupplierAgreement(supplier.Identifier, customer.Identifier,
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
             catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         agreement.Accept();
@@ -36,6 +36,26 @@ public class RevokeAgreementCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Revoked, agreement.Status);
         Assert.AreEqual("raison valable", agreement.RevokedReason);
+    }
+    
+    [Test]
+    public async Task Fail_To_Revoke_Agreement_If_Not_In_Active_Status()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
+            catalog.Identifier, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        agreement.Refuse();
+        
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Identifier, "reason"), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.revoke.requires.active", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, RevokeAgreementHandler) InitHandler()

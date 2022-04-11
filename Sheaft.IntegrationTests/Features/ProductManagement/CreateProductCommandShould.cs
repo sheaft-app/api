@@ -30,7 +30,7 @@ public class CreateProductCommandShould
     }
 
     [Test]
-    public async Task Insert_Product_With_Same_Code_But_Different_Supplier()
+    public async Task Insert_Product_If_Reference_Exists_From_Different_Supplier()
     {
         var (supplierId, context, handler) = InitHandler();
         context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(2000), null,
@@ -46,7 +46,7 @@ public class CreateProductCommandShould
     }
 
     [Test]
-    public async Task Insert_Product_With_Generated_Code()
+    public async Task Generate_Reference_For_Product_If_Not_Provided()
     {
         var (supplierId, context, handler) = InitHandler();
         var command = GetCommand(supplierId, code: null);
@@ -75,27 +75,26 @@ public class CreateProductCommandShould
     }
 
     [Test]
-    public async Task Fail_Insert_Product_With_Not_Found_Returnable()
+    public async Task Fail_To_Insert_Product_If_Returnable_Not_Found()
     {
         var (supplierId, context, handler) = InitHandler();
-
         var command = GetCommand(supplierId, returnableId: ReturnableId.New());
 
         var result = await handler.Handle(command, CancellationToken.None);
+        
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);
         Assert.AreEqual("returnable.not.found", result.Error.Code);
     }
 
     [Test]
-    public async Task Fail_When_Inserting_Product_With_Already_Existing_Product_Code()
+    public async Task Fail_To_Insert_Product_If_New_Reference_Already_Exists()
     {
         var (supplierId, context, handler) = InitHandler();
         context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(2000), null,
             supplierId));
         
         context.SaveChanges();
-
         var command = GetCommand(supplierId);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -105,7 +104,7 @@ public class CreateProductCommandShould
     }
 
     [Test]
-    public void Fail_When_Inserting_Product_With_Invalid_Price()
+    public void Fail_To_Insert_Product_If_Price_Is_Equal_Zero()
     {
         var (supplierId, context, handler) = InitHandler();
         var command = GetCommand(supplierId, 0);
