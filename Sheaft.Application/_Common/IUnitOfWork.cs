@@ -2,6 +2,7 @@
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
+using Sheaft.Domain.InvoiceManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -24,6 +25,8 @@ public interface IUnitOfWork
     
     public IOrderRepository Orders { get; }
     public IDeliveryRepository Deliveries { get; }
+    
+    public IInvoiceRepository Invoices { get; }
     
     public IBatchRepository Batches { get; }
     

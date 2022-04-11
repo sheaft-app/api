@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\InvoiceManagement" />
     <Folder Include="Features\SupplierManagement\DomainServices" />
   </ItemGroup>
 

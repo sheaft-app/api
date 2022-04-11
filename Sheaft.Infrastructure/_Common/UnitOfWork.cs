@@ -5,6 +5,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
+using Sheaft.Domain.InvoiceManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -14,6 +15,7 @@ using Sheaft.Infrastructure.BatchManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
+using Sheaft.Infrastructure.InvoiceManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.SupplierManagement;
 
@@ -47,6 +49,9 @@ internal class UnitOfWork : IUnitOfWork
         
         Orders = new OrderRepository(_context);
         Deliveries = new DeliveryRepository(_context);
+
+        Invoices = new InvoiceRepository(_context);
+        
         Batches = new BatchRepository(_context);
     }
 
@@ -63,6 +68,8 @@ internal class UnitOfWork : IUnitOfWork
     
     public IOrderRepository Orders { get; }
     public IDeliveryRepository Deliveries { get; }
+    
+    public IInvoiceRepository Invoices { get; }
     
     public IBatchRepository Batches { get; }
 
