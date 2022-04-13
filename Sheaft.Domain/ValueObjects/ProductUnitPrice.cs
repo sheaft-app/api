@@ -2,15 +2,11 @@
 
 public record ProductUnitPrice : UnitPrice
 {
-    public ProductUnitPrice(int value) : this(value, Currency.Euro)
-    {
-    }
-    
-    public ProductUnitPrice(UnitPrice value) : this(value.Value, value.Currency)
+    public ProductUnitPrice(UnitPrice value) : this(value.Value)
     {
     }
 
-    public ProductUnitPrice(int value, Currency currency) : base(value, currency)
+    public ProductUnitPrice(int value) : base(value)
     {
         if(value <= 0)
             throw new InvalidOperationException("Product price must be greater than 0");

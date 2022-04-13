@@ -33,7 +33,9 @@ public class UpdateOrderDraftProductsHandler : ICommandHandler<UpdateOrderDraftP
         if (linesResult.IsFailure)
             return Result.Failure(linesResult);
         
-        order.UpdateDraftLines(linesResult.Value);
+        var result = order.UpdateDraftLines(linesResult.Value);
+        if (result.IsFailure)
+            return result;
 
         _uow.Orders.Update(order);
         return await _uow.Save(token);

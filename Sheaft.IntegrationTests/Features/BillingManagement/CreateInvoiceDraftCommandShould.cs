@@ -7,7 +7,7 @@ using Sheaft.Domain;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
-namespace Sheaft.IntegrationTests.InvoiceManagement;
+namespace Sheaft.IntegrationTests.BillingManagement;
 
 #pragma warning disable CS8767
 #pragma warning disable CS8618

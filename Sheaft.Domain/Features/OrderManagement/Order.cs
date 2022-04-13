@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using Sheaft.Domain.AgreementManagement;
-
-namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain.OrderManagement;
 
 public class Order : AggregateRoot
 {
@@ -31,9 +28,11 @@ public class Order : AggregateRoot
 
     public OrderId Identifier { get; }
     public OrderReference? Reference { get; private set; }
+    public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
+    public TotalVatPrice TotalVatPrice { get; private set; }
+    public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
-    public UnitPrice TotalPrice { get; private set; }
     public DateTimeOffset? FulfilledOn { get; private set; }
     public DateTimeOffset? AcceptedOn { get; private set; }
     public DateTimeOffset? CompletedOn { get; private set; }
@@ -51,8 +50,9 @@ public class Order : AggregateRoot
         if (lines == null || !lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.lines");
         
-        Reference = reference;
         SetLines(lines);
+        
+        Reference = reference;
         Status = OrderStatus.Pending;
         return Result.Success();
     }
@@ -122,17 +122,35 @@ public class Order : AggregateRoot
     {
         var orderLines = lines?.ToList() ?? new List<OrderLine>();
         Lines = new List<OrderLine>(orderLines);
-        TotalPrice = GetTotalPrice();
+        
         ProductsCount = GetProductsCount();
-    }
-    
-    private int GetProductsCount()
-    {
-        return Lines.Sum(l => l.Quantity.Value);
+        CalculatePrices();
     }
 
-    private UnitPrice GetTotalPrice()
+    private void CalculatePrices()
     {
-        return new UnitPrice(Lines.Sum(l => l.TotalPrice.Value));
+        TotalWholeSalePrice = GetTotalWholeSalePrice();
+        TotalVatPrice = GetTotalVatPrice();
+        TotalOnSalePrice = GetTotalOnSalePrice();
+    }
+
+    private int GetProductsCount()
+    {
+        return Lines.Sum(l => l.PriceInfo.Quantity.Value);
+    }
+
+    private TotalWholeSalePrice GetTotalWholeSalePrice()
+    {
+        return new TotalWholeSalePrice(Lines.Sum(l => l.PriceInfo.WholeSalePrice.Value));
+    }
+
+    private TotalOnSalePrice GetTotalOnSalePrice()
+    {
+        return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value));
+    }
+
+    private TotalVatPrice GetTotalVatPrice()
+    {
+        return new TotalVatPrice(Lines.Sum(l => l.PriceInfo.VatPrice.Value));
     }
 }

@@ -12,10 +12,7 @@ public record OrderLine
         LineKind = lineKind;
         Reference = reference;
         Name = name;
-        Quantity = quantity;
-        UnitPrice = unitPrice;
-        Vat = vat;
-        TotalPrice = GetTotalPrice(Quantity, UnitPrice);
+        PriceInfo = new LinePrice(unitPrice, vat, quantity);
     }
 
     public static OrderLine CreateProductLine(ProductId productIdentifier, ProductReference reference, ProductName name,
@@ -34,13 +31,5 @@ public record OrderLine
     public OrderLineKind LineKind { get; private set; }
     public string Reference { get; private set; }
     public string Name { get; private set; }
-    public OrderedQuantity Quantity { get; private set; }
-    public UnitPrice UnitPrice { get; private set; }
-    public VatRate Vat { get; private set; }
-    public TotalPrice TotalPrice { get; private set; }
-
-    private static TotalPrice GetTotalPrice(OrderedQuantity quantity, UnitPrice? unitPrice)
-    {
-        return new TotalPrice((unitPrice?.Value ?? 0) * quantity.Value, unitPrice?.Currency ?? Currency.Euro);
-    }
+    public LinePrice PriceInfo { get; private set; }
 }

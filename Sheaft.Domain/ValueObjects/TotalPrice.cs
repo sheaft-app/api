@@ -1,17 +1,26 @@
 ﻿namespace Sheaft.Domain;
 
-public record TotalPrice
+public record LineWholeSalePrice
 {
-    public TotalPrice(int value) : this(value, Currency.Euro)
+    public LineWholeSalePrice(UnitPrice unitPrice, Quantity quantity)
     {
+        Value = unitPrice.Value * quantity.Value;
     }
     
-    public TotalPrice(int value, Currency currency)
+    public LineWholeSalePrice(int value)
     {
         Value = value;
-        Currency = currency;
     }
 
     public int Value { get; }
-    public Currency Currency { get; }
+}
+
+public record TotalWholeSalePrice
+{
+    public TotalWholeSalePrice(int value)
+    {
+        Value = value;
+    }
+
+    public int Value { get; }
 }

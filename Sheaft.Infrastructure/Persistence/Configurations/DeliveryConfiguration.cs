@@ -46,21 +46,32 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         
         builder.OwnsMany(o => o.Lines, l =>
         {
-            l
-                .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
+            l.OwnsOne(ol => ol.PriceInfo, pi =>
+            {
+                pi
+                    .Property(p => p.UnitPrice)
+                    .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
-            l
-                .Property(p => p.Quantity)
-                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+                pi
+                    .Property(p => p.Quantity)
+                    .HasConversion(quantity => quantity.Value, value => new Quantity(value));
 
-            l
-                .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
+                pi
+                    .Property(p => p.WholeSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
-            l
-                .Property(p => p.Vat)
-                .HasConversion(vat => vat.Value, value => new VatRate(value));
+                pi
+                    .Property(p => p.VatPrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
+
+                pi
+                    .Property(p => p.OnSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
+
+                pi
+                    .Property(p => p.Vat)
+                    .HasConversion(vat => vat.Value, value => new VatRate(value));
+            });
             
             l.WithOwner().HasForeignKey("DeliveryId");
             l.HasKey("DeliveryId", "Identifier");
@@ -78,27 +89,51 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         
         builder.OwnsMany(o => o.Adjustments, l =>
         {
-            l
-                .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
+            l.OwnsOne(ol => ol.PriceInfo, pi =>
+            {
+                pi
+                    .Property(p => p.UnitPrice)
+                    .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
-            l
-                .Property(p => p.Quantity)
-                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+                pi
+                    .Property(p => p.Quantity)
+                    .HasConversion(quantity => quantity.Value, value => new Quantity(value));
 
-            l
-                .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
+                pi
+                    .Property(p => p.WholeSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
-            l
-                .Property(p => p.Vat)
-                .HasConversion(vat => vat.Value, value => new VatRate(value));
+                pi
+                    .Property(p => p.VatPrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
+
+                pi
+                    .Property(p => p.OnSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
+
+                pi
+                    .Property(p => p.Vat)
+                    .HasConversion(vat => vat.Value, value => new VatRate(value));
+            });
             
             l.WithOwner().HasForeignKey("DeliveryId");
             l.HasKey("DeliveryId", "Identifier");
 
             l.ToTable("Delivery_Adjustments");
         });
+        
+        builder
+            .Property(p => p.TotalWholeSalePrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalWholeSalePrice(value));
+        
+        builder
+            .Property(p => p.TotalVatPrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalVatPrice(value));
+        
+        builder
+            .Property(p => p.TotalOnSalePrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
+
         
         builder
             .Property(p => p.SupplierIdentifier)

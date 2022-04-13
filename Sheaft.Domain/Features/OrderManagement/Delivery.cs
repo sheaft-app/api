@@ -17,6 +17,8 @@ public class Delivery : AggregateRoot
         var result = SetOrders(orders);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
+        
+        CalculatePrices();
     }
 
     public DeliveryId Identifier { get; }
@@ -24,12 +26,15 @@ public class Delivery : AggregateRoot
     public DeliveryStatus Status { get; private set; }
     public DeliveryDate ScheduledAt { get; private set; }
     public DateTimeOffset? DeliveredOn { get; private set; }
+    public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
+    public TotalVatPrice TotalVatPrice { get; private set; }
+    public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public DeliveryAddress Address { get; }
     public SupplierId SupplierIdentifier { get; }
-    public IEnumerable<DeliveryOrder> Orders { get; private set; }
-    public IEnumerable<DeliveryLine> Lines { get; private set; }
-    public IEnumerable<DeliveryLine> Adjustments { get; private set; }
-    public IEnumerable<DeliveryBatch> Batches { get; private set; }
+    public IEnumerable<DeliveryOrder> Orders { get; private set; } = new List<DeliveryOrder>();
+    public IEnumerable<DeliveryLine> Lines { get; private set; } = new List<DeliveryLine>();
+    public IEnumerable<DeliveryLine> Adjustments { get; private set; } = new List<DeliveryLine>();
+    public IEnumerable<DeliveryBatch> Batches { get; private set; } = new List<DeliveryBatch>();
 
     private Result SetOrders(IEnumerable<Order> orders)
     {
@@ -53,8 +58,10 @@ public class Delivery : AggregateRoot
         Batches = batches?.ToList() ?? new List<DeliveryBatch>();
         Reference = reference;
         Status = DeliveryStatus.Scheduled;
-        
         ScheduledAt = scheduledOn;
+        
+        CalculatePrices();
+        
         return Result.Success();
     }
 
@@ -92,6 +99,31 @@ public class Delivery : AggregateRoot
         Adjustments = linesAdjustments.ToList();
         DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = DeliveryStatus.Delivered;
+        
+        CalculatePrices();
+
         return Result.Success();
+    }
+
+    private void CalculatePrices()
+    {
+        TotalWholeSalePrice = GetTotalWholeSalePrice();
+        TotalVatPrice = GetTotalVatPrice();
+        TotalOnSalePrice = GetTotalOnSalePrice();
+    }
+
+    private TotalWholeSalePrice GetTotalWholeSalePrice()
+    {
+        return new TotalWholeSalePrice(Lines.Sum(l => l.PriceInfo.WholeSalePrice.Value) + Adjustments.Sum(l => l.PriceInfo.WholeSalePrice.Value));
+    }
+
+    private TotalOnSalePrice GetTotalOnSalePrice()
+    {
+        return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value) + Adjustments.Sum(l => l.PriceInfo.OnSalePrice.Value));
+    }
+
+    private TotalVatPrice GetTotalVatPrice()
+    {
+        return new TotalVatPrice(Lines.Sum(l => l.PriceInfo.VatPrice.Value) + Adjustments.Sum(l => l.PriceInfo.VatPrice.Value));
     }
 }

@@ -71,15 +71,15 @@ public class DeliverOrderCommandShould
         var firstProduct = delivery.Adjustments.First(a => a.Identifier == products.First().Identifier.Value);
         Assert.IsNotNull(firstProduct);
         Assert.AreEqual(DeliveryLineKind.Product, firstProduct.LineKind);
-        Assert.AreEqual(1, firstProduct.Quantity.Value);
+        Assert.AreEqual(1, firstProduct.PriceInfo.Quantity.Value);
         var firstReturnable = delivery.Adjustments.First(a => a.Identifier == products.First().Returnable.Identifier.Value);
         Assert.IsNotNull(firstReturnable);
         Assert.AreEqual(DeliveryLineKind.Returnable, firstReturnable.LineKind);
-        Assert.AreEqual(1, firstReturnable.Quantity.Value);
+        Assert.AreEqual(1, firstReturnable.PriceInfo.Quantity.Value);
         var secondProduct = delivery.Adjustments.First(a => a.Identifier == products.Skip(1).First().Identifier.Value);
         Assert.IsNotNull(secondProduct);
         Assert.AreEqual(DeliveryLineKind.Product, secondProduct.LineKind);
-        Assert.AreEqual(-1, secondProduct.Quantity.Value);
+        Assert.AreEqual(-1, secondProduct.PriceInfo.Quantity.Value);
     }
 
     [Test]
@@ -101,7 +101,7 @@ public class DeliverOrderCommandShould
         var deliveryLine = delivery.Adjustments.First();
         Assert.AreEqual(DeliveryLineKind.ReturnedReturnable, deliveryLine.LineKind);
         Assert.AreEqual(returnable.Identifier.Value, deliveryLine.Identifier);
-        Assert.AreEqual(-1, deliveryLine.Quantity.Value);
+        Assert.AreEqual(-1, deliveryLine.PriceInfo.Quantity.Value);
     }
 
     private (AppDbContext, DeliverOrderHandler) InitHandler()
@@ -150,7 +150,7 @@ public class DeliverOrderCommandShould
 
         delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
             new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLine(l.Identifier, DeliveryLineKind.Product, l.Reference, l.Name, l.Quantity, l.UnitPrice, l.Vat)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
+                .Select(l => new DeliveryLine(l.Identifier, DeliveryLineKind.Product, l.Reference, l.Name, l.PriceInfo.Quantity, l.PriceInfo.UnitPrice, l.PriceInfo.Vat)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
 
         context.Add(order);
         context.Add(delivery);

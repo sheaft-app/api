@@ -71,7 +71,7 @@ public class UpdateOrderDraftProductsCommandShould
         
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(2, order.Lines.Count());
-        Assert.AreEqual(2, order.Lines.First(l => l.Identifier == product.Identifier.Value).Quantity.Value);
+        Assert.AreEqual(2, order.Lines.First(l => l.Identifier == product.Identifier.Value).PriceInfo.Quantity.Value);
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class UpdateOrderDraftProductsCommandShould
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(2, order.Lines.Count());
-        Assert.AreEqual(2, order.Lines.First(l => l.Identifier == product.Identifier.Value).Quantity.Value);
+        Assert.AreEqual(2, order.Lines.First(l => l.Identifier == product.Identifier.Value).PriceInfo.Quantity.Value);
     }
 
     [Test]

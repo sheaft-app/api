@@ -48,12 +48,12 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
 
                     if (existingProduct != null)
                     {
-                        price = new ProductUnitPrice(existingProduct.UnitPrice);
-                        vat = existingProduct.Vat;
+                        price = new ProductUnitPrice(existingProduct.PriceInfo.UnitPrice);
+                        vat = existingProduct.PriceInfo.Vat;
                         name = new ProductName(existingProduct.Name);
                         reference = new ProductReference(existingProduct.Reference);
 
-                        if (existingProduct.Quantity.Value < Math.Abs(quantity.Value))
+                        if (existingProduct.PriceInfo.Quantity.Value < Math.Abs(quantity.Value))
                             throw new InvalidOperationException("delivery.adjusted.product.invalid.quantity");
                     }
 
@@ -75,12 +75,12 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
 
                     if (existingReturnable != null)
                     {
-                        price = new ProductUnitPrice(existingReturnable.UnitPrice);
-                        vat = existingReturnable.Vat;
+                        price = new ProductUnitPrice(existingReturnable.PriceInfo.UnitPrice);
+                        vat = existingReturnable.PriceInfo.Vat;
                         name = new ReturnableName(existingReturnable.Name);
                         reference = new ReturnableReference(existingReturnable.Reference);
 
-                        if (existingReturnable.Quantity.Value < Math.Abs(quantity.Value))
+                        if (existingReturnable.PriceInfo.Quantity.Value < Math.Abs(quantity.Value))
                             throw new InvalidOperationException("delivery.adjusted.returnable.invalid.quantity");
                     }
 

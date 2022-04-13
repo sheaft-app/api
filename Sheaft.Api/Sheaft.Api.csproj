@@ -31,6 +31,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\InvoiceManagement" />
+    <Folder Include="Features\BillingManagement" />
   </ItemGroup>
 </Project>

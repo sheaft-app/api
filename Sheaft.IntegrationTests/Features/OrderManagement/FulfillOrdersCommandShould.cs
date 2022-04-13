@@ -85,7 +85,7 @@ public class FulfillOrdersCommandShould
         Assert.IsTrue(result.IsSuccess);
         var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
         Assert.IsNotNull(delivery);
-        Assert.IsTrue(delivery.Lines.All(l => l.Quantity.Value == 5));
+        Assert.IsTrue(delivery.Lines.All(l => l.PriceInfo.Quantity.Value == 5));
     }
     
     [Test]

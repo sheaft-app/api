@@ -14,6 +14,16 @@ namespace Sheaft.IntegrationTests.Helpers;
 
 internal static class DataHelpers
 {
+    public static Siret GetDefaultSiret()
+    {
+        return new Siret("15932477173006");
+    }
+    
+    public static BillingInformation GetDefaultBilling()
+    {
+        return new BillingInformation(new TradeName("test"),  new EmailAddress("test@test.com"), GetDefaultSiret(), new BillingAddress("test", null, "70000", "city"));
+    }
+    
     public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com",
         string password = "P@ssword")
     {

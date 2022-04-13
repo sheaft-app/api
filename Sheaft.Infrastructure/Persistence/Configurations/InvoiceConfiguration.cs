@@ -29,26 +29,61 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
         builder.OwnsMany(o => o.Lines, l =>
         {
-            l
-                .Property(p => p.UnitPrice)
-                .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
+            l.Property<long>("Id");
+            l.HasKey("Id");
+            
+            l.OwnsOne(ol => ol.PriceInfo, pi =>
+            {
+                pi
+                    .Property(p => p.UnitPrice)
+                    .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
-            l
-                .Property(p => p.Quantity)
-                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+                pi
+                    .Property(p => p.Quantity)
+                    .HasConversion(quantity => quantity.Value, value => new Quantity(value));
 
-            l
-                .Property(p => p.TotalPrice)
-                .HasConversion(totalPrice => totalPrice.Value, value => new TotalPrice(value));
+                pi
+                    .Property(p => p.WholeSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
-            l
-                .Property(p => p.Vat)
-                .HasConversion(vat => vat.Value, value => new VatRate(value));
+                pi
+                    .Property(p => p.VatPrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
+
+                pi
+                    .Property(p => p.OnSalePrice)
+                    .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
+
+                pi
+                    .Property(p => p.Vat)
+                    .HasConversion(vat => vat.Value, value => new VatRate(value));
+            });
 
             l.WithOwner().HasForeignKey("InvoiceId");
-            l.HasKey("InvoiceId", "Identifier");
 
             l.ToTable("Invoice_Lines");
+        });
+        
+        builder.OwnsMany(o => o.Vats, l =>
+        {
+            l
+                .Property(p => p.Vat)
+                .HasConversion(vatRate => vatRate.Value, value => new VatRate(value));
+
+            l
+                .Property(p => p.Price)
+                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
+
+            l.WithOwner().HasForeignKey("InvoiceId");
+            l.HasKey("InvoiceId", "Vat");
+
+            l.ToTable("Invoice_Vats");
+        });
+        
+        builder.OwnsMany(o => o.CreditNotes, l =>
+        {
+            l.HasKey("InvoiceId", "InvoiceIdentifier");
+            l.ToTable("Invoice_CreditNotes");
         });
 
         builder.OwnsOne(b => b.BillingInformation, bi =>
@@ -70,8 +105,16 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 value => value != null ? new InvoiceReference(value) : null);
 
         builder
-            .Property(p => p.TotalPrice)
-            .HasConversion(totalPrice => totalPrice.Value, value => new UnitPrice(value));
+            .Property(p => p.TotalWholeSalePrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalWholeSalePrice(value));
+
+        builder
+            .Property(p => p.TotalVatPrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalVatPrice(value));
+
+        builder
+            .Property(p => p.TotalOnSalePrice)
+            .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
 
         builder
             .Property(p => p.SupplierIdentifier)

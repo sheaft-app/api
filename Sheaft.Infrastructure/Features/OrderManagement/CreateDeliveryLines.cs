@@ -52,8 +52,8 @@ public class CreateDeliveryLines : ICreateDeliveryLines
                     p.Vat)).ToList();
 
             var deliveryLines = new List<DeliveryLine>();
-            deliveryLines.AddRange(deliveryProductLines.Where(dp => dp.Quantity.Value > 0));
-            deliveryLines.AddRange(deliveryReturnableLines.Where(dp => dp.Quantity.Value > 0));
+            deliveryLines.AddRange(deliveryProductLines.Where(dp => dp.PriceInfo.Quantity.Value > 0));
+            deliveryLines.AddRange(deliveryReturnableLines.Where(dp => dp.PriceInfo.Quantity.Value > 0));
 
             return Result.Success(deliveryLines.AsEnumerable());
         }
@@ -70,7 +70,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
 
     private ProductUnitPrice GetProductPrice(ProductId productIdentifier, IEnumerable<OrderLine> orderedProducts)
     {
-        var productPrice = orderedProducts.Single(p => p.Identifier == productIdentifier.Value).UnitPrice;
-        return new ProductUnitPrice(productPrice.Value, productPrice.Currency);
+        var productPrice = orderedProducts.Single(p => p.Identifier == productIdentifier.Value).PriceInfo.UnitPrice;
+        return new ProductUnitPrice(productPrice.Value);
     }
 }
