@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Moq;
@@ -22,20 +23,24 @@ public class MarkInvoiceAsPayedCommandShould
     {
         var payedDate = DateTimeOffset.UtcNow.AddDays(-2);
         var (invoice, context, handler) = InitHandler(true, true);
-        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, payedDate);
+        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, "VIRDFDFDF", payedDate, PaymentKind.Check);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(InvoiceStatus.Payed, invoice.Status);
-        Assert.AreEqual(payedDate, invoice.PayedOn);
+        Assert.AreEqual(1, invoice.Payments.Count());
+        
+        var payment = invoice.Payments.Single();
+        Assert.AreEqual(PaymentKind.Check, payment.Kind);
+        Assert.AreEqual(payedDate, payment.PaymentDate);
     }
     
     [Test]
     public async Task Fail_If_Not_In_Sent_Status()
     {
         var (invoice, context, handler) = InitHandler(true, false);
-        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, null);
+        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, "test", DateTimeOffset.Now, PaymentKind.Check);
 
         var result = await handler.Handle(command, CancellationToken.None);
 

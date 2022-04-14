@@ -13,6 +13,8 @@ public record DeliveryLine
         Reference = reference;
         Name = name;
         PriceInfo = new LinePrice(unitPrice, vat, quantity);
+        Quantity = quantity;
+        Vat = vat;
     }
 
     public static DeliveryLine CreateProductLine(ProductId identifier, ProductReference reference, ProductName name,
@@ -38,4 +40,6 @@ public record DeliveryLine
     public string Reference { get; private set; }
     public string Name { get; private set; }
     public LinePrice PriceInfo { get; private set; }
+    public Quantity Quantity { get; }
+    public VatRate Vat { get; }
 }

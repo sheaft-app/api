@@ -59,8 +59,6 @@ public class Invoice : AggregateRoot
     public string? CancellationReason { get; private set; }
     public DateTimeOffset? CancelledOn { get; private set; }
     public DateTimeOffset? SentOn { get; private set; }
-    public DateTimeOffset? PayedOn { get; private set; }
-    public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; }
     public BillingInformation BillingInformation { get; private set; }
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
     public TotalVatPrice TotalVatPrice { get; private set; }
@@ -69,6 +67,8 @@ public class Invoice : AggregateRoot
     public SupplierId SupplierIdentifier { get; private set; }
     public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
     public IEnumerable<InvoiceVat> Vats { get; private set; } = new List<InvoiceVat>();
+    public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; }
+    public IEnumerable<InvoicePayment> Payments { get; private set; }
 
     internal Result Publish(InvoiceReference reference, IEnumerable<InvoiceLine> lines,
         DateTimeOffset? currentDateTime = null)
@@ -106,7 +106,7 @@ public class Invoice : AggregateRoot
         return Result.Success();
     }
 
-    public Result MarkAsPayed(DateTimeOffset? currentDateTime = null)
+    public Result MarkAsPayed(string reference, PaymentKind kind, DateTimeOffset paymentDate)
     {
         if (Status != InvoiceStatus.Sent && Kind == InvoiceKind.Invoice)
             return Result.Failure(ErrorKind.BadRequest, "invoice.payed.requires.sent");
@@ -115,7 +115,7 @@ public class Invoice : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "creditnote.payed.requires.published");
 
         Status = InvoiceStatus.Payed;
-        PayedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        Payments = new List<InvoicePayment> {new InvoicePayment(reference, kind, paymentDate)};
         return Result.Success();
     }
 
@@ -149,7 +149,7 @@ public class Invoice : AggregateRoot
 
     private IEnumerable<InvoiceVat> GetInvoiceVats(IEnumerable<InvoiceLine> lines)
     {
-        var groupedLines = lines.GroupBy(l => l.PriceInfo.Vat);
+        var groupedLines = lines.GroupBy(l => l.Vat);
         return groupedLines
             .Select(groupedLine =>
                 new InvoiceVat(groupedLine.Key, new Price(groupedLine.Sum(gl => gl.PriceInfo.VatPrice.Value))))

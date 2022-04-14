@@ -136,7 +136,7 @@ public class Order : AggregateRoot
 
     private int GetProductsCount()
     {
-        return Lines.Sum(l => l.PriceInfo.Quantity.Value);
+        return Lines.Sum(l => l.Quantity.Value);
     }
 
     private TotalWholeSalePrice GetTotalWholeSalePrice()

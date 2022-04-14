@@ -39,10 +39,6 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                     .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
                 pi
-                    .Property(p => p.Quantity)
-                    .HasConversion(quantity => quantity.Value, value => new Quantity(value));
-
-                pi
                     .Property(p => p.WholeSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
@@ -53,11 +49,15 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 pi
                     .Property(p => p.OnSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
-
-                pi
-                    .Property(p => p.Vat)
-                    .HasConversion(vat => vat.Value, value => new VatRate(value));
             });
+            
+            l
+                .Property(p => p.Quantity)
+                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+
+            l
+                .Property(p => p.Vat)
+                .HasConversion(vat => vat.Value, value => new VatRate(value));
 
             l.WithOwner().HasForeignKey("InvoiceId");
 
@@ -78,6 +78,14 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.HasKey("InvoiceId", "Vat");
 
             l.ToTable("Invoice_Vats");
+        });
+        
+        builder.OwnsMany(o => o.Payments, l =>
+        {
+            l.WithOwner().HasForeignKey("InvoiceId");
+            l.HasKey("InvoiceId", "Reference");
+
+            l.ToTable("Invoice_Payments");
         });
         
         builder.OwnsMany(o => o.CreditNotes, l =>

@@ -2,20 +2,18 @@
 
 public record LinePrice
 {
+    private LinePrice(){}
+    
     public LinePrice(UnitPrice unitPrice, VatRate vat, Quantity quantity)
     {
-        Quantity = quantity;
         UnitPrice = unitPrice;
-        WholeSalePrice = new LineWholeSalePrice(UnitPrice, Quantity);
-        Vat = vat;
-        VatPrice = new LineVatPrice(UnitPrice, Quantity, Vat);
-        OnSalePrice = new LineOnSalePrice(UnitPrice, Quantity, Vat);
+        WholeSalePrice = new LineWholeSalePrice(UnitPrice, quantity);
+        VatPrice = new LineVatPrice(UnitPrice, quantity, vat);
+        OnSalePrice = new LineOnSalePrice(UnitPrice, quantity, vat);
     }
 
-    public Quantity Quantity { get; }
     public UnitPrice UnitPrice { get; }
     public LineWholeSalePrice WholeSalePrice { get; }
     public LineVatPrice VatPrice { get; }
     public LineOnSalePrice OnSalePrice { get; }
-    public VatRate Vat { get; }
 }

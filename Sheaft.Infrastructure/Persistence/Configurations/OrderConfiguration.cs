@@ -37,10 +37,6 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                     .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
                 pi
-                    .Property(p => p.Quantity)
-                    .HasConversion(quantity => quantity.Value, value => new Quantity(value));
-
-                pi
                     .Property(p => p.WholeSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
@@ -51,11 +47,15 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                 pi
                     .Property(p => p.OnSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
-
-                pi
-                    .Property(p => p.Vat)
-                    .HasConversion(vat => vat.Value, value => new VatRate(value));
             });
+            
+            l
+                .Property(p => p.Quantity)
+                .HasConversion(quantity => quantity.Value, value => new Quantity(value));
+
+            l
+                .Property(p => p.Vat)
+                .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("OrderId");
             l.HasKey("OrderId", "Identifier");

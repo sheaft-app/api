@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.BillingManagement;
 
-public record MarkInvoiceAsPayedCommand(InvoiceId InvoiceIdentifier, DateTimeOffset? PayedOn) : Command<Result>;
+public record MarkInvoiceAsPayedCommand(InvoiceId InvoiceIdentifier, string Reference, DateTimeOffset PayedOn, PaymentKind Kind) : Command<Result>;
 
 public class MarkInvoiceAsPayedHandler : ICommandHandler<MarkInvoiceAsPayedCommand, Result>
 {
@@ -21,7 +21,7 @@ public class MarkInvoiceAsPayedHandler : ICommandHandler<MarkInvoiceAsPayedComma
             return invoiceResult;
 
         var invoice = invoiceResult.Value;
-        var result = invoice.MarkAsPayed(request.PayedOn);
+        var result = invoice.MarkAsPayed(request.Reference, request.Kind, request.PayedOn);
         if (result.IsFailure)
             return result;
         

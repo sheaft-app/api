@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,7 +34,7 @@ public class CancelInvoiceCommandShould
     }
     
     [Test]
-    public async Task Generate_CreditNote()
+    public async Task Generate_CreditNote_With_Amount_Equal_To_Invoice()
     {
         var (invoice, context, handler) = InitHandler();
         var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
@@ -47,6 +48,10 @@ public class CancelInvoiceCommandShould
         var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
         Assert.IsNotNull(creditNote);
         Assert.AreEqual(InvoiceKind.CreditNote, creditNote.Kind);
+        Assert.AreEqual(1, creditNote.Lines.Count());
+        Assert.AreEqual(invoice.TotalWholeSalePrice, creditNote.TotalWholeSalePrice);
+        Assert.AreEqual(invoice.TotalVatPrice, creditNote.TotalVatPrice);
+        Assert.AreEqual(invoice.TotalOnSalePrice, creditNote.TotalOnSalePrice);
     }
 
     [Test]
@@ -98,7 +103,7 @@ public class CancelInvoiceCommandShould
             invoice.MarkAsSent();
 
         if (payed)
-            invoice.MarkAsPayed();
+            invoice.MarkAsPayed("", PaymentKind.Check, DateTimeOffset.Now);
 
         context.Add(invoice);
         context.SaveChanges();

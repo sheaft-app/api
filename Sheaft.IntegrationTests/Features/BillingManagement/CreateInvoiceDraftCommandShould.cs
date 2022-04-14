@@ -15,7 +15,7 @@ namespace Sheaft.IntegrationTests.BillingManagement;
 public class CreateInvoiceDraftCommandShould
 {
     [Test]
-    public async Task Insert_Draft()
+    public async Task Insert_Invoice_With_Status_As_Draft()
     {
         var (supplierId, customerId, context, handler) = InitHandler();
         var command = new CreateInvoiceDraftCommand(supplierId, customerId);

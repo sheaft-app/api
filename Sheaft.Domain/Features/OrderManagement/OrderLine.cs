@@ -13,6 +13,8 @@ public record OrderLine
         Reference = reference;
         Name = name;
         PriceInfo = new LinePrice(unitPrice, vat, quantity);
+        Quantity = quantity;
+        Vat = vat;
     }
 
     public static OrderLine CreateProductLine(ProductId productIdentifier, ProductReference reference, ProductName name,
@@ -32,4 +34,6 @@ public record OrderLine
     public string Reference { get; private set; }
     public string Name { get; private set; }
     public LinePrice PriceInfo { get; private set; }
+    public Quantity Quantity { get; }
+    public VatRate Vat { get; }
 }
