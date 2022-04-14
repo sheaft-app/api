@@ -31,11 +31,11 @@ public class Invoice : AggregateRoot
     public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
-        var lines = new List<InvoiceLine>
-        {
-            new InvoiceLine($"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
-                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), new VatRate(0))
-        };
+        var lines = invoice.Vats
+            .Select(v => new InvoiceLine(
+                $"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
+                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat, $"Cette ligne d'avoir concerne les produits dont la TVA est de {v.Vat.Value/100}%"))
+            .ToList();
 
         var creditNote = new Invoice(InvoiceKind.CreditNote, InvoiceStatus.Published, invoice.SupplierIdentifier,
             invoice.CustomerIdentifier, BillingInformation.Copy(invoice.BillingInformation), lines,
@@ -45,10 +45,9 @@ public class Invoice : AggregateRoot
         };
 
         var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
-        if (result.IsFailure)
-            return Result.Failure<Invoice>(result);
-
-        return Result.Success(creditNote);
+        return result.IsFailure 
+            ? Result.Failure<Invoice>(result) 
+            : Result.Success(creditNote);
     }
 
     public InvoiceId Identifier { get; }
@@ -128,7 +127,7 @@ public class Invoice : AggregateRoot
         if (string.IsNullOrWhiteSpace(cancellationReason))
             return Result.Failure(ErrorKind.BadRequest, "invoice.cancel.requires.reason");
 
-        CreditNotes = new List<InvoiceCreditNote>{new InvoiceCreditNote(creditNoteIdentifier)};
+        CreditNotes = new List<InvoiceCreditNote> {new InvoiceCreditNote(creditNoteIdentifier)};
         CancellationReason = cancellationReason;
         Status = InvoiceStatus.Cancelled;
         CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
@@ -158,13 +157,13 @@ public class Invoice : AggregateRoot
         return new TotalWholeSalePrice(Lines.Sum(l => l.PriceInfo.WholeSalePrice.Value));
     }
 
-    private TotalOnSalePrice GetTotalOnSalePrice()
-    {
-        return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value));
-    }
-
     private TotalVatPrice GetTotalVatPrice()
     {
         return new TotalVatPrice(Vats.Sum(l => l.Price.Value));
+    }
+
+    private TotalOnSalePrice GetTotalOnSalePrice()
+    {
+        return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value));
     }
 }
