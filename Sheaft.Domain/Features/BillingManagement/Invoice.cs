@@ -128,10 +128,7 @@ public class Invoice : AggregateRoot
         if (string.IsNullOrWhiteSpace(cancellationReason))
             return Result.Failure(ErrorKind.BadRequest, "invoice.cancel.requires.reason");
 
-        var notes = CreditNotes.ToList();
-        notes.Add(new InvoiceCreditNote(creditNoteIdentifier));
-
-        CreditNotes = notes;
+        CreditNotes = new List<InvoiceCreditNote>{new InvoiceCreditNote(creditNoteIdentifier)};
         CancellationReason = cancellationReason;
         Status = InvoiceStatus.Cancelled;
         CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
