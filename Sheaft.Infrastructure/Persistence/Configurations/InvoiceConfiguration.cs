@@ -94,12 +94,25 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.ToTable("Invoice_CreditNotes");
         });
 
-        builder.OwnsOne(b => b.BillingInformation, bi =>
+        builder.OwnsOne(b => b.Customer, bi =>
         {
             bi
-                .Property(p => p.Name)
-                .HasConversion(name => name.Value, value => new TradeName(value));
-            
+                .Property(p => p.Identifier)
+                .HasConversion(identifier => identifier.Value, value => new CustomerId(value));
+
+            bi
+                .Property(p => p.Siret)
+                .HasConversion(siret => siret.Value, value => new Siret(value));
+
+            bi.OwnsOne(bie => bie.Address);
+        });
+
+        builder.OwnsOne(b => b.Supplier, bi =>
+        {
+            bi
+                .Property(p => p.Identifier)
+                .HasConversion(identifier => identifier.Value, value => new SupplierId(value));
+
             bi
                 .Property(p => p.Siret)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
@@ -111,6 +124,11 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .Property(p => p.Reference)
             .HasConversion(code => code != null ? code.Value : null,
                 value => value != null ? new InvoiceReference(value) : null);
+
+        builder
+            .Property(p => p.DueOn)
+            .HasConversion(dueOn => dueOn != null ? (DateTimeOffset?)dueOn.Value : null,
+                value => value != null ? new InvoiceDueDate(value.Value) : null);
 
         builder
             .Property(p => p.TotalWholeSalePrice)
@@ -125,20 +143,12 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
 
         builder
-            .Property(p => p.SupplierIdentifier)
-            .HasConversion(vat => vat.Value, value => new SupplierId(value));
-
-        builder
-            .Property(p => p.CustomerIdentifier)
-            .HasConversion(vat => vat.Value, value => new CustomerId(value));
-
-        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
-
-        builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
-            .IsUnique();
+        
+        // builder
+        //     .HasIndex("Supplier_Identifier", "Reference")
+        //     .IsUnique();
 
         builder.ToTable("Invoice");
     }

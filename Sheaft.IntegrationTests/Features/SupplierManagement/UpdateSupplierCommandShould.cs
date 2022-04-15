@@ -45,8 +45,9 @@ public class UpdateSupplierCommandShould
     private static UpdateSupplierCommand GetCommand(SupplierId supplierIdentifier)
     {
         var address = new AddressDto("street", null, "74540", "city");
+        var namedAddress = new NamedAddressDto("ee", "tys@tese.com", "street", null, "74540", "city");
         var command = new UpdateSupplierCommand(supplierIdentifier, "TradeName", "CorporateName", "15932477173006", "test@test.com",
-            "0654653221", address, address);
+            "0654653221", address,namedAddress, namedAddress);
         return command;
     }
 }

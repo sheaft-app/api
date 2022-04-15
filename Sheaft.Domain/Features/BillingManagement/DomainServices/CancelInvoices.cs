@@ -28,7 +28,7 @@ public class CancelInvoices : ICancelInvoices
 
         var invoice = invoiceResult.Value;
         
-        var codeResult = await _generateCreditNoteCode.GenerateNextCode(invoice.SupplierIdentifier, token);
+        var codeResult = await _generateCreditNoteCode.GenerateNextCode(invoice.Supplier.Identifier, token);
         if (codeResult.IsFailure)
             return Result.Failure<string>(codeResult);
 

@@ -36,7 +36,7 @@ public class UpdateCustomerCommandShould
 
         var customer = new Customer(new TradeName("trade"), new EmailAddress("test@est.com"),
             new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null, AccountId.New());
+            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), AccountId.New());
         
         context.Customers.Add(customer);
         context.SaveChanges();
@@ -47,8 +47,9 @@ public class UpdateCustomerCommandShould
     private static UpdateCustomerCommand GetCommand(CustomerId customerIdentifier)
     {
         var address = new AddressDto("street", null, "74540", "city");
+        var namedAddress = new NamedAddressDto("ee", "tys@tese.com", "street", null, "74540", "city");
         var command = new UpdateCustomerCommand(customerIdentifier, "TradeName", "CorporateName", "15932477173006", "test@test.com",
-            "0654653221", address, address);
+            "0654653221", address, namedAddress, namedAddress);
         return command;
     }
 }

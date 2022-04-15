@@ -2,32 +2,56 @@
 
 public record BillingInformation
 {
-    private BillingInformation(){}
+    protected BillingInformation(){}
     
-    public BillingInformation(TradeName Name, EmailAddress Email, Siret Siret, BillingAddress Address)
+    protected BillingInformation(string name, EmailAddress email, Siret siret, Address address)
     {
-        this.Name = Name;
-        this.Email = Email;
-        this.Siret = Siret;
-        this.Address = Address;
+        Name = name;
+        Email = email;
+        Siret = siret;
+        Address = address;
     }
 
-    public static BillingInformation Copy(BillingInformation billingInformation)
-    {
-        return new BillingInformation(billingInformation.Name, billingInformation.Email, billingInformation.Siret,
-            BillingAddress.Copy(billingInformation.Address));
-    }
-
-    public TradeName Name { get; init; }
+    public string Name { get; init; }
+    public EmailAddress Email { get; init; }
     public Siret Siret { get; init; }
-    public BillingAddress Address { get; init; }
-    public EmailAddress Email { get; set; }
+    public Address Address { get; init; }
+}
 
-    public void Deconstruct(out TradeName Name, out EmailAddress Email, out Siret Siret, out BillingAddress Address)
+public record SupplierBillingInformation : BillingInformation
+{
+    private SupplierBillingInformation(){}
+
+    public SupplierBillingInformation(SupplierId identifier, string name, EmailAddress email, Siret siret, Address address) 
+        : base(name, email, siret, address)
     {
-        Name = this.Name;
-        Email = this.Email;
-        Siret = this.Siret;
-        Address = this.Address;
+        Identifier = identifier;
+    }
+    
+    public SupplierId Identifier { get; }
+
+    public static SupplierBillingInformation Copy(SupplierBillingInformation supplier)
+    {
+        return new SupplierBillingInformation(supplier.Identifier, supplier.Name, supplier.Email, supplier.Siret,
+            Domain.Address.Copy(supplier.Address));
+    }
+}
+
+public record CustomerBillingInformation : BillingInformation
+{
+    public CustomerId Identifier { get; }
+
+    private CustomerBillingInformation(){}
+
+    public CustomerBillingInformation(CustomerId identifier, string name, EmailAddress email, Siret siret, Address address) 
+        : base(name, email, siret, address)
+    {
+        Identifier = identifier;
+    }
+
+    public static CustomerBillingInformation Copy(CustomerBillingInformation customer)
+    {
+        return new CustomerBillingInformation(customer.Identifier, customer.Name, customer.Email, customer.Siret,
+            Domain.Address.Copy(customer.Address));
     }
 }

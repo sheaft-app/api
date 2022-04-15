@@ -3,19 +3,18 @@ using Sheaft.Domain.InvoiceManagement;
 
 namespace Sheaft.Application.InvoiceManagement;
 
-public record UpdateInvoiceDraftLinesCommand
-    (InvoiceId InvoiceIdentifier, IEnumerable<InvoiceLineDto> Lines) : Command<Result>;
+public record UpdateInvoiceDraftCommand(InvoiceId InvoiceIdentifier, IEnumerable<InvoiceLineDto> Lines) : Command<Result>;
 
-public class UpdateInvoiceDraftLinesHandler : ICommandHandler<UpdateInvoiceDraftLinesCommand, Result>
+public class UpdateInvoiceDraftHandler : ICommandHandler<UpdateInvoiceDraftCommand, Result>
 {
     private readonly IUnitOfWork _uow;
 
-    public UpdateInvoiceDraftLinesHandler(IUnitOfWork uow)
+    public UpdateInvoiceDraftHandler(IUnitOfWork uow)
     {
         _uow = uow;
     }
 
-    public async Task<Result> Handle(UpdateInvoiceDraftLinesCommand request, CancellationToken token)
+    public async Task<Result> Handle(UpdateInvoiceDraftCommand request, CancellationToken token)
     {
         var invoiceResult = await _uow.Invoices.Get(request.InvoiceIdentifier, token);
         if (invoiceResult.IsFailure)

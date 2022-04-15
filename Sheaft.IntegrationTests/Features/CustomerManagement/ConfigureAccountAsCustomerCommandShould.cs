@@ -37,7 +37,7 @@ public class ConfigureAccountAsCustomerCommandShould
         var accountIdentifier = AccountId.New();
         var email = new EmailAddress("existing@test.com");
         context.Customers.Add(new Customer(new TradeName("trade"), email, new PhoneNumber("0664566565"),
-            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), null, accountIdentifier));
+            new Legal(new CorporateName("le"), new Siret("15932477173006"), new LegalAddress("", null, "", "")), accountIdentifier));
         await context.SaveChangesAsync();
         var command = GetCommand(accountIdentifier);
         
@@ -60,8 +60,9 @@ public class ConfigureAccountAsCustomerCommandShould
     private static ConfigureAccountAsCustomerCommand GetCommand(AccountId accountIdentifier)
     {
         var address = new AddressDto("street", null, "74540", "city");
+        var namedAddress = new NamedAddressDto("ee", "tys@tese.com", "street", null, "74540", "city");
         var command = new ConfigureAccountAsCustomerCommand("TradeName", "CorporateName", "15932477173006", "test@test.com",
-            "0654653221", address, address, accountIdentifier);
+            "0654653221", address, namedAddress, namedAddress, accountIdentifier);
         return command;
     }
 }

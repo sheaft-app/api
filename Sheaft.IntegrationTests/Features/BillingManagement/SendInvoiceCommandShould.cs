@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ public class SendInvoiceCommandShould
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraft(supplierId, customerId, DataHelpers.GetDefaultBilling());
+        var invoice = Invoice.CreateInvoiceDraft(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId));
         invoice.UpdateDraftLines(new List<InvoiceLine>
         {
             new InvoiceLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
@@ -65,7 +66,7 @@ public class SendInvoiceCommandShould
         });
 
         if (publish)
-            invoice.Publish(new InvoiceReference("test"), invoice.Lines);
+            invoice.Publish(new InvoiceReference("test"), new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(2)), invoice.Lines);
         
         if (sent)
             invoice.MarkAsSent();

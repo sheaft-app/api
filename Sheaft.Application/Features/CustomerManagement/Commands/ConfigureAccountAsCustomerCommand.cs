@@ -3,7 +3,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.CustomerManagement;
 
-public record ConfigureAccountAsCustomerCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, AddressDto? DeliveryAddress, AccountId AccountIdentifier) : ICommand<Result<string>>;
+public record ConfigureAccountAsCustomerCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? DeliveryAddress, NamedAddressDto? BillingAddress, AccountId AccountIdentifier) : ICommand<Result<string>>;
 
 public class ConfigureAccountAsCustomerHandler : ICommandHandler<ConfigureAccountAsCustomerCommand, Result<string>>
 {
@@ -24,8 +24,13 @@ public class ConfigureAccountAsCustomerHandler : ICommandHandler<ConfigureAccoun
             request.LegalAddress.Postcode, request.LegalAddress.City);
 
         var deliveryAddress = request.DeliveryAddress != null
-            ? new DeliveryAddress(request.DeliveryAddress.Street, request.DeliveryAddress.Complement,
+            ? new DeliveryAddress(request.DeliveryAddress.Name, new EmailAddress(request.DeliveryAddress.Email), request.DeliveryAddress.Street, request.DeliveryAddress.Complement,
                 request.DeliveryAddress.Postcode, request.DeliveryAddress.City)
+            : null;
+        
+        var billingAddress = request.BillingAddress != null
+            ? new BillingAddress(request.BillingAddress.Name, new EmailAddress(request.BillingAddress.Email), request.BillingAddress.Street, request.BillingAddress.Complement,
+                request.BillingAddress.Postcode, request.BillingAddress.City)
             : null;
 
         var requireCustomerRegistrationResult =
@@ -43,9 +48,10 @@ public class ConfigureAccountAsCustomerHandler : ICommandHandler<ConfigureAccoun
             new PhoneNumber(request.Phone), 
             new Legal(
                 new CorporateName(request.CorporateName),
-                new Siret(request.Siret), legalAddress),
-            deliveryAddress, 
-            request.AccountIdentifier);
+                new Siret(request.Siret), legalAddress), 
+            request.AccountIdentifier,
+            deliveryAddress,
+            billingAddress);
         
         _uow.Customers.Add(customer);
         var result = await _uow.Save(token);

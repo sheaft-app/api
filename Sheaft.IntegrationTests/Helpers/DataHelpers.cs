@@ -19,9 +19,14 @@ internal static class DataHelpers
         return new Siret("15932477173006");
     }
     
-    public static BillingInformation GetDefaultBilling()
+    public static SupplierBillingInformation GetDefaultSupplierBilling(SupplierId supplierId)
     {
-        return new BillingInformation(new TradeName("test"),  new EmailAddress("test@test.com"), GetDefaultSiret(), new BillingAddress("test", null, "70000", "city"));
+        return new SupplierBillingInformation(supplierId, "test",  new EmailAddress("test@test.com"), GetDefaultSiret(), new Address("test", null, "70000", "city"));
+    }
+    
+    public static CustomerBillingInformation GetDefaultCustomerBilling(CustomerId customerId)
+    {
+        return new CustomerBillingInformation(customerId, "test",  new EmailAddress("test@test.com"), GetDefaultSiret(), new Address("test", null, "70000", "city"));
     }
     
     public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com",
@@ -33,15 +38,15 @@ internal static class DataHelpers
     public static Supplier GetDefaultSupplier(AccountId accountIdentifier, string emailAddress = "test@test.com")
     {
         return new Supplier(new TradeName(accountIdentifier.Value), new EmailAddress($"{accountIdentifier.Value}.{emailAddress}"), new PhoneNumber("0664566565"),
-            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), new ShippingAddress(accountIdentifier.Value, null, "70000", "Test"),
-            accountIdentifier);
+            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), accountIdentifier, new ShippingAddress(accountIdentifier.Value, new EmailAddress("test@est.com"), "70000", "Test", "7000", "city"),
+            new BillingAddress(accountIdentifier.Value, new EmailAddress("test@est.com"), "70000", "Test", "7000", "city"));
     }
 
     public static Customer GetDefaultCustomer(AccountId accountIdentifier, string emailAddress = "test@test.com")
     {
         return new Customer(new TradeName(accountIdentifier.Value), new EmailAddress($"{accountIdentifier.Value}.{emailAddress}"), new PhoneNumber("0664566565"),
-            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), new DeliveryAddress(accountIdentifier.Value, null, "70000", "Test"),
-            accountIdentifier);
+            new Legal(new CorporateName(accountIdentifier.Value), new Siret("15932477173006"), new LegalAddress(accountIdentifier.Value, null, "70000", "Test")), accountIdentifier, new DeliveryAddress(accountIdentifier.Value, new EmailAddress("test@est.com"), "70000", "Test", "7000", "city"),
+            new BillingAddress(accountIdentifier.Value, new EmailAddress("test@est.com"), "70000", "Test", "7000", "city"));
     }
     
     public static Order CreateOrderWithLines(Supplier supplier, Customer customer, bool isDraft, IEnumerable<Product>? products = null)

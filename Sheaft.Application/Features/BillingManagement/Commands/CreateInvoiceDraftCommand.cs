@@ -9,23 +9,27 @@ public record CreateInvoiceDraftCommand
 public class CreateInvoiceDraftHandler : ICommandHandler<CreateInvoiceDraftCommand, Result<string>>
 {
     private readonly IUnitOfWork _uow;
+    private readonly IRetrieveBillingInformation _retrieveBillingInformation;
 
-    public CreateInvoiceDraftHandler(IUnitOfWork uow)
+    public CreateInvoiceDraftHandler(
+        IUnitOfWork uow,
+        IRetrieveBillingInformation retrieveBillingInformation)
     {
         _uow = uow;
+        _retrieveBillingInformation = retrieveBillingInformation;
     }
 
     public async Task<Result<string>> Handle(CreateInvoiceDraftCommand request, CancellationToken token)
     {
-        var customerResult = await _uow.Customers.Get(request.CustomerIdentifier, token);
-        if (customerResult.IsFailure)
-            return Result.Failure<string>(customerResult);
+        var supplierBillingResult = await _retrieveBillingInformation.GetSupplierBilling(request.SupplierIdentifier, token);
+        if (supplierBillingResult.IsFailure)
+            return Result.Failure<string>(supplierBillingResult);
+        
+        var customerBillingResult = await _retrieveBillingInformation.GetCustomerBilling(request.CustomerIdentifier, token);
+        if (customerBillingResult.IsFailure)
+            return Result.Failure<string>(customerBillingResult);
 
-        var customer = customerResult.Value;
-        var invoice = Invoice.CreateInvoiceDraft(request.SupplierIdentifier, request.CustomerIdentifier,
-            new BillingInformation(customer.TradeName, customer.Email, customer.Legal.Siret,
-                new BillingAddress(customer.Legal.Address.Street, customer.Legal.Address.Complement,
-                    customer.Legal.Address.Postcode, customer.Legal.Address.City)));
+        var invoice = Invoice.CreateInvoiceDraft(supplierBillingResult.Value, customerBillingResult.Value);
 
         _uow.Invoices.Add(invoice);
         var result = await _uow.Save(token);

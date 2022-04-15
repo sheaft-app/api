@@ -16,9 +16,14 @@ public class ConfigureAccountAsCustomer : Feature
     [HttpPost("configure/customer")]
     public async Task<ActionResult<string>> Post([FromBody] CustomerInfoRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new ConfigureAccountAsCustomerCommand(data.TradeName, data.CorporateName, data.Siret, data.Email, data.Phone, data.LegalAddress, data.DeliveryAddress, CurrentAccountId), token);
+        var result =
+            await Mediator.Execute(
+                new ConfigureAccountAsCustomerCommand(data.TradeName, data.CorporateName, data.Siret, data.Email,
+                    data.Phone, data.LegalAddress, data.DeliveryAddress, data.BillingAddress, CurrentAccountId), token);
+        
         return HandleCommandResult(result);
     }
 }
 
-public record CustomerInfoRequest(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, AddressDto? DeliveryAddress);
+public record CustomerInfoRequest(string TradeName, string CorporateName, string Siret, string Email, string Phone,
+    AddressDto LegalAddress, NamedAddressDto? DeliveryAddress, NamedAddressDto? BillingAddress);

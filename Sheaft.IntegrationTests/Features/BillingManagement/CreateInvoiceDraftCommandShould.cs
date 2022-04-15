@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.InvoiceManagement;
 using Sheaft.Domain;
+using Sheaft.Infrastructure.InvoiceManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -32,15 +33,16 @@ public class CreateInvoiceDraftCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateInvoiceDraftHandler>();
 
-        var handler = new CreateInvoiceDraftHandler(uow);
+        var handler = new CreateInvoiceDraftHandler(uow, new RetrieveBillingInformation(context));
 
-        var supplierId = SupplierId.New();
+        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
+        context.Add(supplier);
 
         var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
         context.Add(customer);
         context.SaveChanges();
         
-        return (supplierId, customer.Identifier, context, handler);
+        return (supplier.Identifier, customer.Identifier, context, handler);
     }
 }
 

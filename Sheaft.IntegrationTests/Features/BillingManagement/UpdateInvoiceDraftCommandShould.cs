@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,13 +15,13 @@ namespace Sheaft.IntegrationTests.BillingManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class UpdateInvoiceDraftLinesCommandShould
+public class UpdateInvoiceDraftCommandShould
 {
     [Test]
     public async Task Add_Lines_To_Invoice()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new UpdateInvoiceDraftLinesCommand(invoice.Identifier,
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier,
         new List<InvoiceLineDto>
             {
                 new InvoiceLineDto("Name1", 2, 2000, 150),
@@ -37,7 +38,7 @@ public class UpdateInvoiceDraftLinesCommandShould
     public async Task Update_Lines_On_Invoice()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new UpdateInvoiceDraftLinesCommand(invoice.Identifier,
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier,
             new List<InvoiceLineDto>
             {
                 new InvoiceLineDto("Name2", 1, 2000, 3000)
@@ -53,7 +54,7 @@ public class UpdateInvoiceDraftLinesCommandShould
     public async Task Remove_Lines_On_Invoice()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new UpdateInvoiceDraftLinesCommand(invoice.Identifier, new List<InvoiceLineDto>());
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>());
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -65,8 +66,8 @@ public class UpdateInvoiceDraftLinesCommandShould
     public async Task Fail_If_Invoice_Is_Not_A_Draft()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new UpdateInvoiceDraftLinesCommand(invoice.Identifier, new List<InvoiceLineDto>());
-        invoice.Publish(new InvoiceReference("test"), invoice.Lines);
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>());
+        invoice.Publish(new InvoiceReference("test"), new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)), invoice.Lines);
         context.SaveChanges();
         
         var result = await handler.Handle(command, CancellationToken.None);
@@ -76,16 +77,16 @@ public class UpdateInvoiceDraftLinesCommandShould
         Assert.AreEqual("invoice.update.lines.requires.draft", result.Error.Code);
     }
 
-    private (Invoice, AppDbContext, UpdateInvoiceDraftLinesHandler) InitHandler(bool addProducts = false)
+    private (Invoice, AppDbContext, UpdateInvoiceDraftHandler) InitHandler(bool addProducts = false)
     {
-        var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateInvoiceDraftLinesHandler>();
+        var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateInvoiceDraftHandler>();
 
-        var handler = new UpdateInvoiceDraftLinesHandler(uow);
+        var handler = new UpdateInvoiceDraftHandler(uow);
 
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraft(supplierId, customerId, DataHelpers.GetDefaultBilling());
+        var invoice = Invoice.CreateInvoiceDraft(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId));
 
         if (addProducts)
             invoice.UpdateDraftLines(new List<InvoiceLine>

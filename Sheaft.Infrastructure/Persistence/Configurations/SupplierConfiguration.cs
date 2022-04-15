@@ -28,6 +28,8 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
             .ValueGeneratedOnAddOrUpdate();
 
         builder.OwnsOne(c => c.ShippingAddress);
+        builder.OwnsOne(c => c.BillingAddress);
+        
         builder.OwnsOne(c => c.Legal, l =>
         {
             l.OwnsOne(le => le.Address);

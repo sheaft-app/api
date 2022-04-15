@@ -146,7 +146,7 @@ public class DeliverOrderCommandShould
         order.Fulfill();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
 
         delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
             new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), order.Lines.Where(l => l.LineKind == OrderLineKind.Product)

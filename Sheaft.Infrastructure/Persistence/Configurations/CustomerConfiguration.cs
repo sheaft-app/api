@@ -27,6 +27,8 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .ValueGeneratedOnAddOrUpdate();
 
         builder.OwnsOne(c => c.DeliveryAddress);
+        builder.OwnsOne(c => c.BillingAddress);
+        
         builder.OwnsOne(c => c.Legal, l =>
         {
             l.OwnsOne(le => le.Address);

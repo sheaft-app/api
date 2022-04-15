@@ -61,7 +61,8 @@ public class DeleteBatchCommandShould
         if (useBatch)
         {
             var order = Order.CreateDraft(supplierId, CustomerId.New());
-            var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow), new DeliveryAddress("", "", "", ""),
+            var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow),
+                new DeliveryAddress("", new EmailAddress("test@est.com"), "", "", "", ""),
                 supplierId, new List<Order> {order});
 
             delivery.Schedule(new DeliveryReference("test"), delivery.ScheduledAt,

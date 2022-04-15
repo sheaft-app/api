@@ -93,7 +93,7 @@ public class AcceptOrderCommandShould
             order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("", "", "", ""), order.SupplierIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "", "", "", ""), order.SupplierIdentifier, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

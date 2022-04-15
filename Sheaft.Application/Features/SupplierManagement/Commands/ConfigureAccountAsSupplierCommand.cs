@@ -4,7 +4,7 @@ using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Application.SupplierManagement;
 
-public record ConfigureAccountAsSupplierCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, AddressDto? ShippingAddress, AccountId AccountIdentifier) : ICommand<Result<string>>;
+public record ConfigureAccountAsSupplierCommand(string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? ShippingAddress, NamedAddressDto? BillingAddress, AccountId AccountIdentifier) : ICommand<Result<string>>;
 
 public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccountAsSupplierCommand, Result<string>>
 {
@@ -25,8 +25,13 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             request.LegalAddress.Postcode, request.LegalAddress.City);
 
         var shippingAddress = request.ShippingAddress != null
-            ? new ShippingAddress(request.ShippingAddress.Street, request.ShippingAddress.Complement,
+            ? new ShippingAddress(request.ShippingAddress.Name, new EmailAddress(request.ShippingAddress.Email), request.ShippingAddress.Street, request.ShippingAddress.Complement,
                 request.ShippingAddress.Postcode, request.ShippingAddress.City)
+            : null;
+        
+        var billingAddress = request.BillingAddress != null
+            ? new BillingAddress(request.BillingAddress.Name, new EmailAddress(request.BillingAddress.Email), request.BillingAddress.Street, request.BillingAddress.Complement,
+                request.BillingAddress.Postcode, request.BillingAddress.City)
             : null;
 
         var requireSupplierRegistrationResult =
@@ -44,9 +49,10 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             new PhoneNumber(request.Phone), 
             new Legal(
                 new CorporateName(request.CorporateName),
-                new Siret(request.Siret), legalAddress),
-            shippingAddress, 
-            request.AccountIdentifier);
+                new Siret(request.Siret), legalAddress), 
+            request.AccountIdentifier,
+            shippingAddress,
+            billingAddress);
         
         _uow.Suppliers.Add(supplier);
         var result = await _uow.Save(token);

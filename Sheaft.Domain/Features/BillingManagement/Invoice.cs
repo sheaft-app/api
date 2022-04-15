@@ -6,40 +6,36 @@ public class Invoice : AggregateRoot
     {
     }
 
-    private Invoice(InvoiceKind kind, InvoiceStatus status, SupplierId supplierIdentifier,
-        CustomerId customerIdentifier, BillingInformation billingInformation, IEnumerable<InvoiceLine>? lines = null,
+    private Invoice(InvoiceKind kind, InvoiceStatus status, SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines = null,
         InvoiceReference? reference = null)
     {
         Identifier = InvoiceId.New();
         Kind = kind;
         Reference = reference;
         Status = status;
-        SupplierIdentifier = supplierIdentifier;
-        CustomerIdentifier = customerIdentifier;
-        BillingInformation = billingInformation;
+        Supplier = supplier;
+        Customer = customer;
 
         SetLines(lines);
     }
 
-    public static Invoice CreateInvoiceDraft(SupplierId supplierIdentifier, CustomerId customerIdentifier,
-        BillingInformation billingInformation)
+    public static Invoice CreateInvoiceDraft(SupplierBillingInformation supplier, CustomerBillingInformation customer)
     {
-        return new Invoice(InvoiceKind.Invoice, InvoiceStatus.Draft, supplierIdentifier, customerIdentifier,
-            billingInformation);
+        return new Invoice(InvoiceKind.Invoice, InvoiceStatus.Draft, supplier, customer);
     }
 
     public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
         var lines = invoice.Vats
-            .Select(v => new InvoiceLine(
-                $"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
-                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat, $"Cette ligne d'avoir concerne les produits dont la TVA est de {v.Vat.Value/100}%"))
+            .Select(v => new InvoiceLine($"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
+                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat, 
+                $"Cette ligne d'avoir concerne les produits dont la TVA est de {v.Vat.Value/100}%"))
             .ToList();
 
-        var creditNote = new Invoice(InvoiceKind.CreditNote, InvoiceStatus.Published, invoice.SupplierIdentifier,
-            invoice.CustomerIdentifier, BillingInformation.Copy(invoice.BillingInformation), lines,
-            creditNoteReference)
+        var creditNote = new Invoice(InvoiceKind.CreditNote, InvoiceStatus.Published, SupplierBillingInformation.Copy(invoice.Supplier),
+            CustomerBillingInformation.Copy(invoice.Customer), lines, creditNoteReference)
         {
             Vats = invoice.Vats.Select(v => new InvoiceVat(v.Vat, v.Price)).ToList()
         };
@@ -52,25 +48,24 @@ public class Invoice : AggregateRoot
 
     public InvoiceId Identifier { get; }
     public InvoiceReference? Reference { get; private set; }
-    public DateTimeOffset? PublishedOn { get; private set; }
+    public InvoiceDueDate? DueOn { get; private set; }
     public InvoiceStatus Status { get; private set; }
     public InvoiceKind Kind { get; private set; }
-    public string? CancellationReason { get; private set; }
+    public DateTimeOffset? PublishedOn { get; private set; }
     public DateTimeOffset? CancelledOn { get; private set; }
     public DateTimeOffset? SentOn { get; private set; }
-    public BillingInformation BillingInformation { get; private set; }
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
     public TotalVatPrice TotalVatPrice { get; private set; }
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
-    public CustomerId CustomerIdentifier { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
+    public CustomerBillingInformation Customer { get; private set; }
+    public SupplierBillingInformation Supplier { get; private set; }
     public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
     public IEnumerable<InvoiceVat> Vats { get; private set; } = new List<InvoiceVat>();
     public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; }
     public IEnumerable<InvoicePayment> Payments { get; private set; }
+    public string? CancellationReason { get; private set; }
 
-    internal Result Publish(InvoiceReference reference, IEnumerable<InvoiceLine> lines,
-        DateTimeOffset? currentDateTime = null)
+    internal Result Publish(InvoiceReference reference, InvoiceDueDate dueOn, IEnumerable<InvoiceLine>? lines, DateTimeOffset? currentDateTime = null)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.draft");
@@ -80,6 +75,7 @@ public class Invoice : AggregateRoot
 
         SetLines(lines);
 
+        DueOn = dueOn;
         Reference = reference;
         Status = InvoiceStatus.Published;
         PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
@@ -165,5 +161,12 @@ public class Invoice : AggregateRoot
     private TotalOnSalePrice GetTotalOnSalePrice()
     {
         return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value));
+    }
+
+    public Result UpdateBillingInformation(SupplierBillingInformation supplier, CustomerBillingInformation customer)
+    {
+        Supplier = supplier;
+        Customer = customer;
+        return Result.Success();
     }
 }

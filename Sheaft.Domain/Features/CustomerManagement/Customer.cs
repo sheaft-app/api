@@ -6,15 +6,16 @@ public class Customer : AggregateRoot
     {
     }
 
-    public Customer(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, DeliveryAddress? deliveryAddress,
-        AccountId accountIdentifier)
+    public Customer(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, 
+        AccountId accountIdentifier, DeliveryAddress? deliveryAddress = null, BillingAddress? billingAddress = null)
     {
         Identifier = CustomerId.New();
         TradeName = tradeName;
         Legal = legal;
         Email = email;
         Phone = phone;
-        DeliveryAddress = deliveryAddress ?? new DeliveryAddress(legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
+        DeliveryAddress = deliveryAddress ?? new DeliveryAddress(tradeName.Value, email, legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
+        BillingAddress = billingAddress ?? new BillingAddress(tradeName.Value, email, legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
         AccountIdentifier = accountIdentifier;
     }
 
@@ -24,15 +25,27 @@ public class Customer : AggregateRoot
     public PhoneNumber Phone { get; private set; }
     public Legal Legal { get; private set; }
     public DeliveryAddress DeliveryAddress { get; private set; }
+    public BillingAddress BillingAddress { get; private set; }
     public AccountId AccountIdentifier { get; }
 
-    public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone, DeliveryAddress address)
+    public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone)
     {
         TradeName = name;
         Email = email;
         Phone = phone;
-        DeliveryAddress = address;
 
+        return Result.Success();
+    }
+
+    public Result SetDeliveryAddress(DeliveryAddress deliveryAddress)
+    {
+        DeliveryAddress = deliveryAddress;
+        return Result.Success();
+    }
+
+    public Result SetBillingAddress(BillingAddress billingAddress)
+    {
+        BillingAddress = billingAddress;
         return Result.Success();
     }
 
