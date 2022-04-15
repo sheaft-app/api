@@ -64,22 +64,6 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.ToTable("Invoice_Lines");
         });
         
-        builder.OwnsMany(o => o.Vats, l =>
-        {
-            l
-                .Property(p => p.Vat)
-                .HasConversion(vatRate => vatRate.Value, value => new VatRate(value));
-
-            l
-                .Property(p => p.Price)
-                .HasConversion(totalPrice => totalPrice.Value, value => new Price(value));
-
-            l.WithOwner().HasForeignKey("InvoiceId");
-            l.HasKey("InvoiceId", "Vat");
-
-            l.ToTable("Invoice_Vats");
-        });
-        
         builder.OwnsMany(o => o.Payments, l =>
         {
             l.WithOwner().HasForeignKey("InvoiceId");

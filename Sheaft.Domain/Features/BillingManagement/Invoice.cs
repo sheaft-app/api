@@ -28,17 +28,16 @@ public class Invoice : AggregateRoot
     public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
-        var lines = invoice.Vats
+        var lines = invoice.Lines
+            .GroupBy(l => l.Vat)
+            .Select(groupedVat => new { Vat = groupedVat.Key, Price = new Price(groupedVat.Sum(e => e.PriceInfo.VatPrice.Value))})
             .Select(v => new InvoiceLine($"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
                 new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat, 
                 $"Cette ligne d'avoir concerne les produits dont la TVA est de {v.Vat.Value/100}%"))
             .ToList();
 
         var creditNote = new Invoice(InvoiceKind.CreditNote, InvoiceStatus.Published, SupplierBillingInformation.Copy(invoice.Supplier),
-            CustomerBillingInformation.Copy(invoice.Customer), lines, creditNoteReference)
-        {
-            Vats = invoice.Vats.Select(v => new InvoiceVat(v.Vat, v.Price)).ToList()
-        };
+            CustomerBillingInformation.Copy(invoice.Customer), lines, creditNoteReference);
 
         var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
         return result.IsFailure 
@@ -60,7 +59,6 @@ public class Invoice : AggregateRoot
     public CustomerBillingInformation Customer { get; private set; }
     public SupplierBillingInformation Supplier { get; private set; }
     public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
-    public IEnumerable<InvoiceVat> Vats { get; private set; } = new List<InvoiceVat>();
     public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; }
     public IEnumerable<InvoicePayment> Payments { get; private set; }
     public string? CancellationReason { get; private set; }
@@ -133,19 +131,9 @@ public class Invoice : AggregateRoot
     private void SetLines(IEnumerable<InvoiceLine>? lines)
     {
         Lines = lines?.ToList() ?? new List<InvoiceLine>();
-        Vats = GetInvoiceVats(Lines);
         TotalWholeSalePrice = GetTotalWholeSalePrice();
         TotalVatPrice = GetTotalVatPrice();
         TotalOnSalePrice = GetTotalOnSalePrice();
-    }
-
-    private IEnumerable<InvoiceVat> GetInvoiceVats(IEnumerable<InvoiceLine> lines)
-    {
-        var groupedLines = lines.GroupBy(l => l.Vat);
-        return groupedLines
-            .Select(groupedLine =>
-                new InvoiceVat(groupedLine.Key, new Price(groupedLine.Sum(gl => gl.PriceInfo.VatPrice.Value))))
-            .ToList();
     }
 
     private TotalWholeSalePrice GetTotalWholeSalePrice()
@@ -155,7 +143,7 @@ public class Invoice : AggregateRoot
 
     private TotalVatPrice GetTotalVatPrice()
     {
-        return new TotalVatPrice(Vats.Sum(l => l.Price.Value));
+        return new TotalVatPrice(Lines.Sum(l => l.PriceInfo.VatPrice.Value));
     }
 
     private TotalOnSalePrice GetTotalOnSalePrice()
