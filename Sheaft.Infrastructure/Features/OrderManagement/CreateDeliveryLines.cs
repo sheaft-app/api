@@ -19,13 +19,9 @@ public class CreateDeliveryLines : ICreateDeliveryLines
     {
         try
         {
-            var orderIdentifiers = delivery.Orders
-                .Select(o => o.OrderIdentifier)
-                .ToList();
-            
             var orders = await _context
                 .Set<Order>()
-                .Where(o => orderIdentifiers.Contains(o.Identifier))
+                .Where(o => o.DeliveryIdentifier == delivery.Identifier)
                 .ToListAsync(token);
 
             var orderedProducts = orders

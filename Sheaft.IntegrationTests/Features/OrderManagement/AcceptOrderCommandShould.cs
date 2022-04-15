@@ -43,7 +43,7 @@ public class AcceptOrderCommandShould
         var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
@@ -88,12 +88,12 @@ public class AcceptOrderCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
         if (accept)
             order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "", "", "", ""), order.SupplierIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "", "", "", ""), order.SupplierIdentifier,  customer.Identifier, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

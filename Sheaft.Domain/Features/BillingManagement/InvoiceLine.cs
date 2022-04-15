@@ -17,9 +17,9 @@ public record InvoiceLine
         IsEditable = editable;
     }
 
-    public static InvoiceLine CreateLine(string name, Quantity quantity, UnitPrice unitPrice, VatRate vat)
+    public static InvoiceLine CreateLine(string identifier, string name, Quantity quantity, UnitPrice unitPrice, VatRate vat)
     {
-        return new InvoiceLine(true, Guid.NewGuid().ToString("N"), name, quantity, unitPrice, vat);
+        return new InvoiceLine(true, identifier, name, quantity, unitPrice, vat);
     }
 
     public static LockedInvoiceLine CreateLockedLine(string name, Quantity quantity, UnitPrice unitPrice, VatRate vat, string? identifier = null)
@@ -35,4 +35,5 @@ public record InvoiceLine
     public bool IsEditable { get; }
 }
 
-public record LockedInvoiceLine(string Identifier, string Name, Quantity Quantity, UnitPrice UnitPrice, VatRate Vat):InvoiceLine(false, Identifier, Name, Quantity, UnitPrice, Vat);
+public record LockedInvoiceLine(string Identifier, string Name, Quantity Quantity, UnitPrice UnitPrice, VatRate Vat)
+    :InvoiceLine(false, Identifier, Name, Quantity, UnitPrice, Vat);

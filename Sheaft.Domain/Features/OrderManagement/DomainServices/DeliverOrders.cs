@@ -58,13 +58,12 @@ public class DeliverOrders : IDeliverOrders
         
         _deliveryRepository.Update(delivery);
 
-        foreach (var orderIdentifier in delivery.Orders.Select(o => o.OrderIdentifier))
+        var ordersResult = await _orderRepository.Get(delivery.Identifier, token);
+        if (ordersResult.IsFailure)
+            return Result.Failure(ordersResult);
+        
+        foreach (var order in ordersResult.Value)
         {
-            var orderResult = await _orderRepository.Get(orderIdentifier, token);
-            if (orderResult.IsFailure)
-                return Result.Failure(orderResult);
-
-            var order = orderResult.Value;
             var markAsDeliveredResult = order.Complete(currentDateTime);
             if (markAsDeliveredResult.IsFailure)
                 return Result.Failure(markAsDeliveredResult);

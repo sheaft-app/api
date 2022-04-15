@@ -29,13 +29,6 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
         builder.OwnsOne(d => d.Address);
         
-        builder.OwnsMany(d => d.Orders, o =>
-        {
-            o.WithOwner().HasForeignKey("DeliveryId");
-            o.HasKey("DeliveryId", "OrderIdentifier");
-            o.ToTable("Delivery_Orders");
-        });
-        
         builder
             .Property(p => p.Reference)
             .HasConversion(code => code != null ? code.Value : null, value => value != null ? new DeliveryReference(value) : null);
@@ -43,6 +36,18 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder
             .Property(p => p.ScheduledAt)
             .HasConversion(scheduledOn => scheduledOn.Value, value => new DeliveryDate(value, value));
+        
+        builder.OwnsMany(o => o.Orders, l =>
+        {
+            l
+                .Property(p => p.Reference)
+                .HasConversion(code => code.Value, value => new OrderReference(value));
+            
+            l.WithOwner().HasForeignKey("DeliveryId");
+            l.HasKey("DeliveryId", "Reference");
+
+            l.ToTable("Delivery_Orders");
+        });
         
         builder.OwnsMany(o => o.Lines, l =>
         {

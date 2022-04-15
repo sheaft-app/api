@@ -83,7 +83,7 @@ public class RefuseOrderCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false);
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
 
         if (accept)
             order.Accept();

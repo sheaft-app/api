@@ -6,14 +6,18 @@ public class Delivery : AggregateRoot
     {
     }
 
-    public Delivery(DeliveryDate date, DeliveryAddress address, SupplierId supplierIdentifier, IEnumerable<Order> orders)
+    public Delivery(DeliveryDate date, DeliveryAddress address, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<Order> orders)
     {
         Identifier = DeliveryId.New();
         ScheduledAt = date;
         Address = address;
         Status = DeliveryStatus.Pending;
         SupplierIdentifier = supplierIdentifier;
+        CustomerIdentifier = customerIdentifier;
 
+        if (orders != null && orders.Any(o => o.Status == OrderStatus.Draft))
+            throw new InvalidOperationException("delivery.requires.published.orders");
+        
         var result = SetOrders(orders);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
@@ -31,6 +35,7 @@ public class Delivery : AggregateRoot
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public DeliveryAddress Address { get; }
     public SupplierId SupplierIdentifier { get; }
+    public CustomerId CustomerIdentifier { get; }
     public IEnumerable<DeliveryOrder> Orders { get; private set; } = new List<DeliveryOrder>();
     public IEnumerable<DeliveryLine> Lines { get; private set; } = new List<DeliveryLine>();
     public IEnumerable<DeliveryLine> Adjustments { get; private set; } = new List<DeliveryLine>();
@@ -41,10 +46,19 @@ public class Delivery : AggregateRoot
         if (orders.GroupBy(o => o.CustomerIdentifier).Count() > 1)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.customer");
         
+        if (orders.First().CustomerIdentifier != CustomerIdentifier)
+            return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.be.from.customer");
+        
         if (orders.GroupBy(o => o.SupplierIdentifier).Count() > 1)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.supplier");
         
-        Orders = orders.Select(o => new DeliveryOrder(o.Identifier)).ToList();
+        if (orders.First().SupplierIdentifier != SupplierIdentifier)
+            return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.be.from.supplier");
+
+        foreach (var order in orders)
+            order.AssignDelivery(Identifier);
+        
+        Orders = orders.Select(o => new DeliveryOrder(o.Reference, o.PublishedOn.Value)).ToList();
         return Result.Success();
     }
 

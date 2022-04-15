@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain.OrderManagement;
 
-public record DeliveryOrder(OrderId OrderIdentifier);
+public record DeliveryOrder(OrderReference Reference, DateTimeOffset PublishedOn);

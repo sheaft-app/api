@@ -50,20 +50,34 @@ public class DeleteBatchCommandShould
 
         var handler = new RemoveBatchHandler(uow, new ValidateAlteringBatchCapability(context));
 
-        var supplierId = SupplierId.New();
+        var supplierAccount = AccountId.New();
+        var customerAccount = AccountId.New();
 
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount, new DeliveryDay(DayOfWeek.Friday)}};
+        var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
+
+        DataHelpers.InitContext(context,
+            new List<AccountId> {customerAccount},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount, supplierProducts}});
+
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+        
         context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplierId));
+            supplier.Identifier));
         
         var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplierId);
+            supplier.Identifier);
 
         if (useBatch)
         {
-            var order = Order.CreateDraft(supplierId, CustomerId.New());
+            var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
+            order.Publish(new OrderReference("test"), order.Lines);
+            
             var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow),
                 new DeliveryAddress("", new EmailAddress("test@est.com"), "", "", "", ""),
-                supplierId, new List<Order> {order});
+                supplier.Identifier, customer.Identifier, new List<Order> {order});
 
             delivery.Schedule(new DeliveryReference("test"), delivery.ScheduledAt,
                 new List<DeliveryLine>

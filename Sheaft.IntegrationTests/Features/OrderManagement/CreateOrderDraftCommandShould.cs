@@ -45,7 +45,8 @@ public class CreateOrderDraftCommandShould
         var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.SingleOrDefault(c => c.Orders.Any(o => o.OrderIdentifier == new OrderId(result.Value)));
+        var order = context.Orders.Single(c => c.Identifier == new OrderId(result.Value));
+        var delivery = context.Deliveries.SingleOrDefault(c => c.Identifier == order.DeliveryIdentifier);
         Assert.IsNull(delivery);
     }
     

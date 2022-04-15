@@ -66,15 +66,16 @@ public class PublishOrders : IPublishOrders
         var publishResult = order.Publish(codeResult.Value, lines);
         if (publishResult.IsFailure)
             return Result.Failure(publishResult);
+
+        var customerDeliveryAddress = await _retrieveOrderCustomer.GetDeliveryAddress(order.Identifier, token);
+        if (customerDeliveryAddress.IsFailure)
+            return Result.Failure(customerDeliveryAddress);
+
+        var delivery = new Delivery(deliveryDate, customerDeliveryAddress.Value, order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
         
+        _deliveryRepository.Add(delivery);
         _orderRepository.Update(order);
         
-        var customerResult = await _retrieveOrderCustomer.GetDeliveryAddress(order.Identifier, token);
-        if (customerResult.IsFailure)
-            return Result.Failure(customerResult);
-        
-        _deliveryRepository.Add(new Delivery(deliveryDate, customerResult.Value, order.SupplierIdentifier, new List<Order> {order}));
-
         return Result.Success();
     }
 }

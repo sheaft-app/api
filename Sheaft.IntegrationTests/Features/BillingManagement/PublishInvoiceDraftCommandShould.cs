@@ -32,7 +32,7 @@ public class PublishInvoiceDraftCommandShould
         Assert.AreEqual(command.CreatedAt, invoice.PublishedOn);
         Assert.AreEqual("0000001", invoice.Reference.Value);
     }
-    
+
     [Test]
     public async Task Update_Customer_Billing_Info_If_They_Have_Changed_Since_Creation()
     {
@@ -50,6 +50,19 @@ public class PublishInvoiceDraftCommandShould
         Assert.AreEqual(InvoiceStatus.Published, invoice.Status);
         Assert.AreEqual("update", invoice.Customer.Name);
         Assert.AreEqual("New street", invoice.Customer.Address.Street);
+    }
+
+    [Test]
+    public async Task Set_Invoice_DueDate_In_30_Days()
+    {
+        var (invoice, context, handler) = InitHandler(true);
+        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(invoice.DueDate);
+        Assert.AreEqual(new InvoiceDueDate(command.CreatedAt.AddDays(30)), invoice.DueDate);
     }
 
     [Test]
@@ -80,7 +93,8 @@ public class PublishInvoiceDraftCommandShould
         Assert.AreEqual("invoice.publish.requires.draft", result.Error.Code);
     }
 
-    private (Invoice, AppDbContext, PublishInvoiceDraftHandler) InitHandler(bool addProducts = false, bool hasDueOn = true)
+    private (Invoice, AppDbContext, PublishInvoiceDraftHandler) InitHandler(bool addProducts = false,
+        bool hasDueOn = true)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<PublishInvoiceDraftHandler>();
 
@@ -98,27 +112,32 @@ public class PublishInvoiceDraftCommandShould
 
         if (addProducts)
         {
-            var invoiceWithProducts = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-                DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<LockedInvoiceLine>
+            var invoiceWithProducts = Invoice.CreateInvoiceDraftForOrder(
+                DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
+                DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
+                new List<OrderToInvoice>
                 {
-                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                    new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
+                    {
+                        InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
+                        InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                    })
                 });
-            
-            if(hasDueOn)
-                invoiceWithProducts.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
+
+            if (hasDueOn)
+                invoiceWithProducts.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
             context.Add(invoiceWithProducts);
             context.SaveChanges();
             return (invoiceWithProducts, context, handler);
         }
-        
-        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-            DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<LockedInvoiceLine>());
 
-        if(hasDueOn)
-            invoice.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-        
+        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
+            DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<OrderToInvoice>());
+
+        if (hasDueOn)
+            invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
+
         context.Add(invoice);
         context.SaveChanges();
         return (invoice, context, handler);

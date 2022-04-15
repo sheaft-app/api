@@ -53,10 +53,17 @@ internal static class DataHelpers
     {
         if (!isDraft)
         {
-            var order = Order.Create(new OrderReference(Guid.NewGuid().ToString("N")), supplier.Identifier,
-                customer.Identifier,
-                products?.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
-                        new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)).ToList() ?? new List<OrderLine>(), "externalCode");
+            var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+            if (products != null && products.Any())
+            {
+                order.UpdateDraftLines(
+                    products.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p =>
+                        OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                            new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
+
+                order.Publish(new OrderReference("test"), order.Lines);
+            }
+
             return order;
         }
 

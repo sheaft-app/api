@@ -51,7 +51,7 @@ public class PublishOrderDraftCommandShould
 
         Assert.IsTrue(result.IsSuccess);
 
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
 
         Assert.IsNotNull(delivery);
         Assert.AreEqual(OrderStatus.Pending, order.Status);

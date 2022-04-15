@@ -72,6 +72,18 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.ToTable("Invoice_Payments");
         });
         
+        builder.OwnsMany(o => o.Orders, l =>
+        {
+            l
+                .Property(p => p.Reference)
+                .HasConversion(code => code.Value, value => new OrderReference(value));
+
+            l.WithOwner().HasForeignKey("InvoiceId");
+            l.HasKey("InvoiceId", "Reference");
+
+            l.ToTable("Invoice_Orders");
+        });
+        
         builder.OwnsMany(o => o.CreditNotes, l =>
         {
             l.HasKey("InvoiceId", "InvoiceIdentifier");
@@ -110,7 +122,7 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 value => value != null ? new InvoiceReference(value) : null);
 
         builder
-            .Property(p => p.DueOn)
+            .Property(p => p.DueDate)
             .HasConversion(dueOn => dueOn != null ? (DateTimeOffset?)dueOn.Value : null,
                 value => value != null ? new InvoiceDueDate(value.Value) : null);
 

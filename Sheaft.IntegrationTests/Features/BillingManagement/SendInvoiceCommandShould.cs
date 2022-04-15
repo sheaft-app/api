@@ -59,13 +59,16 @@ public class SendInvoiceCommandShould
         var customerId = CustomerId.New();
 
         var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId),
-            new List<LockedInvoiceLine>
+            new List<OrderToInvoice>
             {
-                InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
+                {
+                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
+                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                })
             });
 
-        invoice.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
+        invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
         if (publish)
             invoice.Publish(new InvoiceReference("test"));

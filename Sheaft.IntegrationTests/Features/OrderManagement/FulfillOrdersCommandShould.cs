@@ -47,7 +47,7 @@ public class FulfillOrdersCommandShould
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
     }
@@ -65,7 +65,7 @@ public class FulfillOrdersCommandShould
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
         Assert.AreEqual(fulfillOrderCommand.NewDeliveryDate.Value, delivery.ScheduledAt.Value);
@@ -83,7 +83,7 @@ public class FulfillOrdersCommandShould
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
         Assert.IsTrue(delivery.Lines.All(l => l.Quantity.Value == 5));
     }
@@ -102,7 +102,7 @@ public class FulfillOrdersCommandShould
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Orders.Any(o => o.OrderIdentifier == order.Identifier));
+        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(order.Lines.Count(), delivery.Batches.Count());
     }
@@ -197,7 +197,7 @@ public class FulfillOrdersCommandShould
         order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(deliveryDate ?? DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

@@ -44,7 +44,7 @@ public class FulfillOrders : IFulfillOrders
 
         _orderRepository.Update(order);
 
-        var deliveryResult = await _deliveryRepository.GetDeliveryForOrder(order.Identifier, token);
+        var deliveryResult = await _deliveryRepository.Get(order.DeliveryIdentifier, token);
         if (deliveryResult.IsFailure)
             return Result.Failure(deliveryResult);
 

@@ -37,6 +37,30 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         });
     }
 
+    public Task<Result<IEnumerable<Order>>> Get(DeliveryId identifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .Where(e => e.DeliveryIdentifier == identifier)
+                .ToListAsync(token);
+
+            return Result.Success(result.AsEnumerable());
+        });
+    }
+
+    public Task<Result<IEnumerable<Order>>> Get(InvoiceId identifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .Where(e => e.InvoiceIdentifier == identifier)
+                .ToListAsync(token);
+
+            return Result.Success(result.AsEnumerable());
+        });
+    }
+
     public Task<Result<Maybe<Order>>> FindDraft(CustomerId customerIdentifier, SupplierId supplierIdentifier,
         CancellationToken token)
     {

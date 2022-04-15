@@ -8,7 +8,10 @@ using Sheaft.Application.InvoiceManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.OrderManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Infrastructure.InvoiceManagement;
+using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -34,6 +37,19 @@ public class CancelInvoiceCommandShould
     }
     
     [Test]
+    public async Task Remove_InvoiceIdentifier_On_Orders()
+    {
+        var (invoice, context, handler) = InitHandler();
+        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        var order = context.Orders.SingleOrDefault(s => s.InvoiceIdentifier == invoice.Identifier);
+        Assert.IsNull(order);
+    }
+
+    [Test]
     public async Task Generate_CreditNote_With_Amount_Equal_To_Invoice()
     {
         var (invoice, context, handler) = InitHandler();
@@ -41,7 +57,7 @@ public class CancelInvoiceCommandShould
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        Assert.IsTrue(result.IsSuccess); 
+        Assert.IsTrue(result.IsSuccess);
         Assert.IsNotEmpty(invoice.CreditNotes);
         Assert.AreNotEqual(invoice.Identifier, new InvoiceId(result.Value));
 
@@ -80,33 +96,50 @@ public class CancelInvoiceCommandShould
         Assert.AreEqual("invoice.cancel.requires.reason", result.Error.Code);
     }
 
-    private (Invoice, AppDbContext, CancelInvoiceHandler) InitHandler(bool publish = true, bool sent = true, bool payed = false)
+    private (Invoice, AppDbContext, CancelInvoiceHandler) InitHandler(bool publish = true, bool sent = true,
+        bool payed = false)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CancelInvoiceHandler>();
 
-        var handler = new CancelInvoiceHandler(uow, new CancelInvoices(new InvoiceRepository(context), new GenerateCreditNoteCode()));
+        var handler = new CancelInvoiceHandler(uow,
+            new CancelInvoices(new InvoiceRepository(context), new OrderRepository(context), new GenerateCreditNoteCode()));
 
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId),
-        new List<LockedInvoiceLine>
-        {
-            InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-            InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
-        });
+        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
+        var customer =  DataHelpers.GetDefaultCustomer(AccountId.New());;
+
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false,
+            new List<Product>
+                {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplierId)});
+
+        var invoice = Invoice.CreateInvoiceDraftForOrder(
+            DataHelpers.GetDefaultSupplierBilling(supplierId),
+            DataHelpers.GetDefaultCustomerBilling(customerId),
+            new List<OrderToInvoice>
+            {
+                new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
+                {
+                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
+                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                })
+            });
         
-        invoice.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
+        order.AttachInvoice(invoice.Identifier);
+
+        invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
         if (publish)
             invoice.Publish(new InvoiceReference("test"));
-        
+
         if (sent)
             invoice.MarkAsSent();
 
         if (payed)
             invoice.MarkAsPayed("", PaymentKind.Check, DateTimeOffset.Now);
 
+        context.Add(order);
         context.Add(invoice);
         context.SaveChanges();
 

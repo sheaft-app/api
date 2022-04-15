@@ -1,10 +1,12 @@
-﻿namespace Sheaft.Domain.OrderManagement;
+﻿using Sheaft.Domain.InvoiceManagement;
+
+namespace Sheaft.Domain.OrderManagement;
 
 public class Order : AggregateRoot
 {
     private Order(){}
     
-    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderReference? reference = null, string? externalCode = null)
+    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderReference? reference = null, DateTimeOffset? publishedOn = null, string? externalCode = null)
     {
         Identifier = OrderId.New();
         Reference = reference;
@@ -21,11 +23,6 @@ public class Order : AggregateRoot
         return new Order(OrderStatus.Draft, supplierIdentifier, customerIdentifier);
     }
 
-    public static Order Create(OrderReference reference, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine> lines, string? externalCode = null)
-    {
-        return new Order(OrderStatus.Pending, supplierIdentifier, customerIdentifier, lines, reference, externalCode);
-    }
-
     public OrderId Identifier { get; }
     public OrderReference? Reference { get; private set; }
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
@@ -33,6 +30,7 @@ public class Order : AggregateRoot
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
+    public DateTimeOffset? PublishedOn { get; private set; }
     public DateTimeOffset? FulfilledOn { get; private set; }
     public DateTimeOffset? AcceptedOn { get; private set; }
     public DateTimeOffset? CompletedOn { get; private set; }
@@ -41,8 +39,10 @@ public class Order : AggregateRoot
     public CustomerId CustomerIdentifier { get; private set; }
     public SupplierId SupplierIdentifier { get; private set; }
     public IEnumerable<OrderLine> Lines { get; private set; } = new List<OrderLine>();
-    
-    internal Result Publish(OrderReference reference, IEnumerable<OrderLine> lines)
+    public InvoiceId? InvoiceIdentifier { get; set; }
+    public DeliveryId? DeliveryIdentifier { get; set; }
+
+    internal Result Publish(OrderReference reference, IEnumerable<OrderLine> lines, DateTimeOffset? currentDateTime = null)
     {
         if (Status != OrderStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "order.publish.requires.draft");
@@ -54,7 +54,23 @@ public class Order : AggregateRoot
         
         Reference = reference;
         Status = OrderStatus.Pending;
+        PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
+    }
+
+    public void AssignDelivery(DeliveryId deliveryIdentifier)
+    {
+        DeliveryIdentifier = deliveryIdentifier;
+    }
+
+    public void AttachInvoice(InvoiceId invoiceIdentifier)
+    {
+        InvoiceIdentifier = invoiceIdentifier;
+    }
+
+    public void DetachInvoice()
+    {
+        InvoiceIdentifier = null;
     }
     
     public Result UpdateDraftLines(IEnumerable<OrderLine> lines)
