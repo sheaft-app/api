@@ -19,27 +19,33 @@ public class CreateInvoiceDraftCommandShould
     public async Task Insert_Invoice_With_Status_As_Draft()
     {
         var (supplierId, customerId, context, handler) = InitHandler();
-        var command = new CreateInvoiceDraftCommand(supplierId, customerId);
+        var orders = context.Orders.Select(o => o.Identifier).ToList();
+        var command = new CreateInvoiceDraftForOrdersCommand(orders);
 
         var result = await handler.Handle(command, CancellationToken.None);
+        var newInvoiceIdentifiers = result.Value.Select(v => new InvoiceId(v)).ToList();
         
         Assert.IsTrue(result.IsSuccess);
-        var invoice = context.Invoices.Single(s => s.Identifier == new InvoiceId(result.Value));
+        var invoice = context.Invoices.Single(s => newInvoiceIdentifiers.Contains(s.Identifier));
         Assert.IsNotNull(invoice);
         Assert.AreEqual(InvoiceStatus.Draft, invoice.Status);
     }
 
-    private (SupplierId, CustomerId, AppDbContext, CreateInvoiceDraftHandler) InitHandler()
+    private (SupplierId, CustomerId, AppDbContext, CreateInvoiceDraftForOrdersHandler) InitHandler()
     {
-        var (context, uow, _) = DependencyHelpers.InitDependencies<CreateInvoiceDraftHandler>();
+        var (context, uow, _) = DependencyHelpers.InitDependencies<CreateInvoiceDraftForOrdersHandler>();
 
-        var handler = new CreateInvoiceDraftHandler(uow, new RetrieveBillingInformation(context));
+        var handler = new CreateInvoiceDraftForOrdersHandler(uow, new RetrieveBillingInformation(context));
 
         var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
         context.Add(supplier);
 
         var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
         context.Add(customer);
+
+        var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
+        context.Add(order);
+        
         context.SaveChanges();
         
         return (supplier.Identifier, customer.Identifier, context, handler);

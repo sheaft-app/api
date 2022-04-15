@@ -3,5 +3,6 @@
 public enum InvoiceKind
 {
     Invoice,
-    CreditNote
+    CreditNote,
+    InvoiceCancellation,
 }

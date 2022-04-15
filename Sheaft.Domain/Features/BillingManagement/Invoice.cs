@@ -20,9 +20,9 @@ public class Invoice : AggregateRoot
         SetLines(lines);
     }
 
-    public static Invoice CreateInvoiceDraft(SupplierBillingInformation supplier, CustomerBillingInformation customer)
+    public static Invoice CreateInvoiceDraftForOrder(SupplierBillingInformation supplier, CustomerBillingInformation customer, IEnumerable<LockedInvoiceLine> orderLines)
     {
-        return new Invoice(InvoiceKind.Invoice, InvoiceStatus.Draft, supplier, customer);
+        return new Invoice(InvoiceKind.Invoice, InvoiceStatus.Draft, supplier, customer, orderLines);
     }
 
     public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
@@ -31,12 +31,11 @@ public class Invoice : AggregateRoot
         var lines = invoice.Lines
             .GroupBy(l => l.Vat)
             .Select(groupedVat => new { Vat = groupedVat.Key, Price = new Price(groupedVat.Sum(e => e.PriceInfo.VatPrice.Value))})
-            .Select(v => new InvoiceLine($"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
-                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat, 
-                $"Cette ligne d'avoir concerne les produits dont la TVA est de {v.Vat.Value/100}%"))
+            .Select(v => InvoiceLine.CreateLockedLine($"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
+                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat))
             .ToList();
 
-        var creditNote = new Invoice(InvoiceKind.CreditNote, InvoiceStatus.Published, SupplierBillingInformation.Copy(invoice.Supplier),
+        var creditNote = new Invoice(InvoiceKind.InvoiceCancellation, InvoiceStatus.Published, SupplierBillingInformation.Copy(invoice.Supplier),
             CustomerBillingInformation.Copy(invoice.Customer), lines, creditNoteReference);
 
         var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
@@ -63,24 +62,24 @@ public class Invoice : AggregateRoot
     public IEnumerable<InvoicePayment> Payments { get; private set; }
     public string? CancellationReason { get; private set; }
 
-    internal Result Publish(InvoiceReference reference, InvoiceDueDate dueOn, IEnumerable<InvoiceLine>? lines, DateTimeOffset? currentDateTime = null)
+    internal Result Publish(InvoiceReference reference, DateTimeOffset? currentDateTime = null)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.draft");
-
-        if (!lines.Any())
+        
+        if (!Lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.lines");
+        
+        if (DueOn == null)
+            return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.due.date");
 
-        SetLines(lines);
-
-        DueOn = dueOn;
         Reference = reference;
         Status = InvoiceStatus.Published;
         PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
-    public Result UpdateDraftLines(IEnumerable<InvoiceLine> lines)
+    public Result UpdateLines(IEnumerable<InvoiceLine>? lines)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.draft");
@@ -155,6 +154,15 @@ public class Invoice : AggregateRoot
     {
         Supplier = supplier;
         Customer = customer;
+        return Result.Success();
+    }
+
+    public Result SetDueOn(InvoiceDueDate dueOn, DateTimeOffset? currentDateTime = null)
+    {
+        if (dueOn.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
+            return Result.Failure(ErrorKind.BadRequest, "invoice.due.date.requires.incoming.date");
+
+        DueOn = dueOn;
         return Result.Success();
     }
 }

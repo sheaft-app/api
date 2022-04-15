@@ -4,8 +4,7 @@ namespace Sheaft.Domain.BillingManagement;
 
 public interface IPublishInvoices
 {
-    Task<Result> Publish(InvoiceId invoiceIdentifier, InvoiceDueDate dueOn, IEnumerable<InvoiceLine>? lines, 
-        DateTimeOffset currentDateTime, CancellationToken token);
+    Task<Result> Publish(InvoiceId invoiceIdentifier, DateTimeOffset currentDateTime, CancellationToken token);
 }
 
 public class PublishOrders : IPublishInvoices
@@ -24,8 +23,7 @@ public class PublishOrders : IPublishInvoices
         _retrieveBillingInformation = retrieveBillingInformation;
     }
 
-    public async Task<Result> Publish(InvoiceId invoiceIdentifier, InvoiceDueDate dueOn, IEnumerable<InvoiceLine>? lines,
-        DateTimeOffset currentDateTime, CancellationToken token)
+    public async Task<Result> Publish(InvoiceId invoiceIdentifier, DateTimeOffset currentDateTime, CancellationToken token)
     {
         var invoiceResult = await _invoiceRepository.Get(invoiceIdentifier, token);
         if (invoiceResult.IsFailure)
@@ -49,7 +47,7 @@ public class PublishOrders : IPublishInvoices
         if (codeResult.IsFailure)
             return Result.Failure(codeResult);
 
-        var publishResult = invoice.Publish(codeResult.Value, dueOn, lines != null && lines.Any() ? lines : invoice.Lines, currentDateTime);
+        var publishResult = invoice.Publish(codeResult.Value, currentDateTime);
         
         if (publishResult.IsFailure)
             return Result.Failure(publishResult);

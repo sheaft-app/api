@@ -47,7 +47,7 @@ public class CancelInvoiceCommandShould
 
         var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
         Assert.IsNotNull(creditNote);
-        Assert.AreEqual(InvoiceKind.CreditNote, creditNote.Kind);
+        Assert.AreEqual(InvoiceKind.InvoiceCancellation, creditNote.Kind);
         Assert.AreEqual(1, creditNote.Lines.Count());
         Assert.AreEqual(invoice.TotalWholeSalePrice, creditNote.TotalWholeSalePrice);
         Assert.AreEqual(invoice.TotalVatPrice, creditNote.TotalVatPrice);
@@ -89,15 +89,17 @@ public class CancelInvoiceCommandShould
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraft(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId));
-        invoice.UpdateDraftLines(new List<InvoiceLine>
+        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId),
+        new List<LockedInvoiceLine>
         {
-            new InvoiceLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-            new InvoiceLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+            InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
+            InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
         });
+        
+        invoice.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
         if (publish)
-            invoice.Publish(new InvoiceReference("test"), new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(2)), invoice.Lines);
+            invoice.Publish(new InvoiceReference("test"));
         
         if (sent)
             invoice.MarkAsSent();

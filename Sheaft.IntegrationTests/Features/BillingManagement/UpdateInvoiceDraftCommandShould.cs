@@ -26,7 +26,7 @@ public class UpdateInvoiceDraftCommandShould
             {
                 new InvoiceLineDto("Name1", 2, 2000, 150),
                 new InvoiceLineDto("Name2", 1, 2000, 3000)
-            });
+            }, DateTimeOffset.UtcNow.AddDays(1));
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -42,7 +42,7 @@ public class UpdateInvoiceDraftCommandShould
             new List<InvoiceLineDto>
             {
                 new InvoiceLineDto("Name2", 1, 2000, 3000)
-            });
+            },DateTimeOffset.UtcNow.AddDays(1));
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -54,7 +54,7 @@ public class UpdateInvoiceDraftCommandShould
     public async Task Remove_Lines_On_Invoice()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>());
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>(),DateTimeOffset.UtcNow.AddDays(1));
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -65,9 +65,9 @@ public class UpdateInvoiceDraftCommandShould
     [Test]
     public async Task Fail_If_Invoice_Is_Not_A_Draft()
     {
-        var (invoice, context, handler) = InitHandler(true);
-        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>());
-        invoice.Publish(new InvoiceReference("test"), new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)), invoice.Lines);
+        var (invoice, context, handler) = InitHandler(true, true);
+        var command = new UpdateInvoiceDraftCommand(invoice.Identifier, new List<InvoiceLineDto>(),DateTimeOffset.UtcNow.AddDays(1));
+        invoice.Publish(new InvoiceReference("test"));
         context.SaveChanges();
         
         var result = await handler.Handle(command, CancellationToken.None);
@@ -77,7 +77,7 @@ public class UpdateInvoiceDraftCommandShould
         Assert.AreEqual("invoice.update.lines.requires.draft", result.Error.Code);
     }
 
-    private (Invoice, AppDbContext, UpdateInvoiceDraftHandler) InitHandler(bool addProducts = false)
+    private (Invoice, AppDbContext, UpdateInvoiceDraftHandler) InitHandler(bool addProducts = false, bool publish = false)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateInvoiceDraftHandler>();
 
@@ -86,18 +86,31 @@ public class UpdateInvoiceDraftCommandShould
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraft(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId));
-
         if (addProducts)
-            invoice.UpdateDraftLines(new List<InvoiceLine>
-            {
-                new InvoiceLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                new InvoiceLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
-            });
+        {
+            var invoiceWithProducts = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId),
+                DataHelpers.GetDefaultCustomerBilling(customerId), new List<LockedInvoiceLine>
+                {
+                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
+                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
+                });
+
+            invoiceWithProducts.SetDueOn(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
+
+            if(publish)
+                invoiceWithProducts.Publish(new InvoiceReference("Test"));
+
+            context.Add(invoiceWithProducts);
+            context.SaveChanges();
+            return (invoiceWithProducts, context, handler);
+        }
         
+        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId),
+            DataHelpers.GetDefaultCustomerBilling(customerId), new List<LockedInvoiceLine>());
+
         context.Add(invoice);
         context.SaveChanges();
-
+        
         return (invoice, context, handler);
     }
 }

@@ -4,7 +4,7 @@ using Sheaft.Domain.InvoiceManagement;
 
 namespace Sheaft.Application.InvoiceManagement;
 
-public record PublishInvoiceDraftCommand(InvoiceId InvoiceIdentifier, DateTimeOffset DueOn, IEnumerable<InvoiceLineDto>? Lines = null) : Command<Result>;
+public record PublishInvoiceDraftCommand(InvoiceId InvoiceIdentifier) : Command<Result>;
 
 public class PublishInvoiceDraftHandler : ICommandHandler<PublishInvoiceDraftCommand, Result>
 {
@@ -21,13 +21,7 @@ public class PublishInvoiceDraftHandler : ICommandHandler<PublishInvoiceDraftCom
 
     public async Task<Result> Handle(PublishInvoiceDraftCommand request, CancellationToken token)
     {
-        var invoiceResult = await _publishInvoices.Publish(request.InvoiceIdentifier,
-            new InvoiceDueDate(request.DueOn),
-            request.Lines?.Select(l =>
-                new InvoiceLine(l.Name, new Quantity(l.Quantity), new UnitPrice(l.UnitPrice), new VatRate(l.Vat))),
-            request.CreatedAt,
-            token);
-
+        var invoiceResult = await _publishInvoices.Publish(request.InvoiceIdentifier, request.CreatedAt, token);
         if (invoiceResult.IsFailure)
             return invoiceResult;
 

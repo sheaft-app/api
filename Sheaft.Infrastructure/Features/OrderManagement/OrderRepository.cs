@@ -18,19 +18,34 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         {
             var result = await Values
                 .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
-            
+
             return result != null
                 ? Result.Success(result)
                 : Result.Failure<Order>(ErrorKind.NotFound, "order.not.found");
         });
     }
 
-    public Task<Result<Maybe<Order>>> FindDraft(CustomerId customerIdentifier, SupplierId supplierIdentifier, CancellationToken token)
+    public Task<Result<IEnumerable<Order>>> Get(IEnumerable<OrderId> identifiers, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .Where(e => identifiers.Contains(e.Identifier))
+                .ToListAsync(token);
+
+            return Result.Success(result.AsEnumerable());
+        });
+    }
+
+    public Task<Result<Maybe<Order>>> FindDraft(CustomerId customerIdentifier, SupplierId supplierIdentifier,
+        CancellationToken token)
     {
         return QueryAsync(async () =>
         {
             return Result.Success(await Values
-                .SingleOrDefaultAsync(e => e.CustomerIdentifier == customerIdentifier && e.SupplierIdentifier == supplierIdentifier, token) ?? Maybe<Order>.None);
+                .SingleOrDefaultAsync(
+                    e => e.CustomerIdentifier == customerIdentifier && e.SupplierIdentifier == supplierIdentifier,
+                    token) ?? Maybe<Order>.None);
         });
     }
 }

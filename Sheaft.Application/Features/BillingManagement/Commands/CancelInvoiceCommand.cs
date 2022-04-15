@@ -20,14 +20,11 @@ public class CancelInvoiceHandler : ICommandHandler<CancelInvoiceCommand, Result
 
     public async Task<Result<string>> Handle(CancelInvoiceCommand request, CancellationToken token)
     {
-        var result = await _cancelInvoices.Cancel(request.InvoiceIdentifier, request.Reason, request.CreatedAt, token);
-        if (result.IsFailure)
-            return result;
+        var creditNoteResult = await _cancelInvoices.Cancel(request.InvoiceIdentifier, request.Reason, request.CreatedAt, token);
+        if (creditNoteResult.IsFailure)
+            return creditNoteResult;
         
         var saveResult = await _uow.Save(token);
-        if (saveResult.IsFailure)
-            return Result.Failure<string>(saveResult);
-
-        return result;
+        return saveResult.IsFailure ? Result.Failure<string>(saveResult) : creditNoteResult;
     }
 }
