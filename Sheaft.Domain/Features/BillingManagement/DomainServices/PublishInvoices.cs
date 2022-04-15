@@ -7,13 +7,13 @@ public interface IPublishInvoices
     Task<Result> Publish(InvoiceId invoiceIdentifier, DateTimeOffset currentDateTime, CancellationToken token);
 }
 
-public class PublishOrders : IPublishInvoices
+public class PublishInvoices : IPublishInvoices
 {
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IGenerateInvoiceCode _generateInvoiceCode;
     private readonly IRetrieveBillingInformation _retrieveBillingInformation;
 
-    public PublishOrders(
+    public PublishInvoices(
         IInvoiceRepository invoiceRepository,
         IGenerateInvoiceCode generateInvoiceCode,
         IRetrieveBillingInformation retrieveBillingInformation)

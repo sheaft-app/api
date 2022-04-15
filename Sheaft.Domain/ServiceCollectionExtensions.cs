@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
+using PublishOrders = Sheaft.Domain.OrderManagement.PublishOrders;
 
 namespace Sheaft.Domain;
 
@@ -21,6 +23,10 @@ public static class ServiceCollectionInitializers
         services.AddScoped<IFulfillOrders, FulfillOrders>();
         services.AddScoped<IDeliverOrders, DeliverOrders>();
         services.AddScoped<IValidateOrderDeliveryDate, ValidateOrderDeliveryDate>();
+        
+        services.AddScoped<ICancelInvoices, CancelInvoices>();
+        services.AddScoped<ICreateInvoices, CreateInvoices>();
+        services.AddScoped<IPublishInvoices, PublishInvoices>();
         
 
         return services;

@@ -14,6 +14,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
+using Sheaft.Domain.InvoiceManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -23,6 +24,7 @@ using Sheaft.Infrastructure.BatchManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
+using Sheaft.Infrastructure.InvoiceManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Infrastructure.SupplierManagement;
@@ -69,6 +71,7 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+        services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         
         services.AddScoped<IBatchRepository, BatchRepository>();
     }
@@ -126,6 +129,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateDeliveryProductAdjustments, CreateDeliveryProductAdjustments>();
         services.AddScoped<ICreateDeliveryBatches, CreateDeliveryBatches>();
         services.AddScoped<ICreateDeliveryLines, CreateDeliveryLines>();
+        
+        services.AddScoped<IGenerateCreditNoteCode, GenerateCreditNoteCode>();
+        services.AddScoped<IGenerateInvoiceCode, GenerateInvoiceCode>();
+        services.AddScoped<IRetrieveBillingInformation, RetrieveBillingInformation>();
         
         services.AddScoped<IValidateAlteringBatchCapability, ValidateAlteringBatchCapability>();
     }

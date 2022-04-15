@@ -99,7 +99,7 @@ public class PublishInvoiceDraftCommandShould
         var (context, uow, _) = DependencyHelpers.InitDependencies<PublishInvoiceDraftHandler>();
 
         var handler = new PublishInvoiceDraftHandler(uow,
-            new PublishOrders(
+            new PublishInvoices(
                 new InvoiceRepository(context),
                 new GenerateInvoiceCode(),
                 new RetrieveBillingInformation(context)));
