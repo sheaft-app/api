@@ -8,6 +8,7 @@ using Sheaft.Application.InvoiceManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Infrastructure.InvoiceManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
@@ -115,13 +116,14 @@ public class PublishInvoiceDraftCommandShould
             var invoiceWithProducts = Invoice.CreateInvoiceDraftForOrder(
                 DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
                 DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
-                new List<OrderToInvoice>
+                new List<InvoiceLine>
                 {
-                    new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
-                    {
-                        InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                        InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
-                    })
+                    InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                        new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                        new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                    InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                        new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                        new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
                 });
 
             if (hasDueOn)
@@ -133,7 +135,7 @@ public class PublishInvoiceDraftCommandShould
         }
 
         var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-            DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<OrderToInvoice>());
+            DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<InvoiceLine>());
 
         if (hasDueOn)
             invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));

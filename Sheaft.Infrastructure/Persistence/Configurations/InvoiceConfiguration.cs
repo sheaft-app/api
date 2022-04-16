@@ -51,6 +51,20 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
             
+            l.OwnsOne(ol => ol.Order, o =>
+            {
+                o
+                    .Property(p => p.Reference)
+                    .HasConversion(value => value.Value, value => new OrderReference(value));
+            });
+            
+            l.OwnsOne(ol => ol.Delivery, d =>
+            {
+                d
+                    .Property(p => p.Reference)
+                    .HasConversion(value => value.Value, value => new DeliveryReference(value));
+            });
+            
             l
                 .Property(p => p.Quantity)
                 .HasConversion(quantity => quantity.Value, value => new Quantity(value));
@@ -70,18 +84,6 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.HasKey("InvoiceId", "Reference");
 
             l.ToTable("Invoice_Payments");
-        });
-        
-        builder.OwnsMany(o => o.Orders, l =>
-        {
-            l
-                .Property(p => p.Reference)
-                .HasConversion(code => code.Value, value => new OrderReference(value));
-
-            l.WithOwner().HasForeignKey("InvoiceId");
-            l.HasKey("InvoiceId", "Reference");
-
-            l.ToTable("Invoice_Orders");
         });
         
         builder.OwnsMany(o => o.CreditNotes, l =>

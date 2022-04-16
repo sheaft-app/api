@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain.InvoiceManagement;
 
-public record InvoiceOrder(OrderReference Reference, DateTimeOffset PublishedOn);
+public record InvoiceDelivery(DeliveryReference Reference, DateTimeOffset DeliveredOn);

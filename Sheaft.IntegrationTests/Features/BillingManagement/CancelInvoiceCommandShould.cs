@@ -35,13 +35,13 @@ public class CancelInvoiceCommandShould
         Assert.AreEqual(command.CreatedAt, invoice.CancelledOn);
         Assert.AreEqual("Reason", invoice.CancellationReason);
     }
-    
+
     [Test]
     public async Task Remove_InvoiceIdentifier_On_Orders()
     {
         var (invoice, context, handler) = InitHandler();
         var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
-        
+
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -63,11 +63,24 @@ public class CancelInvoiceCommandShould
 
         var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
         Assert.IsNotNull(creditNote);
-        Assert.AreEqual(InvoiceKind.InvoiceCancellation, creditNote.Kind);
-        Assert.AreEqual(1, creditNote.Lines.Count());
         Assert.AreEqual(invoice.TotalWholeSalePrice, creditNote.TotalWholeSalePrice);
         Assert.AreEqual(invoice.TotalVatPrice, creditNote.TotalVatPrice);
         Assert.AreEqual(invoice.TotalOnSalePrice, creditNote.TotalOnSalePrice);
+    }
+
+    [Test]
+    public async Task Generate_Published_CreditNote()
+    {
+        var (invoice, context, handler) = InitHandler();
+        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
+        Assert.IsNotNull(creditNote);
+        Assert.AreEqual(InvoiceKind.InvoiceCancellation, creditNote.Kind);
+        Assert.AreEqual(InvoiceStatus.Published, creditNote.Status);
     }
 
     [Test]
@@ -102,13 +115,15 @@ public class CancelInvoiceCommandShould
         var (context, uow, _) = DependencyHelpers.InitDependencies<CancelInvoiceHandler>();
 
         var handler = new CancelInvoiceHandler(uow,
-            new CancelInvoices(new InvoiceRepository(context), new OrderRepository(context), new GenerateCreditNoteCode()));
+            new CancelInvoices(new InvoiceRepository(context), new OrderRepository(context),
+                new GenerateCreditNoteCode()));
 
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
         var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
-        var customer =  DataHelpers.GetDefaultCustomer(AccountId.New());;
+        var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
+        ;
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false,
             new List<Product>
@@ -117,15 +132,16 @@ public class CancelInvoiceCommandShould
         var invoice = Invoice.CreateInvoiceDraftForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplierId),
             DataHelpers.GetDefaultCustomerBilling(customerId),
-            new List<OrderToInvoice>
+            new List<InvoiceLine>
             {
-                new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
-                {
-                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
-                })
+                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             });
-        
+
         order.AttachInvoice(invoice.Identifier);
 
         invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));

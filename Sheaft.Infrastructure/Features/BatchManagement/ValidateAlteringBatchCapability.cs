@@ -20,7 +20,7 @@ public class ValidateAlteringBatchCapability : IValidateAlteringBatchCapability
         try
         {
             var batchAlreadyUsed = await _context.Set<Delivery>().AnyAsync(a =>
-                a.Batches.Any(b => b.BatchIdentifier == batchIdentifier), token);
+                a.Lines.Any(d => d.Batches.Any(b => b.BatchIdentifier == batchIdentifier)), token);
             
             return Result.Success(!batchAlreadyUsed);
         }

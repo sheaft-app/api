@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Infrastructure.Persistence;
@@ -15,7 +16,8 @@ public class CreateDeliveryLines : ICreateDeliveryLines
         _context = context;
     }
 
-    public async Task<Result<IEnumerable<DeliveryLine>>> Get(Delivery delivery, IEnumerable<DeliveryProductBatches> productLines, CancellationToken token)
+    public async Task<Result<IEnumerable<DeliveryLine>>> Get(Delivery delivery,
+        IEnumerable<DeliveryProductBatches> productLines, CancellationToken token)
     {
         try
         {
@@ -26,26 +28,42 @@ public class CreateDeliveryLines : ICreateDeliveryLines
 
             var orderedProducts = orders
                 .SelectMany(o => o.Lines.Where(l => l.LineKind == OrderLineKind.Product));
-            
+
             var productIdentifiers = productLines.Select(p => p.ProductIdentifier).ToList();
             var products = await _context
                 .Set<Product>()
-                .Where(r => r.SupplierIdentifier == delivery.SupplierIdentifier && productIdentifiers.Contains(r.Identifier))
+                .Where(r => r.SupplierIdentifier == delivery.SupplierIdentifier &&
+                            productIdentifiers.Contains(r.Identifier))
                 .ToListAsync(token);
-            
-            if (products.Count != productIdentifiers.Count())
+
+            if (products.Count != productIdentifiers.Count)
                 return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound,
                     "delivery.lines.products.not.found");
 
+            var batchIdentifiers = productLines.SelectMany(op => op.BatchIdentifiers).Distinct().ToList();
+            if (batchIdentifiers.Any())
+            {
+                var batches = await _context
+                    .Set<Batch>()
+                    .Where(b => b.SupplierIdentifier == delivery.SupplierIdentifier)
+                    .ToListAsync(token);
+
+                if (batchIdentifiers.Count != batches.Count)
+                    return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound,
+                        "delivery.lines.batches.not.found");
+            }
+
             var deliveryProductLines = products.Select(p =>
-                DeliveryLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
-                    GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
-                    p.Vat)).ToList();
+                    DeliveryLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                        GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
+                        p.Vat, GetProductOrder(p.Identifier, productLines),
+                        GetProductBatches(p.Identifier, productLines)))
+                .ToList();
 
             var deliveryReturnableLines = products.Where(p => p.Returnable != null).Select(p =>
                 DeliveryLine.CreateReturnableLine(p.Returnable.Identifier, p.Returnable.Reference, p.Returnable.Name,
                     GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
-                    p.Vat)).ToList();
+                    p.Vat, GetProductOrder(p.Identifier, productLines))).ToList();
 
             var deliveryLines = new List<DeliveryLine>();
             deliveryLines.AddRange(deliveryProductLines.Where(dp => dp.Quantity.Value > 0));
@@ -59,9 +77,26 @@ public class CreateDeliveryLines : ICreateDeliveryLines
         }
     }
 
-    private Quantity GetProductQuantity(ProductId productIdentifier, IEnumerable<DeliveryProductBatches> orderedProducts)
+    private IEnumerable<BatchId> GetProductBatches(ProductId productIdentifier,
+        IEnumerable<DeliveryProductBatches> orderedProducts)
+    {
+        return orderedProducts
+            .Single(p => p.ProductIdentifier == productIdentifier).BatchIdentifiers?
+            .Distinct()
+            .ToList() ?? new List<BatchId>();
+    }
+
+    private Quantity GetProductQuantity(ProductId productIdentifier,
+        IEnumerable<DeliveryProductBatches> orderedProducts)
     {
         return orderedProducts.Single(p => p.ProductIdentifier == productIdentifier).Quantity;
+    }
+
+    private DeliveryOrder GetProductOrder(ProductId productIdentifier,
+        IEnumerable<DeliveryProductBatches> orderedProducts)
+    {
+        var order = orderedProducts.Single(p => p.ProductIdentifier == productIdentifier).Order;
+        return new DeliveryOrder(order.Reference, order.PublishedOn);
     }
 
     private ProductUnitPrice GetProductPrice(ProductId productIdentifier, IEnumerable<OrderLine> orderedProducts)

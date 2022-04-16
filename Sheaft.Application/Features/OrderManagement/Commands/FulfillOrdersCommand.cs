@@ -20,8 +20,12 @@ public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result
 
     public async Task<Result> Handle(FulfillOrdersCommand request, CancellationToken token)
     {
+        var orderResult = await _uow.Orders.Get(request.OrderIdentifier, token);
+        if (orderResult.IsFailure)
+            return orderResult;
+        
         var result = await _fulfillOrders.Fulfill(request.OrderIdentifier, request.DeliveryLines.Select(
-                dl => new DeliveryProductBatches(new ProductId(dl.ProductIdentifier), new Quantity(dl.Quantity),
+            dl => new DeliveryProductBatches(new DeliveryOrder(orderResult.Value.Reference, orderResult.Value.PublishedOn.Value), new ProductId(dl.ProductIdentifier), new Quantity(dl.Quantity),
                     dl.BatchIdentifiers?.Select(b => new BatchId(b)) ?? new List<BatchId>())),
             request.NewDeliveryDate != null ? new DeliveryDate(request.NewDeliveryDate.Value, request.CreatedAt) : null,
             request.CreatedAt, token);

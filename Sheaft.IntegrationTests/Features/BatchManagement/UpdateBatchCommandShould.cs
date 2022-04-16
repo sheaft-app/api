@@ -95,13 +95,12 @@ public class UpdateBatchCommandShould
                 new DeliveryAddress("", new EmailAddress("test@est.com"), "", "", "", ""),
                 supplier.Identifier, customer.Identifier, new List<Order> {order});
 
-            delivery.Schedule(new DeliveryReference("test"), delivery.ScheduledAt,
-                new List<DeliveryLine>
-                {
-                    DeliveryLine.CreateProductLine(ProductId.New(), new ProductReference("test"),
-                        new ProductName("test"),
-                        new Quantity(1), new ProductUnitPrice(2100), new VatRate(2000))
-                }, new List<DeliveryBatch> {new DeliveryBatch(batch.Identifier, ProductId.New())}, delivery.ScheduledAt.Value);
+            delivery.UpdateLines(order.Lines.Select(o => new DeliveryLine(o.Identifier,
+                o.LineKind == OrderLineKind.Product ? DeliveryLineKind.Product : DeliveryLineKind.Returnable, o.Reference,
+                o.Name, o.Quantity, o.PriceInfo.UnitPrice, o.Vat,
+                new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>{batch.Identifier})));
+
+            delivery.Schedule(new DeliveryReference("test"), delivery.ScheduledAt, delivery.ScheduledAt.Value);
 
             context.Add(order);
             context.Add(delivery);

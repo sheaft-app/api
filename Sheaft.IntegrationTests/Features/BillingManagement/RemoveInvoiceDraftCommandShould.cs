@@ -79,12 +79,17 @@ public class RemoveInvoiceDraftCommandShould
 
         context.Add(delivery);
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-            DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<OrderToInvoice>
+        var invoice = Invoice.CreateInvoiceDraftForOrder(
+            DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
+            DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
+            new List<InvoiceLine>
             {
-                new OrderToInvoice(order.Reference, order.PublishedOn.Value,
-                    order.Lines.Select(l =>
-                        InvoiceLine.CreateLockedLine(l.Name, l.Quantity, l.PriceInfo.UnitPrice, l.Vat, l.Identifier)))
+                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             });
 
         if (publishInvoice)

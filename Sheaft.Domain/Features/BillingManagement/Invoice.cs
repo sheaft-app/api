@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Domain.InvoiceManagement;
+﻿using Sheaft.Domain.OrderManagement;
+
+namespace Sheaft.Domain.InvoiceManagement;
 
 public class Invoice : AggregateRoot
 {
@@ -6,63 +8,73 @@ public class Invoice : AggregateRoot
     {
     }
 
-    private Invoice(InvoiceKind kind, InvoiceStatus status, SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, IEnumerable<InvoiceOrder> orders,
-        InvoiceReference? reference = null)
+    private Invoice(InvoiceKind kind, SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, string? comment = null)
     {
         Identifier = InvoiceId.New();
         Kind = kind;
-        Reference = reference;
-        Status = status;
+        Status = InvoiceStatus.Draft;
         Supplier = supplier;
         Customer = customer;
-        Orders = orders;
+        Comment = comment;
+    }
 
+    private Invoice(InvoiceKind kind, SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines, string? comment = null)
+        : this(kind, supplier, customer, comment)
+    {
         var result = SetLines(lines);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
     }
 
     public static Invoice CreateInvoiceDraftForOrder(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, IEnumerable<OrderToInvoice> orders)
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines)
     {
-        var orderReferences = orders
-            .Select(o => new InvoiceOrder(o.Reference, o.PublishedOn))
-            .ToList();
+        return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
+    }
+
+    public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier, 
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines = null, Invoice? invoice = null)
+    {
+        var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, lines);
+        if (invoice == null) 
+            return creditNote;
         
-        var groupedLines = orders
-            .SelectMany(o => o.Lines)
-            .GroupBy(o => new {o.Identifier, o.Name, o.UnitPrice, o.Vat});
+        var result = invoice.AttachCreditNote(creditNote);
+        if (result.IsFailure)
+            throw new InvalidOperationException(result.Error.Code);
 
-        var lines = new List<LockedInvoiceLine>();
-        foreach (var groupedLine in groupedLines)
-        {
-            lines.Add(new LockedInvoiceLine(
-                groupedLine.Key.Identifier, 
-                groupedLine.Key.Name,
-                new Quantity(groupedLine.Sum(gl => gl.Quantity.Value)), 
-                groupedLine.Key.UnitPrice,
-                groupedLine.Key.Vat));
-        }
+        return creditNote;
+    }
 
-        return new Invoice(InvoiceKind.Invoice, InvoiceStatus.Draft, supplier, customer, lines, orderReferences);
+    private Result AttachCreditNote(Invoice creditNote)
+    {
+        var notes = CreditNotes.ToList();
+        if (notes.Any(n => n.InvoiceIdentifier == creditNote.Identifier))
+            return Result.Failure(ErrorKind.BadRequest, "invoice.already.contains.creditnote");
+        
+        notes.Add(new InvoiceCreditNote(creditNote.Identifier));
+        return Result.Success();
     }
 
     public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
         var lines = invoice.Lines
-            .GroupBy(l => l.Vat)
-            .Select(groupedVat => new
-                {Vat = groupedVat.Key, Price = new Price(groupedVat.Sum(e => e.PriceInfo.VatPrice.Value))})
-            .Select(v => InvoiceLine.CreateLockedLine(
-                $"Avoir sur la facture n°{invoice.Reference?.Value} du {invoice.PublishedOn:d}",
-                new Quantity(1), new UnitPrice(invoice.TotalWholeSalePrice.Value), v.Vat))
+            .Select(v => InvoiceLine.CreateLineForDeliveryOrder(v.Identifier, v.Name, v.Quantity, 
+                v.PriceInfo.UnitPrice, v.Vat,
+                new InvoiceDelivery(v.Delivery.Reference, v.Delivery.DeliveredOn),
+                new DeliveryOrder(v.Order.Reference, v.Order.PublishedOn)))
             .ToList();
 
-        var creditNote = new Invoice(InvoiceKind.InvoiceCancellation, InvoiceStatus.Published,
+        var creditNote = new Invoice(InvoiceKind.InvoiceCancellation, 
             SupplierBillingInformation.Copy(invoice.Supplier),
-            CustomerBillingInformation.Copy(invoice.Customer), lines, new List<InvoiceOrder>(), creditNoteReference);
+            CustomerBillingInformation.Copy(invoice.Customer),
+            lines,
+            comment: $"Avoir sur la facture n°{invoice.Reference.Value} du {invoice.PublishedOn.Value:d}");
+
+        creditNote.Publish(creditNoteReference, currentDateTime);
 
         var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
         return result.IsFailure
@@ -78,16 +90,16 @@ public class Invoice : AggregateRoot
     public DateTimeOffset? PublishedOn { get; private set; }
     public DateTimeOffset? CancelledOn { get; private set; }
     public DateTimeOffset? SentOn { get; private set; }
+    public string? Comment { get; }
+    public string? CancellationReason { get; private set; }
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
     public TotalVatPrice TotalVatPrice { get; private set; }
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public CustomerBillingInformation Customer { get; private set; }
     public SupplierBillingInformation Supplier { get; private set; }
     public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
-    public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; }
-    public IEnumerable<InvoicePayment> Payments { get; private set; }
-    public IEnumerable<InvoiceOrder> Orders { get; private set; }
-    public string? CancellationReason { get; private set; }
+    public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; } = new List<InvoiceCreditNote>();
+    public IEnumerable<InvoicePayment> Payments { get; private set; } = new List<InvoicePayment>();
 
     internal Result Publish(InvoiceReference reference, DateTimeOffset? currentDateTime = null)
     {
@@ -124,6 +136,18 @@ public class Invoice : AggregateRoot
 
         Status = InvoiceStatus.Payed;
         Payments = new List<InvoicePayment> {new InvoicePayment(reference, kind, paymentDate)};
+        return Result.Success();
+    }
+
+    public Result UpdateLines(IEnumerable<InvoiceLine>? lines)
+    {
+        if (Status != InvoiceStatus.Draft)
+            return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.draft");
+
+        if (Kind != InvoiceKind.CreditNote)
+            return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.credit.note");
+
+        SetLines(lines);
         return Result.Success();
     }
 
@@ -183,5 +207,3 @@ public class Invoice : AggregateRoot
         return Result.Success();
     }
 }
-
-public record OrderToInvoice(OrderReference Reference, DateTimeOffset PublishedOn, IEnumerable<LockedInvoiceLine> Lines);

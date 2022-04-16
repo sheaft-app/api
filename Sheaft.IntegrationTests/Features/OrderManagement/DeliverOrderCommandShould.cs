@@ -148,9 +148,13 @@ public class DeliverOrderCommandShould
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
 
+        delivery.UpdateLines(order.Lines.Select(o => new DeliveryLine(o.Identifier,
+            o.LineKind == OrderLineKind.Product ? DeliveryLineKind.Product : DeliveryLineKind.Returnable, o.Reference,
+            o.Name, o.Quantity, o.PriceInfo.UnitPrice, o.Vat,
+            new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>())));
+        
         delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
-            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLine(l.Identifier, DeliveryLineKind.Product, l.Reference, l.Name, l.Quantity, l.PriceInfo.UnitPrice, l.Vat)), new List<DeliveryBatch>(), DateTimeOffset.UtcNow);
+            new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), DateTimeOffset.UtcNow);
 
         context.Add(order);
         context.Add(delivery);

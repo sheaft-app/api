@@ -34,21 +34,24 @@ public class CreateInvoices : ICreateInvoices
             return Result.Failure<Invoice>(deliveryResult);
 
         var delivery = deliveryResult.Value;
-        
-        var supplierBillingResult = await _retrieveBillingInformation.GetSupplierBilling(delivery.SupplierIdentifier, token);
+
+        var supplierBillingResult =
+            await _retrieveBillingInformation.GetSupplierBilling(delivery.SupplierIdentifier, token);
         if (supplierBillingResult.IsFailure)
             return Result.Failure<Invoice>(supplierBillingResult);
-        
-        var customerBillingResult = await _retrieveBillingInformation.GetCustomerBilling(delivery.CustomerIdentifier, token);
+
+        var customerBillingResult =
+            await _retrieveBillingInformation.GetCustomerBilling(delivery.CustomerIdentifier, token);
         if (customerBillingResult.IsFailure)
             return Result.Failure<Invoice>(customerBillingResult);
-        
+
         var ordersResult = await _orderRepository.Get(delivery.Identifier, token);
         if (ordersResult.IsFailure)
             return Result.Failure<Invoice>(ordersResult);
-        
-        var orderToInvoices = GetOrderToInvoices(delivery);
-        var invoice = Invoice.CreateInvoiceDraftForOrder(supplierBillingResult.Value, customerBillingResult.Value, orderToInvoices);
+
+        var invoiceLines = GetInvoiceLines(delivery);
+        var invoice =
+            Invoice.CreateInvoiceDraftForOrder(supplierBillingResult.Value, customerBillingResult.Value, invoiceLines);
 
         foreach (var order in ordersResult.Value)
         {
@@ -60,28 +63,35 @@ public class CreateInvoices : ICreateInvoices
         return Result.Success(invoice);
     }
 
-    private static List<OrderToInvoice> GetOrderToInvoices(Delivery delivery)
+    private static IEnumerable<InvoiceLine> GetInvoiceLines(Delivery delivery)
     {
-        var orderToInvoices = new List<OrderToInvoice>();
-        foreach (var order in delivery.Orders)
+        var lines = new List<InvoiceLine>();
+
+        foreach (var line in delivery.Lines)
         {
-            var lines = new List<LockedInvoiceLine>();
-            foreach (var deliveryLine in delivery.Lines)
-            {
-                lines.Add(new LockedInvoiceLine(deliveryLine.Identifier, deliveryLine.Name, deliveryLine.Quantity,
-                    deliveryLine.PriceInfo.UnitPrice, deliveryLine.Vat));
-            }
-
-            foreach (var deliveryAdjustment in delivery.Adjustments)
-            {
-                lines.Add(new LockedInvoiceLine(deliveryAdjustment.Identifier, deliveryAdjustment.Name,
-                    deliveryAdjustment.Quantity,
-                    deliveryAdjustment.PriceInfo.UnitPrice, deliveryAdjustment.Vat));
-            }
-
-            orderToInvoices.Add(new OrderToInvoice(order.Reference, order.PublishedOn, lines));
+            lines.Add(InvoiceLine.CreateLineForDeliveryOrder(line.Identifier, line.Name,
+                line.Quantity,
+                line.PriceInfo.UnitPrice, line.Vat,
+                new InvoiceDelivery(delivery.Reference, delivery.DeliveredOn.Value),
+                new DeliveryOrder(line.Order.Reference, line.Order.PublishedOn)));
         }
 
-        return orderToInvoices;
+        foreach (var line in delivery.Adjustments)
+        {
+            lines.Add(InvoiceLine.CreateLineForDeliveryOrder(line.Identifier, line.Name,
+                line.Quantity,
+                line.PriceInfo.UnitPrice, line.Vat,
+                new InvoiceDelivery(delivery.Reference, delivery.DeliveredOn.Value),
+                new DeliveryOrder(line.Order.Reference, line.Order.PublishedOn)));
+        }
+
+        var invoiceLines = new List<InvoiceLine>();
+        var groupedLines = lines.GroupBy(l => new
+            {l.Identifier, l.Delivery, l.Order, l.Vat, l.PriceInfo.UnitPrice, l.Name});
+
+        foreach (var line in groupedLines)
+            invoiceLines.Add(InvoiceLine.CreateLineForDeliveryOrder(line.Key.Identifier, line.Key.Name, new Quantity(line.Sum(l => l.Quantity.Value)), line.Key.UnitPrice, line.Key.Vat, line.Key.Delivery, line.Key.Order));
+
+        return invoiceLines.Where(il => il.Quantity.Value > 0).ToList();
     }
 }

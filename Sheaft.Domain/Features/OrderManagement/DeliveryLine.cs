@@ -6,7 +6,7 @@ public record DeliveryLine
     {
     }
 
-    internal DeliveryLine(string identifier, DeliveryLineKind lineKind, string reference, string name, Quantity quantity, UnitPrice unitPrice, VatRate vat)
+    internal DeliveryLine(string identifier, DeliveryLineKind lineKind, string reference, string name, Quantity quantity, UnitPrice unitPrice, VatRate vat, DeliveryOrder? order = null, IEnumerable<BatchId>? batches = null)
     {
         Identifier = identifier;
         LineKind = lineKind;
@@ -15,18 +15,20 @@ public record DeliveryLine
         PriceInfo = new LinePrice(unitPrice, vat, quantity);
         Quantity = quantity;
         Vat = vat;
+        Order = order;
+        Batches = batches?.Select(b => new DeliveryBatch(b)).ToList() ?? new List<DeliveryBatch>();
     }
 
     public static DeliveryLine CreateProductLine(ProductId identifier, ProductReference reference, ProductName name,
-        Quantity quantity, ProductUnitPrice unitPrice, VatRate vat)
+        Quantity quantity, ProductUnitPrice unitPrice, VatRate vat, DeliveryOrder order, IEnumerable<BatchId>? batches)
     {
-        return new DeliveryLine(identifier.Value, DeliveryLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat);
+        return new DeliveryLine(identifier.Value, DeliveryLineKind.Product, reference.Value, name.Value, quantity, unitPrice, vat, order, batches);
     }
 
     public static DeliveryLine CreateReturnableLine(ReturnableId identifier, ReturnableReference reference, ReturnableName name,
-        Quantity quantity, UnitPrice unitPrice, VatRate vat)
+        Quantity quantity, UnitPrice unitPrice, VatRate vat, DeliveryOrder order)
     {
-        return new DeliveryLine(identifier.Value, DeliveryLineKind.Returnable, reference.Value, name.Value, quantity, unitPrice, vat);
+        return new DeliveryLine(identifier.Value, DeliveryLineKind.Returnable, reference.Value, name.Value, quantity, unitPrice, vat, order);
     }
 
     public static DeliveryLine CreateReturnedReturnableLine(ReturnableId identifier, ReturnableReference reference, ReturnableName name,
@@ -42,4 +44,6 @@ public record DeliveryLine
     public LinePrice PriceInfo { get; private set; }
     public Quantity Quantity { get; }
     public VatRate Vat { get; }
+    public DeliveryOrder? Order { get; }
+    public IEnumerable<DeliveryBatch> Batches { get; } = new List<DeliveryBatch>();
 }

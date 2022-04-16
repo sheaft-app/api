@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.BillingManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 
@@ -29,7 +30,7 @@ public class SendInvoiceCommandShould
         Assert.AreEqual(InvoiceStatus.Sent, invoice.Status);
         Assert.AreEqual(command.CreatedAt, invoice.SentOn);
     }
-    
+
     [Test]
     public async Task Fail_If_Not_In_Published_Status()
     {
@@ -52,27 +53,30 @@ public class SendInvoiceCommandShould
             .Setup(c => c.SendTemplatedEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<object>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(Result.Success()));
-        
+
         var handler = new SendInvoiceHandler(uow, emailServiceMocked.Object);
 
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(DataHelpers.GetDefaultSupplierBilling(supplierId), DataHelpers.GetDefaultCustomerBilling(customerId),
-            new List<OrderToInvoice>
+        var invoice = Invoice.CreateInvoiceDraftForOrder(
+            DataHelpers.GetDefaultSupplierBilling(supplierId),
+            DataHelpers.GetDefaultCustomerBilling(customerId),
+            new List<InvoiceLine>
             {
-                new OrderToInvoice(new OrderReference("Ref"), DateTimeOffset.Now, new List<LockedInvoiceLine>
-                {
-                    InvoiceLine.CreateLockedLine("Name1", new Quantity(2), new UnitPrice(2000), new VatRate(0)),
-                    InvoiceLine.CreateLockedLine("Name2", new Quantity(1), new UnitPrice(2000), new VatRate(0))
-                })
+                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             });
 
         invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
         if (publish)
             invoice.Publish(new InvoiceReference("test"));
-        
+
         if (sent)
             invoice.MarkAsSent();
 

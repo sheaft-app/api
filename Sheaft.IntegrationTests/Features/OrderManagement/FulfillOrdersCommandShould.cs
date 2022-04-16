@@ -104,7 +104,7 @@ public class FulfillOrdersCommandShould
         Assert.IsTrue(result.IsSuccess);
         var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
         Assert.IsNotNull(delivery);
-        Assert.AreEqual(order.Lines.Count(), delivery.Batches.Count());
+        Assert.AreEqual(order.Lines.Count(), delivery.Lines.Sum(l => l.Batches.Count()));
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class FulfillOrdersCommandShould
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);
-        Assert.AreEqual("delivery.batches.not.found", result.Error.Code);
+        Assert.AreEqual("delivery.lines.batches.not.found", result.Error.Code);
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class FulfillOrdersCommandShould
 
         var handler = new FulfillOrdersHandler(uow,
             new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context),
-                new GenerateDeliveryCode(), new CreateDeliveryBatches(context), new CreateDeliveryLines(context)));
+                new GenerateDeliveryCode(), new CreateDeliveryLines(context)));
 
         return (context, handler);
     }

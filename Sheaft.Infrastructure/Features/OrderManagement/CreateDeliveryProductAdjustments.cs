@@ -45,6 +45,8 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                     var name = p.Product.Name;
                     var reference = p.Product.Reference;
                     var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
+                    var batches = GetProductBatches(p.Product.Identifier, delivery.Lines);
+                    var order = GetProductOrder(p.Product.Identifier, delivery.Lines);
 
                     if (existingProduct != null)
                     {
@@ -57,7 +59,7 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                             throw new InvalidOperationException("delivery.adjusted.product.invalid.quantity");
                     }
 
-                    return DeliveryLine.CreateProductLine(p.Product.Identifier, reference, name, quantity, price, vat);
+                    return DeliveryLine.CreateProductLine(p.Product.Identifier, reference, name, quantity, price, vat, order, batches);
                 }).ToList();
             
             adjustedProducts.AddRange(products
@@ -72,6 +74,7 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                     var name = p.Product.Returnable.Name;
                     var reference = p.Product.Returnable.Reference;
                     var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
+                    var order = GetProductOrder(p.Product.Identifier, delivery.Lines);
 
                     if (existingReturnable != null)
                     {
@@ -84,7 +87,7 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                             throw new InvalidOperationException("delivery.adjusted.returnable.invalid.quantity");
                     }
 
-                    return DeliveryLine.CreateReturnableLine(p.Product.Returnable.Identifier, reference, name, quantity, price, vat);
+                    return DeliveryLine.CreateReturnableLine(p.Product.Returnable.Identifier, reference, name, quantity, price, vat, order);
                 }));
 
             return Result.Success(adjustedProducts.AsEnumerable());
@@ -98,5 +101,18 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
     private Quantity GetProductQuantity(ProductId productIdentifier, IEnumerable<ProductAdjustment> productAdjustments)
     {
         return productAdjustments.Single(p => p.Identifier == productIdentifier).Quantity;
+    }
+
+    private IEnumerable<BatchId> GetProductBatches(ProductId productIdentifier, IEnumerable<DeliveryLine> deliveryLines)
+    {
+        return deliveryLines.Single(p => p.Identifier == productIdentifier.Value).Batches?
+            .Select(b => b.BatchIdentifier)
+            .ToList() ?? new List<BatchId>();
+    }
+
+    private DeliveryOrder GetProductOrder(ProductId productIdentifier, IEnumerable<DeliveryLine> deliveryLines)
+    {
+        var order = deliveryLines.Single(p => p.Identifier == productIdentifier.Value).Order;
+        return new DeliveryOrder(order.Reference, order.PublishedOn);
     }
 }

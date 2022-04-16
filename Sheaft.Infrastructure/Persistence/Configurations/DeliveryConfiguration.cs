@@ -37,20 +37,11 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             .Property(p => p.ScheduledAt)
             .HasConversion(scheduledOn => scheduledOn.Value, value => new DeliveryDate(value, value));
         
-        builder.OwnsMany(o => o.Orders, l =>
-        {
-            l
-                .Property(p => p.Reference)
-                .HasConversion(code => code.Value, value => new OrderReference(value));
-            
-            l.WithOwner().HasForeignKey("DeliveryId");
-            l.HasKey("DeliveryId", "Reference");
-
-            l.ToTable("Delivery_Orders");
-        });
-        
         builder.OwnsMany(o => o.Lines, l =>
         {
+            l.Property<long>("Id");
+            l.HasKey("Id");
+            
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
                 pi
@@ -70,6 +61,27 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
             
+            l.OwnsOne(ol => ol.Order, o =>
+            {
+                o
+                    .Property(p => p.Reference)
+                    .HasConversion(unitPrice => unitPrice.Value, value => new OrderReference(value));
+            });
+            
+            l.OwnsMany(ol => ol.Batches, b =>
+            {
+                b.Property<long>("DeliveryLineId");
+                
+                b
+                    .Property(p => p.BatchIdentifier)
+                    .HasConversion(batch => batch.Value, value => new BatchId(value));
+            
+                b.WithOwner().HasForeignKey("DeliveryLineId");
+                b.HasKey("DeliveryLineId", "BatchIdentifier");
+
+                b.ToTable("DeliveryLine_Batches");
+            });
+            
             l
                 .Property(p => p.Quantity)
                 .HasConversion(quantity => quantity.Value, value => new Quantity(value));
@@ -79,21 +91,14 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("DeliveryId");
-            l.HasKey("DeliveryId", "Identifier");
-
             l.ToTable("Delivery_Lines");
-        });
-        
-        builder.OwnsMany(b => b.Batches, b =>
-        {
-            b.WithOwner().HasForeignKey("DeliveryId");
-            b.HasKey("DeliveryId", "BatchIdentifier", "ProductIdentifier");
-                
-            b.ToTable("Delivery_Batches");
         });
         
         builder.OwnsMany(o => o.Adjustments, l =>
         {
+            l.Property<long>("Id");
+            l.HasKey("Id");
+            
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
                 pi
@@ -112,6 +117,27 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                     .Property(p => p.OnSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
+            
+            l.OwnsOne(ol => ol.Order, o =>
+            {
+                o
+                    .Property(p => p.Reference)
+                    .HasConversion(unitPrice => unitPrice.Value, value => new OrderReference(value));
+            });
+            
+            l.OwnsMany(ol => ol.Batches, b =>
+            {
+                b.Property<long>("DeliveryAdjustmentId");
+                
+                b
+                    .Property(p => p.BatchIdentifier)
+                    .HasConversion(batch => batch.Value, value => new BatchId(value));
+            
+                b.WithOwner().HasForeignKey("DeliveryAdjustmentId");
+                b.HasKey("DeliveryAdjustmentId", "BatchIdentifier");
+
+                b.ToTable("DeliveryAdjustment_Batches");
+            });
 
             l
                 .Property(p => p.Quantity)
@@ -122,7 +148,6 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("DeliveryId");
-            l.HasKey("DeliveryId", "Identifier");
 
             l.ToTable("Delivery_Adjustments");
         });

@@ -12,20 +12,17 @@ public class FulfillOrders : IFulfillOrders
     private readonly IOrderRepository _orderRepository;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IGenerateDeliveryCode _generateDeliveryCode;
-    private readonly ICreateDeliveryBatches _createDeliveryBatches;
     private readonly ICreateDeliveryLines _createDeliveryLines;
 
     public FulfillOrders(
         IOrderRepository orderRepository,
         IDeliveryRepository deliveryRepository,
         IGenerateDeliveryCode generateDeliveryCode,
-        ICreateDeliveryBatches createDeliveryBatches,
         ICreateDeliveryLines createDeliveryLines)
     {
         _orderRepository = orderRepository;
         _deliveryRepository = deliveryRepository;
         _generateDeliveryCode = generateDeliveryCode;
-        _createDeliveryBatches = createDeliveryBatches;
         _createDeliveryLines = createDeliveryLines;
     }
 
@@ -55,11 +52,11 @@ public class FulfillOrders : IFulfillOrders
         if (deliveryProductsResult.IsFailure)
             return Result.Failure(deliveryProductsResult);
 
-        var deliveryBatchesResult = await _createDeliveryBatches.Get(delivery, deliveryLines, token);
-        if (deliveryBatchesResult.IsFailure)
-            return Result.Failure(deliveryBatchesResult);
+        var linesResult = delivery.UpdateLines(deliveryProductsResult.Value);
+        if (linesResult.IsFailure)
+            return Result.Failure(linesResult);
 
-        var canDeliverResult = delivery.CanScheduleDelivery(deliveryDate, deliveryProductsResult.Value, currentDateTime);
+        var canDeliverResult = delivery.CanScheduleDelivery(deliveryDate, currentDateTime);
         if (canDeliverResult.IsFailure)
             return canDeliverResult;
 
@@ -67,7 +64,7 @@ public class FulfillOrders : IFulfillOrders
         if (deliveryCodeResult.IsFailure)
             return Result.Failure(deliveryCodeResult);
         
-        var deliveryScheduledResult = delivery.Schedule(deliveryCodeResult.Value, deliveryDate, deliveryProductsResult.Value, deliveryBatchesResult.Value, currentDateTime);
+        var deliveryScheduledResult = delivery.Schedule(deliveryCodeResult.Value, deliveryDate, currentDateTime);
         if (deliveryScheduledResult.IsFailure)
             return Result.Failure(deliveryScheduledResult);
 

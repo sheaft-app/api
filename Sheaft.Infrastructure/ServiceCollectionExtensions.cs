@@ -127,7 +127,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransformProductsToOrderLines, TransformProductsToOrderLines>();
         services.AddScoped<ICreateDeliveryReturnedReturnables, CreateDeliveryReturnedReturnables>();
         services.AddScoped<ICreateDeliveryProductAdjustments, CreateDeliveryProductAdjustments>();
-        services.AddScoped<ICreateDeliveryBatches, CreateDeliveryBatches>();
         services.AddScoped<ICreateDeliveryLines, CreateDeliveryLines>();
         
         services.AddScoped<IGenerateCreditNoteCode, GenerateCreditNoteCode>();
