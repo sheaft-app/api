@@ -14,5 +14,10 @@ public record Quantity
         Value = value;
     }
 
-    public int Value { get; }
+    public int Value { get; private set; }
+
+    public void Update(Quantity quantity)
+    {
+        Value = quantity.Value;
+    }
 }

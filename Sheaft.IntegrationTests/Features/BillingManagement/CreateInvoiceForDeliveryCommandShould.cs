@@ -49,7 +49,20 @@ public class CreateInvoiceForDeliveryCommandShould
         Assert.IsNotNull(order);
     }
 
-    private (DeliveryId, AppDbContext, CreateInvoiceForDeliveryHandler) InitHandler()
+    [Test]
+    public async Task Fail_If_Order_Already_Billed()
+    {
+        var (deliveryId, context, handler) = InitHandler(true);
+        var command = new CreateInvoiceForDeliveryCommand(deliveryId);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("invoice.order.already.billed", result.Error.Code);
+    }
+
+    private (DeliveryId, AppDbContext, CreateInvoiceForDeliveryHandler) InitHandler(bool createInvoice = false)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateInvoiceForDeliveryHandler>();
 
@@ -94,7 +107,22 @@ public class CreateInvoiceForDeliveryCommandShould
 
         delivery.Schedule(new DeliveryReference("Test"), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)));
         delivery.Deliver(new List<DeliveryLine>());
-        
+
+        if (createInvoice)
+        {
+            var invoice = Invoice.CreateInvoiceForOrder(
+                DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
+                DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
+                order.Lines.Select(l => InvoiceLine.CreateLineForDeliveryOrder(l.Identifier, l.Name, l.Quantity,
+                    l.PriceInfo.UnitPrice, l.Vat, new InvoiceDelivery(delivery.Reference, delivery.DeliveredOn.Value),
+                    new DeliveryOrder(order.Reference, order.PublishedOn.Value))).ToList(),
+                new InvoiceReference("Test"));
+            
+            context.Invoices.Add(invoice);
+            
+            order.AttachInvoice(invoice.Identifier);
+        }
+
         context.Add(delivery);
 
         context.SaveChanges();

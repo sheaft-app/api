@@ -52,13 +52,19 @@ public class CreateInvoices : ICreateInvoices
         if (ordersResult.IsFailure)
             return Result.Failure<Invoice>(ordersResult);
 
+        if (ordersResult.Value.Any(o => o.InvoiceIdentifier != null))
+            return Result.Failure<Invoice>(ErrorKind.BadRequest, "invoice.order.already.billed");
+
         var codeResult = await _generateInvoiceCode.GenerateNextCode(supplierBillingResult.Value.Identifier, token);
         if (codeResult.IsFailure)
             return Result.Failure<Invoice>(codeResult);
+
+        var invoiceLinesResult = GetInvoiceLines(delivery);
+        if (invoiceLinesResult.IsFailure)
+            return Result.Failure<Invoice>(invoiceLinesResult);
         
-        var invoiceLines = GetInvoiceLines(delivery);
-        var invoice =
-            Invoice.CreateInvoiceForOrder(supplierBillingResult.Value, customerBillingResult.Value, invoiceLines, codeResult.Value);
+        var invoice = Invoice.CreateInvoiceForOrder(supplierBillingResult.Value, customerBillingResult.Value, 
+                invoiceLinesResult.Value, codeResult.Value);
 
         foreach (var order in ordersResult.Value)
         {
@@ -70,7 +76,7 @@ public class CreateInvoices : ICreateInvoices
         return Result.Success(invoice);
     }
 
-    private static IEnumerable<InvoiceLine> GetInvoiceLines(Delivery delivery)
+    private Result<IEnumerable<InvoiceLine>> GetInvoiceLines(Delivery delivery)
     {
         var lines = new List<InvoiceLine>();
 
@@ -97,8 +103,38 @@ public class CreateInvoices : ICreateInvoices
             {l.Identifier, l.Delivery, l.Order, l.Vat, l.PriceInfo.UnitPrice, l.Name});
 
         foreach (var line in groupedLines)
-            invoiceLines.Add(InvoiceLine.CreateLineForDeliveryOrder(line.Key.Identifier, line.Key.Name, new Quantity(line.Sum(l => l.Quantity.Value)), line.Key.UnitPrice, line.Key.Vat, line.Key.Delivery, line.Key.Order));
+            invoiceLines.Add(InvoiceLine.CreateLineForDeliveryOrder(line.Key.Identifier, line.Key.Name,
+                new Quantity(line.Sum(l => l.Quantity.Value)), line.Key.UnitPrice, line.Key.Vat, line.Key.Delivery,
+                line.Key.Order));
 
-        return invoiceLines.Where(il => il.Quantity.Value > 0).ToList();
+        var invoiceLinesWithInvalidQuantity = invoiceLines
+            .Where(il => il.Quantity.Value < 0)
+            .Select(il => new { il.Identifier, il.Order.Reference, il.Quantity.Value})
+            .ToList();
+        
+        foreach (var invoiceLineWithInvalidQuantity in invoiceLinesWithInvalidQuantity)
+        {
+            var quantityToRemove = invoiceLineWithInvalidQuantity.Value;
+            var validInvoiceLines = invoiceLines.Where(il =>
+                il.Identifier == invoiceLineWithInvalidQuantity.Identifier &&
+                il.Order.Reference != invoiceLineWithInvalidQuantity.Reference)
+                .OrderByDescending(il => il.Quantity.Value)
+                .ToList();
+
+            while (quantityToRemove > 0)
+            {
+                var validInvoiceLine = validInvoiceLines.FirstOrDefault(c => c.Quantity.Value > 0);
+                if (validInvoiceLine == null)
+                    break;
+
+                validInvoiceLine.Quantity.Update(new Quantity(validInvoiceLine.Quantity.Value - quantityToRemove));
+                quantityToRemove -= validInvoiceLine.Quantity.Value;
+            }
+
+            if (quantityToRemove > 0)
+                return Result.Failure<IEnumerable<InvoiceLine>>(ErrorKind.BadRequest, "invoice.lines.with.invalid.quantity");
+        }
+
+        return Result.Success(invoiceLines.Where(il => il.Quantity.Value > 0));
     }
 }
