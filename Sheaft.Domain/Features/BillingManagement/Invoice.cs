@@ -40,6 +40,13 @@ public class Invoice : AggregateRoot
         return invoice;
     }
 
+    public static Invoice CreateInvoice(SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, 
+        DateTimeOffset? currentDateTime = null)
+    {
+        return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
+    }
+
     public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
         CustomerBillingInformation customer, Invoice invoice)
     {
@@ -149,9 +156,6 @@ public class Invoice : AggregateRoot
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.draft");
-
-        if (Kind != InvoiceKind.CreditNote)
-            return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.credit.note");
 
         SetLines(lines);
         return Result.Success();

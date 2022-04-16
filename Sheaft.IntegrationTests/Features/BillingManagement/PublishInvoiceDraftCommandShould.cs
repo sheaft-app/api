@@ -52,6 +52,19 @@ public class PublishInvoiceDraftCommandShould
         Assert.AreEqual("update", invoice.Customer.Name);
         Assert.AreEqual("New street", invoice.Customer.Address.Street);
     }
+    
+    [Test]
+    public async Task Set_Invoice_DueDate_In_30_Days()
+    {
+        var (invoice, context, handler) = InitHandler(true);
+        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+    
+        var result = await handler.Handle(command, CancellationToken.None);
+    
+        Assert.IsTrue(result.IsSuccess);
+        Assert.IsNotNull(invoice.DueDate);
+        Assert.AreEqual(new InvoiceDueDate(command.CreatedAt.AddDays(30)), invoice.DueDate);
+    }
 
     [Test]
     public async Task Fail_If_Invoice_Has_No_Lines()
@@ -97,29 +110,14 @@ public class PublishInvoiceDraftCommandShould
         var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
         context.Add(supplier);
 
-        var invoice = Invoice.CreateInvoiceForOrder(
+        var invoice = Invoice.CreateInvoice(
             DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
             DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
-            new List<InvoiceLine>
-            {
-                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            }, new InvoiceReference("Test"));
-        
-        invoice.Publish(new InvoiceReference("test"));
-        
-        var creditNote = Invoice.CreateCreditNoteDraft(
-            DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-            DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
-            invoice);
+            new List<InvoiceLine>());
         
         if (addProducts)
         {
-            creditNote.UpdateLines(new List<InvoiceLine>
+            invoice.UpdateLines(new List<InvoiceLine>
             {
                 InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
@@ -128,13 +126,11 @@ public class PublishInvoiceDraftCommandShould
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             });
-            
         }
 
         context.Add(invoice);
-        context.Add(creditNote);
         context.SaveChanges();
-        return (creditNote, context, handler);
+        return (invoice, context, handler);
     }
 }
 
