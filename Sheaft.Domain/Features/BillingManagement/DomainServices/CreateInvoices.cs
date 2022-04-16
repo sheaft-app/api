@@ -5,7 +5,7 @@ namespace Sheaft.Domain.BillingManagement;
 
 public interface ICreateInvoices
 {
-    Task<Result<Invoice>> CreateDraftForDelivery(DeliveryId deliveryIdentifier, CancellationToken token);
+    Task<Result<Invoice>> CreateForDelivery(DeliveryId deliveryIdentifier, CancellationToken token);
 }
 
 public class CreateInvoices : ICreateInvoices
@@ -13,21 +13,24 @@ public class CreateInvoices : ICreateInvoices
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IDeliveryRepository _deliveryRepository;
     private readonly IOrderRepository _orderRepository;
+    private readonly IGenerateInvoiceCode _generateInvoiceCode;
     private readonly IRetrieveBillingInformation _retrieveBillingInformation;
 
     public CreateInvoices(
         IInvoiceRepository invoiceRepository,
         IDeliveryRepository deliveryRepository,
         IOrderRepository orderRepository,
+        IGenerateInvoiceCode generateInvoiceCode,
         IRetrieveBillingInformation retrieveBillingInformation)
     {
         _invoiceRepository = invoiceRepository;
         _deliveryRepository = deliveryRepository;
         _orderRepository = orderRepository;
+        _generateInvoiceCode = generateInvoiceCode;
         _retrieveBillingInformation = retrieveBillingInformation;
     }
 
-    public async Task<Result<Invoice>> CreateDraftForDelivery(DeliveryId deliveryIdentifier, CancellationToken token)
+    public async Task<Result<Invoice>> CreateForDelivery(DeliveryId deliveryIdentifier, CancellationToken token)
     {
         var deliveryResult = await _deliveryRepository.Get(deliveryIdentifier, token);
         if (deliveryResult.IsFailure)
@@ -49,9 +52,13 @@ public class CreateInvoices : ICreateInvoices
         if (ordersResult.IsFailure)
             return Result.Failure<Invoice>(ordersResult);
 
+        var codeResult = await _generateInvoiceCode.GenerateNextCode(supplierBillingResult.Value.Identifier, token);
+        if (codeResult.IsFailure)
+            return Result.Failure<Invoice>(codeResult);
+        
         var invoiceLines = GetInvoiceLines(delivery);
         var invoice =
-            Invoice.CreateInvoiceDraftForOrder(supplierBillingResult.Value, customerBillingResult.Value, invoiceLines);
+            Invoice.CreateInvoiceForOrder(supplierBillingResult.Value, customerBillingResult.Value, invoiceLines, codeResult.Value);
 
         foreach (var order in ordersResult.Value)
         {

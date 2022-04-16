@@ -129,7 +129,7 @@ public class CancelInvoiceCommandShould
             new List<Product>
                 {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplierId)});
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(
+        var invoice = Invoice.CreateInvoiceForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplierId),
             DataHelpers.GetDefaultCustomerBilling(customerId),
             new List<InvoiceLine>
@@ -140,7 +140,7 @@ public class CancelInvoiceCommandShould
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            });
+            }, new InvoiceReference("Test"));
 
         order.AttachInvoice(invoice.Identifier);
 

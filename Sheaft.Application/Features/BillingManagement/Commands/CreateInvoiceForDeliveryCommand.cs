@@ -20,7 +20,7 @@ public class CreateInvoiceForDeliveryHandler : ICommandHandler<CreateInvoiceForD
 
     public async Task<Result<string>> Handle(CreateInvoiceForDeliveryCommand request, CancellationToken token)
     {
-        var invoiceResult = await _createInvoices.CreateDraftForDelivery(request.DeliveryIdentifier, token);
+        var invoiceResult = await _createInvoices.CreateForDelivery(request.DeliveryIdentifier, token);
         if (invoiceResult.IsFailure)
             return Result.Failure<string>(invoiceResult);
         

@@ -59,7 +59,7 @@ public class MarkInvoiceAsPayedCommandShould
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(
+        var invoice = Invoice.CreateInvoiceForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplierId),
             DataHelpers.GetDefaultCustomerBilling(customerId),
             new List<InvoiceLine>
@@ -70,7 +70,7 @@ public class MarkInvoiceAsPayedCommandShould
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            });
+            }, new InvoiceReference("Test"));
 
         invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 

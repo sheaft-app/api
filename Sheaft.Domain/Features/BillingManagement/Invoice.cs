@@ -28,10 +28,15 @@ public class Invoice : AggregateRoot
             throw new InvalidOperationException(result.Error.Code);
     }
 
-    public static Invoice CreateInvoiceDraftForOrder(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines)
+    public static Invoice CreateInvoiceForOrder(SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, InvoiceReference reference, DateTimeOffset? currentDateTime = null)
     {
-        return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
+        var invoice = new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
+        var result = invoice.Publish(reference, currentDateTime);
+        if (result.IsFailure)
+            throw new InvalidOperationException(result.Error.Code);
+        
+        return invoice;
     }
 
     public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier, 

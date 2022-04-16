@@ -21,7 +21,7 @@ public class SendInvoiceCommandShould
     [Test]
     public async Task Set_Invoice_Status_As_Sent()
     {
-        var (invoice, context, handler) = InitHandler(true, false);
+        var (invoice, context, handler) = InitHandler(false);
         var command = new SendInvoiceCommand(invoice.Identifier);
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -31,20 +31,20 @@ public class SendInvoiceCommandShould
         Assert.AreEqual(command.CreatedAt, invoice.SentOn);
     }
 
-    [Test]
-    public async Task Fail_If_Not_In_Published_Status()
-    {
-        var (invoice, context, handler) = InitHandler(false, false);
-        var command = new SendInvoiceCommand(invoice.Identifier);
+    // [Test]
+    // public async Task Fail_If_Not_In_Published_Status()
+    // {
+    //     var (invoice, context, handler) = InitHandler(false);
+    //     var command = new SendInvoiceCommand(invoice.Identifier);
+    //
+    //     var result = await handler.Handle(command, CancellationToken.None);
+    //
+    //     Assert.IsTrue(result.IsFailure);
+    //     Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+    //     Assert.AreEqual("invoice.sent.requires.published", result.Error.Code);
+    // }
 
-        var result = await handler.Handle(command, CancellationToken.None);
-
-        Assert.IsTrue(result.IsFailure);
-        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
-        Assert.AreEqual("invoice.sent.requires.published", result.Error.Code);
-    }
-
-    private (Invoice, AppDbContext, SendInvoiceHandler) InitHandler(bool publish = true, bool sent = true)
+    private (Invoice, AppDbContext, SendInvoiceHandler) InitHandler(bool sent = true)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<SendInvoiceHandler>();
 
@@ -59,7 +59,7 @@ public class SendInvoiceCommandShould
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
 
-        var invoice = Invoice.CreateInvoiceDraftForOrder(
+        var invoice = Invoice.CreateInvoiceForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplierId),
             DataHelpers.GetDefaultCustomerBilling(customerId),
             new List<InvoiceLine>
@@ -70,12 +70,9 @@ public class SendInvoiceCommandShould
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            });
+            }, new InvoiceReference("Test"));
 
         invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-
-        if (publish)
-            invoice.Publish(new InvoiceReference("test"));
 
         if (sent)
             invoice.MarkAsSent();
