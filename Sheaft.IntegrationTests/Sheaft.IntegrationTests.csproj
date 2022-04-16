@@ -23,4 +23,8 @@
       <ProjectReference Include="..\Sheaft.Infrastructure\Sheaft.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\DocumentManagement" />
+    </ItemGroup>
+
 </Project>

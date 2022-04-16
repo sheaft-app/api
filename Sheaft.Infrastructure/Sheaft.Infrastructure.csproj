@@ -38,6 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Features\DocumentManagement" />
       <Folder Include="Persistence\Migrations" />
     </ItemGroup>
 
