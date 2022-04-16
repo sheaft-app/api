@@ -144,8 +144,6 @@ public class CancelInvoiceCommandShould
 
         order.AttachInvoice(invoice.Identifier);
 
-        invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-
         if (publish)
             invoice.Publish(new InvoiceReference("test"));
 

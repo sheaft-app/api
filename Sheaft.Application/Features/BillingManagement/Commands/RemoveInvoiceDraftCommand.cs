@@ -9,8 +9,7 @@ public class RemoveInvoiceDraftHandler : ICommandHandler<RemoveInvoiceDraftComma
 {
     private readonly IUnitOfWork _uow;
 
-    public RemoveInvoiceDraftHandler(
-        IUnitOfWork uow)
+    public RemoveInvoiceDraftHandler(IUnitOfWork uow)
     {
         _uow = uow;
     }

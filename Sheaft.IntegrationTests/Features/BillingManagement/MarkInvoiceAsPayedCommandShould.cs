@@ -72,8 +72,6 @@ public class MarkInvoiceAsPayedCommandShould
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             }, new InvoiceReference("Test"));
 
-        invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-
         if (publish)
             invoice.Publish(new InvoiceReference("test"));
 

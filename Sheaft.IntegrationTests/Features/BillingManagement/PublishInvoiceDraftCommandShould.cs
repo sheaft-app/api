@@ -94,8 +94,7 @@ public class PublishInvoiceDraftCommandShould
         Assert.AreEqual("invoice.publish.requires.draft", result.Error.Code);
     }
 
-    private (Invoice, AppDbContext, PublishInvoiceDraftHandler) InitHandler(bool addProducts = false,
-        bool hasDueOn = true)
+    private (Invoice, AppDbContext, PublishInvoiceDraftHandler) InitHandler(bool addProducts = false)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<PublishInvoiceDraftHandler>();
 
@@ -126,9 +125,6 @@ public class PublishInvoiceDraftCommandShould
                         new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
                 }, new InvoiceReference("Test"));
 
-            if (hasDueOn)
-                invoiceWithProducts.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-
             context.Add(invoiceWithProducts);
             context.SaveChanges();
             return (invoiceWithProducts, context, handler);
@@ -136,9 +132,6 @@ public class PublishInvoiceDraftCommandShould
 
         var invoice = Invoice.CreateInvoiceForOrder(DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
             DataHelpers.GetDefaultCustomerBilling(customer.Identifier), new List<InvoiceLine>(), new InvoiceReference("Test"));
-
-        if (hasDueOn)
-            invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
 
         context.Add(invoice);
         context.SaveChanges();

@@ -1,25 +1,49 @@
 ﻿using Sheaft.Domain;
-using Sheaft.Domain.BillingManagement;
+using Sheaft.Domain.InvoiceManagement;
 
 namespace Sheaft.Application.BillingManagement;
 
-public record CreateCreditNoteDraftCommand(SupplierId SupplierIdentifier, CustomerId CustomerIdentifier) : Command<Result<string>>;
+public record CreateCreditNoteDraftCommand(SupplierId SupplierIdentifier, CustomerId CustomerIdentifier,
+    InvoiceId InvoiceIdentifier) : Command<Result<string>>;
 
 public class CreateCreditNoteDraftHandler : ICommandHandler<CreateCreditNoteDraftCommand, Result<string>>
 {
     private readonly IUnitOfWork _uow;
+    private readonly IRetrieveBillingInformation _retrieveBillingInformation;
 
     public CreateCreditNoteDraftHandler(
-        IUnitOfWork uow)
+        IUnitOfWork uow,
+        IRetrieveBillingInformation retrieveBillingInformation)
     {
         _uow = uow;
+        _retrieveBillingInformation = retrieveBillingInformation;
     }
 
     public async Task<Result<string>> Handle(CreateCreditNoteDraftCommand request, CancellationToken token)
     {
+        var invoiceResult = await _uow.Invoices.Get(request.InvoiceIdentifier, token);
+        if (invoiceResult.IsFailure)
+            return Result.Failure<string>(invoiceResult);
+
+        var invoice = invoiceResult.Value;
+
+        var supplierBillingResult =
+            await _retrieveBillingInformation.GetSupplierBilling(request.SupplierIdentifier, token);
+        if (supplierBillingResult.IsFailure)
+            return Result.Failure<string>(supplierBillingResult);
+
+        var customerBillingResult =
+            await _retrieveBillingInformation.GetCustomerBilling(request.CustomerIdentifier, token);
+        if (customerBillingResult.IsFailure)
+            return Result.Failure<string>(customerBillingResult);
+
+        var creditNote = Invoice.CreateCreditNoteDraft(supplierBillingResult.Value, customerBillingResult.Value, invoice);
+        _uow.Invoices.Add(creditNote);
+        _uow.Invoices.Update(invoice);
+
         var result = await _uow.Save(token);
         return result.IsSuccess
-            ? Result.Success(string.Empty)
+            ? Result.Success(creditNote.Identifier.Value)
             : Result.Failure<string>(result);
     }
 }

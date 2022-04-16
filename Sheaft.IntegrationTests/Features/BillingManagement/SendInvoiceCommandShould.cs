@@ -72,8 +72,6 @@ public class SendInvoiceCommandShould
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             }, new InvoiceReference("Test"));
 
-        invoice.UpdatePaymentInformation(new InvoiceDueDate(DateTimeOffset.UtcNow.AddDays(1)));
-
         if (sent)
             invoice.MarkAsSent();
 

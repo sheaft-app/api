@@ -29,23 +29,23 @@ public class Invoice : AggregateRoot
     }
 
     public static Invoice CreateInvoiceForOrder(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, InvoiceReference reference, DateTimeOffset? currentDateTime = null)
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, InvoiceReference reference,
+        DateTimeOffset? currentDateTime = null)
     {
         var invoice = new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
         var result = invoice.Publish(reference, currentDateTime);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
-        
+
         return invoice;
     }
 
-    public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier, 
-        CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines = null, Invoice? invoice = null)
+    public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, Invoice invoice)
     {
-        var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, lines);
-        if (invoice == null) 
-            return creditNote;
-        
+        var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, null,
+            $"Avoir sur la facture n°{invoice.Reference.Value} du {invoice.PublishedOn:d}");
+
         var result = invoice.AttachCreditNote(creditNote);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
@@ -55,11 +55,12 @@ public class Invoice : AggregateRoot
 
     private Result AttachCreditNote(Invoice creditNote)
     {
-        var notes = CreditNotes.ToList();
-        if (notes.Any(n => n.InvoiceIdentifier == creditNote.Identifier))
+        var creditNotes = CreditNotes.ToList();
+        if (creditNotes.Any(n => n.InvoiceIdentifier == creditNote.Identifier))
             return Result.Failure(ErrorKind.BadRequest, "invoice.already.contains.creditnote");
-        
-        notes.Add(new InvoiceCreditNote(creditNote.Identifier));
+
+        creditNotes.Add(new InvoiceCreditNote(creditNote.Identifier));
+        CreditNotes = creditNotes.ToList();
         return Result.Success();
     }
 
@@ -67,17 +68,17 @@ public class Invoice : AggregateRoot
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
         var lines = invoice.Lines
-            .Select(v => InvoiceLine.CreateLineForDeliveryOrder(v.Identifier, v.Name, v.Quantity, 
+            .Select(v => InvoiceLine.CreateLineForDeliveryOrder(v.Identifier, v.Name, v.Quantity,
                 v.PriceInfo.UnitPrice, v.Vat,
                 new InvoiceDelivery(v.Delivery.Reference, v.Delivery.DeliveredOn),
                 new DeliveryOrder(v.Order.Reference, v.Order.PublishedOn)))
             .ToList();
 
-        var creditNote = new Invoice(InvoiceKind.InvoiceCancellation, 
+        var creditNote = new Invoice(InvoiceKind.InvoiceCancellation,
             SupplierBillingInformation.Copy(invoice.Supplier),
             CustomerBillingInformation.Copy(invoice.Customer),
             lines,
-            comment: $"Avoir sur la facture n°{invoice.Reference.Value} du {invoice.PublishedOn.Value:d}");
+            $"Avoir d'annulation de la facture n°{invoice.Reference.Value} du {invoice.PublishedOn.Value:d}");
 
         creditNote.Publish(creditNoteReference, currentDateTime);
 
@@ -95,7 +96,7 @@ public class Invoice : AggregateRoot
     public DateTimeOffset? PublishedOn { get; private set; }
     public DateTimeOffset? CancelledOn { get; private set; }
     public DateTimeOffset? SentOn { get; private set; }
-    public string? Comment { get; }
+    public string? Comment { get; private set; }
     public string? CancellationReason { get; private set; }
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
     public TotalVatPrice TotalVatPrice { get; private set; }
@@ -117,7 +118,7 @@ public class Invoice : AggregateRoot
         Reference = reference;
         Status = InvoiceStatus.Published;
         PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
-        DueDate = new InvoiceDueDate((currentDateTime ?? DateTimeOffset.UtcNow).AddDays(30));
+        DueDate = Kind == InvoiceKind.Invoice ? new InvoiceDueDate((currentDateTime ?? DateTimeOffset.UtcNow).AddDays(30)) : null;
         return Result.Success();
     }
 
@@ -200,15 +201,6 @@ public class Invoice : AggregateRoot
     {
         Supplier = supplier;
         Customer = customer;
-        return Result.Success();
-    }
-
-    public Result UpdatePaymentInformation(InvoiceDueDate dueOn, DateTimeOffset? currentDateTime = null)
-    {
-        if (dueOn.Value < (currentDateTime ?? DateTimeOffset.UtcNow))
-            return Result.Failure(ErrorKind.BadRequest, "invoice.due.date.requires.incoming.date");
-
-        DueDate = dueOn;
         return Result.Success();
     }
 }
