@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Sheaft.Application.InvoiceManagement;
+using Sheaft.Application.BillingManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
-using Sheaft.Domain.InvoiceManagement;
 using Sheaft.Domain.OrderManagement;
-using Sheaft.Infrastructure.InvoiceManagement;
+using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 

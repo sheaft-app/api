@@ -1,7 +1,7 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
 
-namespace Sheaft.Application.InvoiceManagement;
+namespace Sheaft.Application.BillingManagement;
 
 public record CancelInvoiceCommand(InvoiceId InvoiceIdentifier, string Reason) : Command<Result<string>>;
 

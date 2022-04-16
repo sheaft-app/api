@@ -5,7 +5,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
-using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;

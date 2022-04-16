@@ -1,6 +1,4 @@
-﻿using Sheaft.Domain.InvoiceManagement;
-
-namespace Sheaft.Domain.BillingManagement;
+﻿namespace Sheaft.Domain.BillingManagement;
 
 public interface IPublishInvoices
 {

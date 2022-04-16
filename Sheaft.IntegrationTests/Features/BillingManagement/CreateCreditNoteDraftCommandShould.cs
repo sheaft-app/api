@@ -5,12 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.BillingManagement;
-using Sheaft.Application.InvoiceManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
-using Sheaft.Domain.InvoiceManagement;
 using Sheaft.Domain.OrderManagement;
-using Sheaft.Infrastructure.InvoiceManagement;
+using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
@@ -27,7 +25,7 @@ public class CreateCreditNoteDraftCommandShould
     {
         var (supplierId, customerId, context, handler) = InitHandler(true);
         var invoice = context.Invoices.Single();
-        var command = new CreateCreditNoteDraftCommand(supplierId, customerId, invoice.Identifier);
+        var command = new CreateCreditNoteDraftCommand(invoice.Identifier);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -43,7 +41,7 @@ public class CreateCreditNoteDraftCommandShould
     {
         var (supplierId, customerId, context, handler) = InitHandler(true);
         var invoice = context.Invoices.Single();
-        var command = new CreateCreditNoteDraftCommand(supplierId, customerId, invoice.Identifier);
+        var command = new CreateCreditNoteDraftCommand(invoice.Identifier);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -55,7 +53,7 @@ public class CreateCreditNoteDraftCommandShould
     public async Task Fail_If_Invoice_Not_Found()
     {
         var (supplierId, customerId, context, handler) = InitHandler(false);
-        var command = new CreateCreditNoteDraftCommand(supplierId, customerId, InvoiceId.New());
+        var command = new CreateCreditNoteDraftCommand(InvoiceId.New());
 
         var result = await handler.Handle(command, CancellationToken.None);
 

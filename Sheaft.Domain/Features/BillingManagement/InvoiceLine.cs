@@ -1,6 +1,6 @@
 ﻿using Sheaft.Domain.OrderManagement;
 
-namespace Sheaft.Domain.InvoiceManagement;
+namespace Sheaft.Domain.BillingManagement;
 
 public record InvoiceLine
 {

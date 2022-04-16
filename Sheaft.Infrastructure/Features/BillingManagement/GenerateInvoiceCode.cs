@@ -1,7 +1,7 @@
 ﻿using Sheaft.Domain;
-using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.BillingManagement;
 
-namespace Sheaft.Infrastructure.InvoiceManagement;
+namespace Sheaft.Infrastructure.BillingManagement;
 
 internal class GenerateInvoiceCode : IGenerateInvoiceCode
 {

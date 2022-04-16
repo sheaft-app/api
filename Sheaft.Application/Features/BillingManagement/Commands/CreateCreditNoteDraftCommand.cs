@@ -1,10 +1,9 @@
 ﻿using Sheaft.Domain;
-using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.BillingManagement;
 
 namespace Sheaft.Application.BillingManagement;
 
-public record CreateCreditNoteDraftCommand(SupplierId SupplierIdentifier, CustomerId CustomerIdentifier,
-    InvoiceId InvoiceIdentifier) : Command<Result<string>>;
+public record CreateCreditNoteDraftCommand(InvoiceId InvoiceIdentifier) : Command<Result<string>>;
 
 public class CreateCreditNoteDraftHandler : ICommandHandler<CreateCreditNoteDraftCommand, Result<string>>
 {
@@ -28,12 +27,12 @@ public class CreateCreditNoteDraftHandler : ICommandHandler<CreateCreditNoteDraf
         var invoice = invoiceResult.Value;
 
         var supplierBillingResult =
-            await _retrieveBillingInformation.GetSupplierBilling(request.SupplierIdentifier, token);
+            await _retrieveBillingInformation.GetSupplierBilling(invoice.Supplier.Identifier, token);
         if (supplierBillingResult.IsFailure)
             return Result.Failure<string>(supplierBillingResult);
 
         var customerBillingResult =
-            await _retrieveBillingInformation.GetCustomerBilling(request.CustomerIdentifier, token);
+            await _retrieveBillingInformation.GetCustomerBilling(invoice.Customer.Identifier, token);
         if (customerBillingResult.IsFailure)
             return Result.Failure<string>(customerBillingResult);
 

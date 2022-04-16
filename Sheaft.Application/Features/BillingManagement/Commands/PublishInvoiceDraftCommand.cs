@@ -1,8 +1,7 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
-using Sheaft.Domain.InvoiceManagement;
 
-namespace Sheaft.Application.InvoiceManagement;
+namespace Sheaft.Application.BillingManagement;
 
 public record PublishInvoiceDraftCommand(InvoiceId InvoiceIdentifier) : Command<Result>;
 

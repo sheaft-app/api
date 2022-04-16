@@ -7,7 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Sheaft.Application.BillingManagement;
 using Sheaft.Domain;
-using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;

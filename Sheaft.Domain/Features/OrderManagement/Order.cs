@@ -1,6 +1,4 @@
-﻿using Sheaft.Domain.InvoiceManagement;
-
-namespace Sheaft.Domain.OrderManagement;
+﻿namespace Sheaft.Domain.OrderManagement;
 
 public class Order : AggregateRoot
 {

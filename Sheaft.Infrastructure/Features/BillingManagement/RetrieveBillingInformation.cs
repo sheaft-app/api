@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
-using Sheaft.Domain.InvoiceManagement;
+using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure.InvoiceManagement;
+namespace Sheaft.Infrastructure.BillingManagement;
 
 internal class RetrieveBillingInformation : IRetrieveBillingInformation
 {

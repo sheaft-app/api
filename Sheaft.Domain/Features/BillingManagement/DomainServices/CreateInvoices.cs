@@ -1,5 +1,4 @@
-﻿using Sheaft.Domain.InvoiceManagement;
-using Sheaft.Domain.OrderManagement;
+﻿using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Domain.BillingManagement;
 

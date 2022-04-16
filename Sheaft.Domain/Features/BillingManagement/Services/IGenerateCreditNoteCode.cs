@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain.InvoiceManagement;
+﻿namespace Sheaft.Domain.BillingManagement;
 
 public interface IGenerateCreditNoteCode
 {
