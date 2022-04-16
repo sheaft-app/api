@@ -22,21 +22,34 @@ namespace Sheaft.IntegrationTests.BillingManagement;
 
 public class RemoveInvoiceDraftCommandShould
 {
-    // [Test]
-    // public async Task Remove_Draft_Invoice()
-    // {
-    //     var (invoiceId, context, handler) = InitHandler();
-    //     var command = new RemoveInvoiceDraftCommand(invoiceId);
-    //
-    //     var result = await handler.Handle(command, CancellationToken.None);
-    //
-    //     Assert.IsTrue(result.IsSuccess);
-    //     var invoice = context.Invoices.SingleOrDefault(s => s.Identifier == invoiceId);
-    //     Assert.IsNull(invoice);
-    // }
+    [Test]
+    public async Task Remove_Draft_Invoice()
+    {
+        var (creditNoteId, context, handler) = InitHandler();
+        var command = new RemoveInvoiceDraftCommand(creditNoteId);
+    
+        var result = await handler.Handle(command, CancellationToken.None);
+    
+        Assert.IsTrue(result.IsSuccess);
+        var creditNote = context.Invoices.SingleOrDefault(s => s.Identifier == creditNoteId);
+        Assert.IsNull(creditNote);
+    }
+    
+    [Test]
+    public async Task Remove_Draft_From_Invoice_CreditNotes()
+    {
+        var (creditNoteId, context, handler) = InitHandler();
+        var command = new RemoveInvoiceDraftCommand(creditNoteId);
+    
+        var result = await handler.Handle(command, CancellationToken.None);
+    
+        Assert.IsTrue(result.IsSuccess);
+        var invoice = context.Invoices.Single(c => c.Kind == InvoiceKind.Invoice);
+        Assert.AreEqual(0, invoice.CreditNotes.Count());
+    }
 
     [Test]
-    public async Task Fail_If_Not_A_Draft()
+    public async Task Fail_If_Is_Not_A_Draft()
     {
         var (deliveryId, context, handler) = InitHandler(true);
         var command = new RemoveInvoiceDraftCommand(deliveryId);
@@ -48,7 +61,7 @@ public class RemoveInvoiceDraftCommandShould
         Assert.AreEqual("invoice.remove.requires.draft", result.Error.Code);
     }
 
-    private (InvoiceId, AppDbContext, RemoveInvoiceDraftHandler) InitHandler(bool publishInvoice = false)
+    private (InvoiceId, AppDbContext, RemoveInvoiceDraftHandler) InitHandler(bool publishCreditNote = false)
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<RemoveInvoiceDraftHandler>();
 
@@ -78,7 +91,7 @@ public class RemoveInvoiceDraftCommandShould
             order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
 
         context.Add(delivery);
-
+        
         var invoice = Invoice.CreateInvoiceForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
             DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
@@ -91,14 +104,32 @@ public class RemoveInvoiceDraftCommandShould
                     new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
                     new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
             }, new InvoiceReference("Test"));
+    
+        invoice.Publish(new InvoiceReference("test"));
+        
+        var creditNote = Invoice.CreateCreditNoteDraft(
+            DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
+            DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
+            invoice);
 
-        if (publishInvoice)
-            invoice.Publish(new InvoiceReference("test"));
+        creditNote.UpdateLines(new List<InvoiceLine>
+        {
+            InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+            InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
+                new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+        });
+
+        if (publishCreditNote)
+            creditNote.Publish(new InvoiceReference("Test"));
 
         context.Add(invoice);
+        context.Add(creditNote);
 
         context.SaveChanges();
-        return (invoice.Identifier, context, handler);
+        return (creditNote.Identifier, context, handler);
     }
 }
 

@@ -203,4 +203,17 @@ public class Invoice : AggregateRoot
         Customer = customer;
         return Result.Success();
     }
+
+    public Result RemoveCreditNote(Invoice creditNote)
+    {
+        var existingCreditNote = CreditNotes.FirstOrDefault(c => c.InvoiceIdentifier == creditNote.Identifier);
+        if (existingCreditNote == null)
+            return Result.Failure(ErrorKind.BadRequest, "invoice.remove.creditnote.not.found");
+
+        var creditNotes = CreditNotes.ToList();
+        creditNotes.Remove(existingCreditNote);
+        CreditNotes = creditNotes.ToList();
+        
+        return Result.Success();
+    }
 }

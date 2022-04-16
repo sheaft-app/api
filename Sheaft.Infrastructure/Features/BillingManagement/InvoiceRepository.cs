@@ -24,4 +24,15 @@ internal class InvoiceRepository : Repository<Invoice, InvoiceId>, IInvoiceRepos
                 : Result.Failure<Invoice>(ErrorKind.NotFound, "invoice.not.found");
         });
     }
+
+    public Task<Result<Maybe<Invoice>>> GetInvoiceWithCreditNote(InvoiceId creditNoteIdentifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var result = await Values
+                .SingleOrDefaultAsync(e => e.CreditNotes.Any(cn => cn.InvoiceIdentifier == creditNoteIdentifier), token);
+
+            return Result.Success(result != null ? Maybe.From(result) : Maybe<Invoice>.None);
+        });
+    }
 }

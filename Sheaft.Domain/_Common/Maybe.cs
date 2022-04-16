@@ -1,4 +1,6 @@
-﻿namespace Sheaft.Domain;
+﻿using Sheaft.Domain.InvoiceManagement;
+
+namespace Sheaft.Domain;
 
 /// <summary>
 /// This code is from CSharpFunctionalExtensions nuget written by vladimir khorikov
