@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain;
+﻿namespace Sheaft.Domain.CustomerManagement;
 
 public class Customer : AggregateRoot
 {

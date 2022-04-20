@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.AgreementManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AgreementManagement;

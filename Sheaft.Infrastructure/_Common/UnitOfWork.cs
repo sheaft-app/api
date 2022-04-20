@@ -6,6 +6,8 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.BillingManagement;
+using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.DocumentManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -16,6 +18,7 @@ using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
+using Sheaft.Infrastructure.DocumentManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.SupplierManagement;
 
@@ -53,6 +56,8 @@ internal class UnitOfWork : IUnitOfWork
         Invoices = new InvoiceRepository(_context);
         
         Batches = new BatchRepository(_context);
+        
+        Documents = new DocumentRepository(_context);
     }
 
     public IAccountRepository Accounts { get; }
@@ -72,6 +77,8 @@ internal class UnitOfWork : IUnitOfWork
     public IInvoiceRepository Invoices { get; }
     
     public IBatchRepository Batches { get; }
+    
+    public IDocumentRepository Documents { get; }
 
 
     public async Task<Result<int>> Save(CancellationToken token)

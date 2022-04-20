@@ -6,6 +6,8 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.BillingManagement;
+using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.DocumentManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -49,6 +51,8 @@ internal class AppDbContext : DbContext, IDbContext
         modelBuilder.ApplyConfiguration(new InvoiceConfiguration());
         
         modelBuilder.ApplyConfiguration(new BatchConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new DocumentConfiguration());
     }
     
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -108,6 +112,10 @@ internal class AppDbContext : DbContext, IDbContext
         configurationBuilder
             .Properties<InvoiceId>()
             .HaveConversion<InvoiceIdConverter>();
+        
+        configurationBuilder
+            .Properties<DocumentId>()
+            .HaveConversion<DocumentIdConverter>();
     }
 
     public DbSet<Account> Accounts { get; set; }
@@ -127,6 +135,8 @@ internal class AppDbContext : DbContext, IDbContext
     public DbSet<Invoice> Invoices { get; set; }
     
     public DbSet<Batch> Batches { get; set; }
+    
+    public DbSet<Document> Documents { get; set; }
 }
 
 internal static class DbContextExtension

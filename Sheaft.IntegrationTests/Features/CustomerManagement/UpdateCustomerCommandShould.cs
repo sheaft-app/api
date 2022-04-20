@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Sheaft.Application.Models;
 using Sheaft.Application.CustomerManagement;
 using Sheaft.Domain;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.IntegrationTests.Helpers;
 

@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\DocumentManagement\Services" />
     <Folder Include="Features\SupplierManagement\DomainServices" />
   </ItemGroup>
 

@@ -3,6 +3,8 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.BillingManagement;
+using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.DocumentManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -29,6 +31,8 @@ public interface IUnitOfWork
     public IInvoiceRepository Invoices { get; }
     
     public IBatchRepository Batches { get; }
+    
+    public IDocumentRepository Documents { get; }
     
     public Task<Result<int>> Save(CancellationToken token);
 }

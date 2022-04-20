@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 

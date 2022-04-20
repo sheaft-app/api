@@ -37,6 +37,19 @@ internal abstract class Repository<T, TU> : IRepository<T, TU>
             return Result.Failure<IEnumerable<T>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
+    
+
+    protected async Task<Result<IEnumerable<U>>> QueryAsync<U>(Func<Task<Result<IEnumerable<U>>>> func)
+    {
+        try
+        {
+            return await func();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure<IEnumerable<U>>(ErrorKind.Unexpected, "database.error", e.Message);
+        }
+    }
 
     protected async Task<Result<Maybe<T>>> QueryAsync(Func<Task<Result<Maybe<T>>>> func)
     {

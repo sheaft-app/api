@@ -15,6 +15,8 @@ using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.BillingManagement;
+using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.DocumentManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
@@ -25,6 +27,7 @@ using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.Infrastructure.CustomerManagement;
+using Sheaft.Infrastructure.DocumentManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Services;
 using Sheaft.Infrastructure.SupplierManagement;
@@ -74,6 +77,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         
         services.AddScoped<IBatchRepository, BatchRepository>();
+        
+        services.AddScoped<IDocumentRepository, DocumentRepository>();
     }
 
     private static void RegisterMediator(IServiceCollection services)
