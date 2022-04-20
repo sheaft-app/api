@@ -2,5 +2,5 @@
 
 public interface IPreparationFileGenerator
 {
-    Task<Result<string>> Generate(PreparationDocumentData data, CancellationToken token);
+    Task<Result<byte[]>> Generate(PreparationDocumentData data, CancellationToken token);
 }

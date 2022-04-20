@@ -51,11 +51,16 @@ public class ProcessDocumentCommandShould
         var (context, uow, logger) = DependencyHelpers.InitDependencies<ProcessDocumentHandler>();
 
         var fileGeneratorMocked = new Mock<IPreparationFileGenerator>();
+        var fileProviderMocked = new Mock<IFileProvider>();
+        
         var fileResult = Result.Success(_urlFile);
         if (fileReturnError)
             fileResult = Result.Failure<string>(ErrorKind.Unexpected, "file.error");
 
         fileGeneratorMocked.Setup(f => f.Generate(It.IsAny<PreparationDocumentData>(), CancellationToken.None))
+            .Returns(Task.FromResult(Result.Success(Array.Empty<byte>())));
+        
+        fileProviderMocked.Setup(f => f.SaveDocument(It.IsAny<SupplierId>(), It.IsAny<DocumentId>(), It.IsAny<byte[]>(), CancellationToken.None))
             .Returns(Task.FromResult(fileResult));
 
         var handler = new ProcessDocumentHandler(uow,
@@ -64,7 +69,8 @@ public class ProcessDocumentCommandShould
                 new OrderRepository(context),
                 new CustomerRepository(context),
                 new DocumentParamsHandler(),
-                fileGeneratorMocked.Object));
+                fileGeneratorMocked.Object,
+                fileProviderMocked.Object));
         
         var supplierId = AccountId.New();
         var customerId = AccountId.New();
