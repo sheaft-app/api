@@ -10,13 +10,20 @@ public class PreparationFileGenerator : IPreparationFileGenerator
 {
     public Task<Result<byte[]>> Generate(PreparationDocumentData documentData, CancellationToken token)
     {
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-        
-        using var stream = new MemoryStream();
-        using var package = new ExcelPackage(stream);
+        try
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-        var data = CreateExcelPickingFile(package, documentData);
-        return Task.FromResult(Result.Success(data));
+            using var stream = new MemoryStream();
+            using var package = new ExcelPackage(stream);
+
+            var data = CreateExcelPickingFile(package, documentData);
+            return Task.FromResult(Result.Success(data));
+        }
+        catch (Exception e)
+        {
+            return Task.FromResult(Result.Failure<byte[]>(ErrorKind.Unexpected, "preparation.file.generation.error"));
+        }
     }
 
     private byte[] CreateExcelPickingFile(ExcelPackage package, PreparationDocumentData documentData)
