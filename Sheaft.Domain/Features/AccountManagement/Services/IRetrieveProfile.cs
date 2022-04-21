@@ -1,4 +1,4 @@
-﻿namespace Sheaft.Domain;
+﻿namespace Sheaft.Domain.AccountManagement;
 
 public interface IRetrieveProfile
 {

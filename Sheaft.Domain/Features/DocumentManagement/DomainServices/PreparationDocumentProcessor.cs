@@ -132,7 +132,9 @@ public class PreparationDocumentProcessor : IDocumentProcessor
             var products = productsPerOrders
                 .GroupBy(o => new {o.CustomerIdentifier, o.ProductReference, o.Name})
                 .Select(l =>
-                    new ProductToPrepare(l.Key.ProductReference, l.Key.Name, new Quantity(l.Sum(p => p.Quantity.Value)),
+                    new ProductToPrepare(
+                        l.Key.ProductReference, 
+                        l.Key.Name,
                         l.Key.CustomerIdentifier,
                         l.Select(p => new QuantityPerOrder(p.OrderReference, p.Quantity)).ToList()))
                 .ToList();
@@ -152,10 +154,11 @@ public class PreparationDocumentProcessor : IDocumentProcessor
 public record PreparationDocumentData(IEnumerable<ProductToPrepare> Products,
     IEnumerable<ClientOrdersToPrepare> Clients, int ProductsCount, int ClientsCount);
 
-public record ProductToPrepare(ProductReference ProductReference, ProductName Name, Quantity Quantity,
-    CustomerId CustomerIdentifier, IEnumerable<QuantityPerOrder> QuantityPerOrder);
+public record ProductToPrepare(ProductReference ProductReference, ProductName Name, CustomerId CustomerIdentifier, IEnumerable<QuantityPerOrder> QuantityPerOrder);
 
 public record QuantityPerOrder(OrderReference OrderReference, Quantity Quantity);
 
-public record ClientOrdersToPrepare(CustomerId CustomerIdentifier, string ClientName,
-    IEnumerable<OrderReference> Orders);
+public record ClientOrdersToPrepare(CustomerId CustomerIdentifier, string ClientName, IEnumerable<OrderReference> Orders)
+{
+    public int OrdersCount => Orders.Count();
+}

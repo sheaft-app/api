@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Sheaft.Infrastructure.Services;
+namespace Sheaft.Infrastructure;
 
 internal class NameUserIdProvider : IUserIdProvider
 {

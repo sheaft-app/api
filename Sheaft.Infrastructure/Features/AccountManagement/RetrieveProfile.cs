@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
+using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence;
 
-namespace Sheaft.Infrastructure;
+namespace Sheaft.Infrastructure.AccountManagement;
 
 public class RetrieveProfile : IRetrieveProfile
 {
