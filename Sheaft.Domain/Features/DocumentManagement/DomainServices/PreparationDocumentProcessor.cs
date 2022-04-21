@@ -70,7 +70,7 @@ public class PreparationDocumentProcessor : IDocumentProcessor
 
         var products = productsResult.Value;
         var clients = clientsResult.Value;
-        var documentData = new PreparationDocumentData(products, clients, products.Count(), clients.Count());
+        var documentData = new PreparationDocumentData(products, clients);
 
         var generationResult = await _preparationFileGenerator.Generate(documentData, token);
         if (generationResult.IsFailure)
@@ -98,7 +98,6 @@ public class PreparationDocumentProcessor : IDocumentProcessor
             var clients = orders.GroupBy(o => o.CustomerIdentifier)
                 .Select(o =>
                     new ClientOrdersToPrepare(
-                        o.Key,
                         customersNameResult.Value.Single(c => c.Identifier == o.Key).Name,
                         o.Select(l => l.Reference).ToList()))
                 .ToList();
@@ -130,12 +129,11 @@ public class PreparationDocumentProcessor : IDocumentProcessor
             }
 
             var products = productsPerOrders
-                .GroupBy(o => new {o.CustomerIdentifier, o.ProductReference, o.Name})
+                .GroupBy(o => new {o.ProductReference, o.Name})
                 .Select(l =>
                     new ProductToPrepare(
                         l.Key.ProductReference, 
                         l.Key.Name,
-                        l.Key.CustomerIdentifier,
                         l.Select(p => new QuantityPerOrder(p.OrderReference, p.Quantity)).ToList()))
                 .ToList();
 
@@ -151,14 +149,13 @@ public class PreparationDocumentProcessor : IDocumentProcessor
         CustomerId CustomerIdentifier, OrderReference OrderReference);
 }
 
-public record PreparationDocumentData(IEnumerable<ProductToPrepare> Products,
-    IEnumerable<ClientOrdersToPrepare> Clients, int ProductsCount, int ClientsCount);
+public record PreparationDocumentData(IEnumerable<ProductToPrepare> Products, IEnumerable<ClientOrdersToPrepare> Clients);
 
-public record ProductToPrepare(ProductReference ProductReference, ProductName Name, CustomerId CustomerIdentifier, IEnumerable<QuantityPerOrder> QuantityPerOrder);
+public record ProductToPrepare(ProductReference ProductReference, ProductName Name, IEnumerable<QuantityPerOrder> QuantityPerOrder);
 
 public record QuantityPerOrder(OrderReference OrderReference, Quantity Quantity);
 
-public record ClientOrdersToPrepare(CustomerId CustomerIdentifier, string ClientName, IEnumerable<OrderReference> Orders)
+public record ClientOrdersToPrepare(string ClientName, IEnumerable<OrderReference> Orders)
 {
     public int OrdersCount => Orders.Count();
 }

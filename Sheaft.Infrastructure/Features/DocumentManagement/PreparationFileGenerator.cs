@@ -10,6 +10,8 @@ public class PreparationFileGenerator : IPreparationFileGenerator
 {
     public Task<Result<byte[]>> Generate(PreparationDocumentData documentData, CancellationToken token)
     {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        
         using var stream = new MemoryStream();
         using var package = new ExcelPackage(stream);
 
@@ -20,11 +22,12 @@ public class PreparationFileGenerator : IPreparationFileGenerator
     private byte[] CreateExcelPickingFile(ExcelPackage package, PreparationDocumentData documentData)
     {
         using var worksheet = package.Workbook.Worksheets.Add("Commandes à préparer");
-
+        
         var currentRow = 1;
         currentRow = AddHeaderRows(worksheet, documentData, currentRow);
+        var productStartingRow = currentRow;
         currentRow = AddProductsRows(worksheet, documentData.Clients, documentData.Products, currentRow);
-        currentRow = AddFooterRow(worksheet, documentData.Clients, currentRow);
+        currentRow = AddFooterRow(worksheet, documentData.Clients, currentRow, productStartingRow);
 
         return package.GetAsByteArray();
     }
@@ -55,7 +58,7 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         foreach (var clientOrder in GetOrderedClients(clientOrders))
         {
             var clientColumnCount = clientOrder.OrdersCount + 1;
-            AddValueToRange(worksheet, currentRow, currentClientColumn, currentRow, clientColumnCount,
+            AddValueToRange(worksheet, currentRow, currentClientColumn, currentRow, currentClientColumn + clientColumnCount - 1,
                 clientOrder.ClientName, true, true, 12, ExcelBorderStyle.Thin,
                 ExcelHorizontalAlignment.Center, 25);
 
@@ -72,7 +75,7 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         IEnumerable<ClientOrdersToPrepare> clientOrders, int currentRow)
     {
         AddValueToRange(worksheet, currentRow, 1, currentRow, 1, "Produits\\Commandes", false, false,
-            10, ExcelBorderStyle.Thin, ExcelHorizontalAlignment.Center, 25);
+            10, ExcelBorderStyle.Thin, ExcelHorizontalAlignment.Left, 25);
 
         var currentClientColumn = 2;
         foreach (var clientOrder in GetOrderedClients(clientOrders))
@@ -88,13 +91,15 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         foreach (var orderReference in GetOrderedClientOrders(clientOrder))
         {
             AddValueToRange(worksheet, currentRow, currentClientColumn, currentRow, currentClientColumn,
-                orderReference, bold: false);
+                orderReference.Value, bold: false);
 
             currentClientColumn++;
         }
 
         AddValueToRange(worksheet, currentRow, currentClientColumn, currentRow, currentClientColumn,
             "Sous-total");
+        
+        currentClientColumn++;
 
         return currentClientColumn - startingColumn;
     }
@@ -114,18 +119,41 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         var currentColumn = 1;
         
         AddValueToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn,
-            productToPrepare.Name.Value);
+            productToPrepare.Name.Value, bold: false, horizontalAlignment: ExcelHorizontalAlignment.Left);
 
+        currentColumn++;
+
+        var productClientTotalCells = new List<ExcelRange>();
         foreach (var clientOrder in GetOrderedClients(clientOrders))
-            currentColumn += AddClientOrderedProductQuantities(worksheet, clientOrder, productToPrepare, currentRow, currentColumn);
+        {
+            var result =
+                AddClientOrderedProductQuantities(worksheet, clientOrder, productToPrepare, currentRow, currentColumn);
 
-        AddValueToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn,
-            "productToPrepare.TotalQuantity.Value");
+            currentColumn += result.ColumnsAdded;
+            productClientTotalCells.Add(result.ClientTotalCell);
+        }
+
+        var formula = GetProductRowTotalFormula(productClientTotalCells);
+        AddFormulaToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn, formula);
         
         return 1;
     }
 
-    private static int AddClientOrderedProductQuantities(ExcelWorksheet worksheet, 
+    private static string GetProductRowTotalFormula(List<ExcelRange> productClientTotalCells)
+    {
+        var cells = "";
+        foreach (var productClientTotalCell in productClientTotalCells)
+        {
+            if (cells.Length > 0)
+                cells += ",";
+
+            cells += $"{productClientTotalCell.Address}";
+        }
+
+        return $"SUM({cells})";
+    }
+
+    private static (int ColumnsAdded, ExcelRange ClientTotalCell) AddClientOrderedProductQuantities(ExcelWorksheet worksheet, 
         ClientOrdersToPrepare clientOrder, ProductToPrepare productToPrepare, int currentRow, int currentColumn)
     {
         var startingColumn = currentColumn;
@@ -135,33 +163,46 @@ public class PreparationFileGenerator : IPreparationFileGenerator
                 productToPrepare.QuantityPerOrder.SingleOrDefault(q => orderReference == q.OrderReference);
 
             var quantity = productQuantityPerOrder?.Quantity.Value ?? 0;
-            AddValueToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn, quantity);
+            AddValueToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn, quantity, bold: false);
 
             currentColumn++;
         }
 
-        AddValueToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn,
-            "productToPrepare.QuantityPerOrder.Sum(qpo => qpo.Quantity.Value)");
+        var startCell = worksheet.Cells[currentRow, startingColumn, currentRow, startingColumn];
+        var endCell = worksheet.Cells[currentRow, currentColumn - 1, currentRow, currentColumn - 1];
+
+        var totalCell = worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn];
+        AddFormulaToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn,
+            $"SUM({startCell.Address}:{endCell.Address})");
 
         currentColumn++;
-        return currentColumn - startingColumn;
+        return (currentColumn - startingColumn, totalCell);
     }
 
-    private int AddFooterRow(ExcelWorksheet worksheet, IEnumerable<ClientOrdersToPrepare> clientOrders, int currentRow)
+    private int AddFooterRow(ExcelWorksheet worksheet, IEnumerable<ClientOrdersToPrepare> clientOrders, int currentRow, int productsStartRow)
     {
         AddValueToRange(worksheet, currentRow, 1, currentRow, 1, "Total", false, true,
-            10, ExcelBorderStyle.Thin, ExcelHorizontalAlignment.Center, 25);
+            10, ExcelBorderStyle.Thin, ExcelHorizontalAlignment.Right, 25);
 
-        var ordersColumnCount = GetOrdersColumnCount(clientOrders);
-        for (var i = 1; i <= ordersColumnCount; i++)
+        var ordersColumnCount = GetOrdersColumnCount(clientOrders) + 1;
+        for (var i = 1; i < ordersColumnCount; i++)
         {
-            AddValueToRange(worksheet, currentRow, i, currentRow, i,
-                "order quantities sum");
+            var currentColumn = i + 1;
+            
+            var startCell = worksheet.Cells[productsStartRow, currentColumn, productsStartRow, currentColumn];
+            var endCell = worksheet.Cells[currentRow - 1, currentColumn, currentRow - 1, currentColumn];
+            
+            AddFormulaToRange(worksheet, currentRow, currentColumn, currentRow, currentColumn,
+                $"SUM({startCell.Address}:{endCell.Address})");
         }
 
         var totalColumnNumber = 1 + ordersColumnCount;
-        AddValueToRange(worksheet, currentRow, totalColumnNumber, currentRow, totalColumnNumber,
-            "total quantities sum");
+        
+        var startTotalCell = worksheet.Cells[productsStartRow, totalColumnNumber, productsStartRow, totalColumnNumber];
+        var endTotalCell = worksheet.Cells[currentRow - 1, totalColumnNumber, currentRow - 1, totalColumnNumber];
+        
+        AddFormulaToRange(worksheet, currentRow, totalColumnNumber, currentRow, totalColumnNumber,
+            $"SUM({startTotalCell.Address}:{endTotalCell.Address})");
 
         return currentRow + 1;
     }
@@ -197,7 +238,20 @@ public class PreparationFileGenerator : IPreparationFileGenerator
 
         MergeRangeIfRequired(merge, rng);
         AutofitIfSpecified(rng, autoFitMinWidth);
+        DefineRangeBorders(rng, style);
+    }
 
+    private static void AddFormulaToRange(ExcelWorksheet worksheet, int fromRow, int fromCol, int toRow, int toCol,
+        string formula,
+        bool merge = false, bool bold = true, int fontSize = 10, ExcelBorderStyle style = ExcelBorderStyle.Thin,
+        ExcelHorizontalAlignment horizontalAlignment = ExcelHorizontalAlignment.Center, int autoFitMinWidth = 0)
+    {
+        using var rng = worksheet.Cells[fromRow, fromCol, toRow, toCol];
+
+        SetRangeFormula(rng, formula, bold, fontSize, horizontalAlignment);
+
+        MergeRangeIfRequired(merge, rng);
+        AutofitIfSpecified(rng, autoFitMinWidth);
         DefineRangeBorders(rng, style);
     }
 
@@ -219,6 +273,15 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         ExcelHorizontalAlignment horizontalAlignment)
     {
         rng.Value = value;
+        rng.Style.Font.Bold = bold;
+        rng.Style.Font.Size = fontSize;
+        rng.Style.HorizontalAlignment = horizontalAlignment;
+    }
+
+    private static void SetRangeFormula(ExcelRange rng, string formula, bool bold, int fontSize,
+        ExcelHorizontalAlignment horizontalAlignment)
+    {
+        rng.Formula = formula;
         rng.Style.Font.Bold = bold;
         rng.Style.Font.Size = fontSize;
         rng.Style.HorizontalAlignment = horizontalAlignment;
