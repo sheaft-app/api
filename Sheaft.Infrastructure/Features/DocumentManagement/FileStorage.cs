@@ -1,4 +1,6 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Storage;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
 using Sheaft.Domain;
 using Sheaft.Domain.DocumentManagement;
@@ -26,5 +28,38 @@ public class FileStorage : IFileStorage
             await blobClient.UploadAsync(ms, token);
 
         return Result.Success();
+    }
+
+    public async Task<Result<string>> DownloadDocument(Document document, CancellationToken token)
+    {
+        var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+        await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+        var blobClient = containerClient.GetBlobClient($"users/{document.SupplierIdentifier.Value}/{document.Category}/{document.Identifier.Value}.{document.Extension}");
+
+        var sasBuilder = new BlobSasBuilder
+        {
+            BlobContainerName = _storageOptions.Containers.Documents,
+            BlobName = blobClient.Name,
+            Resource = "b",
+            StartsOn = DateTimeOffset.UtcNow.AddHours(-1),
+            ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(15)
+        };
+
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+        return Result.Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Documents));
+    }
+
+    private string GetBlobSasUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
+    {
+        return new UriBuilder
+        {
+            Scheme = _storageOptions.ContentScheme,
+            Host = _storageOptions.ContentHostname,
+            Path = $"{container}/{blobClient.Name}",
+            Query = sasBuilder
+                .ToSasQueryParameters(new StorageSharedKeyCredential(_storageOptions.Account, _storageOptions.Key))
+                .ToString()
+        }.ToString();
     }
 }
