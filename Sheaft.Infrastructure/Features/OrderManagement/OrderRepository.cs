@@ -33,23 +33,26 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
                 .Where(e => identifiers.Contains(e.Identifier))
                 .ToListAsync(token);
 
+            if (result.Count() != identifiers.Count())
+                return Result.Failure<IEnumerable<Order>>(ErrorKind.NotFound, "orders.some.not.found");
+
             return Result.Success(result.AsEnumerable());
         });
     }
 
-    public Task<Result<IEnumerable<Order>>> Get(DeliveryId identifier, CancellationToken token)
+    public Task<Result<IEnumerable<Order>>> Find(DeliveryId identifier, CancellationToken token)
     {
         return QueryAsync(async () =>
         {
             var result = await Values
                 .Where(e => e.DeliveryIdentifier == identifier)
                 .ToListAsync(token);
-
+            
             return Result.Success(result.AsEnumerable());
         });
     }
 
-    public Task<Result<IEnumerable<Order>>> Get(InvoiceId identifier, CancellationToken token)
+    public Task<Result<IEnumerable<Order>>> Find(InvoiceId identifier, CancellationToken token)
     {
         return QueryAsync(async () =>
         {

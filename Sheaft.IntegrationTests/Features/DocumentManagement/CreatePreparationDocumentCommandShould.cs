@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,10 @@ public class CreatePreparationDocumentCommandShould
     public async Task Insert_Document_Waiting_For_Processing()
     {
         var (context, handler) = InitHandler();
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(new List<OrderId>(), SupplierId.New()),
+        var supplier = context.Suppliers.Single();
+        var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
+        
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -33,9 +37,10 @@ public class CreatePreparationDocumentCommandShould
     public async Task Insert_Document_And_Retrieve_Params()
     {
         var (context, handler) = InitHandler();
-        var orderIdentifiers = new List<OrderId> {OrderId.New(), OrderId.New()};
+        var supplier = context.Suppliers.Single();
+        var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
 
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, SupplierId.New()),
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -45,11 +50,64 @@ public class CreatePreparationDocumentCommandShould
             document.GetParams<PreparationDocumentParams>(new DocumentParamsHandler()).OrderIdentifiers.Count());
     }
 
-    private (AppDbContext, CreatePreparationDocumentHandler) InitHandler()
+    [Test]
+    public async Task Fail_If_Order_Not_Found()
+    {
+        var (context, handler) = InitHandler();
+        var orderIdentifiers = new List<OrderId> {OrderId.New()};
+
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, SupplierId.New()),
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+    }
+    
+    [Test]
+    public async Task Switch_Pending_Orders_To_Accepted_If_AutoAccept_True()
+    {
+        var (context, handler) = InitHandler(false);
+        var supplier = context.Suppliers.Single();
+        var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
+        
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsSuccess);
+        var orders = context.Orders.ToList();
+        Assert.IsTrue(orders.All(o => o.Status == OrderStatus.Accepted));
+    }
+
+    private (AppDbContext, CreatePreparationDocumentHandler) InitHandler(bool accept = true)
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<CreatePreparationDocumentHandler>();
         var handler = new CreatePreparationDocumentHandler(uow, new DocumentParamsHandler());
+        var supplierId = AccountId.New();
+        var customerId = AccountId.New();
 
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerId, new DeliveryDay(DayOfWeek.Friday)}};
+        var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
+
+        DataHelpers.InitContext(context,
+            new List<AccountId> {customerId},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierId, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierId, supplierProducts}});
+        
+        var supplier = context.Suppliers.First();
+        var customer = context.Customers.First();
+
+        var order1 = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
+        if(accept)
+            order1.Accept();
+        
+        context.Add(order1);
+        
+        var order2 = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
+        if(accept)
+            order2.Accept();
+        
+        context.Add(order2);
+        context.SaveChanges();
+        
         return (context, handler);
     }
 }

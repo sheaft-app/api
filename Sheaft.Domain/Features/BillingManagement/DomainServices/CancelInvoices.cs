@@ -31,7 +31,7 @@ public class CancelInvoices : ICancelInvoices
 
         var invoice = invoiceResult.Value;
         
-        var ordersResult = await _orderRepository.Get(invoiceIdentifier, token);
+        var ordersResult = await _orderRepository.Find(invoiceIdentifier, token);
         if (ordersResult.IsFailure)
             return Result.Failure<string>(ordersResult);
 

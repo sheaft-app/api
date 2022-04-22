@@ -24,7 +24,7 @@ public class RemoveInvoiceDraftHandler : ICommandHandler<RemoveInvoiceDraftComma
         if (invoice.Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.remove.requires.draft");
         
-        var ordersResult = await _uow.Orders.Get(invoice.Identifier, token);
+        var ordersResult = await _uow.Orders.Find(invoice.Identifier, token);
         if (ordersResult.IsFailure)
             return Result.Failure(ordersResult);
 

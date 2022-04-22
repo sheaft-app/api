@@ -62,7 +62,7 @@ internal static class DataHelpers
                         OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
                             new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
 
-                order.Publish(new OrderReference("test"), order.Lines);
+                order.Publish(new OrderReference(Guid.NewGuid().ToString("N")), order.Lines);
             }
 
             return order;

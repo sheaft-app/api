@@ -58,7 +58,7 @@ public class DeliverOrders : IDeliverOrders
         
         _deliveryRepository.Update(delivery);
 
-        var ordersResult = await _orderRepository.Get(delivery.Identifier, token);
+        var ordersResult = await _orderRepository.Find(delivery.Identifier, token);
         if (ordersResult.IsFailure)
             return Result.Failure(ordersResult);
         

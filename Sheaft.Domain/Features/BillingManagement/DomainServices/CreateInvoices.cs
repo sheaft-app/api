@@ -47,7 +47,7 @@ public class CreateInvoices : ICreateInvoices
         if (customerBillingResult.IsFailure)
             return Result.Failure<Invoice>(customerBillingResult);
 
-        var ordersResult = await _orderRepository.Get(delivery.Identifier, token);
+        var ordersResult = await _orderRepository.Find(delivery.Identifier, token);
         if (ordersResult.IsFailure)
             return Result.Failure<Invoice>(ordersResult);
 

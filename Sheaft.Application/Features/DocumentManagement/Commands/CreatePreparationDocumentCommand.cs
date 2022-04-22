@@ -20,6 +20,17 @@ public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparatio
 
     public async Task<Result<string>> Handle(CreatePreparationDocumentCommand request, CancellationToken token)
     {
+        var ordersResult = await _uow.Orders.Get(request.OrderIdentifiers, token);
+        if (ordersResult.IsFailure)
+            return Result.Failure<string>(ordersResult);
+
+        if(request.AcceptPendingOrders && ordersResult.Value.Any(o => o.Status == OrderStatus.Pending))
+            foreach (var order in ordersResult.Value.Where(o => o.Status == OrderStatus.Pending))
+            {
+                order.Accept();
+                _uow.Orders.Update(order);
+            }
+
         var document = Document.CreatePreparationDocument($"Préparation du {request.CreatedAt:d}", _documentParamsHandler, request.OrderIdentifiers, request.SupplierIdentifier);
         _uow.Documents.Add(document);
         
