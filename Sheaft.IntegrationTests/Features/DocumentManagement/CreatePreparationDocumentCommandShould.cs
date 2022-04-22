@@ -22,7 +22,7 @@ public class CreatePreparationDocumentCommandShould
         var supplier = context.Suppliers.Single();
         var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
         
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier, true),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -40,7 +40,7 @@ public class CreatePreparationDocumentCommandShould
         var supplier = context.Suppliers.Single();
         var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
 
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier, true),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -56,10 +56,25 @@ public class CreatePreparationDocumentCommandShould
         var (context, handler) = InitHandler();
         var orderIdentifiers = new List<OrderId> {OrderId.New()};
 
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, SupplierId.New()),
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, SupplierId.New(), true),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
+    }
+
+    [Test]
+    public async Task Fail_If_Order_Not_Accepted_With_AutoAcceptOrders_False()
+    {
+        var (context, handler) = InitHandler(false);
+        var supplier = context.Suppliers.Single();
+        var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
+
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
+            CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("document.preparation.requires.accepted.orders", result.Error.Code);
     }
     
     [Test]
@@ -69,7 +84,7 @@ public class CreatePreparationDocumentCommandShould
         var supplier = context.Suppliers.Single();
         var orderIdentifiers = context.Orders.Select(o => o.Identifier).ToList();
         
-        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier),
+        var result = await handler.Handle(new CreatePreparationDocumentCommand(orderIdentifiers, supplier.Identifier, true),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);

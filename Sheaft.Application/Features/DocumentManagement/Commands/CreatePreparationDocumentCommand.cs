@@ -3,7 +3,7 @@ using Sheaft.Domain.DocumentManagement;
 
 namespace Sheaft.Application.DocumentManagement;
 
-public record CreatePreparationDocumentCommand(List<OrderId> OrderIdentifiers, SupplierId SupplierIdentifier, bool AcceptPendingOrders = true) : Command<Result<string>>;
+public record CreatePreparationDocumentCommand(List<OrderId> OrderIdentifiers, SupplierId SupplierIdentifier, bool AcceptPendingOrders = false) : Command<Result<string>>;
     
 public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparationDocumentCommand, Result<string>>
 {
@@ -24,12 +24,17 @@ public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparatio
         if (ordersResult.IsFailure)
             return Result.Failure<string>(ordersResult);
 
-        if(request.AcceptPendingOrders && ordersResult.Value.Any(o => o.Status == OrderStatus.Pending))
+        if (ordersResult.Value.Any(o => o.Status != OrderStatus.Accepted))
+        {
+            if (!request.AcceptPendingOrders)
+                return Result.Failure<string>(ErrorKind.BadRequest, "document.preparation.requires.accepted.orders");
+            
             foreach (var order in ordersResult.Value.Where(o => o.Status == OrderStatus.Pending))
             {
                 order.Accept();
                 _uow.Orders.Update(order);
             }
+        }
 
         var document = Document.CreatePreparationDocument($"Préparation du {request.CreatedAt:d}", _documentParamsHandler, request.OrderIdentifiers, request.SupplierIdentifier);
         _uow.Documents.Add(document);
