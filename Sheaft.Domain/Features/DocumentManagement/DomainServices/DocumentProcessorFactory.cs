@@ -15,7 +15,7 @@ public class DocumentProcessorFactory : IDocumentProcessorFactory
     private readonly ICustomerRepository _customerRepository;
     private readonly IDocumentParamsHandler _documentParamsHandler;
     private readonly IPreparationFileGenerator _preparationFileGenerator;
-    private readonly IFileProvider _fileProvider;
+    private readonly IFileStorage _fileStorage;
 
     public DocumentProcessorFactory(
         IDocumentRepository documentRepository,
@@ -23,21 +23,21 @@ public class DocumentProcessorFactory : IDocumentProcessorFactory
         ICustomerRepository customerRepository,
         IDocumentParamsHandler documentParamsHandler,
         IPreparationFileGenerator preparationFileGenerator,
-        IFileProvider fileProvider)
+        IFileStorage fileStorage)
     {
         _documentRepository = documentRepository;
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _documentParamsHandler = documentParamsHandler;
         _preparationFileGenerator = preparationFileGenerator;
-        _fileProvider = fileProvider;
+        _fileStorage = fileStorage;
     }
     
     public IDocumentProcessor GetProcessor(Document document)
     {
         if (document.Kind == DocumentKind.Preparation)
             return new PreparationDocumentProcessor(_documentRepository, _orderRepository, _customerRepository,
-                _documentParamsHandler, _preparationFileGenerator, _fileProvider);
+                _documentParamsHandler, _preparationFileGenerator, _fileStorage);
 
         throw new NotImplementedException();
     }

@@ -18,8 +18,6 @@ namespace Sheaft.IntegrationTests.DocumentManagement;
 
 public class ProcessDocumentCommandShould
 {
-    private static string _urlFile = "https://test.com/file";
-
     [Test]
     public async Task Set_Document_As_Done_And_Set_Url()
     {
@@ -30,7 +28,6 @@ public class ProcessDocumentCommandShould
         Assert.IsTrue(result.IsSuccess);
         var document = context.Documents.Single(d => d.Identifier == documentId);
         Assert.AreEqual(DocumentStatus.Done, document.Status);
-        Assert.AreEqual(_urlFile, document.Url);
     }
 
     [Test]
@@ -51,16 +48,16 @@ public class ProcessDocumentCommandShould
         var (context, uow, logger) = DependencyHelpers.InitDependencies<ProcessDocumentHandler>();
 
         var fileGeneratorMocked = new Mock<IPreparationFileGenerator>();
-        var fileProviderMocked = new Mock<IFileProvider>();
+        var fileProviderMocked = new Mock<IFileStorage>();
         
-        var fileResult = Result.Success(_urlFile);
+        var fileResult = Result.Success();
         if (fileReturnError)
-            fileResult = Result.Failure<string>(ErrorKind.Unexpected, "file.error");
+            fileResult = Result.Failure(ErrorKind.Unexpected, "file.error");
 
         fileGeneratorMocked.Setup(f => f.Generate(It.IsAny<PreparationDocumentData>(), CancellationToken.None))
             .Returns(Task.FromResult(Result.Success(Array.Empty<byte>())));
         
-        fileProviderMocked.Setup(f => f.SaveDocument(It.IsAny<SupplierId>(), It.IsAny<DocumentId>(), It.IsAny<byte[]>(), CancellationToken.None))
+        fileProviderMocked.Setup(f => f.SaveDocument(It.IsAny<Document>(), It.IsAny<byte[]>(), CancellationToken.None))
             .Returns(Task.FromResult(fileResult));
 
         var handler = new ProcessDocumentHandler(uow,

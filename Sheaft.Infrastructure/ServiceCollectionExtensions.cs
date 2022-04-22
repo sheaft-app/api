@@ -139,6 +139,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRetrieveBillingInformation, RetrieveBillingInformation>();
         
         services.AddScoped<IValidateAlteringBatchCapability, ValidateAlteringBatchCapability>();
+        
+        services.AddScoped<IDocumentParamsHandler, DocumentParamsHandler>();
+        services.AddScoped<IFileStorage, FileStorage>();
+        services.AddScoped<IPreparationFileGenerator, PreparationFileGenerator>();
     }
 
     private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)

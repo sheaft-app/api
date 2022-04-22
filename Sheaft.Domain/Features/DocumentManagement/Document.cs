@@ -8,13 +8,14 @@ public class Document : AggregateRoot
     {
     }
 
-    private Document(SupplierId supplierIdentifier, DocumentCategory category, DocumentKind kind, string name, string data)
+    private Document(SupplierId supplierIdentifier, DocumentCategory category, DocumentKind kind, DocumentExtension extension, string name, string data)
     {
         Identifier = DocumentId.New();
         Category = category;
         Kind = kind;
         Status = DocumentStatus.Waiting;
         SupplierIdentifier = supplierIdentifier;
+        Extension = extension;
         Name = name;
         _params = data;
     }
@@ -22,16 +23,16 @@ public class Document : AggregateRoot
     public static Document CreatePreparationDocument(string name, IDocumentParamsHandler documentParamsHandler,
         List<OrderId> orderIdentifiers, SupplierId supplierIdentifier)
     {
-        return new Document(supplierIdentifier, DocumentCategory.Orders, DocumentKind.Preparation, name,
+        return new Document(supplierIdentifier, DocumentCategory.Orders, DocumentKind.Preparation, DocumentExtension.xlsx, name,
             documentParamsHandler.SerializeParams(new PreparationDocumentParams(orderIdentifiers)));
     }
 
     public DocumentId Identifier { get; }
     public DocumentCategory Category { get; }
     public DocumentKind Kind { get; }
+    public DocumentExtension Extension { get; set; }
     public DocumentStatus Status { get; private set; }
     public string Name { get; private set; }
-    public string? Url { get; private set; }
     public SupplierId SupplierIdentifier { get; set; }
     public string? ErrorMessage { get; private set; }
 
@@ -46,9 +47,8 @@ public class Document : AggregateRoot
         return Result.Success();
     }
 
-    public Result CompleteProcessing(string url)
+    public Result CompleteProcessing()
     {
-        Url = url;
         Status = DocumentStatus.Done;
         return Result.Success();
     }

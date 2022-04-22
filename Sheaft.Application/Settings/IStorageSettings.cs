@@ -14,5 +14,7 @@ public interface IStorageSettings
 
     public class StorageContainers
     {
+        public string Documents { get; set; }
+        public string Images { get; set; }
     }
 }

@@ -15,7 +15,7 @@ public class PreparationDocumentProcessor : IDocumentProcessor
     private readonly ICustomerRepository _customerRepository;
     private readonly IDocumentParamsHandler _documentParamsHandler;
     private readonly IPreparationFileGenerator _preparationFileGenerator;
-    private readonly IFileProvider _fileProvider;
+    private readonly IFileStorage _fileStorage;
 
     public PreparationDocumentProcessor(
         IDocumentRepository documentRepository,
@@ -23,14 +23,14 @@ public class PreparationDocumentProcessor : IDocumentProcessor
         ICustomerRepository customerRepository,
         IDocumentParamsHandler documentParamsHandler,
         IPreparationFileGenerator preparationFileGenerator,
-        IFileProvider fileProvider)
+        IFileStorage fileStorage)
     {
         _documentRepository = documentRepository;
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _documentParamsHandler = documentParamsHandler;
         _preparationFileGenerator = preparationFileGenerator;
-        _fileProvider = fileProvider;
+        _fileStorage = fileStorage;
     }
 
     public async Task<Result> Process(DocumentId documentIdentifier, CancellationToken token)
@@ -76,12 +76,11 @@ public class PreparationDocumentProcessor : IDocumentProcessor
         if (generationResult.IsFailure)
             return generationResult;
 
-        var saveResult = await _fileProvider.SaveDocument(document.SupplierIdentifier, document.Identifier,
-            generationResult.Value, token);
+        var saveResult = await _fileStorage.SaveDocument(document, generationResult.Value, token);
         if (saveResult.IsFailure)
             return saveResult;
 
-        var completionResult = document.CompleteProcessing(saveResult.Value);
+        var completionResult = document.CompleteProcessing();
         return completionResult.IsFailure ? completionResult : Result.Success();
     }
 
