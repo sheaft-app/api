@@ -128,10 +128,19 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 .HasMaxLength(Siret.MAXLENGTH)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
 
-            bi.OwnsOne(bie => bie.Address, abie =>
+            bi.OwnsOne(bie => bie.Address, da =>
             {
-                abie.Property(c => c.Postcode)
+                da.Property(a => a.Street)
+                    .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+                da.Property(a => a.Complement)
+                    .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+                da.Property(a => a.Postcode)
                     .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+                da.Property(a => a.City)
+                    .HasMaxLength(Address.CITY_MAXLENGTH);
             });
         });
 
@@ -155,10 +164,19 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 .HasMaxLength(Siret.MAXLENGTH)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
 
-            bi.OwnsOne(bie => bie.Address, abie =>
+            bi.OwnsOne(bie => bie.Address, da =>
             {
-                abie.Property(c => c.Postcode)
+                da.Property(a => a.Street)
+                    .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+                da.Property(a => a.Complement)
+                    .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+                da.Property(a => a.Postcode)
                     .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+                da.Property(a => a.City)
+                    .HasMaxLength(Address.CITY_MAXLENGTH);
             });
         });
         

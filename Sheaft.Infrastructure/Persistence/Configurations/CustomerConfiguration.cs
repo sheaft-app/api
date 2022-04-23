@@ -44,8 +44,17 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             da.Property(a => a.Email)
                 .HasMaxLength(EmailAddress.MAXLENGTH);
             
+            da.Property(a => a.Street)
+                .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+            da.Property(a => a.Complement)
+                .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
             da.Property(a => a.Postcode)
                 .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+            da.Property(a => a.City)
+                .HasMaxLength(Address.CITY_MAXLENGTH);
         });
         
         builder.OwnsOne(c => c.BillingAddress, da =>
@@ -56,16 +65,34 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             da.Property(a => a.Email)
                 .HasMaxLength(EmailAddress.MAXLENGTH);
             
+            da.Property(a => a.Street)
+                .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+            da.Property(a => a.Complement)
+                .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
             da.Property(a => a.Postcode)
                 .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+            da.Property(a => a.City)
+                .HasMaxLength(Address.CITY_MAXLENGTH);
         });
         
         builder.OwnsOne(c => c.Legal, l =>
         {
-            l.OwnsOne(le => le.Address, a =>
+            l.OwnsOne(le => le.Address, da =>
             {
-                a.Property(ad => ad.Postcode)
+                da.Property(a => a.Street)
+                    .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+                da.Property(a => a.Complement)
+                    .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+                da.Property(a => a.Postcode)
                     .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+                da.Property(a => a.City)
+                    .HasMaxLength(Address.CITY_MAXLENGTH);
             });
 
             l.Property(p => p.Siret)

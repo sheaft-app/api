@@ -29,11 +29,23 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
         builder.OwnsOne(d => d.Address, da =>
         {
+            da.Property(b => b.Name)
+                .HasMaxLength(TradeName.MAXLENGTH);
+            
             da.Property(a => a.Email)
                 .HasMaxLength(EmailAddress.MAXLENGTH);
             
+            da.Property(a => a.Street)
+                .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+            da.Property(a => a.Complement)
+                .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
             da.Property(a => a.Postcode)
                 .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+            da.Property(a => a.City)
+                .HasMaxLength(Address.CITY_MAXLENGTH);
         });
         
         builder

@@ -2,7 +2,10 @@
 
 public record Address
 {
+    public const int STREET_MAXLENGTH = 200;
+    public const int COMPLEMENT_MAXLENGTH = 150;
     public const int POSTCODE_MAXLENGTH = 5;
+    public const int CITY_MAXLENGTH = 80;
     protected Address(){}
     public Address(string Street, string? Complement, string Postcode, string City)
     {

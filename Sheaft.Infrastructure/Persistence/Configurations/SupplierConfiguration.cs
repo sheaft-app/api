@@ -36,36 +36,63 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         builder.Property(b => b.TradeName)
             .HasMaxLength(TradeName.MAXLENGTH);
 
-        builder.OwnsOne(c => c.ShippingAddress, ad =>
+        builder.OwnsOne(c => c.ShippingAddress, da =>
         {
-            ad.Property(b => b.Name)
+            da.Property(b => b.Name)
                 .HasMaxLength(TradeName.MAXLENGTH);
-
-            ad.Property(c => c.Email)
+            
+            da.Property(a => a.Email)
                 .HasMaxLength(EmailAddress.MAXLENGTH);
             
-            ad.Property(c => c.Postcode)
+            da.Property(a => a.Street)
+                .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+            da.Property(a => a.Complement)
+                .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+            da.Property(a => a.Postcode)
                 .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+            da.Property(a => a.City)
+                .HasMaxLength(Address.CITY_MAXLENGTH);
         });
         
-        builder.OwnsOne(c => c.BillingAddress, ad =>
+        builder.OwnsOne(c => c.BillingAddress, da =>
         {
-            ad.Property(b => b.Name)
+            da.Property(b => b.Name)
                 .HasMaxLength(TradeName.MAXLENGTH);
             
-            ad.Property(c => c.Email)
+            da.Property(a => a.Email)
                 .HasMaxLength(EmailAddress.MAXLENGTH);
             
-            ad.Property(c => c.Postcode)
+            da.Property(a => a.Street)
+                .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+            da.Property(a => a.Complement)
+                .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+            da.Property(a => a.Postcode)
                 .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+            da.Property(a => a.City)
+                .HasMaxLength(Address.CITY_MAXLENGTH);
         });
         
         builder.OwnsOne(c => c.Legal, l =>
         {
-            l.OwnsOne(le => le.Address, a =>
+            l.OwnsOne(le => le.Address, da =>
             {
-                a.Property(c => c.Postcode)
+                da.Property(a => a.Street)
+                    .HasMaxLength(Address.STREET_MAXLENGTH);
+            
+                da.Property(a => a.Complement)
+                    .HasMaxLength(Address.COMPLEMENT_MAXLENGTH);
+            
+                da.Property(a => a.Postcode)
                     .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            
+                da.Property(a => a.City)
+                    .HasMaxLength(Address.CITY_MAXLENGTH);
             });
 
             l.Property(p => p.Siret)
