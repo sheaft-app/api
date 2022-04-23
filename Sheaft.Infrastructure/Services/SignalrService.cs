@@ -17,13 +17,13 @@ internal class SignalrService : ISignalrService
         _logger = logger;
     }
 
-    public async Task<Result> SendNotificationTo<T>(ProfileId profileIdentifier, string eventName, T content,
+    public async Task<Result> SendNotificationTo<T>(string userIdentifier, string eventName, T content,
         CancellationToken token)
     {
         try
         {
-            await _hubContext.Clients.User(profileIdentifier.Value).SendAsync("event",
-                new {Method = eventName, UserId = profileIdentifier, Content = content}, token);
+            await _hubContext.Clients.User(userIdentifier).SendAsync("event",
+                new {Method = eventName, UserId = userIdentifier, Content = content}, token);
             return Result.Success();
         }
         catch (Exception e)

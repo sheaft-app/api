@@ -2,6 +2,7 @@
 
 public record DeliveryReference
 {
+    public const int MAXLENGTH = 20;
     private DeliveryReference(){}
     
     public DeliveryReference(string value)

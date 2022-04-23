@@ -150,7 +150,7 @@ public class CancelInvoiceCommandShould
             invoice.MarkAsSent();
 
         if (payed)
-            invoice.MarkAsPayed("", PaymentKind.Check, DateTimeOffset.Now);
+            invoice.MarkAsPayed(new PaymentReference("test"), PaymentKind.Check, DateTimeOffset.Now);
 
         context.Add(order);
         context.Add(invoice);

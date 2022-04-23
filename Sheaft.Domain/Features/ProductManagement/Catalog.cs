@@ -2,6 +2,7 @@
 
 public class Catalog : AggregateRoot
 {
+    public const int NAME_MAXLENGTH = 80;
     private List<CatalogProduct> _products = new List<CatalogProduct>();
 
     private Catalog()

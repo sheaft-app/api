@@ -29,16 +29,22 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
         
         builder
             .Property(p => p.Number)
+            .HasMaxLength(40)
             .HasConversion(number => number.Value, value => new BatchNumber(value));
 
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(supplierIdentifier => supplierIdentifier.Value, value => new SupplierId(value));
 
         builder
             .Property(p => p.Date)
             .HasConversion(date => new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc), value => DateOnly.FromDateTime(value));
 
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();

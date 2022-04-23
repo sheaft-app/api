@@ -8,7 +8,7 @@ public class Document : AggregateRoot
     {
     }
 
-    private Document(SupplierId supplierIdentifier, DocumentCategory category, DocumentKind kind, DocumentExtension extension, string name, string data)
+    private Document(SupplierId supplierIdentifier, DocumentCategory category, DocumentKind kind, DocumentExtension extension, DocumentName name, string data)
     {
         Identifier = DocumentId.New();
         Category = category;
@@ -20,7 +20,7 @@ public class Document : AggregateRoot
         _params = data;
     }
 
-    public static Document CreatePreparationDocument(string name, IDocumentParamsHandler documentParamsHandler,
+    public static Document CreatePreparationDocument(DocumentName name, IDocumentParamsHandler documentParamsHandler,
         List<OrderId> orderIdentifiers, SupplierId supplierIdentifier)
     {
         return new Document(supplierIdentifier, DocumentCategory.Orders, DocumentKind.Preparation, DocumentExtension.xlsx, name,
@@ -32,7 +32,7 @@ public class Document : AggregateRoot
     public DocumentKind Kind { get; }
     public DocumentExtension Extension { get; set; }
     public DocumentStatus Status { get; private set; }
-    public string Name { get; private set; }
+    public DocumentName Name { get; private set; }
     public SupplierId SupplierIdentifier { get; set; }
     public string? ErrorMessage { get; private set; }
 

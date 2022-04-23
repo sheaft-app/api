@@ -36,10 +36,12 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder
             .Property(p => p.Name)
+            .HasMaxLength(ProductName.MAXLENGTH)
             .HasConversion(name => name.Value, value => new ProductName(value));
 
         builder
             .Property(p => p.Reference)
+            .HasMaxLength(ProductReference.MAXLENGTH)
             .HasConversion(code => code.Value, value => new ProductReference(value));
 
         builder
@@ -48,7 +50,12 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

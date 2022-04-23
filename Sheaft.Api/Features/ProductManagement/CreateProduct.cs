@@ -5,6 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Api.ProductManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.PRODUCTS)]
 public class CreateProduct : Feature
 {
@@ -16,9 +17,14 @@ public class CreateProduct : Feature
     [HttpPost("")]
     public async Task<ActionResult<string>> Post([FromBody] CreateProductRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateProductCommand(data.Name, data.Code, data.Description, data.Price, data.Vat, data.ReturnableIdentifier != null ? new ReturnableId(data.ReturnableIdentifier) : null, CurrentSupplierId), token);
+        var result =
+            await Mediator.Execute(
+                new CreateProductCommand(data.Name, data.Code, data.Description, data.Price, data.Vat,
+                    data.ReturnableIdentifier != null ? new ReturnableId(data.ReturnableIdentifier) : null,
+                    CurrentSupplierId), token);
         return HandleCommandResult(result);
     }
 }
 
-public record CreateProductRequest(string Name, string? Code, int Price, int Vat, string? Description, string? ReturnableIdentifier);
+public record CreateProductRequest(string Name, string? Code, int Price, int Vat, string? Description,
+    string? ReturnableIdentifier);

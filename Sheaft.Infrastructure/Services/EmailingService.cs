@@ -23,7 +23,7 @@ internal class EmailingService : IEmailingService
     public async Task<Result> SendTemplatedEmail<T>(string toEmail, string toName, string subject,
         string templateId, T data, bool isHtml, CancellationToken token)
     {
-        var content = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data);
+        var content = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data ?? throw new ArgumentNullException(nameof(data)));
         var msg = new SendEmailRequest
         {
             Destination = new Destination

@@ -2,6 +2,7 @@
 
 public record ReturnableName
 {
+    public const int MAXLENGTH = 80;
     private ReturnableName(){}
 
     public ReturnableName(string value)

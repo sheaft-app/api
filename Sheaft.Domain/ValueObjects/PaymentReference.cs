@@ -1,15 +1,15 @@
 ﻿namespace Sheaft.Domain;
 
-public record OrderReference
+public record PaymentReference
 {
     public const int MAXLENGTH = 20;
-    private OrderReference(){}
+    private PaymentReference(){}
     
-    public OrderReference(string value)
+    public PaymentReference(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidOperationException("Order code is required");
-        
+            throw new InvalidOperationException("Payment reference is required");
+
         Value = value;
     }
 

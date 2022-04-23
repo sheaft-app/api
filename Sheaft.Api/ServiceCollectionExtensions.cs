@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Sheaft.Application;
 using Sheaft.Infrastructure;
+#pragma warning disable CS8601
+#pragma warning disable CS8602
 
 namespace Sheaft.Api;
 

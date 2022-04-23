@@ -1,4 +1,5 @@
 ﻿using Sheaft.Application;
+#pragma warning disable CS8618
 
 namespace Sheaft.Infrastructure;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Sheaft.Domain;
 using Sheaft.Domain.AgreementManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -37,6 +38,22 @@ internal class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
             
             dd.ToTable("Agreement_DeliveryDays");
         });
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
+        builder
+            .Property(c => c.CustomerIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
+        builder
+            .Property(c => c.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
+        builder
+            .Property(c => c.CatalogIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

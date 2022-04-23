@@ -29,7 +29,7 @@ internal class PdfGenerator : IPdfGenerator
         var objectSettings = new ObjectSettings
         {
             PagesCount = true,
-            HtmlContent = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data),
+            HtmlContent = await RazorTemplateEngine.RenderAsync($"~/Templates/{templateId}.cshtml", data ?? throw new ArgumentNullException(nameof(data))),
             WebSettings = {DefaultEncoding = "utf-8"},
         };
 

@@ -4,6 +4,6 @@ public record CustomerId(string Value)
 {
     public static CustomerId New()
     {
-        return new CustomerId(Guid.NewGuid().ToString("N"));
+        return new CustomerId(Nanoid.Nanoid.Generate(Constants.IDS_ALPHABET, Constants.IDS_LENGTH));
     }
 }

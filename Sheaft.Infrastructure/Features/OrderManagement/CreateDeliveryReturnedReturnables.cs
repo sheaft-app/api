@@ -42,7 +42,7 @@ public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnab
         }
         catch (Exception e)
         {
-            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 

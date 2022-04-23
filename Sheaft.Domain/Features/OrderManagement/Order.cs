@@ -4,11 +4,10 @@ public class Order : AggregateRoot
 {
     private Order(){}
     
-    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderReference? reference = null, DateTimeOffset? publishedOn = null, string? externalCode = null)
+    private Order(OrderStatus status, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<OrderLine>? lines = null, OrderReference? reference = null)
     {
         Identifier = OrderId.New();
         Reference = reference;
-        ExternalCode = externalCode;
         Status = status;
         SupplierIdentifier = supplierIdentifier;
         CustomerIdentifier = customerIdentifier;
@@ -26,7 +25,6 @@ public class Order : AggregateRoot
     public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
     public TotalVatPrice TotalVatPrice { get; private set; }
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
-    public string? ExternalCode { get; private set; }
     public OrderStatus Status { get; private set; }
     public DateTimeOffset? PublishedOn { get; private set; }
     public DateTimeOffset? FulfilledOn { get; private set; }

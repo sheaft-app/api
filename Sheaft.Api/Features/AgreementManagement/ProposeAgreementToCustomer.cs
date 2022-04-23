@@ -5,6 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Api.AgreementManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.CUSTOMERS)]
 public class ProposeAgreementToCustomer : Feature
 {

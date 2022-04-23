@@ -6,6 +6,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Api.BatchManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.BATCHES)]
 public class CreateBatch : Feature
 {

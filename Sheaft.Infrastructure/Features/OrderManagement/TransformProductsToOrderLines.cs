@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
@@ -53,20 +54,24 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
             
             lines.AddRange(productsToTransform
                 .Where(p => p.Product.Returnable != null)
-                .Select(cp => 
-                    OrderLine.CreateReturnableLine(
-                        cp.Product.Returnable.Identifier, 
-                        cp.Product.Returnable.Reference, 
-                        cp.Product.Returnable.Name, 
-                        GetProductQuantity(cp.Product.Identifier, productsToProcess), 
-                        cp.Product.Returnable.UnitPrice, 
-                        cp.Product.Returnable.Vat)));
+                .Select(cp =>
+                {
+                    Debug.Assert(cp.Product.Returnable != null, "cp.Product.Returnable != null");
+                    
+                    return OrderLine.CreateReturnableLine(
+                        cp.Product.Returnable.Identifier,
+                        cp.Product.Returnable.Reference,
+                        cp.Product.Returnable.Name,
+                        GetProductQuantity(cp.Product.Identifier, productsToProcess),
+                        cp.Product.Returnable.UnitPrice,
+                        cp.Product.Returnable.Vat);
+                }));
 
             return Result.Success(lines.AsEnumerable());
         }
         catch (Exception e)
         {
-            return Result.Failure<IEnumerable<OrderLine>>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<IEnumerable<OrderLine>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 

@@ -39,7 +39,7 @@ public class DownloadDocumentCommandShould
 
         var handler = new DownloadDocumentHandler(uow, fileStorageMocked.Object);
 
-        var document = Document.CreatePreparationDocument("tests", new DocumentParamsHandler(), 
+        var document = Document.CreatePreparationDocument(new DocumentName("tests"), new DocumentParamsHandler(), 
             new List<OrderId>(), SupplierId.New());
         
         context.Add(document);

@@ -29,10 +29,12 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
 
         builder
             .Property(p => p.Name)
+            .HasMaxLength(ReturnableName.MAXLENGTH)
             .HasConversion(name => name.Value, value => new ReturnableName(value));
 
         builder
             .Property(p => p.Reference)
+            .HasMaxLength(ReturnableReference.MAXLENGTH)
             .HasConversion(reference => reference.Value, value => new ReturnableReference(value));
 
         builder
@@ -45,8 +47,13 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
         
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
 
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();

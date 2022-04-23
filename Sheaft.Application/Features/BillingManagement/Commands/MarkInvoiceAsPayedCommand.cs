@@ -21,7 +21,7 @@ public class MarkInvoiceAsPayedHandler : ICommandHandler<MarkInvoiceAsPayedComma
             return invoiceResult;
 
         var invoice = invoiceResult.Value;
-        var result = invoice.MarkAsPayed(request.Reference, request.Kind, request.PayedOn);
+        var result = invoice.MarkAsPayed(new PaymentReference(request.Reference), request.Kind, request.PayedOn);
         if (result.IsFailure)
             return result;
         

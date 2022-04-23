@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Sheaft.Domain;
@@ -13,6 +14,7 @@ using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence.Configurations;
 using Sheaft.Infrastructure.Persistence.Converters;
+#pragma warning disable CS8618
 
 namespace Sheaft.Infrastructure.Persistence;
 
@@ -21,6 +23,7 @@ public interface IDbContext
     public DbSet<TEntity> Set<TEntity>() where TEntity : class;
 }
 
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 internal class AppDbContext : DbContext, IDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options)

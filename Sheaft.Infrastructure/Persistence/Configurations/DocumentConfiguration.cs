@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
-using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.DocumentManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -29,15 +28,21 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
             .ValueGeneratedOnAddOrUpdate();
         
         builder
-            .Property(p => p.Identifier)
-            .HasConversion(vat => vat.Value, value => new DocumentId(value));
-        
-        builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
 
         builder
             .Property("_params");
+
+        builder
+            .Property(p => p.Name)
+            .HasMaxLength(DocumentName.MAXLENGTH)
+            .HasConversion(vat => vat.Value, value => new DocumentName(value));
+            
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

@@ -10,6 +10,8 @@ using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+#pragma warning disable CS8601
+#pragma warning disable CS8618
 
 namespace Sheaft.Api.Pages;
 

@@ -33,7 +33,7 @@ public class RetrieveOrderCustomer : IRetrieveOrderCustomer
         }
         catch (Exception e)
         {
-            return Result.Failure<DeliveryAddress>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<DeliveryAddress>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 }

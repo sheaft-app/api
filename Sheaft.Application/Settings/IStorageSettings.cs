@@ -1,5 +1,9 @@
-﻿namespace Sheaft.Application;
+﻿using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CS8618
+namespace Sheaft.Application;
+
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public interface IStorageSettings
 {
     string Account { get; set; }
@@ -12,6 +16,7 @@ public interface IStorageSettings
     string ContentScheme { get; set; }
     bool RequireEtag { get; set; }
 
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class StorageContainers
     {
         public string Documents { get; set; }

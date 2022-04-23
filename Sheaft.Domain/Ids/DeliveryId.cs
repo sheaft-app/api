@@ -4,6 +4,6 @@ public record DeliveryId(string Value)
 {
     public static DeliveryId New()
     {
-        return new DeliveryId(Guid.NewGuid().ToString("N"));
+        return new DeliveryId(Nanoid.Nanoid.Generate(Constants.IDS_ALPHABET, Constants.IDS_LENGTH));
     }
 }

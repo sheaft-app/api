@@ -36,7 +36,7 @@ public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparatio
             }
         }
 
-        var document = Document.CreatePreparationDocument($"Préparation du {request.CreatedAt:d}", _documentParamsHandler, request.OrderIdentifiers, request.SupplierIdentifier);
+        var document = Document.CreatePreparationDocument(new DocumentName($"Préparation du {request.CreatedAt:d}"), _documentParamsHandler, request.OrderIdentifiers, request.SupplierIdentifier);
         _uow.Documents.Add(document);
         
         var result = await _uow.Save(token);

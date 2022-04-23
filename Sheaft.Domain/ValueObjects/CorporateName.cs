@@ -2,6 +2,8 @@
 
 public record CorporateName
 {
+    public const int MAXLENGTH = 100;
+
     public CorporateName(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

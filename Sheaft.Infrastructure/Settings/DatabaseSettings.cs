@@ -1,4 +1,5 @@
 ﻿using Sheaft.Application;
+#pragma warning disable CS8618
 
 namespace Sheaft.Infrastructure;
 
@@ -11,10 +12,7 @@ public abstract class DatabaseSettings : IDatabaseSettings
     public string User { get; set; }
     public string Password { get; set; }
 
-    public string ConnectionString
-    {
-        get => string.Format(Url, Server, Port, Name, User, Password);
-    }
+    public string ConnectionString => string.Format(Url, Server, Port, Name, User, Password);
 }
 
 public class AppDatabaseSettings : DatabaseSettings

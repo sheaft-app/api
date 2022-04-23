@@ -27,10 +27,18 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 
-        builder.OwnsOne(d => d.Address);
+        builder.OwnsOne(d => d.Address, da =>
+        {
+            da.Property(a => a.Email)
+                .HasMaxLength(EmailAddress.MAXLENGTH);
+            
+            da.Property(a => a.Postcode)
+                .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+        });
         
         builder
             .Property(p => p.Reference)
+            .HasMaxLength(DeliveryReference.MAXLENGTH)
             .HasConversion(code => code != null ? code.Value : null, value => value != null ? new DeliveryReference(value) : null);
         
         builder
@@ -41,6 +49,16 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         {
             l.Property<long>("Id");
             l.HasKey("Id");
+            
+            l
+                .Property(c => c.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
+
+            l.Property(c => c.Reference)
+                .HasMaxLength(Constants.LINE_REFERENCE_MAXLENGTH);
+            
+            l.Property(c => c.Name)
+                .HasMaxLength(Constants.LINE_NAME_MAXLENGTH);
             
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
@@ -65,6 +83,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             {
                 o
                     .Property(p => p.Reference)
+                    .HasMaxLength(OrderReference.MAXLENGTH)
                     .HasConversion(unitPrice => unitPrice.Value, value => new OrderReference(value));
             });
             
@@ -74,6 +93,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                 
                 b
                     .Property(p => p.BatchIdentifier)
+                    .HasMaxLength(Constants.IDS_LENGTH)
                     .HasConversion(batch => batch.Value, value => new BatchId(value));
             
                 b.WithOwner().HasForeignKey("DeliveryLineId");
@@ -98,6 +118,10 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         {
             l.Property<long>("Id");
             l.HasKey("Id");
+            
+            l
+                .Property(c => c.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
             
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
@@ -131,6 +155,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                 
                 b
                     .Property(p => p.BatchIdentifier)
+                    .HasMaxLength(Constants.IDS_LENGTH)
                     .HasConversion(batch => batch.Value, value => new BatchId(value));
             
                 b.WithOwner().HasForeignKey("DeliveryAdjustmentId");
@@ -138,6 +163,10 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
                 b.ToTable("DeliveryAdjustment_Batches");
             });
+            
+            l
+                .Property(c => c.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
 
             l
                 .Property(p => p.Quantity)
@@ -163,11 +192,15 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         builder
             .Property(p => p.TotalOnSalePrice)
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
-
         
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

@@ -139,7 +139,7 @@ public class Invoice : AggregateRoot
         return Result.Success();
     }
 
-    public Result MarkAsPayed(string reference, PaymentKind kind, DateTimeOffset paymentDate)
+    public Result MarkAsPayed(PaymentReference reference, PaymentKind kind, DateTimeOffset paymentDate)
     {
         if (Status != InvoiceStatus.Sent && Kind == InvoiceKind.Invoice)
             return Result.Failure(ErrorKind.BadRequest, "invoice.payed.requires.sent");

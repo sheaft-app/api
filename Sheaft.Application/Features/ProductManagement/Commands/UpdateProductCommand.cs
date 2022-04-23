@@ -10,7 +10,6 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
     private readonly IUnitOfWork _uow;
     private readonly IRetrieveDefaultCatalog _retrieveDefaultCatalog;
     private readonly IHandleProductCode _handleProductCode;
-    private readonly IReturnableRepository _returnableRepository;
 
     public UpdateProductHandler(
         IUnitOfWork uow,

@@ -32,7 +32,7 @@ public class RetrieveDeliveryDays : IRetrieveDeliveryDays
         }
         catch (Exception e)
         {
-            return Result.Failure<Maybe<IEnumerable<DeliveryDay>>>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<Maybe<IEnumerable<DeliveryDay>>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 }

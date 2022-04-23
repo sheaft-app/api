@@ -4,6 +4,7 @@ using Sheaft.Application.ProductManagement;
 
 namespace Sheaft.Api.ProductManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.RETURNABLES)]
 public class CreateReturnable : Feature
 {
@@ -15,7 +16,9 @@ public class CreateReturnable : Feature
     [HttpPost("")]
     public async Task<ActionResult<string>> Post([FromBody] CreateReturnableRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateReturnableCommand(data.Name, data.Code,  data.Price, data.Vat, CurrentSupplierId), token);
+        var result =
+            await Mediator.Execute(
+                new CreateReturnableCommand(data.Name, data.Code, data.Price, data.Vat, CurrentSupplierId), token);
         return HandleCommandResult(result);
     }
 }

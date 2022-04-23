@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
 using Sheaft.Domain;
 using Sheaft.Infrastructure;
-using Sheaft.Infrastructure.AccountManagement;
+#pragma warning disable CS8604
 
 namespace Sheaft.Api;
 
@@ -68,20 +68,18 @@ public class Feature : ControllerBase
 
     private ActionResult<PaginatedResults<T>> GetPaginatedResults<T>(PagedResult<T> orders)
     {
-        return new ObjectResult(new PaginatedResults<T>
-        {
-            Items = orders.Items,
-            Next = orders.PageInfo.Skip < orders.TotalItems
+        return new ObjectResult(new PaginatedResults<T>(
+            orders.Items,
+            orders.PageInfo.Skip < orders.TotalItems
                 ? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}?page={orders.PageInfo.Page + 1}&take={orders.PageInfo.Take}"
                 : null,
-            Previous = orders.PageInfo.Page > 1
+            orders.PageInfo.Page > 1
                 ? $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}{HttpContext.Request.Path}?page={orders.PageInfo.Page - 1}&take={orders.PageInfo.Take}"
                 : null,
-            PageNumber = orders.PageInfo.Page,
-            ItemsPerPage = orders.PageInfo.Take,
-            TotalItems = orders.TotalItems,
-            TotalPages = orders.TotalPages
-        }){StatusCode = StatusCodes.Status200OK};
+            orders.PageInfo.Page,
+            orders.PageInfo.Take,
+            orders.TotalItems,
+            orders.TotalPages)){StatusCode = StatusCodes.Status200OK};
     }
 
     private ActionResult HandleErrorResult(Result result)
@@ -123,11 +121,22 @@ public class Feature : ControllerBase
 
 public record PaginatedResults<T>
 {
-    public IEnumerable<T> Items { get; set; }
-    public string? Next { get; set; }
-    public string? Previous { get; set; }
-    public int PageNumber { get; set; }
-    public int ItemsPerPage { get; set; }
-    public int TotalItems { get; set; }
-    public int TotalPages { get; set; }
+    public PaginatedResults(IEnumerable<T> items, string? next, string? previous, int pageNumber, int itemsPerPage, int totalItems, int totalPages)
+    {
+        Items = items;
+        Next = next;
+        Previous = previous;
+        PageNumber = pageNumber;
+        ItemsPerPage = itemsPerPage;
+        TotalItems = totalItems;
+        TotalPages = totalPages;
+    }
+
+    public IEnumerable<T> Items { get; private set; }
+    public string? Next { get; private set; }
+    public string? Previous { get; private set; }
+    public int PageNumber { get; private set; }
+    public int ItemsPerPage { get; private set; }
+    public int TotalItems { get; private set; }
+    public int TotalPages { get; private set; }
 }

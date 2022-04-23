@@ -4,6 +4,6 @@ public record OrderId(string Value)
 {
     public static OrderId New()
     {
-        return new OrderId(Guid.NewGuid().ToString("N"));
+        return new OrderId(Nanoid.Nanoid.Generate(Constants.IDS_ALPHABET, Constants.IDS_LENGTH));
     }
 }

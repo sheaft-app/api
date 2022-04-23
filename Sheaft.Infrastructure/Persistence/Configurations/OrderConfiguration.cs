@@ -30,6 +30,17 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder.OwnsMany(o => o.Lines, l =>
         {
+            l.Property(c => c.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
+            
+            l
+                .Property(p => p.Reference)
+                .HasMaxLength(Constants.LINE_REFERENCE_MAXLENGTH);
+            
+            l
+                .Property(p => p.Name)
+                .HasMaxLength(Constants.LINE_NAME_MAXLENGTH);
+            
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
                 pi
@@ -65,7 +76,16 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder
             .Property(p => p.Reference)
+            .HasMaxLength(OrderReference.MAXLENGTH)
             .HasConversion(code => code != null ? code.Value : null, value => value != null ? new OrderReference(value) : null);
+
+        builder
+            .Property(p => p.InvoiceIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+        
+        builder
+            .Property(p => p.DeliveryIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .Property(p => p.TotalWholeSalePrice)
@@ -81,11 +101,17 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
         
         builder
             .Property(p => p.CustomerIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new CustomerId(value));
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

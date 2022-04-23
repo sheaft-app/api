@@ -26,7 +26,7 @@ public class ValidateAlteringBatchCapability : IValidateAlteringBatchCapability
         }
         catch (Exception e)
         {
-            return Result.Failure<bool>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<bool>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 }

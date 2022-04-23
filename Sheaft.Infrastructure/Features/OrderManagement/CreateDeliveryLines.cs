@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.OrderManagement;
@@ -29,18 +30,26 @@ public class CreateDeliveryLines : ICreateDeliveryLines
             var orderedProducts = orders
                 .SelectMany(o => o.Lines.Where(l => l.LineKind == OrderLineKind.Product));
 
-            var productIdentifiers = productLines.Select(p => p.ProductIdentifier).ToList();
+            var productIdentifiers = productLines
+                .Select(p => p.ProductIdentifier)
+                .ToList();
+            
             var products = await _context
                 .Set<Product>()
-                .Where(r => r.SupplierIdentifier == delivery.SupplierIdentifier &&
-                            productIdentifiers.Contains(r.Identifier))
+                .Where(r => 
+                    r.SupplierIdentifier == delivery.SupplierIdentifier 
+                    && productIdentifiers.Contains(r.Identifier))
                 .ToListAsync(token);
 
             if (products.Count != productIdentifiers.Count)
                 return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound,
                     "delivery.lines.products.not.found");
 
-            var batchIdentifiers = productLines.SelectMany(op => op.BatchIdentifiers).Distinct().ToList();
+            var batchIdentifiers = productLines
+                .SelectMany(op => op.BatchIdentifiers)
+                .Distinct()
+                .ToList();
+            
             if (batchIdentifiers.Any())
             {
                 var batches = await _context
@@ -53,17 +62,25 @@ public class CreateDeliveryLines : ICreateDeliveryLines
                         "delivery.lines.batches.not.found");
             }
 
-            var deliveryProductLines = products.Select(p =>
+            var deliveryProductLines = products
+                .Select(p =>
                     DeliveryLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
                         GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
                         p.Vat, GetProductOrder(p.Identifier, productLines),
                         GetProductBatches(p.Identifier, productLines)))
                 .ToList();
 
-            var deliveryReturnableLines = products.Where(p => p.Returnable != null).Select(p =>
-                DeliveryLine.CreateReturnableLine(p.Returnable.Identifier, p.Returnable.Reference, p.Returnable.Name,
-                    GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
-                    p.Vat, GetProductOrder(p.Identifier, productLines))).ToList();
+            var deliveryReturnableLines = products
+                .Where(p => p.Returnable != null)
+                .Select(p =>
+                {
+                    Debug.Assert(p.Returnable != null, "p.Returnable != null");
+
+                    return DeliveryLine.CreateReturnableLine(p.Returnable.Identifier, p.Returnable.Reference,
+                        p.Returnable.Name,
+                        GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
+                        p.Vat, GetProductOrder(p.Identifier, productLines));
+                }).ToList();
 
             var deliveryLines = new List<DeliveryLine>();
             deliveryLines.AddRange(deliveryProductLines.Where(dp => dp.Quantity.Value > 0));
@@ -73,7 +90,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
         }
         catch (Exception e)
         {
-            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 

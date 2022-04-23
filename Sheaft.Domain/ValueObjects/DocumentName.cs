@@ -1,11 +1,11 @@
 ﻿namespace Sheaft.Domain;
 
-public record ProductName
+public record DocumentName
 {
     public const int MAXLENGTH = 150;
-    private ProductName(){}
+    private DocumentName(){}
 
-    public ProductName(string value)
+    public DocumentName(string value)
     {
         Value = value;
     }

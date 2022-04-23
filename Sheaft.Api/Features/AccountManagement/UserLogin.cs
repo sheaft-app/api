@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
 using Sheaft.Application.AccountManagement;
-using Sheaft.Domain;
+#pragma warning disable CS8618
 
 namespace Sheaft.Api.AccountManagement;
 
@@ -27,6 +28,7 @@ public class UserLogin : Feature
 
 public record LoginRequest(string Username, string Password);
 
+[SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
 public record LoginResponse
 {
     [JsonPropertyName("access_token")]

@@ -32,6 +32,12 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             l.Property<long>("Id");
             l.HasKey("Id");
             
+            l.Property(c => c.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
+            
+            l.Property(c => c.Name)
+                .HasMaxLength(Constants.LINE_NAME_MAXLENGTH);
+
             l.OwnsOne(ol => ol.PriceInfo, pi =>
             {
                 pi
@@ -50,21 +56,23 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                     .Property(p => p.OnSalePrice)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
-            
+
             l.OwnsOne(ol => ol.Order, o =>
             {
                 o
                     .Property(p => p.Reference)
+                    .HasMaxLength(OrderReference.MAXLENGTH)
                     .HasConversion(value => value.Value, value => new OrderReference(value));
             });
-            
+
             l.OwnsOne(ol => ol.Delivery, d =>
             {
                 d
                     .Property(p => p.Reference)
+                    .HasMaxLength(DeliveryReference.MAXLENGTH)
                     .HasConversion(value => value.Value, value => new DeliveryReference(value));
             });
-            
+
             l
                 .Property(p => p.Quantity)
                 .HasConversion(quantity => quantity.Value, value => new Quantity(value));
@@ -77,17 +85,25 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
             l.ToTable("Invoice_Lines");
         });
-        
+
         builder.OwnsMany(o => o.Payments, l =>
         {
             l.WithOwner().HasForeignKey("InvoiceId");
             l.HasKey("InvoiceId", "Reference");
 
+            l
+                .Property(p => p.Reference)
+                .HasMaxLength(PaymentReference.MAXLENGTH)
+                .HasConversion(vat => vat.Value, value => new PaymentReference(value));
+
             l.ToTable("Invoice_Payments");
         });
-        
+
         builder.OwnsMany(o => o.CreditNotes, l =>
         {
+            l.Property(c => c.InvoiceIdentifier)
+                .HasMaxLength(Constants.IDS_LENGTH);
+            
             l.HasKey("InvoiceId", "InvoiceIdentifier");
             l.ToTable("Invoice_CreditNotes");
         });
@@ -96,36 +112,65 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
         {
             bi
                 .Property(p => p.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH)
                 .HasConversion(identifier => identifier.Value, value => new CustomerId(value));
 
             bi
+                .Property(p => p.Name)
+                .HasMaxLength(TradeName.MAXLENGTH);
+            
+            bi
+                .Property(p => p.Email)
+                .HasMaxLength(EmailAddress.MAXLENGTH);
+            
+            bi
                 .Property(p => p.Siret)
+                .HasMaxLength(Siret.MAXLENGTH)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
 
-            bi.OwnsOne(bie => bie.Address);
+            bi.OwnsOne(bie => bie.Address, abie =>
+            {
+                abie.Property(c => c.Postcode)
+                    .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            });
         });
 
         builder.OwnsOne(b => b.Supplier, bi =>
         {
             bi
                 .Property(p => p.Identifier)
+                .HasMaxLength(Constants.IDS_LENGTH)
                 .HasConversion(identifier => identifier.Value, value => new SupplierId(value));
 
             bi
+                .Property(p => p.Name)
+                .HasMaxLength(TradeName.MAXLENGTH);
+            
+            bi
+                .Property(p => p.Email)
+                .HasMaxLength(EmailAddress.MAXLENGTH);
+            
+            bi
                 .Property(p => p.Siret)
+                .HasMaxLength(Siret.MAXLENGTH)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
 
-            bi.OwnsOne(bie => bie.Address);
+            bi.OwnsOne(bie => bie.Address, abie =>
+            {
+                abie.Property(c => c.Postcode)
+                    .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            });
         });
-
+        
         builder
             .Property(p => p.Reference)
+            .HasMaxLength(InvoiceReference.MAXLENGTH)
             .HasConversion(code => code != null ? code.Value : null,
                 value => value != null ? new InvoiceReference(value) : null);
 
         builder
             .Property(p => p.DueDate)
-            .HasConversion(dueOn => dueOn != null ? (DateTimeOffset?)dueOn.Value : null,
+            .HasConversion(dueOn => dueOn != null ? (DateTimeOffset?) dueOn.Value : null,
                 value => value != null ? new InvoiceDueDate(value.Value) : null);
 
         builder
@@ -141,11 +186,16 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
 
         builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+
+        builder
             .HasIndex(c => c.Identifier)
             .IsUnique();
-        
+
         // builder
         //     .HasIndex("Supplier_Identifier", "Reference")
+        //     .HasFilter("WHERE [Reference] IS NOT NULL")
         //     .IsUnique();
 
         builder.ToTable("Invoice");

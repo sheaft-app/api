@@ -38,11 +38,17 @@ internal class CatalogConfiguration : IEntityTypeConfiguration<Catalog>
 
         builder
             .Property(p => p.Name)
+            .HasMaxLength(Catalog.NAME_MAXLENGTH)
             .HasConversion(name => name.Value, value => new CatalogName(value));
 
         builder
             .Property(p => p.SupplierIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
             .HasIndex(c => c.Identifier)

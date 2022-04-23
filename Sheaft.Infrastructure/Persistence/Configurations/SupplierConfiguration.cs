@@ -27,18 +27,54 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
             .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
             .ValueGeneratedOnAddOrUpdate();
 
-        builder.OwnsOne(c => c.ShippingAddress);
-        builder.OwnsOne(c => c.BillingAddress);
+        builder.Property(c => c.Email)
+            .HasMaxLength(EmailAddress.MAXLENGTH);
+        
+        builder.Property(c => c.Phone)
+            .HasMaxLength(PhoneNumber.MAXLENGTH);
+        
+        builder.Property(b => b.TradeName)
+            .HasMaxLength(TradeName.MAXLENGTH);
+
+        builder.OwnsOne(c => c.ShippingAddress, ad =>
+        {
+            ad.Property(b => b.Name)
+                .HasMaxLength(TradeName.MAXLENGTH);
+
+            ad.Property(c => c.Email)
+                .HasMaxLength(EmailAddress.MAXLENGTH);
+            
+            ad.Property(c => c.Postcode)
+                .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+        });
+        
+        builder.OwnsOne(c => c.BillingAddress, ad =>
+        {
+            ad.Property(b => b.Name)
+                .HasMaxLength(TradeName.MAXLENGTH);
+            
+            ad.Property(c => c.Email)
+                .HasMaxLength(EmailAddress.MAXLENGTH);
+            
+            ad.Property(c => c.Postcode)
+                .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+        });
         
         builder.OwnsOne(c => c.Legal, l =>
         {
-            l.OwnsOne(le => le.Address);
+            l.OwnsOne(le => le.Address, a =>
+            {
+                a.Property(c => c.Postcode)
+                    .HasMaxLength(Address.POSTCODE_MAXLENGTH);
+            });
 
             l.Property(p => p.Siret)
+                .HasMaxLength(Siret.MAXLENGTH)
                 .HasConversion(siret => siret.Value, value => new Siret(value));
             
             l
                 .Property(p => p.CorporateName)
+                .HasMaxLength(CorporateName.MAXLENGTH)
                 .HasConversion(name => name.Value, value => new CorporateName(value));
         });
          
@@ -48,8 +84,13 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         
         builder
             .Property(p => p.AccountIdentifier)
+            .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(identifier => identifier.Value, value => new AccountId(value));
         
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();

@@ -4,6 +4,6 @@ public record CatalogId(string Value)
 {
     public static CatalogId New()
     {
-        return new CatalogId(Guid.NewGuid().ToString("N"));
+        return new CatalogId(Nanoid.Nanoid.Generate(Constants.IDS_ALPHABET, Constants.IDS_LENGTH));
     }
 }

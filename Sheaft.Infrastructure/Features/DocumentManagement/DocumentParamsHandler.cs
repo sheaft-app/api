@@ -6,7 +6,7 @@ namespace Sheaft.Infrastructure.DocumentManagement;
 
 internal class DocumentParamsHandler : IDocumentParamsHandler
 {
-    public T GetParams<T>(string data) where T: class
+    public T? GetParams<T>(string data) where T: class
     {
         return JsonConvert.DeserializeObject<T>(data);
     }

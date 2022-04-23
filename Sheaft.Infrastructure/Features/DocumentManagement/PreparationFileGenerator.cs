@@ -22,7 +22,7 @@ public class PreparationFileGenerator : IPreparationFileGenerator
         }
         catch (Exception e)
         {
-            return Task.FromResult(Result.Failure<byte[]>(ErrorKind.Unexpected, "preparation.file.generation.error"));
+            return Task.FromResult(Result.Failure<byte[]>(ErrorKind.Unexpected, "preparation.file.generation.error", e.Message));
         }
     }
 

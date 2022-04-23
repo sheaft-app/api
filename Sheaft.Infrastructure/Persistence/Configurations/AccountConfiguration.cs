@@ -43,8 +43,16 @@ internal class AccountConfiguration : IEntityTypeConfiguration<Account>
         
         builder
             .Property(p => p.Username)
+            .HasMaxLength(EmailAddress.MAXLENGTH)
             .HasConversion(username => username.Value, value => new Username(value));
 
+        builder.Property(b => b.Email)
+            .HasMaxLength(EmailAddress.MAXLENGTH);
+        
+        builder
+            .Property(c => c.Identifier)
+            .HasMaxLength(Constants.IDS_LENGTH);
+            
         builder
             .HasIndex(c => c.Identifier)
             .IsUnique();

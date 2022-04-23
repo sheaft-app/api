@@ -4,6 +4,6 @@ public record AgreementId(string Value)
 {
     public static AgreementId New()
     {
-        return new AgreementId(Guid.NewGuid().ToString("N"));
+        return new AgreementId(Nanoid.Nanoid.Generate(Constants.IDS_ALPHABET, Constants.IDS_LENGTH));
     }
 }

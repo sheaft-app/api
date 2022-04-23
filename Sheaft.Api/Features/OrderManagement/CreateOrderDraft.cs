@@ -5,6 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Api.OrderManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.ORDERS)]
 public class CreateOrderDraft : Feature
 {
@@ -16,7 +17,9 @@ public class CreateOrderDraft : Feature
     [HttpPost("drafts")]
     public async Task<ActionResult<string>> Post([FromBody] CreateOrderDraftRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateOrderDraftCommand(new SupplierId(data.SupplierIdentifier), CurrentCustomerId), token);
+        var result =
+            await Mediator.Execute(
+                new CreateOrderDraftCommand(new SupplierId(data.SupplierIdentifier), CurrentCustomerId), token);
         return HandleCommandResult(result);
     }
 }

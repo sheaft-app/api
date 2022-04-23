@@ -1,4 +1,5 @@
-﻿using Sheaft.Domain;
+﻿using System.Diagnostics;
+using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
@@ -23,6 +24,9 @@ public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result
         var orderResult = await _uow.Orders.Get(request.OrderIdentifier, token);
         if (orderResult.IsFailure)
             return orderResult;
+        
+        Debug.Assert(orderResult.Value.Reference != null, "orderResult.Value.Reference != null");
+        Debug.Assert(orderResult.Value.PublishedOn != null, "orderResult.Value.PublishedOn != null");
         
         var result = await _fulfillOrders.Fulfill(request.OrderIdentifier, request.DeliveryLines.Select(
             dl => new DeliveryProductBatches(new DeliveryOrder(orderResult.Value.Reference, orderResult.Value.PublishedOn.Value), new ProductId(dl.ProductIdentifier), new Quantity(dl.Quantity),

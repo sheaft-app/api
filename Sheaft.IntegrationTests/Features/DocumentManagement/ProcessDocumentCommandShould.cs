@@ -90,7 +90,7 @@ public class ProcessDocumentCommandShould
         var orders = new List<OrderId> {order.Identifier};
 
         var document =
-            Document.CreatePreparationDocument("test", new DocumentParamsHandler(), orders, supplier.Identifier);
+            Document.CreatePreparationDocument(new DocumentName("test"), new DocumentParamsHandler(), orders, supplier.Identifier);
         
         context.Add(document);
         context.SaveChanges();

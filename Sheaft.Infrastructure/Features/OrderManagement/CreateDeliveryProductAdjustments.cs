@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
@@ -27,6 +28,9 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                         .ThenInclude(p => p.Returnable)
                 .SingleOrDefaultAsync(c => c.IsDefault && c.SupplierIdentifier == delivery.SupplierIdentifier, token);
 
+            if (catalog == null)
+                return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound, "catalog.not.found");
+            
             var productsToAdjust = productAdjustments.Select(p => p.Identifier).ToList();
             var products = catalog.Products.Where(p => productsToAdjust.Contains(p.Product.Identifier))
                 .ToList();
@@ -66,6 +70,8 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                 .Where(p => p.Product.Returnable != null)
                 .Select(p =>
                 {
+                    Debug.Assert(p.Product.Returnable != null, "p.Product.Returnable != null");
+                    
                     var existingReturnable =
                         delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Returnable.Identifier.Value);
 
@@ -92,9 +98,13 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
 
             return Result.Success(adjustedProducts.AsEnumerable());
         }
+        catch (InvalidOperationException e)
+        {
+            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.BadRequest, e.Message);
+        }
         catch (Exception e)
         {
-            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error");
+            return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.Unexpected, "database.error", e.Message);
         }
     }
 
@@ -113,6 +123,9 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
     private DeliveryOrder GetProductOrder(ProductId productIdentifier, IEnumerable<DeliveryLine> deliveryLines)
     {
         var order = deliveryLines.Single(p => p.Identifier == productIdentifier.Value).Order;
+        if (order == null)
+            throw new InvalidOperationException("deliveryline.order.null");
+        
         return new DeliveryOrder(order.Reference, order.PublishedOn);
     }
 }

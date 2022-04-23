@@ -4,13 +4,15 @@ namespace Sheaft.Domain;
 
 public record Siret
 {
+    public const int MAXLENGTH = 14;
+    
     private Siret(){}
     public Siret(string value)
     {
         if(string.IsNullOrWhiteSpace(value))
             throw new InvalidOperationException(nameof(value));
             
-        if (value.Length != 14)
+        if (value.Length != MAXLENGTH)
             throw new InvalidOperationException("Siret must be 14 characters.");
 
         if (!Regex.IsMatch(value, "[0-9]"))

@@ -22,7 +22,7 @@ internal class SheaftMediator : ISheaftMediator
         _logger = logger;
     }
 
-    public void Publish(IDomainEvent notification, string jobName = null)
+    public void Publish(IDomainEvent notification, string? jobName = null)
     {
         var name = jobName ?? notification.GetType().Name;
         _logger.LogTrace("Publishing integration event {Name}", name);
@@ -30,21 +30,21 @@ internal class SheaftMediator : ISheaftMediator
             bridge.Execute(name, notification, CancellationToken.None));
     }
 
-    public void Post(ICommand<Result> command, string jobName = null)
+    public void Post(ICommand<Result> command, string? jobName = null)
     {
         var name = jobName ?? command.GetType().Name;
         _logger.LogTrace("Posting command {Name}", name);
         _backgroundJobClient.Enqueue<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
     }
 
-    public void Post<T>(ICommand<Result<T>> command, string jobName = null)
+    public void Post<T>(ICommand<Result<T>> command, string? jobName = null)
     {
         var name = jobName ?? command.GetType().Name;
         _logger.LogTrace("Posting command<T> {Name}", name);
         _backgroundJobClient.Enqueue<SheaftDispatcher>(bridge => bridge.Execute(name, command, CancellationToken.None));
     }
 
-    public void Schedule(ICommand<Result> command, TimeSpan delay, string jobName = null)
+    public void Schedule(ICommand<Result> command, TimeSpan delay, string? jobName = null)
     {
         var name = jobName ?? command.GetType().Name;
         _logger.LogTrace("Scheduling command {Name}", name);
@@ -52,7 +52,7 @@ internal class SheaftMediator : ISheaftMediator
             delay);
     }
 
-    public void Schedule<T>(ICommand<Result<T>> command, TimeSpan delay, string jobName = null)
+    public void Schedule<T>(ICommand<Result<T>> command, TimeSpan delay, string? jobName = null)
     {
         var name = jobName ?? command.GetType().Name;
         _logger.LogTrace("Scheduling command<T> {Name}", name);

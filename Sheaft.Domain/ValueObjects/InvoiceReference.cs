@@ -2,6 +2,7 @@
 
 public record InvoiceReference
 {
+    public const int MAXLENGTH = 20;
     private InvoiceReference(){}
     
     public InvoiceReference(string value)

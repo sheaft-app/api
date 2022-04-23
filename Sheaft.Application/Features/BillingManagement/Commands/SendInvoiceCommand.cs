@@ -1,4 +1,5 @@
-﻿using Sheaft.Application.Mailer;
+﻿using System.Diagnostics;
+using Sheaft.Application.Mailer;
 using Sheaft.Domain;
 
 namespace Sheaft.Application.BillingManagement;
@@ -28,6 +29,8 @@ public class SendInvoiceHandler : ICommandHandler<SendInvoiceCommand, Result>
         var result = invoice.MarkAsSent(request.CreatedAt);
         if (result.IsFailure)
             return result;
+
+        Debug.Assert(invoice.PublishedOn != null, "invoice.PublishedOn != null");
         
         var emailResult = await _emailingService.SendTemplatedEmail(invoice.Customer.Email.Value, invoice.Customer.Name,
             $"{(invoice.Kind == InvoiceKind.Invoice ? "Facture" : "Avoir")} n°{invoice.Identifier.Value} du {invoice.PublishedOn.Value:d}",

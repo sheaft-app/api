@@ -2,6 +2,8 @@
 using MediatR;
 using Sheaft.Application;
 using Sheaft.Domain;
+#pragma warning disable CS8600
+#pragma warning disable CS8603
 
 namespace Sheaft.Infrastructure;
 

@@ -2,6 +2,7 @@
 
 public record ProductReference
 {
+    public const int MAXLENGTH = 20;
     private ProductReference(){}
     
     public ProductReference(string value)

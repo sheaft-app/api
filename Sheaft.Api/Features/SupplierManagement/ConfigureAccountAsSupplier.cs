@@ -1,14 +1,11 @@
-using Mapster;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
-using Sheaft.Application.AccountManagement;
 using Sheaft.Application.Models;
 using Sheaft.Application.SupplierManagement;
 
 namespace Sheaft.Api.SupplierManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.ACCOUNT)]
 public class ConfigureAccountAsSupplier : Feature
 {

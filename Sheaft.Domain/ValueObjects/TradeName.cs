@@ -2,6 +2,8 @@
 
 public record TradeName
 {
+    public const int MAXLENGTH = 100;
+
     public TradeName(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

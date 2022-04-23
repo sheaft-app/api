@@ -5,6 +5,7 @@ using Sheaft.Application.CustomerManagement;
 
 namespace Sheaft.Api.CustomerManagement;
 
+#pragma warning disable CS8604
 [Route(Routes.ACCOUNT)]
 public class ConfigureAccountAsCustomer : Feature
 {

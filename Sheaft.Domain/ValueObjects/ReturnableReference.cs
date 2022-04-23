@@ -2,6 +2,7 @@
 
 public record ReturnableReference
 {
+    public const int MAXLENGTH = 20;
     private ReturnableReference(){}
 
     public ReturnableReference(string value)
