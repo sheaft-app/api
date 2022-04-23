@@ -158,6 +158,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             {
                 o
                     .Property(p => p.Reference)
+                    .HasMaxLength(OrderReference.MAXLENGTH)
                     .HasConversion(unitPrice => unitPrice.Value, value => new OrderReference(value));
             });
             
@@ -179,6 +180,14 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             l
                 .Property(c => c.Identifier)
                 .HasMaxLength(Constants.IDS_LENGTH);
+            
+            l
+                .Property(c => c.Reference)
+                .HasMaxLength(Constants.LINE_REFERENCE_MAXLENGTH);
+            
+            l
+                .Property(c => c.Name)
+                .HasMaxLength(Constants.LINE_NAME_MAXLENGTH);
 
             l
                 .Property(p => p.Quantity)
