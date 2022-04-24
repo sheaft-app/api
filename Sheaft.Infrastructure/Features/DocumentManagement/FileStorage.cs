@@ -50,6 +50,17 @@ public class FileStorage : IFileStorage
         return Result.Success(GetBlobSasUri(blobClient, sasBuilder, _storageOptions.Containers.Documents));
     }
 
+    public async Task<Result> RemoveDocument(Document document, CancellationToken token)
+    {
+        var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
+        await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
+
+        var blobClient = containerClient.GetBlobClient($"users/{document.SupplierIdentifier.Value}/{document.Category}/{document.Identifier.Value}.{document.Extension}");
+        var result = await blobClient.DeleteIfExistsAsync(cancellationToken: token);
+        
+        return !result.Value ? Result.Failure() : Result.Success();
+    }
+
     private string GetBlobSasUri(BlobClient blobClient, BlobSasBuilder sasBuilder, string container)
     {
         return new UriBuilder

@@ -14,30 +14,29 @@ using Sheaft.IntegrationTests.Helpers;
 
 namespace Sheaft.IntegrationTests.DocumentManagement;
 
-public class DownloadDocumentCommandShould
+public class RemoveDocumentCommandShould
 {
-    private const string _expectedUrl = "https://myurl/document/id";
-    
     [Test]
-    public async Task Generate_Url()
+    public async Task Remove_Document_From_Database()
     {
         var (documentId, context, handler) = InitHandler();
         
-        var result = await handler.Handle(new DownloadDocumentCommand(documentId), CancellationToken.None);
+        var result = await handler.Handle(new RemoveDocumentCommand(documentId), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(_expectedUrl, result.Value);
+        var document = context.Documents.SingleOrDefault(d => d.Identifier == documentId);
+        Assert.IsNull(document);
     }
 
-    private (DocumentId, AppDbContext, DownloadDocumentHandler) InitHandler()
+    private (DocumentId, AppDbContext, RemoveDocumentHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<DownloadDocumentHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<RemoveDocumentHandler>();
 
         var fileStorageMocked = new Mock<IFileStorage>();
-        fileStorageMocked.Setup(f => f.DownloadDocument(It.IsAny<Document>(), CancellationToken.None))
-            .Returns(Task.FromResult(Result.Success(_expectedUrl)));
+        fileStorageMocked.Setup(f => f.RemoveDocument(It.IsAny<Document>(), CancellationToken.None))
+            .Returns(Task.FromResult(Result.Success()));
 
-        var handler = new DownloadDocumentHandler(uow, fileStorageMocked.Object);
+        var handler = new RemoveDocumentHandler(uow, fileStorageMocked.Object);
 
         var document = Document.CreatePreparationDocument(new DocumentName("tests"), new DocumentParamsHandler(), 
             new List<OrderId>(), SupplierId.New());
