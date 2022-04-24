@@ -5,7 +5,7 @@ namespace Sheaft.Domain;
 public record ProductReference
 {
     public const int MAXLENGTH = 20;
-    public const string VALIDATION_REGEX = "[0-9]{13}";
+    public const string VALIDATION_REGEX = "^[0-9]{13}$";
     private ProductReference(){}
     
     public ProductReference(int value)
@@ -26,7 +26,8 @@ public record ProductReference
         if (!regexMatch.Success)
             return Result.Failure<ProductReference>(ErrorKind.BadRequest, "product.reference.next.invalid.reference");
 
-        var orderNumber = int.Parse(regexMatch.Value);
+        var currentId = regexMatch.Value.Substring(0, regexMatch.Value.Length - 1);
+        var orderNumber = int.Parse(currentId);
         return Result.Success(new ProductReference(++orderNumber));
     }
 

@@ -5,13 +5,13 @@ namespace Sheaft.Domain;
 public record DeliveryReference
 {
     public const int MAXLENGTH = 20;
-    private readonly string ReferenceFormat = "LIV{0}#####";
-    public const string VALIDATION_REGEX = "LIV(?<Year>[0-9]{4})(?<DeliveryNumber>[0-9]{5})";
+    private readonly string ReferenceFormat = "LIV{0}-#####";
+    public const string VALIDATION_REGEX = "^LIV(?<Year>[0-9]{4})-(?<DeliveryNumber>[0-9]{5})$";
     private DeliveryReference(){}
     
-    public DeliveryReference(int value)
+    public DeliveryReference(int value, DateTimeOffset? currentDateTime = null)
     {
-        Value = value.ToString(string.Format(ReferenceFormat, DateTimeOffset.UtcNow.Year));
+        Value = value.ToString(string.Format(ReferenceFormat, (currentDateTime ?? DateTimeOffset.UtcNow).Year));
     }
     
     public DeliveryReference(string value)
@@ -34,13 +34,13 @@ public record DeliveryReference
         return Result.Success(new DeliveryReference(++deliveryNumber));
     }
 
-    public string GetDeliveryNoteReference()
+    public DeliveryNoteReference GetDeliveryNoteReference()
     {
-        return Value.Replace("LIV", "BL");
+        return new DeliveryNoteReference(this);
     }
 
-    public string GetDeliveryReceiptReference()
+    public DeliveryReceiptReference GetDeliveryReceiptReference()
     {
-        return Value.Replace("LIV", "BR");
+        return new DeliveryReceiptReference(this);
     }
 }

@@ -5,14 +5,14 @@ namespace Sheaft.Domain;
 public record CreditNoteReference : BillingReference
 {
     public const int MAXLENGTH = 20;
-    private readonly string ReferenceFormat = "AVR{0}-####";
-    public const string VALIDATION_REGEX = "AVR(?<Year>[0-9]{4})-(?<InvoiceNumber>[0-9]{4})";
+    private readonly string ReferenceFormat = "AVR{0}-#####";
+    public const string VALIDATION_REGEX = "^AVR(?<Year>[0-9]{4})-(?<InvoiceNumber>[0-9]{5})$";
     
     private CreditNoteReference(){}
     
-    public CreditNoteReference(int value)
+    public CreditNoteReference(int value, DateTimeOffset? currentDateTime = null)
     {
-        Value = value.ToString(string.Format(ReferenceFormat, DateTimeOffset.UtcNow.Year));
+        Value = value.ToString(string.Format(ReferenceFormat, (currentDateTime ?? DateTimeOffset.UtcNow).Year));
     }
     
     public CreditNoteReference(string value)

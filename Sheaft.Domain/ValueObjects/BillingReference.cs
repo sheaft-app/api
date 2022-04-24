@@ -13,14 +13,14 @@ public record BillingReference
 public record InvoiceReference : BillingReference
 {
     public const int MAXLENGTH = 20;
-    private readonly string ReferenceFormat = "FCT{0}-####";
-    public const string VALIDATION_REGEX = "FCT(?<Year>[0-9]{4})-(?<InvoiceNumber>[0-9]{4})";
+    private readonly string ReferenceFormat = "FCT{0}-#####";
+    public const string VALIDATION_REGEX = "^FCT(?<Year>[0-9]{4})-(?<InvoiceNumber>[0-9]{5})$";
     
     private InvoiceReference(){}
     
-    public InvoiceReference(int value)
+    public InvoiceReference(int value, DateTimeOffset? currentDateTime = null)
     {
-        Value = value.ToString(string.Format(ReferenceFormat, DateTimeOffset.UtcNow.Year));
+        Value = value.ToString(string.Format(ReferenceFormat, (currentDateTime ?? DateTimeOffset.UtcNow).Year));
     }
     
     public InvoiceReference(string value)

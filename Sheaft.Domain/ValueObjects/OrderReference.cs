@@ -5,13 +5,13 @@ namespace Sheaft.Domain;
 public record OrderReference
 {
     public const int MAXLENGTH = 20;
-    private readonly string ReferenceFormat = "CD{0}#####";
-    public const string VALIDATION_REGEX = "CD(?<Year>[0-9]{4})(?<OrderNumber>[0-9]{5})";
+    private readonly string ReferenceFormat = "CD{0}-#####";
+    public const string VALIDATION_REGEX = "^CD(?<Year>[0-9]{4})-(?<OrderNumber>[0-9]{5})$";
     private OrderReference(){}
     
-    public OrderReference(int value)
+    public OrderReference(int value, DateTimeOffset? currentDateTime = null)
     {
-        Value = value.ToString(string.Format(ReferenceFormat, DateTimeOffset.UtcNow.Year));
+        Value = value.ToString(string.Format(ReferenceFormat, (currentDateTime ?? DateTimeOffset.UtcNow).Year));
     }
     
     public OrderReference(string value)
