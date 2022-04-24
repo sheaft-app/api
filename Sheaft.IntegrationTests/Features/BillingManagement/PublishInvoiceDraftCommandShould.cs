@@ -30,7 +30,7 @@ public class PublishInvoiceDraftCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(InvoiceStatus.Published, invoice.Status);
         Assert.AreEqual(command.CreatedAt, invoice.PublishedOn);
-        Assert.AreEqual("FCT2022-0001", invoice.Reference.Value);
+        Assert.AreEqual("FCT2022-00001", invoice.Reference.Value);
     }
     
     [Test]

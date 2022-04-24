@@ -31,9 +31,9 @@ public class PreparationFileGeneratorShould
         Assert.AreEqual("Client1", worksheet.Cells["B2"].GetValue<string>());
         Assert.AreEqual("Client2", worksheet.Cells["E2"].GetValue<string>());
         
-        Assert.AreEqual("CD202200001", worksheet.Cells["B3"].GetValue<string>());
-        Assert.AreEqual("CD202200002", worksheet.Cells["C3"].GetValue<string>());
-        Assert.AreEqual("CD202200003", worksheet.Cells["E3"].GetValue<string>());
+        Assert.AreEqual("CD2022-00001", worksheet.Cells["B3"].GetValue<string>());
+        Assert.AreEqual("CD2022-00002", worksheet.Cells["C3"].GetValue<string>());
+        Assert.AreEqual("CD2022-00003", worksheet.Cells["E3"].GetValue<string>());
         
         Assert.AreEqual("PRODUCT 1", worksheet.Cells["A4"].GetValue<string>());
         Assert.AreEqual(5, worksheet.Cells["B4"].GetValue<int>());
