@@ -50,6 +50,8 @@ internal static class DataHelpers
             new BillingAddress(accountIdentifier.Value, new EmailAddress("test@est.com"), "70000", "Test", "7000", "city"));
     }
     
+    private static int currentOrder = 0;
+    
     public static Order CreateOrderWithLines(Supplier supplier, Customer customer, bool isDraft, IEnumerable<Product>? products = null)
     {
         if (!isDraft)
@@ -62,7 +64,7 @@ internal static class DataHelpers
                         OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
                             new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
 
-                order.Publish(new OrderReference(Guid.NewGuid().ToString("N")), order.Lines);
+                order.Publish(new OrderReference(++currentOrder), order.Lines);
             }
 
             return order;

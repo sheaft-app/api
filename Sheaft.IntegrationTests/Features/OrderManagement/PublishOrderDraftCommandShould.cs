@@ -85,7 +85,7 @@ public class PublishOrderDraftCommandShould
         var (context, handler) = InitHandler();
 
         var order = InitDraft(context, true);
-        order.Publish(new OrderReference("test"), order.Lines);
+        order.Publish(new OrderReference(0), order.Lines);
         context.SaveChanges();
 
         var result =
@@ -185,7 +185,7 @@ public class PublishOrderDraftCommandShould
                 new PublishOrders(
                     new OrderRepository(context),
                     new DeliveryRepository(context),
-                    new GenerateOrderCode(),
+                    new GenerateOrderCode(context),
                     new TransformProductsToOrderLines(context),
                     new ValidateOrderDeliveryDate(new RetrieveDeliveryDays(context)),
                     new RetrieveOrderCustomer(context),

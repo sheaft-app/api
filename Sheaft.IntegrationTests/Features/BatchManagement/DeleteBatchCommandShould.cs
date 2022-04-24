@@ -73,7 +73,7 @@ public class DeleteBatchCommandShould
         if (useBatch)
         {
             var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
-            order.Publish(new OrderReference("test"), order.Lines);
+            order.Publish(new OrderReference(0), order.Lines);
             
             var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow),
                 new DeliveryAddress("", new EmailAddress("test@est.com"), "", "", "", ""),
@@ -84,7 +84,7 @@ public class DeleteBatchCommandShould
                 o.Name, o.Quantity, o.PriceInfo.UnitPrice, o.Vat,
                 new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>{batch.Identifier})));
 
-            delivery.Schedule(new DeliveryReference("test"), delivery.ScheduledAt, delivery.ScheduledAt.Value);
+            delivery.Schedule(new DeliveryReference(0), delivery.ScheduledAt, delivery.ScheduledAt.Value);
 
             context.Add(order);
             context.Add(delivery);

@@ -65,15 +65,15 @@ public class SendInvoiceCommandShould
             new List<InvoiceLine>
             {
                 InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
             });
 
         if(publish)
-            invoice.Publish(new InvoiceReference("Test"));
+            invoice.Publish(new InvoiceReference(0));
 
         if (sent)
             invoice.MarkAsSent();

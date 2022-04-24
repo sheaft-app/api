@@ -179,7 +179,7 @@ public class FulfillOrdersCommandShould
 
         var handler = new FulfillOrdersHandler(uow,
             new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context),
-                new GenerateDeliveryCode(), new CreateDeliveryLines(context)));
+                new GenerateDeliveryCode(context), new CreateDeliveryLines(context)));
 
         return (context, handler);
     }

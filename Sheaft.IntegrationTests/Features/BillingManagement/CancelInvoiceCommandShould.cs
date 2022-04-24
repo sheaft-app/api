@@ -115,7 +115,7 @@ public class CancelInvoiceCommandShould
 
         var handler = new CancelInvoiceHandler(uow,
             new CancelInvoices(new InvoiceRepository(context), new OrderRepository(context),
-                new GenerateCreditNoteCode()));
+                new GenerateCreditNoteCode(context)));
 
         var supplierId = SupplierId.New();
         var customerId = CustomerId.New();
@@ -134,17 +134,17 @@ public class CancelInvoiceCommandShould
             new List<InvoiceLine>
             {
                 InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            }, new InvoiceReference("Test"));
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+            }, new InvoiceReference(0));
 
         order.AttachInvoice(invoice.Identifier);
 
         if (publish)
-            invoice.Publish(new InvoiceReference("test"));
+            invoice.Publish(new InvoiceReference(0));
 
         if (sent)
             invoice.MarkAsSent();

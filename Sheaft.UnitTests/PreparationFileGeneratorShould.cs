@@ -31,9 +31,9 @@ public class PreparationFileGeneratorShould
         Assert.AreEqual("Client1", worksheet.Cells["B2"].GetValue<string>());
         Assert.AreEqual("Client2", worksheet.Cells["E2"].GetValue<string>());
         
-        Assert.AreEqual("ORDER1", worksheet.Cells["B3"].GetValue<string>());
-        Assert.AreEqual("ORDER2", worksheet.Cells["C3"].GetValue<string>());
-        Assert.AreEqual("ORDER3", worksheet.Cells["E3"].GetValue<string>());
+        Assert.AreEqual("CD202200001", worksheet.Cells["B3"].GetValue<string>());
+        Assert.AreEqual("CD202200002", worksheet.Cells["C3"].GetValue<string>());
+        Assert.AreEqual("CD202200003", worksheet.Cells["E3"].GetValue<string>());
         
         Assert.AreEqual("PRODUCT 1", worksheet.Cells["A4"].GetValue<string>());
         Assert.AreEqual(5, worksheet.Cells["B4"].GetValue<int>());
@@ -48,29 +48,29 @@ public class PreparationFileGeneratorShould
     
     private PreparationDocumentData _preparationDocumentData = new(new List<ProductToPrepare>
     {
-        new ProductToPrepare(new ProductReference("PDT1"), new ProductName("PRODUCT 1"),
+        new ProductToPrepare(new ProductReference(1), new ProductName("PRODUCT 1"),
             new List<QuantityPerOrder>
             {
-                new QuantityPerOrder(new OrderReference("ORDER1"), new Quantity(5)),
-                new QuantityPerOrder(new OrderReference("ORDER2"), new Quantity(2))
+                new QuantityPerOrder(new OrderReference(1), new Quantity(5)),
+                new QuantityPerOrder(new OrderReference(2), new Quantity(2))
             }),
-        new ProductToPrepare(new ProductReference("PDT2"), new ProductName("PRODUCT 2"),
+        new ProductToPrepare(new ProductReference(2), new ProductName("PRODUCT 2"),
             new List<QuantityPerOrder>
             {
-                new QuantityPerOrder(new OrderReference("ORDER2"), new Quantity(4)),
-                new QuantityPerOrder(new OrderReference("ORDER3"), new Quantity(1))
+                new QuantityPerOrder(new OrderReference(2), new Quantity(4)),
+                new QuantityPerOrder(new OrderReference(3), new Quantity(1))
             })
     },
     new List<ClientOrdersToPrepare>
     {
         new ClientOrdersToPrepare("Client1", new List<OrderReference>
         {
-            new OrderReference("ORDER1"),
-            new OrderReference("ORDER2"),
+            new OrderReference(1),
+            new OrderReference(2),
         }),
         new ClientOrdersToPrepare("Client2", new List<OrderReference>
         {
-            new OrderReference("ORDER3")
+            new OrderReference(3)
         })
     });
 }

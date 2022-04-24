@@ -81,7 +81,7 @@ public class RemoveInvoiceDraftCommandShould
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
         context.Add(order);
 
-        order.Publish(new OrderReference("test"), order.Lines);
+        order.Publish(new OrderReference(0), order.Lines);
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"),
@@ -95,32 +95,30 @@ public class RemoveInvoiceDraftCommandShould
             new List<InvoiceLine>
             {
                 InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
                 InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            }, new InvoiceReference("Test"));
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+            }, new InvoiceReference(0));
     
-        invoice.Publish(new InvoiceReference("test"));
+        invoice.Publish(new InvoiceReference(0));
         
         var creditNote = Invoice.CreateCreditNoteDraft(
             DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
             DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
-            invoice);
-
-        creditNote.UpdateLines(new List<InvoiceLine>
-        {
-            InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-        });
+            invoice, new List<InvoiceLine>
+            {
+                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+            });
 
         if (publishCreditNote)
-            creditNote.Publish(new InvoiceReference("Test"));
+            creditNote.Publish(new CreditNoteReference(0));
 
         context.Add(invoice);
         context.Add(creditNote);

@@ -120,7 +120,7 @@ public class CreateProductCommandShould
         var handler = new CreateProductHandler(
             uow,
             new RetrieveDefaultCatalog(new CatalogRepository(context)),
-            new HandleProductCode(new ProductRepository(context), new GenerateProductCode()));
+            new HandleProductCode(new ProductRepository(context), new GenerateProductCode(context)));
 
         var supplierId = SupplierId.New();
 

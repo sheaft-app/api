@@ -39,7 +39,7 @@ internal class HandleProductCode : IHandleProductCode
     private async Task<Result<ProductReference>> GenerateNextProductCode(string? code, ProductId? productIdentifier, SupplierId supplierIdentifier, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(code))
-            return await _generateProductCode.GenerateNextCode(supplierIdentifier, token);
+            return _generateProductCode.GenerateNextCode(supplierIdentifier);
 
         var existingProductResult = await _productRepository.Find(new ProductReference(code), supplierIdentifier, token);
         if (existingProductResult.IsFailure)

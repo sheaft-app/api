@@ -2,5 +2,5 @@
 
 public interface IGenerateInvoiceCode
 {
-    Task<Result<InvoiceReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token);
+    Result<InvoiceReference> GenerateNextCode(SupplierId supplierIdentifier);
 }

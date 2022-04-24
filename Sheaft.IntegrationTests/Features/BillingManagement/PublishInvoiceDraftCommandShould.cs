@@ -30,7 +30,7 @@ public class PublishInvoiceDraftCommandShould
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(InvoiceStatus.Published, invoice.Status);
         Assert.AreEqual(command.CreatedAt, invoice.PublishedOn);
-        Assert.AreEqual("0000001", invoice.Reference.Value);
+        Assert.AreEqual("FCT2022-0001", invoice.Reference.Value);
     }
     
     [Test]
@@ -83,7 +83,7 @@ public class PublishInvoiceDraftCommandShould
     {
         var (invoice, context, handler) = InitHandler(true);
         var command = new PublishInvoiceDraftCommand(invoice.Identifier);
-        invoice.Publish(new InvoiceReference("test"));
+        invoice.Publish(new InvoiceReference(0));
         context.SaveChanges();
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -100,7 +100,7 @@ public class PublishInvoiceDraftCommandShould
         var handler = new PublishInvoiceDraftHandler(uow,
             new PublishInvoices(
                 new InvoiceRepository(context),
-                new GenerateInvoiceCode(),
+                new GenerateInvoiceCode(context),
                 new RetrieveBillingInformation(context)));
 
         var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
@@ -109,23 +109,23 @@ public class PublishInvoiceDraftCommandShould
         var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
         context.Add(supplier);
 
+        var products = new List<InvoiceLine>();
+        if (addProducts)
+        {
+            products = new List<InvoiceLine> {
+                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
+                    new VatRate(0), new InvoiceDelivery(new DeliveryReference(0), DateTimeOffset.UtcNow),
+                    new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
+            };
+        }
+        
         var invoice = Invoice.CreateInvoice(
             DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
             DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
-            new List<InvoiceLine>());
-        
-        if (addProducts)
-        {
-            invoice.UpdateLines(new List<InvoiceLine>
-            {
-                InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-                InvoiceLine.CreateLineForDeliveryOrder("Test2", "Name2", new Quantity(1), new UnitPrice(2000),
-                    new VatRate(0), new InvoiceDelivery(new DeliveryReference("Test"), DateTimeOffset.UtcNow),
-                    new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow)),
-            });
-        }
+            products);
 
         context.Add(invoice);
         context.SaveChanges();

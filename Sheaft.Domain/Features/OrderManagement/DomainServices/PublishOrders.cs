@@ -59,7 +59,7 @@ public class PublishOrders : IPublishOrders
             lines = linesResult.Value;
         }
 
-        var codeResult = await _generateOrderCode.GenerateNextCode(order.SupplierIdentifier, token);
+        var codeResult = _generateOrderCode.GenerateNextCode(order.SupplierIdentifier);
         if (codeResult.IsFailure)
             return Result.Failure(codeResult);
 

@@ -54,7 +54,7 @@ public class CreateInvoices : ICreateInvoices
         if (ordersResult.Value.Any(o => o.InvoiceIdentifier != null))
             return Result.Failure<Invoice>(ErrorKind.BadRequest, "invoice.order.already.billed");
 
-        var codeResult = await _generateInvoiceCode.GenerateNextCode(supplierBillingResult.Value.Identifier, token);
+        var codeResult = _generateInvoiceCode.GenerateNextCode(supplierBillingResult.Value.Identifier);
         if (codeResult.IsFailure)
             return Result.Failure<Invoice>(codeResult);
 

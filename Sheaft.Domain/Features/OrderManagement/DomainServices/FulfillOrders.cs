@@ -60,7 +60,7 @@ public class FulfillOrders : IFulfillOrders
         if (canDeliverResult.IsFailure)
             return canDeliverResult;
 
-        var deliveryCodeResult = await _generateDeliveryCode.GenerateNextCode(delivery.SupplierIdentifier, token);
+        var deliveryCodeResult = _generateDeliveryCode.GenerateNextCode(delivery.SupplierIdentifier);
         if (deliveryCodeResult.IsFailure)
             return Result.Failure(deliveryCodeResult);
         

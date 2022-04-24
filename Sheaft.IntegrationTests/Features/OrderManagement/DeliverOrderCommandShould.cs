@@ -153,7 +153,7 @@ public class DeliverOrderCommandShould
             o.Name, o.Quantity, o.PriceInfo.UnitPrice, o.Vat,
             new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>())));
         
-        delivery.Schedule(new DeliveryReference(Guid.NewGuid().ToString("N")),
+        delivery.Schedule(new DeliveryReference(0),
             new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)), DateTimeOffset.UtcNow);
 
         context.Add(order);

@@ -70,7 +70,7 @@ public class CreateInvoiceForDeliveryCommandShould
                 new InvoiceRepository(context), 
                 new DeliveryRepository(context),
                 new OrderRepository(context), 
-                new GenerateInvoiceCode(),
+                new GenerateInvoiceCode(context),
                 new RetrieveBillingInformation(context)));
 
         var supplierAccount = AccountId.New();
@@ -90,7 +90,7 @@ public class CreateInvoiceForDeliveryCommandShould
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
         context.Add(order);
 
-        order.Publish(new OrderReference("test"), order.Lines);
+        order.Publish(new OrderReference(0), order.Lines);
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
             new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"),
@@ -100,10 +100,10 @@ public class CreateInvoiceForDeliveryCommandShould
         delivery.UpdateLines(new List<DeliveryLine>
         {
             DeliveryLine.CreateProductLine(product.Identifier, product.Reference, product.Name, new Quantity(2), new ProductUnitPrice(2000),
-                new VatRate(0), new DeliveryOrder(new OrderReference("Test"), DateTimeOffset.UtcNow), null)
+                new VatRate(0), new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow), null)
         });
 
-        delivery.Schedule(new DeliveryReference("Test"), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)));
+        delivery.Schedule(new DeliveryReference(0), new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)));
         delivery.Deliver(new List<DeliveryLine>());
 
         if (createInvoice)
@@ -114,7 +114,7 @@ public class CreateInvoiceForDeliveryCommandShould
                 order.Lines.Select(l => InvoiceLine.CreateLineForDeliveryOrder(l.Identifier, l.Name, l.Quantity,
                     l.PriceInfo.UnitPrice, l.Vat, new InvoiceDelivery(delivery.Reference, delivery.DeliveredOn.Value),
                     new DeliveryOrder(order.Reference, order.PublishedOn.Value))).ToList(),
-                new InvoiceReference("Test"));
+                new InvoiceReference(0));
             
             context.Invoices.Add(invoice);
             

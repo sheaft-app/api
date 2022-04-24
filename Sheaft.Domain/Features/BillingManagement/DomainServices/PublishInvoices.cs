@@ -41,7 +41,7 @@ public class PublishInvoices : IPublishInvoices
         if (billingResult.IsFailure)
             return billingResult;
         
-        var codeResult = await _generateInvoiceCode.GenerateNextCode(invoice.Supplier.Identifier, token);
+        var codeResult = _generateInvoiceCode.GenerateNextCode(invoice.Supplier.Identifier);
         if (codeResult.IsFailure)
             return Result.Failure(codeResult);
 

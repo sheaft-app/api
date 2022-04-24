@@ -41,16 +41,15 @@ public class Invoice : AggregateRoot
     }
 
     public static Invoice CreateInvoice(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines, 
-        DateTimeOffset? currentDateTime = null)
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine> lines)
     {
         return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
     }
 
     public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, Invoice invoice)
+        CustomerBillingInformation customer, Invoice invoice, IEnumerable<InvoiceLine>? lines = null)
     {
-        var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, null,
+        var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, lines,
             $"Avoir sur la facture n°{invoice.Reference.Value} du {invoice.PublishedOn:d}");
 
         var result = invoice.AttachCreditNote(creditNote);
@@ -71,7 +70,7 @@ public class Invoice : AggregateRoot
         return Result.Success();
     }
 
-    public static Result<Invoice> CancelInvoice(Invoice invoice, InvoiceReference creditNoteReference,
+    public static Result<Invoice> CancelInvoice(Invoice invoice, CreditNoteReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
         var lines = invoice.Lines
@@ -87,7 +86,9 @@ public class Invoice : AggregateRoot
             lines,
             $"Avoir d'annulation de la facture n°{invoice.Reference.Value} du {invoice.PublishedOn.Value:d}");
 
-        creditNote.Publish(creditNoteReference, currentDateTime);
+        var publishResult = creditNote.Publish(creditNoteReference, currentDateTime);
+        if (publishResult.IsFailure)
+            return Result.Failure<Invoice>(publishResult);
 
         var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
         return result.IsFailure
@@ -96,7 +97,7 @@ public class Invoice : AggregateRoot
     }
 
     public InvoiceId Identifier { get; }
-    public InvoiceReference? Reference { get; private set; }
+    public BillingReference? Reference { get; private set; }
     public InvoiceDueDate? DueDate { get; private set; }
     public InvoiceStatus Status { get; private set; }
     public InvoiceKind Kind { get; private set; }
@@ -114,13 +115,19 @@ public class Invoice : AggregateRoot
     public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; } = new List<InvoiceCreditNote>();
     public IEnumerable<InvoicePayment> Payments { get; private set; } = new List<InvoicePayment>();
 
-    internal Result Publish(InvoiceReference reference, DateTimeOffset? currentDateTime = null)
+    internal Result Publish(BillingReference reference, DateTimeOffset? currentDateTime = null)
     {
         if (Status != InvoiceStatus.Draft)
             return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.draft");
 
         if (!Lines.Any())
             return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.lines");
+        
+        if(Kind != InvoiceKind.Invoice && reference is not CreditNoteReference)
+            return Result.Failure(ErrorKind.BadRequest, "creditnote.publish.requires.creditnote.reference");
+        
+        if(Kind == InvoiceKind.Invoice && reference is not InvoiceReference)
+            return Result.Failure(ErrorKind.BadRequest, "invoice.publish.requires.invoice.reference");
 
         Reference = reference;
         Status = InvoiceStatus.Published;
@@ -149,15 +156,6 @@ public class Invoice : AggregateRoot
 
         Status = InvoiceStatus.Payed;
         Payments = new List<InvoicePayment> {new InvoicePayment(reference, kind, paymentDate)};
-        return Result.Success();
-    }
-
-    public Result UpdateLines(IEnumerable<InvoiceLine>? lines)
-    {
-        if (Status != InvoiceStatus.Draft)
-            return Result.Failure(ErrorKind.BadRequest, "invoice.update.lines.requires.draft");
-
-        SetLines(lines);
         return Result.Success();
     }
 

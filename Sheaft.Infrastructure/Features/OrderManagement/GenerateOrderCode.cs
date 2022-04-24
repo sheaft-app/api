@@ -1,15 +1,36 @@
 ﻿using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
-using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.OrderManagement;
 
 internal class GenerateOrderCode : IGenerateOrderCode
 {
-    private int code = 0;
-    public Task<Result<OrderReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
+    private static readonly object Locker = new { };
+    private readonly IDbContext _context;
+    private OrderReference? _currentReference;
+
+    public GenerateOrderCode(IDbContext context)
     {
-        code++;
-        return Task.FromResult(Result.Success(new OrderReference(code.ToString("0000000"))));
+        _context = context;
+    }
+
+    public Result<OrderReference> GenerateNextCode(SupplierId supplierIdentifier)
+    {
+        lock (Locker)
+        {
+            _currentReference ??= _context.Set<Order>()
+                .Where(o => o.SupplierIdentifier == supplierIdentifier && o.Reference != null)
+                .OrderByDescending(o => o.Reference)
+                .Select(o => o.Reference)
+                .FirstOrDefault() ?? new OrderReference(0);
+
+            var nextResult = OrderReference.Next(_currentReference);
+            if (nextResult.IsFailure)
+                return nextResult;
+
+            _currentReference = nextResult.Value;
+            return Result.Success(_currentReference);
+        }
     }
 }

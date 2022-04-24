@@ -1,49 +1,45 @@
-﻿using Sheaft.Domain;
+﻿using System.Text.RegularExpressions;
+using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.Persistence;
 
 namespace Sheaft.Infrastructure.ProductManagement;
 
 internal class GenerateProductCode : IGenerateProductCode
 {
-    private int code = 0;
-    public Task<Result<ProductReference>> GenerateNextCode(SupplierId supplierIdentifier, CancellationToken token)
+    private static readonly object Locker = new { };
+    private readonly IDbContext _context;
+    private ProductReference? _currentReference;
+
+    public GenerateProductCode(IDbContext context)
     {
-        code++;
-        return Task.FromResult(Result.Success(new ProductReference(GenerateEanIdentifier(code, 13))));
+        _context = context;
     }
 
-    private string GenerateEanIdentifier(long value, int length)
+    public Result<ProductReference> GenerateNextCode(SupplierId supplierIdentifier)
     {
-        if (value.ToString().Length > 12)
-            throw new ArgumentException("Invalid EAN length", nameof(value));
-
-        if (length > 12)
+        lock (Locker)
         {
-            var str = value.ToString("000000000000");
-            var checksum = CalculateChecksum(str);
+            if (_currentReference == null)
+            {
+                var references = _context.Set<Product>()
+                    .Where(o => o.SupplierIdentifier == supplierIdentifier)
+                    .OrderByDescending(o => o.Reference)
+                    .Select(o => o.Reference)
+                    .ToList();
 
-            return value.ToString("000000000000") + checksum;
+                _currentReference = references
+                                        .FirstOrDefault(r =>
+                                            Regex.IsMatch(r.Value, ProductReference.VALIDATION_REGEX)) ??
+                                    new ProductReference(0);
+            }
+
+            var nextResult = ProductReference.Next(_currentReference);
+            if (nextResult.IsFailure)
+                return nextResult;
+
+            _currentReference = nextResult.Value;
+            return Result.Success(_currentReference);
         }
-
-        return value.ToString("000000000000");
-    }
-
-    private int CalculateChecksum(string codeToValidate)
-    {
-        if (codeToValidate == null || codeToValidate.Length != 12)
-            throw new ArgumentException("Code length should be 12, i.e. excluding the checksum digit",
-                nameof(codeToValidate));
-
-        int sum = 0;
-        for (int i = 0; i < 12; i++)
-        {
-            int v;
-            if (!int.TryParse(codeToValidate[i].ToString(), out v))
-                throw new ArgumentException("Invalid character encountered in specified code.", nameof(codeToValidate));
-            sum += (i % 2 == 0 ? v : v * 3);
-        }
-
-        int check = 10 - (sum % 10);
-        return check % 10;
     }
 }
