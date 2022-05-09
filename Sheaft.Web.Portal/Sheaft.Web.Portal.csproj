@@ -9,15 +9,24 @@
 
     <ItemGroup>
       <Folder Include="wwwroot" />
-      <Folder Include="src\routes" />
       <Folder Include="src\stores" />
       <Folder Include="src\utils" />
+      <Folder Include="public" />
     </ItemGroup>
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\assets\index.d0d3791b.css" />
       <_ContentIncludedByDefault Remove="wwwroot\assets\index.fb173837.js" />
       <_ContentIncludedByDefault Remove="wwwroot\assets\svelte.d72399d3.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include=".routify\instance.default.js" />
+      <Content Include=".routify\routes.default.js" />
     </ItemGroup>
 
 </Project>

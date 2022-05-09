@@ -2,14 +2,21 @@ import postcss from "./postcss.config.js";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "url";
+import routify from '@roxi/routify/vite-plugin'
+
+const production = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
+  clearScreen: false,
   build: {
     outDir: "./wwwroot",
   },
-  plugins: [svelte()],
+  plugins: [
+    routify(),
+    svelte()],
   resolve: {
     alias: {
+      $routify: fileURLToPath(new URL("./.routify", import.meta.url)),
       $routes: fileURLToPath(new URL("./src/routes", import.meta.url)),
       $components: fileURLToPath(new URL("./src/components", import.meta.url)),
       $utils: fileURLToPath(new URL("./src/utils", import.meta.url)),

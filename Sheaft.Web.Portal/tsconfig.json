@@ -10,6 +10,7 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
+      "$routify/*": [".routify/*"],
       "$routes/*": ["src/routes/*"],
       "$components/*": ["src/components/*"],
       "$utils/*": ["src/utils/*"],
