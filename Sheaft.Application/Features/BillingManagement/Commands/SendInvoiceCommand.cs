@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Sheaft.Application.Mailer;
 using Sheaft.Domain;
+using Sheaft.Domain.Email;
 
 namespace Sheaft.Application.BillingManagement;
 

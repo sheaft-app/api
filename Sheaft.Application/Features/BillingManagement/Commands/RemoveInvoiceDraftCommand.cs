@@ -1,5 +1,4 @@
-﻿using Sheaft.Application.Mailer;
-using Sheaft.Domain;
+﻿using Sheaft.Domain;
 
 namespace Sheaft.Application.BillingManagement;
 

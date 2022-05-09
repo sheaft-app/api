@@ -1,0 +1,8 @@
+# Logs
+obj/*
+bin/*
+logs
+node_modules
+public/*
+wwwroot/*
+appsettings.*.json
