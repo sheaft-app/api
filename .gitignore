@@ -6,15 +6,7 @@
 *.ldf
 **/PublishProfiles/**
 Sheaft.Web.Api/appsettings.Development.json
-Sheaft.Web.Signalr/appsettings.Development.json
-Sheaft.Web.Functions/appsettings.Development.json
-Sheaft.Web.Manage/appsettings.Development.json
-Sheaft.Web.Payment/appsettings.Development.json
-Sheaft.Web.Jobs/appsettings.Development.json
+Sheaft.Web.Portal/appsettings.Development.json
 .history
-Docker/sql/data
-Docker/sql/log
-Docker/sql/secrets
-
 .idea/*
 *.sln.*.user
