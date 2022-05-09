@@ -23,9 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Application", "Sheaf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Infrastructure", "Sheaft.Infrastructure\Sheaft.Infrastructure.csproj", "{8F861470-B5E5-4313-8C7D-53830A07426E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.IntegrationTests", "Sheaft.IntegrationTests\Sheaft.IntegrationTests.csproj", "{F3AFC4B7-9903-4E38-890B-AB9BB43B47FA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.UnitTests", "Sheaft.UnitTests\Sheaft.UnitTests.csproj", "{1E41E786-0E48-4A3E-BEDF-CAB8426337FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.UnitTests", "Sheaft.UnitTests\Sheaft.UnitTests.csproj", "{F3AFC4B7-9903-4E38-890B-AB9BB43B47FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sheaft.Web.Portal", "Sheaft.Web.Portal\Sheaft.Web.Portal.csproj", "{821E281E-BE5B-492D-8255-09D6ED8B7A5A}"
 EndProject
@@ -55,10 +53,6 @@ Global
 		{F3AFC4B7-9903-4E38-890B-AB9BB43B47FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3AFC4B7-9903-4E38-890B-AB9BB43B47FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3AFC4B7-9903-4E38-890B-AB9BB43B47FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E41E786-0E48-4A3E-BEDF-CAB8426337FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E41E786-0E48-4A3E-BEDF-CAB8426337FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E41E786-0E48-4A3E-BEDF-CAB8426337FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E41E786-0E48-4A3E-BEDF-CAB8426337FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{821E281E-BE5B-492D-8255-09D6ED8B7A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{821E281E-BE5B-492D-8255-09D6ED8B7A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{821E281E-BE5B-492D-8255-09D6ED8B7A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
