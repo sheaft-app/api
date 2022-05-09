@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Sheaft.IntegrationTests</_Parameter1>
+      <_Parameter1>Sheaft.UnitTests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
