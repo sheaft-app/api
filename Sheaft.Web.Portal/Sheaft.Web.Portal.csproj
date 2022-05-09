@@ -12,12 +12,11 @@
       <Folder Include="src\stores" />
       <Folder Include="src\utils" />
       <Folder Include="public" />
+      <Folder Include=".routify" />
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\assets\index.d0d3791b.css" />
-      <_ContentIncludedByDefault Remove="wwwroot\assets\index.fb173837.js" />
-      <_ContentIncludedByDefault Remove="wwwroot\assets\svelte.d72399d3.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\*" />
     </ItemGroup>
 
     <ItemGroup>
