@@ -1,6 +1,4 @@
-# Sheaft API
-
-Ce projet permet de prendre en compte les requêtes de l'interface web de Sheaft
+# Sheaft
 
 ## Pré-requis
 
