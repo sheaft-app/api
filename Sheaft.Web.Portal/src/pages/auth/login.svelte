@@ -1,22 +1,25 @@
-<!-- routify:options anonymous=true -->
+<!-- routify:options public=true -->
+<!-- routify:options redirectIfAuthenticated=true -->
 
 <script lang="ts">
-  import {goto} from "@roxi/routify";
+  import { goto } from '@roxi/routify';
   import { authStore } from '$stores/auth';
   import Password from '$components/Password.svelte';
   import Email from '$components/Email.svelte';
-  import Checkbox from '$components/Checkbox.svelte';
   import Link from '$components/Link.svelte';
   import SubmitButton from '$components/SubmitButton.svelte';
 
   let username: string = '';
   let password: string = '';
-  let rememberMe: boolean = false;
 
   const login = async () => {
-    const returnUrl = await authStore.login(username, password);
-    console.log(returnUrl);
-    $goto(returnUrl);
+    try {
+      const returnUrl = await authStore.login(username, password);
+      $goto(returnUrl);
+    }
+    catch(e){
+      console.log(e);
+    }
   };
 </script>
 
@@ -40,8 +43,7 @@
           </div>
 
           <div class="flex justify-between items-center mb-6">
-            <Checkbox label="Se souvenir de moi" value="{rememberMe}" />
-            <Link href="/password/forgot">Mot de passe oublié?</Link>
+            <Link href="/auth/forgot">Mot de passe oublié?</Link>
           </div>
 
           <SubmitButton on:click="{() => login()}">Se connecter</SubmitButton>

@@ -1,11 +1,11 @@
 ﻿<script lang="ts">
   import logo from '$assets/svelte.png';
+  import Link from '$components/Link.svelte'
 </script>
 
 <main>
   <img src="{logo}" alt="Svelte Logo" />
   <h1>Hello Typescript!</h1>
-
   <p>
     Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte apps.
   </p>
