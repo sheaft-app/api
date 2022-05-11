@@ -39,6 +39,7 @@
     "vite": "^2.9.8"
   },
   "dependencies": {
-    "@roxi/routify": "^2.18.5"
+    "@roxi/routify": "^2.18.5",
+    "qs": "^6.10.3"
   }
 }

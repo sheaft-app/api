@@ -4,10 +4,10 @@
   @apply px-5 py-2;
 }
 
-.f-input{
+.f-input {
   @apply mb-3;
-  
-  input{
+
+  input {
     @apply block;
     @apply w-full;
     @apply px-3;
@@ -27,7 +27,31 @@
     @apply focus:outline-none;
   }
 
-  label{
+  label {
     @apply text-gray-700;
   }
+}
+
+.f-button {
+  @apply inline-block px-7 py-3 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:shadow-lg  focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out w-full;
+}
+
+.f-primary-color{
+  @apply bg-green-600 hover:bg-green-700 focus:bg-green-700 active:bg-green-800 ;
+}
+
+.f-secondary-color{
+  @apply bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 ;
+}
+
+.f-default-color{
+  @apply bg-gray-300 hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-400 ;
+}
+
+.f-danger-color{
+  @apply bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-800 ;
+}
+
+.f-warning-color{
+  @apply bg-orange-600 hover:bg-orange-700 focus:bg-orange-700 active:bg-orange-800 ;
 }

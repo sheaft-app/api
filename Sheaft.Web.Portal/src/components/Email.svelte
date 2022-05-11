@@ -6,6 +6,6 @@
 </script>
 
 <div class="f-input">
-  <input type="email" placeholder="{placeholder}" />
+  <input type="email" placeholder="{placeholder}" bind:value class="{className}" />
   <label>{label}</label>
 </div>

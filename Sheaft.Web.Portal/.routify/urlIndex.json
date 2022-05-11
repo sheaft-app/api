@@ -1,4 +1,6 @@
 [
+  "/auth/forgot",
+  "/auth/login",
   "/contact",
   "/index"
 ]

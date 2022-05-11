@@ -1,18 +1,17 @@
-﻿import { derived, writable } from 'svelte/store';
-import type { Writable, Readable } from 'svelte/store';
+﻿import { writable } from 'svelte/store';
+import qs from "qs";
 
-class AuthStore {
-  constructor(private _authenticated: Writable<boolean> = writable(false)) {}
+const { subscribe:authenticatedSub, set:setIsAuthenticated } = writable(false);
 
-  get isAuthenticated(): Readable<boolean> {
-    return derived([this._authenticated], ([$_authenticated]) => $_authenticated);
-  }
-
-  login(username: string, password: string): Promise<boolean> {
-    this._authenticated.set(true);
-    return Promise.resolve(true);
-  }
+const login = (username: string, password: string): Promise<string> => {
+  //TODO call api
+  setIsAuthenticated(true);
+  let search = window.location.search.replace('?', '');
+  return Promise.resolve(search.indexOf('returnUrl') > -1 ? 
+    qs.parse(search)["returnUrl"] : '/');
 }
 
-// Export a singleton
-export const authStore = new AuthStore();
+export const authStore = { 
+  isAuthenticated : {subscribe:authenticatedSub},
+  login
+};
