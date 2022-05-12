@@ -1,5 +1,5 @@
-﻿<!-- routify:options redirectIfAuthenticated=true -->
+﻿<!-- routify:options public=true -->
 <script lang="ts">
 </script>
 
-<!-- routify:options public=true -->
+<!-- routify:options redirectIfAuthenticated=true -->

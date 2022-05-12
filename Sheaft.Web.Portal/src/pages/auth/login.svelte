@@ -1,5 +1,6 @@
-<!-- routify:options redirectIfAuthenticated=true -->
+<!-- routify:options public=true -->
 <script lang="ts">
+  import qs from "qs";
   import { goto } from "@roxi/routify";
   import { getAuthStore } from "$stores/auth";
   import Password from "$components/Password.svelte";
@@ -12,7 +13,12 @@
 
   const login = async () => {
     try {
-      const returnUrl = await getAuthStore().login(username, password);
+      const result = await getAuthStore().login(username, password);
+      if (!result) return;
+
+      const search = window.location.search.replace("?", "");
+      const returnUrl =
+        search.indexOf("returnUrl") > -1 ? qs.parse(search)["returnUrl"] : "/";
       $goto(returnUrl);
     } catch (e) {
       console.log(e);
@@ -20,7 +26,8 @@
   };
 </script>
 
-<!-- routify:options public=true -->
+<!-- routify:options redirectIfAuthenticated=true -->
+
 
 <section class="h-screen">
   <div class="container px-6 py-12 h-full">

@@ -1,36 +1,37 @@
 ﻿import { writable } from "svelte-local-storage-store";
 import { derived, get } from "svelte/store";
-import qs from "qs";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 let timer = null;
 let initialized = false;
 
-const userStore = writable("user", {
+const userStore = writable("auth", {
   tokens: { accessToken: "", refreshToken: "", expiresAt: null, tokenType: "" },
   isAuthenticated: false,
-  username: ""
+  user: {
+    id: "",
+    username: "",
+    email: ""
+  }
 });
 
-const login = async (username: string, password: string): Promise<string> => {
+const login = async (username: string, password: string): Promise<boolean> => {
   try {
     const result = await axios.post("/api/token/login", { username, password });
 
     userStore.update(as => {
       as.isAuthenticated = true;
       as.tokens = getTokens(result.data);
-      as.username = username;
+      as.user = getUserFromAccessToken(as.tokens.accessToken);
       return as;
     });
 
     configureRefreshTokensHandler();
 
-    let search = window.location.search.replace("?", "");
-    return Promise.resolve(
-      search.indexOf("returnUrl") > -1 ? qs.parse(search)["returnUrl"] : "/"
-    );
+    return Promise.resolve(true);
   } catch (e) {
-    return Promise.reject(e);
+    return Promise.reject(false);
   }
 };
 
@@ -39,7 +40,7 @@ const logout = (): boolean => {
     userStore.update(as => {
       as.isAuthenticated = false;
       as.tokens = getTokens();
-      as.username = "";
+      as.user = getUserFromAccessToken();
       return as;
     });
 
@@ -49,6 +50,20 @@ const logout = (): boolean => {
   } catch (e) {
     return false;
   }
+};
+
+const getUserFromAccessToken = (access_token?) => {
+  const user = { id: "", username: "", email: "" };
+  if (!access_token) return user;
+
+  const decoded = jwt_decode<any>(access_token);
+
+  user.id = decoded.sub;
+  user.username =
+    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+  user.email =
+    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+  return user;
 };
 
 const getTokens = (data?) => {
@@ -81,8 +96,7 @@ const refreshTokensIfRequired = async () => {
 
   const expiresAt = new Date(user.tokens.expiresAt);
   const minRefreshDate = new Date(expiresAt.valueOf() - 5 * 60000);
-  if (minRefreshDate <= new Date()) 
-    return;
+  if (minRefreshDate > new Date()) return;
 
   try {
     const result = await axios.post("/api/token/refresh", {
