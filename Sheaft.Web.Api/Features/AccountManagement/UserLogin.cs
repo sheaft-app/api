@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,27 +17,11 @@ public class UserLogin : Feature
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResponse>> Post([FromBody] LoginRequest data, CancellationToken token)
+    public async Task<ActionResult<TokenResponse>> Post([FromBody] LoginRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<LoginUserCommand>(), token);
-        return HandleCommandResult<AuthenticationTokenDto, LoginResponse>(result);
+        return HandleCommandResult<AuthenticationTokenDto, TokenResponse>(result);
     }
 }
 
 public record LoginRequest(string Username, string Password);
-
-[SuppressMessage("ReSharper", "UnassignedGetOnlyAutoProperty")]
-public record LoginResponse
-{
-    [JsonPropertyName("access_token")]
-    public string AccessToken { get; set; }
-    
-    [JsonPropertyName("refresh_token")]
-    public string RefreshToken { get; set; }
-    
-    [JsonPropertyName("token_type")]
-    public string TokenType { get; set; }
-    
-    [JsonPropertyName("expires_in")]
-    public int ExpiresIn { get; set; }
-}

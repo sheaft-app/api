@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
-  import logo from '$assets/svelte.png';
-  import Link from '$components/Link.svelte'
+  import logo from "$assets/svelte.png";
+  import Link from "$components/Link.svelte";
 </script>
 
 <main>
@@ -18,8 +18,8 @@
 
 <style>
   :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-      Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+      Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 
   main {

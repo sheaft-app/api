@@ -1,8 +1,8 @@
 <script lang="ts">
-  export let value: string = '';
-  export let label: string = '';
-  export let placeholder: string = '';
-  export let className: string = '';
+  export let value: string = "";
+  export let label: string = "";
+  export let placeholder: string = "";
+  export let className: string = "";
 </script>
 
 <div class="f-input">

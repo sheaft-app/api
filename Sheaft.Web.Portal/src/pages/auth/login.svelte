@@ -1,27 +1,26 @@
-<!-- routify:options public=true -->
 <!-- routify:options redirectIfAuthenticated=true -->
-
 <script lang="ts">
-  import { goto } from '@roxi/routify';
-  import { authStore } from '$stores/auth';
-  import Password from '$components/Password.svelte';
-  import Email from '$components/Email.svelte';
-  import Link from '$components/Link.svelte';
-  import SubmitButton from '$components/SubmitButton.svelte';
+  import { goto } from "@roxi/routify";
+  import { getAuthStore } from "$stores/auth";
+  import Password from "$components/Password.svelte";
+  import Email from "$components/Email.svelte";
+  import Link from "$components/Link.svelte";
+  import SubmitButton from "$components/SubmitButton.svelte";
 
-  let username: string = '';
-  let password: string = '';
+  let username: string = "";
+  let password: string = "";
 
   const login = async () => {
     try {
-      const returnUrl = await authStore.login(username, password);
+      const returnUrl = await getAuthStore().login(username, password);
       $goto(returnUrl);
-    }
-    catch(e){
+    } catch (e) {
       console.log(e);
     }
   };
 </script>
+
+<!-- routify:options public=true -->
 
 <section class="h-screen">
   <div class="container px-6 py-12 h-full">

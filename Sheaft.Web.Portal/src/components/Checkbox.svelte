@@ -1,7 +1,7 @@
 <script lang="ts">
   export let value: boolean = false;
   export let label: string = null;
-  export let className: string = '';
+  export let className: string = "";
 </script>
 
 <div class="form-check">

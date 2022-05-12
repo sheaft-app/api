@@ -15,9 +15,11 @@ public class RefreshAccessToken : Feature
 
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthenticationTokenDto>> Post([FromBody] string refreshToken, CancellationToken token)
+    public async Task<ActionResult<TokenResponse>> Post([FromBody] RefreshTokenRequest refreshToken, CancellationToken token)
     {
-        var result = await Mediator.Execute(new RefreshAccessTokenCommand(refreshToken), token);
-        return HandleCommandResult(result);
+        var result = await Mediator.Execute(new RefreshAccessTokenCommand(refreshToken.Token), token);
+        return HandleCommandResult<AuthenticationTokenDto, TokenResponse>(result);
     }
 }
+
+public record RefreshTokenRequest(string Token);

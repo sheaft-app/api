@@ -1,11 +1,12 @@
 ﻿<script lang="ts">
-  import { authStore } from '$stores/auth';
-  import { page, goto, url, beforeUrlChange } from '@roxi/routify';
+  import { getAuthStore } from "$stores/auth";
+  import { page, goto, url, beforeUrlChange } from "@roxi/routify";
 
+  const authStore = getAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
 
   const getReturnUrl = (path, params) => {
-    let returnUrl = `${path ?? '/'}${params && params.length > 0 ? '?' : ''}`;
+    let returnUrl = `${path ?? "/"}${params && params.length > 0 ? "?" : ""}`;
     Object.entries(params).forEach(([key, value]) => {
       if (value) returnUrl += `&${key}=${value}`;
       else returnUrl += `&${key}`;
@@ -15,14 +16,13 @@
   };
 
   $beforeUrlChange((event, route) => {
-    if(route.meta.redirectIfAuthenticated && $isAuthenticated)
-    {
-      $goto('/');
+    if (route.meta.redirectIfAuthenticated && $isAuthenticated) {
+      $goto("/");
       return false;
     }
-    
-    if (route.path != '/auth/login' && !route.meta.public && !$isAuthenticated) {
-      $goto('/auth/login', {
+
+    if (route.path != "/auth/login" && !route.meta.public && !$isAuthenticated) {
+      $goto("/auth/login", {
         returnUrl: getReturnUrl(event.state?.path, event.state?.params)
       });
       return false;
@@ -31,11 +31,11 @@
   });
 
   if ($page.meta.redirectIfAuthenticated && $isAuthenticated) {
-    $goto('/');
+    $goto("/");
   }
 
   if (!$page.meta.public && !$isAuthenticated)
-    $goto('/auth/login', {
+    $goto("/auth/login", {
       returnUrl: `${window.location.pathname}${window.location.search}`
     });
 </script>

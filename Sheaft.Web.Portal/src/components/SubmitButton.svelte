@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  export let className: string = '';
+  import { createEventDispatcher } from "svelte";
+  export let className: string = "";
 
   const dispatch = createEventDispatcher();
 
   const dispatchClick = e => {
-    dispatch('click', e);
+    dispatch("click", e);
   };
 </script>
 
