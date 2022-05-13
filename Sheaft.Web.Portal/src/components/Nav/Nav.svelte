@@ -1,6 +1,8 @@
 <script lang="ts">
   import { layout } from "@roxi/routify";
   import Menu from "./Menu.svelte";
+  import Logo from '$components/Nav/Logo.svelte'
+  import User from '$components/Nav/User.svelte'
 
   const menuDefinition = {};
 
@@ -56,12 +58,8 @@
   const entries = orderMenus(menus);
 </script>
 
-<nav>
+<nav class='w-80 h-full flex flex-col'>
+  <Logo />
   <Menu entries="{entries}" />
+  <User/>
 </nav>
-
-<style lang="scss">
-  nav {
-    @apply w-40 h-full bg-gray-100;
-  }
-</style>

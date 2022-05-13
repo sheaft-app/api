@@ -18,6 +18,9 @@
   };
 
   $beforeUrlChange((event, route) => {
+    if(route.path == '/_fallback')
+      return true;
+    
     if (route.meta.redirectIfAuthenticated && $isAuthenticated) {
       $goto("/");
       return false;
@@ -40,34 +43,35 @@
     }
     return true;
   });
+  
+  const checkPageAccess = (isAuthenticated) => {
+    if($page.path == '/_fallback')
+      return;
+    
+    if ($page.meta.redirectIfAuthenticated && isAuthenticated) {
+      $goto("/");
+    }
 
-  if ($page.meta.redirectIfAuthenticated && $isAuthenticated) {
-    $goto("/");
-  }
+    if (
+      $page.meta.roles &&
+      $page.meta.roles.length > 0 &&
+      (!isAuthenticated || !authStore.isInRoles($page.meta.roles))
+    ) {
+      $goto("/unauthorized");
+    }
 
-  if (
-    $page.meta.roles &&
-    $page.meta.roles.length > 0 &&
-    (!$isAuthenticated || !authStore.isInRoles($page.meta.roles))
-  ) {
-    $goto("/unauthorized");
-  }
-
-  if (!$page.meta.public && !$isAuthenticated)
-    $goto("/auth/login", {
-      returnUrl: `${window.location.pathname}${window.location.search}`
-    });
+    if (!$page.meta.public && !isAuthenticated)
+      $goto("/auth/login", {
+        returnUrl: `${window.location.pathname}${window.location.search}`
+      });
+  }  
+  
+  $:checkPageAccess($isAuthenticated);
 </script>
 
-<main>
+<main class='flex'>
   <Nav />
   <Screen>
     <slot />
   </Screen>
 </main>
-
-<style lang="scss">
-  main {
-    display: flex;
-  }
-</style>

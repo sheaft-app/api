@@ -14,7 +14,7 @@
   };
 </script>
 
-<menu class="nav-menu">
+<menu class="nav-menu flex-grow">
   {#each Object.keys(entries) as key}
     {#if entries[key].visible}
       {#if entries[key].pages && entries[key].pages.length > 0}

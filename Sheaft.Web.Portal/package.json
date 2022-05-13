@@ -39,10 +39,15 @@
     "vite": "^2.9.8"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-brands-svg-icons": "^6.1.1",
+    "@fortawesome/free-regular-svg-icons": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@roxi/routify": "^2.18.5",
     "axios": "^0.27.2",
     "jwt-decode": "^3.1.2",
     "qs": "^6.10.3",
+    "svelte-fa": "^2.4.0",
     "svelte-local-storage-store": "^0.2.6"
   }
 }

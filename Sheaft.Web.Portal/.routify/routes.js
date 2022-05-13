@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Fri May 13 2022 20:03:11 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Sat May 14 2022 00:55:17 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-13T18:03:11.236Z"
+export const __timestamp = "2022-05-13T22:55:17.631Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -25,14 +25,39 @@ export const _tree = {
   "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/_layout.svelte",
   "children": [
     {
-      "isFile": false,
-      "isDir": true,
-      "file": "auth",
-      "filepath": "/auth",
-      "name": "auth",
-      "ext": "",
+      "isFile": true,
+      "isDir": false,
+      "file": "_fallback.svelte",
+      "filepath": "/_fallback.svelte",
+      "name": "_fallback",
+      "ext": "svelte",
       "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth",
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/_fallback.svelte",
+      "importPath": "../src/pages/_fallback.svelte",
+      "isLayout": false,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": true,
+      "isPage": false,
+      "ownMeta": {},
+      "meta": {
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/_fallback",
+      "id": "__fallback",
+      "component": () => import('../src/pages/_fallback.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_layout.svelte",
+      "filepath": "/auth/_layout.svelte",
+      "name": "_layout",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/_layout.svelte",
       "children": [
         {
           "isFile": true,
@@ -95,18 +120,28 @@ export const _tree = {
           "component": () => import('../src/pages/auth/login.svelte').then(m => m.default)
         }
       ],
-      "isLayout": false,
+      "isLayout": true,
       "isReset": false,
       "isIndex": false,
       "isFallback": false,
       "isPage": false,
-      "ownMeta": {},
+      "importPath": "../src/pages/auth/_layout.svelte",
+      "ownMeta": {
+        "menu": true,
+        "index": true,
+        "group": "Commandes"
+      },
       "meta": {
+        "menu": true,
+        "index": true,
+        "group": "Commandes",
         "recursive": true,
         "preload": false,
         "prerender": true
       },
-      "path": "/auth"
+      "path": "/auth",
+      "id": "_auth__layout",
+      "component": () => import('../src/pages/auth/_layout.svelte').then(m => m.default)
     },
     {
       "isFile": true,
@@ -137,13 +172,15 @@ export const _tree = {
             "public": true,
             "menu": true,
             "index": true,
-            "title": "Create"
+            "title": "Create",
+            "icon": "fas#coffee"
           },
           "meta": {
             "public": true,
             "menu": true,
             "index": true,
             "title": "Create",
+            "icon": "fas#coffee",
             "recursive": true,
             "preload": false,
             "prerender": true
@@ -208,7 +245,8 @@ export const _tree = {
             "menu": true,
             "title": "Index",
             "roles": [],
-            "index": true
+            "index": true,
+            "icon": "fas#addressBook"
           },
           "meta": {
             "public": true,
@@ -216,6 +254,7 @@ export const _tree = {
             "title": "Index",
             "roles": [],
             "index": true,
+            "icon": "fas#addressBook",
             "recursive": true,
             "preload": false,
             "prerender": true

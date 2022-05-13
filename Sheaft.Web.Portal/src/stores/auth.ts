@@ -9,7 +9,7 @@ let initialized = false;
 const userStore = writable("auth", {
   tokens: { accessToken: "", refreshToken: "", expiresAt: null, tokenType: "" },
   isAuthenticated: false,
-  user: {
+  profile: {
     id: "",
     username: "",
     email: "",
@@ -24,7 +24,7 @@ const login = async (username: string, password: string): Promise<boolean> => {
     userStore.update(as => {
       as.isAuthenticated = true;
       as.tokens = getTokens(result.data);
-      as.user = getUserFromAccessToken(as.tokens.accessToken);
+      as.profile = getUserFromAccessToken(as.tokens.accessToken);
       return as;
     });
 
@@ -41,7 +41,7 @@ const logout = (): boolean => {
     userStore.update(as => {
       as.isAuthenticated = false;
       as.tokens = getTokens();
-      as.user = getUserFromAccessToken();
+      as.profile = getUserFromAccessToken();
       return as;
     });
 
@@ -53,13 +53,30 @@ const logout = (): boolean => {
   }
 };
 
+const refreshToken = async () => {
+  const user = get(userStore);
+  try {
+    const result = await axios.post("/api/token/refresh", {
+      token: user.tokens.refreshToken
+    });
+
+    userStore.update(as => {
+      as.tokens = getTokens(result.data);
+      as.profile = getUserFromAccessToken(as.tokens.accessToken);
+      return as;
+    });
+  } catch (e) {
+    console.error("An error occured while refreshing access token");
+  }
+}
+
 const isInRoles = (roles?: Array<string>): boolean => {
   if (!roles) return true;
 
   const user = get(userStore);
-  if (!user.user.roles) user.user.roles = [];
+  if (!user.profile.roles) user.profile.roles = [];
 
-  const userInRoles = roles.filter(r => user.user.roles.includes(r));
+  const userInRoles = roles.filter(r => user.profile.roles.includes(r));
   return userInRoles.length > 0;
 };
 
@@ -113,18 +130,7 @@ const refreshTokensIfRequired = async () => {
   const minRefreshDate = new Date(expiresAt.valueOf() - 5 * 60000);
   if (minRefreshDate > new Date()) return;
 
-  try {
-    const result = await axios.post("/api/token/refresh", {
-      token: user.tokens.refreshToken
-    });
-
-    userStore.update(as => {
-      as.tokens = getTokens(result.data);
-      return as;
-    });
-  } catch (e) {
-    console.error("An error occured while refreshing access token");
-  }
+  await refreshToken();
 
   configureRefreshTokensHandler();
 };
@@ -138,11 +144,12 @@ const clearRefreshTokensHandler = () => {
 };
 
 const authStore = {
-  user: derived([userStore], ([$userStore]) => $userStore),
+  user: derived([userStore], ([$userStore]) => $userStore.profile),
   isAuthenticated: derived([userStore], ([$userStore]) => $userStore.isAuthenticated),
   isInRoles,
   login,
-  logout
+  logout,
+  refreshToken
 };
 
 export const getAuthStore = () => {

@@ -3,7 +3,7 @@
 }
 
 .menu-group .menu-entry {
-  padding-left:1em;
+  margin: 0 1em 0 2em;
 }
 
 .btn-primary {
@@ -45,7 +45,7 @@
 }
 
 .f-primary-color{
-  @apply bg-green-600 hover:bg-green-700 focus:bg-green-700 active:bg-green-800 ;
+  @apply bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-800 ;
 }
 
 .f-secondary-color{
