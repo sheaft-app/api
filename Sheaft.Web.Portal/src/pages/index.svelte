@@ -6,7 +6,6 @@
 <!-- routify:options menu=true -->
 <!-- routify:options title="Home" -->
 
-
 <img src="{logo}" alt="Svelte Logo" />
 <h1>Hello Typescript!</h1>
 <p>

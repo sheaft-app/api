@@ -6,11 +6,11 @@
   export let entries = [];
 
   const canHighlightMenuItem = (entry, currentPath): boolean => {
-    if(currentPath == entry.path)
-      return true;
-    
-    if(entry.parent) //should highlight current menu item => /sub only if /sub/1 is found but not visible in menu
-      return entry.parent.pages.find(p => !p.visible && p.path == currentPath) != null;      
+    if (currentPath == entry.path) return true;
+
+    if (entry.parent)
+      //should highlight current menu item => /sub only if /sub/1 is found but not visible in menu
+      return entry.parent.pages.find(p => !p.visible && p.path == currentPath) != null;
   };
 </script>
 

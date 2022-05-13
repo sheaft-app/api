@@ -53,17 +53,15 @@ const logout = (): boolean => {
   }
 };
 
-const isInRoles = (roles?:Array<string>):boolean => {
-  if(!roles)
-    return true;
-  
+const isInRoles = (roles?: Array<string>): boolean => {
+  if (!roles) return true;
+
   const user = get(userStore);
-  if(!user.user.roles)
-    user.user.roles = [];
-  
-  const userInRoles = roles.filter(r => user.user.roles.includes(r))
+  if (!user.user.roles) user.user.roles = [];
+
+  const userInRoles = roles.filter(r => user.user.roles.includes(r));
   return userInRoles.length > 0;
-}
+};
 
 const getUserFromAccessToken = (access_token?) => {
   const user = { id: "", username: "", email: "", roles: [] };
@@ -76,9 +74,10 @@ const getUserFromAccessToken = (access_token?) => {
     decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
   user.email =
     decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
-  user.roles =
-    JSON.parse(decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? "[]");
-  
+  user.roles = JSON.parse(
+    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? "[]"
+  );
+
   return user;
 };
 

@@ -13,11 +13,12 @@
           icon: c.meta.icon,
           pages: [],
           visible: c.meta.menu ?? false,
-          referenced: c.meta.index > 0 || c.meta.index ?? false
+          referenced: (c.meta.index > 0 || c.meta.index) ?? false
         };
       }
 
-      if(c.__file.isFile && !c.__file.isDir) {
+      //avoid referencing _layout files
+      if (c.__file.isFile && !c.__file.isDir) {
         let group = menus[selector];
         if (group) {
           group.pages.push({
@@ -26,8 +27,8 @@
             icon: c.meta.icon,
             pages: [],
             visible: c.meta.menu ?? false,
-            referenced: c.meta.index > 0 || c.meta.index ?? false,
-            parent : group
+            referenced: (c.meta.index > 0 || c.meta.index) ?? false,
+            parent: group
           });
         } else
           menus[c.path] = {
@@ -36,7 +37,7 @@
             icon: c.meta.icon,
             pages: [],
             visible: c.meta.menu ?? false,
-            referenced: c.meta.index > 0 || c.meta.index ?? false
+            referenced: (c.meta.index > 0 || c.meta.index) ?? false
           };
       }
 

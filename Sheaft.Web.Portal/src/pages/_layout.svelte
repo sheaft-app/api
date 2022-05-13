@@ -2,7 +2,7 @@
   import { getAuthStore } from "$stores/auth";
   import { page, goto, url, beforeUrlChange } from "@roxi/routify";
   import Nav from "$components/Nav.svelte";
-  import Screen from '$components/Screen.svelte'
+  import Screen from "$components/Screen.svelte";
 
   const authStore = getAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
@@ -22,8 +22,12 @@
       $goto("/");
       return false;
     }
-    
-    if (route.meta.roles && route.meta.roles.length > 0 && (!$isAuthenticated || !authStore.isInRoles(route.meta.roles))) {
+
+    if (
+      route.meta.roles &&
+      route.meta.roles.length > 0 &&
+      (!$isAuthenticated || !authStore.isInRoles(route.meta.roles))
+    ) {
       $goto("/unauthorized");
       return false;
     }
@@ -41,7 +45,11 @@
     $goto("/");
   }
 
-  if ($page.meta.roles && $page.meta.roles.length > 0 && (!$isAuthenticated || !authStore.isInRoles($page.meta.roles))) {
+  if (
+    $page.meta.roles &&
+    $page.meta.roles.length > 0 &&
+    (!$isAuthenticated || !authStore.isInRoles($page.meta.roles))
+  ) {
     $goto("/unauthorized");
   }
 
