@@ -4,7 +4,7 @@
 <!-- routify:options public=true -->
 <!-- routify:options menu=true -->
 <!-- routify:options title="Index" -->
-<!-- routify:options roles=["User","Admin"] -->
+<!-- routify:options roles=[] -->
 <!-- routify:options index=true -->
 
 Index

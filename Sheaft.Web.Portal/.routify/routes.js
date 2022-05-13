@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Fri May 13 2022 19:32:52 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri May 13 2022 19:48:03 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-13T17:32:52.018Z"
+export const __timestamp = "2022-05-13T17:48:03.202Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -172,20 +172,14 @@ export const _tree = {
             "index": true,
             "menu": true,
             "title": "Details",
-            "roles": [
-              "User",
-              "Admin"
-            ]
+            "roles": []
           },
           "meta": {
             "public": true,
             "index": true,
             "menu": true,
             "title": "Details",
-            "roles": [
-              "User",
-              "Admin"
-            ],
+            "roles": [],
             "recursive": true,
             "preload": false,
             "prerender": true
@@ -213,20 +207,14 @@ export const _tree = {
             "public": true,
             "menu": true,
             "title": "Index",
-            "roles": [
-              "User",
-              "Admin"
-            ],
+            "roles": [],
             "index": true
           },
           "meta": {
             "public": true,
             "menu": true,
             "title": "Index",
-            "roles": [
-              "User",
-              "Admin"
-            ],
+            "roles": [],
             "index": true,
             "recursive": true,
             "preload": false,

@@ -9,3 +9,12 @@
 
   return path;
 };
+
+export const parseSubActivePath = path => {
+  if (!path || path.length < 1) return "/index";
+
+  let indexOf = path.indexOf("/");
+  if (indexOf > -1 && path.indexOf("/") == path.length - 1) path += "index";
+
+  return path;
+};

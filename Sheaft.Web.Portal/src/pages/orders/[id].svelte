@@ -6,6 +6,6 @@
 <!-- routify:options index=true -->
 <!-- routify:options menu=true -->
 <!-- routify:options title="Details" -->
-<!-- routify:options roles=["User","Admin"] -->
+<!-- routify:options roles=[] -->
 
 Details

@@ -2,7 +2,7 @@
   import { getAuthStore } from "$stores/auth";
   import { page, goto, url, beforeUrlChange } from "@roxi/routify";
   import Nav from "$components/Nav.svelte";
-  import Main from "$components/Main.svelte";
+  import Screen from '$components/Screen.svelte'
 
   const authStore = getAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
@@ -51,15 +51,15 @@
     });
 </script>
 
-<div class="body">
+<main>
   <Nav />
-  <Main>
+  <Screen>
     <slot />
-  </Main>
-</div>
+  </Screen>
+</main>
 
 <style lang="scss">
-  .body {
+  main {
     display: flex;
   }
 </style>

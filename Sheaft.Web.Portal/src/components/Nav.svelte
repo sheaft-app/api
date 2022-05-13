@@ -61,6 +61,6 @@
 
 <style lang="scss">
   nav {
-    @apply w-40 h-full;
+    @apply w-40 h-full bg-gray-100;
   }
 </style>

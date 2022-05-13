@@ -1,12 +1,12 @@
-<script lang="ts">
+<script lang='ts'>
 </script>
 
-<main>
+<div>
   <slot />
-</main>
+</div>
 
 <style>
-  main {
+  div {
     text-align: center;
     padding: 1em;
     margin: 0 auto;
