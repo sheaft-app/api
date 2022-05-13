@@ -42,15 +42,15 @@
     });
 </script>
 
-<div class='body'>
+<div class="body">
   <Nav />
   <Main>
     <slot />
   </Main>
 </div>
 
-<style lang='scss'>
-  .body{
-    display:flex;
+<style lang="scss">
+  .body {
+    display: flex;
   }
 </style>

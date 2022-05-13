@@ -1,5 +1,8 @@
-﻿<!-- routify:options group="Commandes" -->
-<!-- routify:options index=true -->
+﻿<!-- routify:options index=true -->
+<!-- routify:options menu=true -->
 <script lang="ts">
 </script>
-<slot/>
+
+<!-- routify:options group="Commandes" -->
+
+<slot />

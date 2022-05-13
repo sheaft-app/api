@@ -7,5 +7,4 @@
 <!-- routify:options title="Contact" -->
 <!-- routify:options index=true -->
 
-
 <h1>{$page.title}</h1>

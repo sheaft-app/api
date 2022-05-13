@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Fri May 13 2022 18:58:09 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri May 13 2022 19:27:45 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-13T16:58:09.560Z"
+export const __timestamp = "2022-05-13T17:27:45.997Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -136,6 +136,7 @@ export const _tree = {
           "ownMeta": {
             "public": true,
             "menu": true,
+            "index": true,
             "title": "Create",
             "roles": [
               "User",
@@ -145,6 +146,7 @@ export const _tree = {
           "meta": {
             "public": true,
             "menu": true,
+            "index": true,
             "title": "Create",
             "roles": [
               "User",
@@ -176,6 +178,7 @@ export const _tree = {
           "ownMeta": {
             "public": true,
             "index": true,
+            "menu": true,
             "title": "Details",
             "roles": [
               "User",
@@ -185,6 +188,7 @@ export const _tree = {
           "meta": {
             "public": true,
             "index": true,
+            "menu": true,
             "title": "Details",
             "roles": [
               "User",
@@ -248,12 +252,14 @@ export const _tree = {
       "isPage": false,
       "importPath": "../src/pages/sub/_layout.svelte",
       "ownMeta": {
-        "group": "Commandes",
-        "index": true
+        "index": true,
+        "menu": true,
+        "group": "Commandes"
       },
       "meta": {
-        "group": "Commandes",
         "index": true,
+        "menu": true,
+        "group": "Commandes",
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -312,14 +318,14 @@ export const _tree = {
       "isFallback": false,
       "isPage": true,
       "ownMeta": {
+        "index": true,
         "menu": true,
-        "title": "Home",
-        "index": true
+        "title": "Home"
       },
       "meta": {
+        "index": true,
         "menu": true,
         "title": "Home",
-        "index": true,
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -344,16 +350,16 @@ export const _tree = {
       "isFallback": false,
       "isPage": true,
       "ownMeta": {
+        "index": true,
         "title": "Test",
         "public": true,
-        "menu": true,
-        "index": true
+        "menu": true
       },
       "meta": {
+        "index": true,
         "title": "Test",
         "public": true,
         "menu": true,
-        "index": true,
         "recursive": true,
         "preload": false,
         "prerender": true

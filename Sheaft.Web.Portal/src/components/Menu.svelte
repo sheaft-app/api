@@ -1,28 +1,32 @@
-<script lang='ts'>
-  import { page } from '@roxi/routify'
-  import MenuEntry from '$components/MenuEntry.svelte'
-  import MenuGroup from '$components/MenuGroup.svelte'
+<script lang="ts">
+  import { page } from "@roxi/routify";
+  import MenuEntry from "$components/MenuEntry.svelte";
+  import MenuGroup from "$components/MenuGroup.svelte";
 
-  export let entries = []
+  export let entries = [];
 
   const canHighlightMenuItem = (entry, currentPath): boolean => {
-    let existingPage = false
-    if (entry.pages && entry.pages.length > 0) {
-      existingPage = entry.pages.find(p => p.visible && p.path == currentPath) != null
-    }
-
-    return currentPath == entry.path || existingPage
-  }
-
+    if(currentPath == entry.path)
+      return true;
+    
+    if(entry.parent) //should highlight current menu item => /sub only if /sub/1 is found but not visible in menu
+      return entry.parent.pages.find(p => !p.visible && p.path == currentPath) != null;      
+  };
 </script>
 
-<menu class='nav-menu'>
+<menu class="nav-menu">
   {#each Object.keys(entries) as key}
     {#if entries[key].visible}
       {#if entries[key].pages && entries[key].pages.length > 0}
-        <MenuGroup entry={entries[key]} canHighlight={canHighlightMenuItem(entries[key], $page.path)} />
-      {:else if entries[key].path && entries[key].path.length > 0 }
-        <MenuEntry entry={entries[key]} canHighlight={canHighlightMenuItem(entries[key], $page.path)} />
+        <MenuGroup
+          entry="{entries[key]}"
+          canHighlight="{canHighlightMenuItem(entries[key], $page.path)}"
+        />
+      {:else if entries[key].path && entries[key].path.length > 0}
+        <MenuEntry
+          entry="{entries[key]}"
+          canHighlight="{canHighlightMenuItem(entries[key], $page.path)}"
+        />
       {/if}
     {/if}
   {/each}

@@ -1,53 +1,66 @@
-<script lang='ts'>
-  import { layout } from '@roxi/routify'
-  import Menu from '$components/Menu.svelte'
+<script lang="ts">
+  import { layout } from "@roxi/routify";
+  import Menu from "$components/Menu.svelte";
 
-  const menuDefinition = {}
+  const menuDefinition = {};
 
   const parseAndAssignToMenus = (children, menus, parent?) => {
     children.forEach(c => {
-      let selector = c.meta.group ?? parent
+      let selector = c.meta.group ?? parent;
       if (selector && !menus[selector]) {
         menus[selector] = {
           title: c.meta.group,
           icon: c.meta.icon,
           pages: [],
-          visible: c.meta.index > 0 || c.meta.index
-        }
+          visible: c.meta.menu ?? false,
+          referenced: c.meta.index > 0 || c.meta.index ?? false
+        };
       }
 
-      let group = menus[selector]
-      if (group) {
-        group.pages.push({
-          path: c.path,
-          title: c.title,
-          icon: c.meta.icon,
-          pages: [],
-          visible: c.meta.menu
-        })
-      } else
-        menus[c.path] = { path: c.path, title: c.title, icon: c.meta.icon, pages: [], visible: c.meta.menu }
+      if(c.__file.isFile && !c.__file.isDir) {
+        let group = menus[selector];
+        if (group) {
+          group.pages.push({
+            path: c.path,
+            title: c.title,
+            icon: c.meta.icon,
+            pages: [],
+            visible: c.meta.menu ?? false,
+            referenced: c.meta.index > 0 || c.meta.index ?? false,
+            parent : group
+          });
+        } else
+          menus[c.path] = {
+            path: c.path,
+            title: c.title,
+            icon: c.meta.icon,
+            pages: [],
+            visible: c.meta.menu ?? false,
+            referenced: c.meta.index > 0 || c.meta.index ?? false
+          };
+      }
 
-      if (c.children && c.children.length > 0) parseAndAssignToMenus(c.children, menus, selector)
-    })
+      if (c.children && c.children.length > 0)
+        parseAndAssignToMenus(c.children, menus, selector);
+    });
 
-    return menus
-  }
+    return menus;
+  };
 
   const orderMenus = (items): Array<any> => {
-    return items
-  }
+    return items;
+  };
 
-  const menus = parseAndAssignToMenus($layout.children, menuDefinition)
-  const entries = orderMenus(menus)
+  const menus = parseAndAssignToMenus($layout.children, menuDefinition);
+  const entries = orderMenus(menus);
 </script>
 
 <nav>
-  <Menu {entries} />
+  <Menu entries="{entries}" />
 </nav>
 
-<style lang='scss'>
+<style lang="scss">
   nav {
-    @apply w-40 h-full
+    @apply w-40 h-full;
   }
 </style>
