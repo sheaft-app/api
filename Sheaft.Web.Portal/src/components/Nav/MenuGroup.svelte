@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isActive } from "@roxi/routify";
   import Menu from "./Menu.svelte";
-  import { parseSubActivePath } from "$utils/path";
+  import { parseSubActivePath } from "./path";
 
   export let entry: { title: string; path: string; pages: Array<any> } = null;
 

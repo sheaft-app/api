@@ -17,7 +17,8 @@
       "$stores/*": ["src/stores/*"],
       "$assets/*": ["src/assets/*"],
       "$configs/*": ["src/configs/*"],
-      "$styles/*": ["src/styles/*"]
+      "$styles/*": ["src/styles/*"],
+      "$settings/*": ["src/settings/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

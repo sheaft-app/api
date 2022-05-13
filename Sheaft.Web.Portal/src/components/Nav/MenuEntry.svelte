@@ -1,6 +1,6 @@
 <script lang="ts">
   import { isActive, goto, page } from "@roxi/routify";
-  import { parseActivePath } from "$utils/path";
+  import { parseActivePath } from "./path";
 
   export let entry: { title: string; path: string; pages: Array<any> } = null;
   export let canHighlight: boolean;

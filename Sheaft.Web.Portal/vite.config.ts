@@ -23,6 +23,7 @@ export default defineConfig({
       $stores: fileURLToPath(new URL("./src/stores", import.meta.url)),
       $styles: fileURLToPath(new URL("./src/styles", import.meta.url)),
       $configs: fileURLToPath(new URL("./src/configs", import.meta.url)),
+      $settings: fileURLToPath(new URL("./src/settings", import.meta.url)),
     },
   },
   css: {
