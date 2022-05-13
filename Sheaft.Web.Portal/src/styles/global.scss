@@ -1,4 +1,12 @@
-﻿.btn-primary {
+﻿html, body{
+  height: 100%;
+}
+
+.menu-group .menu-entry {
+  padding-left:1em;
+}
+
+.btn-primary {
   @apply bg-gray-200;
   @apply rounded-full;
   @apply px-5 py-2;

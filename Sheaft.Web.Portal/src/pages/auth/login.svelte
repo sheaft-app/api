@@ -28,7 +28,6 @@
 
 <!-- routify:options redirectIfAuthenticated=true -->
 
-
 <section class="h-screen">
   <div class="container px-6 py-12 h-full">
     <div class="flex justify-center items-center flex-wrap h-full g-6 text-gray-800">

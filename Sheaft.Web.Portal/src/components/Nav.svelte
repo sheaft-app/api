@@ -1,0 +1,54 @@
+<script lang='ts'>
+  import { layout } from '@roxi/routify'
+  import Menu from '$components/Menu.svelte'
+
+  const menuDefinition = {}
+
+  const parseAndAssignToMenus = (children, menus, parent?) => {
+    children.forEach(c => {
+      let selector = c.meta.group ?? parent
+      if (selector && !menus[selector]) {
+        menus[selector] = {
+          title: c.meta.group,
+          icon: c.meta.icon,
+          pages: [],
+          visible: c.meta.index > 0 || c.meta.index
+        }
+      }
+
+      let group = menus[selector]
+      if (group) {
+        group.pages.push({
+          path: c.path,
+          title: c.title,
+          icon: c.meta.icon,
+          pages: [],
+          visible: c.meta.menu
+        })
+      } else
+        menus[c.path] = { path: c.path, title: c.title, icon: c.meta.icon, pages: [], visible: c.meta.menu }
+
+      if (c.children && c.children.length > 0) parseAndAssignToMenus(c.children, menus, selector)
+    })
+
+    return menus
+  }
+
+  const orderMenus = (items): Array<any> => {
+    return items
+  }
+
+  console.log($layout.children)
+  const menus = parseAndAssignToMenus($layout.children, menuDefinition)
+  const entries = orderMenus(menus)
+</script>
+
+<nav>
+  <Menu {entries} />
+</nav>
+
+<style lang='scss'>
+  nav {
+    @apply w-40 h-full
+  }
+</style>
