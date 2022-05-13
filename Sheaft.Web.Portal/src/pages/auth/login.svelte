@@ -1,12 +1,14 @@
 <!-- routify:options public=true -->
+<!-- routify:options redirectIfAuthenticated=true -->
+
 <script lang="ts">
   import qs from "qs";
   import { goto } from "@roxi/routify";
   import { getAuthStore } from "$stores/auth";
-  import Password from "$components/Password.svelte";
-  import Email from "$components/Email.svelte";
+  import Password from "$components/Inputs/Password.svelte";
+  import Email from "$components/Inputs/Email.svelte";
   import Link from "$components/Link.svelte";
-  import SubmitButton from "$components/SubmitButton.svelte";
+  import SubmitButton from "$components/Buttons/SubmitButton.svelte";
 
   let username: string = "";
   let password: string = "";
@@ -25,8 +27,6 @@
     }
   };
 </script>
-
-<!-- routify:options redirectIfAuthenticated=true -->
 
 <section class="h-screen">
   <div class="container px-6 py-12 h-full">

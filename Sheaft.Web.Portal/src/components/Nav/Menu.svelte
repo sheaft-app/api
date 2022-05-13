@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "@roxi/routify";
-  import MenuEntry from "$components/MenuEntry.svelte";
-  import MenuGroup from "$components/MenuGroup.svelte";
+  import MenuEntry from "./MenuEntry.svelte";
+  import MenuGroup from "./MenuGroup.svelte";
 
   export let entries = [];
 

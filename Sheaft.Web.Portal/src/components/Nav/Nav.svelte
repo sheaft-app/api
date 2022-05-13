@@ -1,6 +1,6 @@
 <script lang="ts">
   import { layout } from "@roxi/routify";
-  import Menu from "$components/Menu.svelte";
+  import Menu from "./Menu.svelte";
 
   const menuDefinition = {};
 

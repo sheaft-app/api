@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
   import { getAuthStore } from "$stores/auth";
   import { page, goto, url, beforeUrlChange } from "@roxi/routify";
-  import Nav from "$components/Nav.svelte";
+  import Nav from "$components/Nav/Nav.svelte";
   import Screen from "$components/Screen.svelte";
 
   const authStore = getAuthStore();
