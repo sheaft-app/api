@@ -22,6 +22,11 @@
       $goto("/");
       return false;
     }
+    
+    if (route.meta.roles && route.meta.roles.length > 0 && (!$isAuthenticated || !authStore.isInRoles(route.meta.roles))) {
+      $goto("/unauthorized");
+      return false;
+    }
 
     if (route.path != "/auth/login" && !route.meta.public && !$isAuthenticated) {
       $goto("/auth/login", {
@@ -34,6 +39,10 @@
 
   if ($page.meta.redirectIfAuthenticated && $isAuthenticated) {
     $goto("/");
+  }
+
+  if ($page.meta.roles && $page.meta.roles.length > 0 && (!$isAuthenticated || !authStore.isInRoles($page.meta.roles))) {
+    $goto("/unauthorized");
   }
 
   if (!$page.meta.public && !$isAuthenticated)

@@ -1,9 +1,9 @@
 [
   "/auth/forgot",
   "/auth/login",
-  "/sub/create",
-  "/sub/index",
+  "/orders/create",
+  "/orders/index",
+  "/unauthorized",
   "/contact",
-  "/index",
-  "/test"
+  "/index"
 ]

@@ -12,7 +12,8 @@ const userStore = writable("auth", {
   user: {
     id: "",
     username: "",
-    email: ""
+    email: "",
+    roles: []
   }
 });
 
@@ -52,8 +53,20 @@ const logout = (): boolean => {
   }
 };
 
+const isInRoles = (roles?:Array<string>):boolean => {
+  if(!roles)
+    return true;
+  
+  const user = get(userStore);
+  if(!user.user.roles)
+    user.user.roles = [];
+  
+  const userInRoles = roles.filter(r => user.user.roles.includes(r))
+  return userInRoles.length > 0;
+}
+
 const getUserFromAccessToken = (access_token?) => {
-  const user = { id: "", username: "", email: "" };
+  const user = { id: "", username: "", email: "", roles: [] };
   if (!access_token) return user;
 
   const decoded = jwt_decode<any>(access_token);
@@ -63,6 +76,9 @@ const getUserFromAccessToken = (access_token?) => {
     decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
   user.email =
     decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+  user.roles =
+    JSON.parse(decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? "[]");
+  
   return user;
 };
 
@@ -125,6 +141,7 @@ const clearRefreshTokensHandler = () => {
 const authStore = {
   user: derived([userStore], ([$userStore]) => $userStore),
   isAuthenticated: derived([userStore], ([$userStore]) => $userStore.isAuthenticated),
+  isInRoles,
   login,
   logout
 };

@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Fri May 13 2022 19:27:45 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri May 13 2022 19:32:52 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-13T17:27:45.997Z"
+export const __timestamp = "2022-05-13T17:32:52.018Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -112,22 +112,22 @@ export const _tree = {
       "isFile": true,
       "isDir": true,
       "file": "_layout.svelte",
-      "filepath": "/sub/_layout.svelte",
+      "filepath": "/orders/_layout.svelte",
       "name": "_layout",
       "ext": "svelte",
       "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/sub/_layout.svelte",
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/_layout.svelte",
       "children": [
         {
           "isFile": true,
           "isDir": false,
           "file": "create.svelte",
-          "filepath": "/sub/create.svelte",
+          "filepath": "/orders/create.svelte",
           "name": "create",
           "ext": "svelte",
           "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/sub/create.svelte",
-          "importPath": "../src/pages/sub/create.svelte",
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/create.svelte",
+          "importPath": "../src/pages/orders/create.svelte",
           "isLayout": false,
           "isReset": false,
           "isIndex": false,
@@ -137,39 +137,31 @@ export const _tree = {
             "public": true,
             "menu": true,
             "index": true,
-            "title": "Create",
-            "roles": [
-              "User",
-              "Admin"
-            ]
+            "title": "Create"
           },
           "meta": {
             "public": true,
             "menu": true,
             "index": true,
             "title": "Create",
-            "roles": [
-              "User",
-              "Admin"
-            ],
             "recursive": true,
             "preload": false,
             "prerender": true
           },
-          "path": "/sub/create",
-          "id": "_sub_create",
-          "component": () => import('../src/pages/sub/create.svelte').then(m => m.default)
+          "path": "/orders/create",
+          "id": "_orders_create",
+          "component": () => import('../src/pages/orders/create.svelte').then(m => m.default)
         },
         {
           "isFile": true,
           "isDir": false,
           "file": "[id].svelte",
-          "filepath": "/sub/[id].svelte",
+          "filepath": "/orders/[id].svelte",
           "name": "[id]",
           "ext": "svelte",
           "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/sub/[id].svelte",
-          "importPath": "../src/pages/sub/[id].svelte",
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/[id].svelte",
+          "importPath": "../src/pages/orders/[id].svelte",
           "isLayout": false,
           "isReset": false,
           "isIndex": false,
@@ -198,20 +190,20 @@ export const _tree = {
             "preload": false,
             "prerender": true
           },
-          "path": "/sub/:id",
-          "id": "_sub__id",
-          "component": () => import('../src/pages/sub/[id].svelte').then(m => m.default)
+          "path": "/orders/:id",
+          "id": "_orders__id",
+          "component": () => import('../src/pages/orders/[id].svelte').then(m => m.default)
         },
         {
           "isFile": true,
           "isDir": false,
           "file": "index.svelte",
-          "filepath": "/sub/index.svelte",
+          "filepath": "/orders/index.svelte",
           "name": "index",
           "ext": "svelte",
           "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/sub/index.svelte",
-          "importPath": "../src/pages/sub/index.svelte",
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/index.svelte",
+          "importPath": "../src/pages/orders/index.svelte",
           "isLayout": false,
           "isReset": false,
           "isIndex": true,
@@ -240,9 +232,9 @@ export const _tree = {
             "preload": false,
             "prerender": true
           },
-          "path": "/sub/index",
-          "id": "_sub_index",
-          "component": () => import('../src/pages/sub/index.svelte').then(m => m.default)
+          "path": "/orders/index",
+          "id": "_orders_index",
+          "component": () => import('../src/pages/orders/index.svelte').then(m => m.default)
         }
       ],
       "isLayout": true,
@@ -250,7 +242,7 @@ export const _tree = {
       "isIndex": false,
       "isFallback": false,
       "isPage": false,
-      "importPath": "../src/pages/sub/_layout.svelte",
+      "importPath": "../src/pages/orders/_layout.svelte",
       "ownMeta": {
         "index": true,
         "menu": true,
@@ -264,9 +256,41 @@ export const _tree = {
         "preload": false,
         "prerender": true
       },
-      "path": "/sub",
-      "id": "_sub__layout",
-      "component": () => import('../src/pages/sub/_layout.svelte').then(m => m.default)
+      "path": "/orders",
+      "id": "_orders__layout",
+      "component": () => import('../src/pages/orders/_layout.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": false,
+      "file": "unauthorized.svelte",
+      "filepath": "/unauthorized.svelte",
+      "name": "unauthorized",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/unauthorized.svelte",
+      "importPath": "../src/pages/unauthorized.svelte",
+      "isLayout": false,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": true,
+      "ownMeta": {
+        "public": true,
+        "index": true,
+        "title": "Accès non autorisé"
+      },
+      "meta": {
+        "public": true,
+        "index": true,
+        "title": "Accès non autorisé",
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/unauthorized",
+      "id": "_unauthorized",
+      "component": () => import('../src/pages/unauthorized.svelte').then(m => m.default)
     },
     {
       "isFile": true,
@@ -333,40 +357,6 @@ export const _tree = {
       "path": "/index",
       "id": "_index",
       "component": () => import('../src/pages/index.svelte').then(m => m.default)
-    },
-    {
-      "isFile": true,
-      "isDir": false,
-      "file": "test.svelte",
-      "filepath": "/test.svelte",
-      "name": "test",
-      "ext": "svelte",
-      "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/test.svelte",
-      "importPath": "../src/pages/test.svelte",
-      "isLayout": false,
-      "isReset": false,
-      "isIndex": false,
-      "isFallback": false,
-      "isPage": true,
-      "ownMeta": {
-        "index": true,
-        "title": "Test",
-        "public": true,
-        "menu": true
-      },
-      "meta": {
-        "index": true,
-        "title": "Test",
-        "public": true,
-        "menu": true,
-        "recursive": true,
-        "preload": false,
-        "prerender": true
-      },
-      "path": "/test",
-      "id": "_test",
-      "component": () => import('../src/pages/test.svelte').then(m => m.default)
     }
   ],
   "isLayout": true,
