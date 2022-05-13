@@ -38,7 +38,6 @@
     return items
   }
 
-  console.log($layout.children)
   const menus = parseAndAssignToMenus($layout.children, menuDefinition)
   const entries = orderMenus(menus)
 </script>

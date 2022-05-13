@@ -3,8 +3,9 @@
   import { parseActivePath } from '$utils/path'
 
   export let entry: { title: string, path: string, pages: Array<any> } = null;
+  export let canHighlight: boolean;
   
-  $: isEntryActive = $isActive(parseActivePath(entry.path)) || parseActivePath($page.path) == parseActivePath(entry.path);
+  $: isEntryActive = canHighlight && ($isActive(parseActivePath(entry.path)) || parseActivePath($page.path) == parseActivePath(entry.path));
 
   const navigate = (path) => {
     $goto(path)
