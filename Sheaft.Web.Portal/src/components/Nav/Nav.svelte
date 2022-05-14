@@ -3,6 +3,7 @@
   import Menu from "./Menu.svelte";
   import Logo from '$components/Nav/Logo.svelte'
   import User from '$components/Nav/User.svelte'
+  import "./nav.scss";
 
   const menuDefinition = {};
 
@@ -17,6 +18,13 @@
           visible: c.meta.menu ?? false,
           referenced: (c.meta.index > 0 || c.meta.index) ?? false
         };
+      }
+      
+      if(selector && menus[selector] && c.__file.isDir){
+        let group = menus[selector];
+        group.icon = c.meta.icon;
+        group.visible = c.meta.menu;
+        group.referenced = (c.meta.index > 0 || c.meta.index) ?? false
       }
 
       //avoid referencing _layout files

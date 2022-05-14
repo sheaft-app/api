@@ -18,19 +18,23 @@
 </script>
 
 <li
-  class='menu-entry cursor-pointer p-3 mx-4 rounded-xl'
-  class:bg-violet-100='{isEntryActive}'
-  class:border-violet-300='{isEntryActive}'
-  class:border='{isEntryActive}'
-  class:text-violet-600='{isEntryActive}'
+  class='menu-entry cursor-pointer mx-4 p-3 rounded-xl'
+  class:active='{isEntryActive}'
+  class:has-parent='{entry.parent}'
   on:click='{() => navigate(entry.path)}'
 >
   <div class='flex items-center'>
-    {#if entry.icon}
-      <Fa icon={getFaIconFromFullName(entry.icon)} class='mr-2' />
-    {:else}
-      <Fa icon={getFaIcon('fas', 'exclamation')} class='mr-2' />
+    {#if !entry.parent}
+      {#if entry.icon}
+        <div class='menu-icon'>
+          <Fa icon={getFaIconFromFullName(entry.icon)} class='menu-icon' />
+        </div>
+      {:else}
+        <div class='menu-icon'>
+          <Fa icon={getFaIcon('fas', 'angleRight')} class='' />
+        </div>
+      {/if}
     {/if}
-    <span>{entry.title}</span>
+    <span class='ml-2'>{entry.title}</span>
   </div>
 </li>

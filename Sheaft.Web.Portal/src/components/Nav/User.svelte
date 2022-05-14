@@ -4,6 +4,7 @@
   import Fa from 'svelte-fa'
   import { faRightFromBracket, faUserLock } from '@fortawesome/free-solid-svg-icons'
   import { goto } from '@roxi/routify'
+  import Primary from '$components/Buttons/Primary.svelte'
 
   const authStore = getAuthStore()
   const user = authStore.user
@@ -16,9 +17,9 @@
   }
 </script>
 
-<div class='w-full self-end border-t'>
+<div class='w-full self-end border-t flex items-center justify-center'>
   {#if $isAuthenticated}
-    <div class='flex items-center justify-center '>
+    <div class='flex items-center justify-center'>
       <div class='m-4 flex cursor-pointer'>
         <img src={logo} width='30' alt='logo' class='mr-4' />
         <span class='overflow-hidden overflow-ellipsis'>{$user.username}</span>
@@ -28,10 +29,11 @@
       </div>
     </div>
   {:else}
-    <div on:click={login}
-         class='cursor-pointer justify-center items-center flex f-primary-color rounded-full text-white py-4 px-8 m-4'>
+    <Primary on:click={login} className='m-4'>
+      <div class='flex items-center justify-center'>
       <Fa icon={faUserLock} class='mr-2' />
       <span class='ml-4'>Se connecter</span>
-    </div>
+      </div>
+    </Primary>
   {/if}
 </div>

@@ -2,64 +2,6 @@
   height: 100%;
 }
 
-.menu-group .menu-entry {
-  margin: 0 1em 0 2em;
-}
-
-.btn-primary {
-  @apply bg-gray-200;
-  @apply rounded-full;
-  @apply px-5 py-2;
-}
-
-.f-input {
-  @apply mb-3;
-
-  input {
-    @apply block;
-    @apply w-full;
-    @apply px-3;
-    @apply py-1.5;
-    @apply text-base;
-    @apply font-normal;
-    @apply text-gray-700;
-    @apply bg-white bg-clip-padding;
-    @apply border border-solid border-gray-300;
-    @apply rounded;
-    @apply transition;
-    @apply ease-in-out;
-    @apply m-0;
-    @apply focus:text-gray-700;
-    @apply focus:bg-white;
-    @apply focus:border-blue-600;
-    @apply focus:outline-none;
-  }
-
-  label {
-    @apply text-gray-700;
-  }
-}
-
-.f-button {
-  @apply inline-block px-7 py-3 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:shadow-lg  focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out w-full;
-}
-
-.f-primary-color{
-  @apply bg-indigo-600 hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-800 ;
-}
-
-.f-secondary-color{
-  @apply bg-blue-600 hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 ;
-}
-
-.f-default-color{
-  @apply bg-gray-300 hover:bg-gray-400 focus:bg-gray-400 active:bg-gray-400 ;
-}
-
-.f-danger-color{
-  @apply bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-800 ;
-}
-
-.f-warning-color{
-  @apply bg-orange-600 hover:bg-orange-700 focus:bg-orange-700 active:bg-orange-800 ;
+html > *{
+  @apply text-gray-500
 }

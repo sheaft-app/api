@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Sat May 14 2022 00:55:17 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Sat May 14 2022 21:13:38 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-13T22:55:17.631Z"
+export const __timestamp = "2022-05-14T19:13:38.666Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -273,12 +273,14 @@ export const _tree = {
       "ownMeta": {
         "menu": true,
         "index": true,
-        "group": "Commandes"
+        "group": "Commandes",
+        "icon": "fas#coffee"
       },
       "meta": {
         "menu": true,
         "index": true,
         "group": "Commandes",
+        "icon": "fas#coffee",
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -338,13 +340,15 @@ export const _tree = {
         "public": true,
         "menu": true,
         "title": "Contact",
-        "index": true
+        "index": true,
+        "icon": "fas#addressBook"
       },
       "meta": {
         "public": true,
         "menu": true,
         "title": "Contact",
         "index": true,
+        "icon": "fas#addressBook",
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -371,12 +375,14 @@ export const _tree = {
       "ownMeta": {
         "index": true,
         "menu": true,
-        "title": "Home"
+        "title": "Home",
+        "icon": "fas#house"
       },
       "meta": {
         "index": true,
         "menu": true,
         "title": "Home",
+        "icon": "fas#house",
         "recursive": true,
         "preload": false,
         "prerender": true

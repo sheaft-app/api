@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "./inputs.scss"
+  
   export let value: boolean = false;
   export let label: string = null;
   export let className: string = "";

@@ -1,6 +1,7 @@
 ﻿<!-- routify:options index=true -->
 <!-- routify:options menu=true -->
 <!-- routify:options title="Home" -->
+<!-- routify:options icon="fas#house" -->
 
 <script lang="ts">
   import logo from "$assets/svelte.png";

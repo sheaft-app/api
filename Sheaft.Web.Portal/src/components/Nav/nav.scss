@@ -1,0 +1,25 @@
+﻿.menu-group .menu-entry {
+  margin: 0 0 0 3em;
+}
+
+.menu-group {
+  > div.active{
+    @apply text-white bg-primary-700
+  }
+  .menu-entry.active {
+    @apply text-primary-600 font-semibold
+  }
+  @apply text-gray-600
+}
+
+.menu-entry:not(.has-parent) {
+  @apply text-gray-600 font-medium
+}
+
+.menu-entry.active:not(.has-parent) {
+  @apply text-white bg-primary-700 font-semibold
+}
+
+.menu-icon {
+  min-width: 2em;
+}

@@ -8,7 +8,7 @@
   import Password from "$components/Inputs/Password.svelte";
   import Email from "$components/Inputs/Email.svelte";
   import Link from "$components/Link.svelte";
-  import SubmitButton from "$components/Buttons/SubmitButton.svelte";
+  import Submit from '$components/Buttons/Submit.svelte'
 
   let username: string = "";
   let password: string = "";
@@ -51,7 +51,7 @@
             <Link href="/auth/forgot">Mot de passe oublié?</Link>
           </div>
 
-          <SubmitButton on:click="{() => login()}">Se connecter</SubmitButton>
+          <Submit on:click="{() => login()}">Se connecter</Submit>
         </form>
       </div>
     </div>
