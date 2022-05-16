@@ -1,34 +1,21 @@
-<script lang="ts">
-  import qs from "qs";
-  import { page, goto, params } from "@roxi/routify";
-  import { getAuthStore } from "$stores/auth";
-  import Password from "$components/Inputs/Password.svelte";
-  import Email from "$components/Inputs/Email.svelte";
+﻿<script lang="ts">
+  import { page, params } from "@roxi/routify";
   import Link from "$components/Link.svelte";
+  import Email from "$components/Inputs/Email.svelte";
+  import Password from "$components/Inputs/Password.svelte";
   import Submit from "$components/Buttons/Submit.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
 
-  let username: string = $params.username;
-  let password: string = "";
+  export let username: string = $params.username;
+  export let password: string = "";
+  export let confirmPassword: string = "";
 
-  const login = async () => {
-    try {
-      const result = await getAuthStore().login(username, password);
-      if (!result) return;
-
-      const search = window.location.search.replace("?", "");
-      const returnUrl =
-        search.indexOf("returnUrl") > -1 ? qs.parse(search)["returnUrl"] : "/";
-      $goto(returnUrl);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const register = () => {};
 </script>
 
 <!-- routify:options redirectIfAuthenticated=true -->
 <!-- routify:options public=true -->
-<!-- routify:options title="Bienvenue" -->
+<!-- routify:options title="Renseigner vos informations" -->
 
 <section class="h-screen bg-back-100">
   <div class="container px-6 py-12 h-full">
@@ -45,14 +32,16 @@
         <form>
           <Email bind:value="{username}" className="mb-6 w-full" />
           <Password bind:value="{password}" className="mb-6 w-full" />
-          <Link href="/auth/forgot?&email={username}">Mot de passe oublié?</Link>
-          <Submit on:click="{() => login()}" className="block w-full mt-8"
-            >Se connecter</Submit
+          <Password
+            bind:value="{confirmPassword}"
+            placeholder="Confirmation de mot de passe"
+            className="mb-6 w-full"
+          />
+          <Submit on:click="{() => register()}" className="block w-full mt-8"
+            >Créer</Submit
           >
           <HorizontalSeparator>
-            <Link href="/account/register?&username={username}"
-              >Je n'ai pas de compte</Link
-            >
+            <Link href="/auth/login?&username={username}">J'ai déjà un compte</Link>
           </HorizontalSeparator>
         </form>
       </div>

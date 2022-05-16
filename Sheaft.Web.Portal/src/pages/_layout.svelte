@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
   import { getAuthStore } from "$stores/auth";
+  import { checkPageAccess } from "$utils/page";
   import { page, goto, beforeUrlChange } from "@roxi/routify";
   import Nav from "$components/Nav/Nav.svelte";
   import Screen from "$components/Screen.svelte";
@@ -18,53 +19,48 @@
   };
 
   $beforeUrlChange((event, route) => {
-    if (route.path == "/_fallback") return true;
+    const pageAccessResult = validateAccessToPage(
+      route.path,
+      route.meta,
+      $isAuthenticated
+    );
+    if (!pageAccessResult) return true;
 
-    if (route.meta.redirectIfAuthenticated && $isAuthenticated) {
-      $goto("/");
-      return false;
-    }
-
-    if (
-      route.meta.roles &&
-      route.meta.roles.length > 0 &&
-      (!$isAuthenticated || !authStore.isInRoles(route.meta.roles))
-    ) {
-      $goto("/unauthorized");
-      return false;
-    }
-
-    if (route.path != "/auth/login" && !route.meta.public && !$isAuthenticated) {
-      $goto("/auth/login", {
-        returnUrl: getReturnUrl(event.state?.path, event.state?.params)
-      });
-      return false;
-    }
-    return true;
+    $goto(pageAccessResult.path, pageAccessResult.params);
+    return false;
   });
 
-  const checkPageAccess = isAuthenticated => {
-    if ($page.path == "/_fallback") return;
-
-    if ($page.meta.redirectIfAuthenticated && isAuthenticated) {
-      $goto("/");
-    }
+  const validateAccessToPage = (
+    path: string,
+    meta: any,
+    isAuthenticated: boolean
+  ): any | null => {
+    const url = checkPageAccess(path, meta.redirectIfAuthenticated, isAuthenticated);
+    if (url) return { path: url };
 
     if (
-      $page.meta.roles &&
-      $page.meta.roles.length > 0 &&
-      (!isAuthenticated || !authStore.isInRoles($page.meta.roles))
+      meta.roles &&
+      meta.roles.length > 0 &&
+      (!isAuthenticated || !authStore.isInRoles(meta.roles))
     ) {
-      $goto("/unauthorized");
+      return { path: "/unauthorized" };
     }
 
-    if (!$page.meta.public && !isAuthenticated)
-      $goto("/auth/login", {
-        returnUrl: `${window.location.pathname}${window.location.search}`
-      });
+    if (!meta.public && !isAuthenticated)
+      return {
+        path: "/auth/login",
+        params: { returnUrl: `${window.location.pathname}${window.location.search}` }
+      };
   };
 
-  $: checkPageAccess($isAuthenticated);
+  $: {
+    const pageAccessResult = validateAccessToPage(
+      $page.path,
+      $page.meta,
+      $isAuthenticated
+    );
+    if (pageAccessResult) $goto(pageAccessResult.path, pageAccessResult.params);
+  }
 </script>
 
 <main class="flex">

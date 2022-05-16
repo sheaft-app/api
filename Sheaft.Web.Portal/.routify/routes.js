@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Mon May 16 2022 22:32:48 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Mon May 16 2022 23:27:19 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-16T20:32:48.016Z"
+export const __timestamp = "2022-05-16T21:27:19.122Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -53,6 +53,65 @@ export const _tree = {
       "isFile": true,
       "isDir": true,
       "file": "_reset.svelte",
+      "filepath": "/account/_reset.svelte",
+      "name": "_reset",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/account/_reset.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "register.svelte",
+          "filepath": "/account/register.svelte",
+          "name": "register",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/account/register.svelte",
+          "importPath": "../src/pages/account/register.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations"
+          },
+          "meta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/account/register",
+          "id": "_account_register",
+          "component": () => import('../src/pages/account/register.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
+      "isReset": true,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": false,
+      "importPath": "../src/pages/account/_reset.svelte",
+      "ownMeta": {},
+      "meta": {
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/account",
+      "id": "_account__reset",
+      "component": () => import('../src/pages/account/_reset.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_reset.svelte",
       "filepath": "/auth/_reset.svelte",
       "name": "_reset",
       "ext": "svelte",
@@ -92,36 +151,6 @@ export const _tree = {
         {
           "isFile": true,
           "isDir": false,
-          "file": "login.svelte",
-          "filepath": "/auth/login.svelte",
-          "name": "login",
-          "ext": "svelte",
-          "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/login.svelte",
-          "importPath": "../src/pages/auth/login.svelte",
-          "isLayout": false,
-          "isReset": false,
-          "isIndex": false,
-          "isFallback": false,
-          "isPage": true,
-          "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true
-          },
-          "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
-            "recursive": true,
-            "preload": false,
-            "prerender": true
-          },
-          "path": "/auth/login",
-          "id": "_auth_login",
-          "component": () => import('../src/pages/auth/login.svelte').then(m => m.default)
-        },
-        {
-          "isFile": true,
-          "isDir": false,
           "file": "reset.svelte",
           "filepath": "/auth/reset.svelte",
           "name": "reset",
@@ -148,6 +177,38 @@ export const _tree = {
           "path": "/auth/reset",
           "id": "_auth_reset",
           "component": () => import('../src/pages/auth/reset.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "login.svelte",
+          "filepath": "/auth/login.svelte",
+          "name": "login",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/login.svelte",
+          "importPath": "../src/pages/auth/login.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Bienvenue"
+          },
+          "meta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Bienvenue",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/login",
+          "id": "_auth_login",
+          "component": () => import('../src/pages/auth/login.svelte').then(m => m.default)
         }
       ],
       "isLayout": true,

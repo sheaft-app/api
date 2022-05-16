@@ -11,7 +11,7 @@
     parent: any;
     icon: string;
   } = null;
-  
+
   export let canHighlight: boolean;
 
   $: isEntryActive =

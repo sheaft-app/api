@@ -6,6 +6,7 @@
   import Submit from "$components/Buttons/Submit.svelte";
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
+  import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
 
   let email: string = $params.email;
   let resetRequested = $params.reset;
@@ -36,14 +37,20 @@
         />
       </div>
       <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
-        <h1>Réinitialiser votre mot de passe</h1>
+        <h1>J'ai oublié mon mot de passe</h1>
         {#if !resetRequested}
           <form class="">
-            <Email bind:value="{email}" className="mb-6 w-full" />
-            <Link href="/auth/login?&username={email}">Finalement je m'en rappel !</Link>
-            <Submit on:click="{() => forgot()}" className="block w-full mt-6"
-              >Reinitialiser</Submit
-            >
+            <Email
+              bind:value="{email}"
+              placeholder="Adresse mail de votre compte"
+              className="mb-6 w-full"
+            />
+            <Submit on:click="{() => forgot()}" className="block w-full mt-8"
+              >Reinitialiser
+            </Submit>
+            <HorizontalSeparator>
+              <Link href="/auth/login?&username={email}">Finalement je m'en rappel</Link>
+            </HorizontalSeparator>
           </form>
         {:else}
           <div class="items-center justify-center">
