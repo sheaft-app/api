@@ -13,7 +13,7 @@
 
 <button
   type='submit'
-  class="{className} bg-primary-600 hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-700 f-button"
+  class="{className} bg-primary-600 hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-700 f-button my-4"
   on:click|preventDefault="{dispatchClick}"
 >
   <slot />

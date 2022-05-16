@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Mon May 16 2022 16:54:26 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Mon May 16 2022 18:42:39 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-16T14:54:26.881Z"
+export const __timestamp = "2022-05-16T16:42:39.158Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -118,6 +118,36 @@ export const _tree = {
           "path": "/auth/login",
           "id": "_auth_login",
           "component": () => import('../src/pages/auth/login.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "reset.svelte",
+          "filepath": "/auth/reset.svelte",
+          "name": "reset",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/reset.svelte",
+          "importPath": "../src/pages/auth/reset.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "public": true,
+            "redirectIfAuthenticated": true
+          },
+          "meta": {
+            "public": true,
+            "redirectIfAuthenticated": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/reset",
+          "id": "_auth_reset",
+          "component": () => import('../src/pages/auth/reset.svelte').then(m => m.default)
         }
       ],
       "isLayout": true,

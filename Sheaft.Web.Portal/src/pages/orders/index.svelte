@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { page } from "@roxi/routify";
 </script>
 
 <!-- routify:options public=true -->
@@ -9,4 +10,4 @@
 <!-- routify:options icon="fas#addressBook" -->
 <!-- routify:options default=true -->
 
-Index
+<h1>{$page.title}</h1>

@@ -24,11 +24,11 @@ internal class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Re
 
     public ForgotPasswordHandler(
         IUnitOfWork uow,
-        IOptionsSnapshot<ISecuritySettings> securitySettings,
+        ISecuritySettings securitySettings,
         ILogger<ForgotPasswordHandler> logger)
     {
         _uow = uow;
-        _securitySettings = securitySettings.Value;
+        _securitySettings = securitySettings;
         _logger = logger;
     }
 

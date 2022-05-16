@@ -1,4 +1,6 @@
 ﻿<script lang="ts">
+  import { page } from "@roxi/routify";
+  
   export let id;
 </script>
 
@@ -7,4 +9,4 @@
 <!-- routify:options title="Details" -->
 <!-- routify:options roles=[] -->
 
-Details
+<h1>{$page.title}</h1>

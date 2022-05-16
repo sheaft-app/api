@@ -53,6 +53,24 @@ const logout = (): boolean => {
   }
 };
 
+const forgot = async (username: string): Promise<boolean> => {
+  try {
+    const result = await axios.post("/api/password/forgot", { email: username });
+    return Promise.resolve(true);
+  } catch (e) {
+    return Promise.reject(false);
+  }
+};
+
+const reset = async (code:string, newPassword: string, confirmPassword: string): Promise<boolean> => {
+  try {
+    const result = await axios.post("/api/password/reset", { resetToken: code, password: newPassword, confirm: confirmPassword });
+    return Promise.resolve(true);
+  } catch (e) {
+    return Promise.reject(false);
+  }
+};
+
 const refreshToken = async () => {
   const user = get(userStore);
   try {
@@ -149,6 +167,8 @@ const authStore = {
   isInRoles,
   login,
   logout,
+  forgot,
+  reset,
   refreshToken
 };
 

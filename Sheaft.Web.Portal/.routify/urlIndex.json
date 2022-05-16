@@ -1,6 +1,7 @@
 [
   "/auth/forgot",
   "/auth/login",
+  "/auth/reset",
   "/unauthorized",
   "/index",
   "/orders/index",

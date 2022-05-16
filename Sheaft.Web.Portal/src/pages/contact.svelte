@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { metatags, page } from "@roxi/routify";
+  import { page } from "@roxi/routify";
 </script>
 
 <!-- routify:options public=true -->

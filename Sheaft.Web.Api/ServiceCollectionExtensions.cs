@@ -32,6 +32,12 @@ public static class ServiceCollectionExtensions
 
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        var securitySettingsConfiguration = configuration.GetSection(SecuritySettings.SECTION);
+        services.Configure<SecuritySettings>(securitySettingsConfiguration);
+        
+        services.AddScoped<ISecuritySettings>(provider =>
+            provider.GetService<IOptionsSnapshot<SecuritySettings>>().Value);
+
         var jwtSettingsConfiguration = configuration.GetSection(JwtSettings.SECTION);
         services.Configure<JwtSettings>(jwtSettingsConfiguration);
         

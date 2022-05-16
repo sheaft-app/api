@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { page } from "@roxi/routify";
 </script>
 
 <!-- routify:options public=true -->
@@ -7,4 +8,4 @@
 <!-- routify:options title="Create" -->
 <!-- routify:options icon="fas#coffee" -->
 
-Plop
+<h1>{$page.title}</h1>

@@ -61,17 +61,11 @@ public class ForgotPasswordCommandShould
         
         var handler = new ForgotPasswordHandler(
             new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()),
-            new OptionsManager<SecuritySettings>(new OptionsFactory<SecuritySettings>(new List<IConfigureOptions<SecuritySettings>>{ new ConfigureOptions<SecuritySettings>(c =>
-            {
-                c.AccessTokenExpirationInMinutes = 5;
-                c.RefreshTokenExpirationInMinutes = 5;
-                c.ResetPasswordTokenValidityInHours = 5;
-            })}, new List<IPostConfigureOptions<SecuritySettings>>{ new PostConfigureOptions<SecuritySettings>(SecuritySettings.SECTION, c =>
-            {
-                c.AccessTokenExpirationInMinutes = 5;
-                c.RefreshTokenExpirationInMinutes = 5;
-                c.ResetPasswordTokenValidityInHours = 5;
-            })})), 
+            new SecuritySettings{
+                AccessTokenExpirationInMinutes = 5,
+                RefreshTokenExpirationInMinutes = 5,
+                ResetPasswordTokenValidityInHours = 5
+            }, 
             new FakeLogger<ForgotPasswordHandler>());
         
         return (username, context, handler);

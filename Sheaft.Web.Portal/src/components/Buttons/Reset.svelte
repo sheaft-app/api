@@ -12,8 +12,8 @@
 </script>
 
 <button
-  type='button'
-  class="f-button {className} bg-primary-600 hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-700"
+  type='reset'
+  class="f-button {className} bg-warning-300 hover:bg-warning-400 focus:bg-warning-400 active:bg-warning-400"
   on:click|preventDefault="{dispatchClick}"
 >
   <slot />
