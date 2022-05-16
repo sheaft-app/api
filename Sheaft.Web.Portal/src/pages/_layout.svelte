@@ -1,13 +1,13 @@
 ﻿<script lang="ts">
   import { getAuthStore } from "$stores/auth";
-  import { page, goto, url, beforeUrlChange } from "@roxi/routify";
+  import { page, goto, beforeUrlChange } from "@roxi/routify";
   import Nav from "$components/Nav/Nav.svelte";
   import Screen from "$components/Screen.svelte";
 
   const authStore = getAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
 
-  const getReturnUrl = (path, params) => {
+  const getReturnUrl = (path: string, params) => {
     let returnUrl = `${path ?? "/"}${params && params.length > 0 ? "?" : ""}`;
     Object.entries(params).forEach(([key, value]) => {
       if (value) returnUrl += `&${key}=${value}`;
@@ -18,9 +18,8 @@
   };
 
   $beforeUrlChange((event, route) => {
-    if(route.path == '/_fallback')
-      return true;
-    
+    if (route.path == "/_fallback") return true;
+
     if (route.meta.redirectIfAuthenticated && $isAuthenticated) {
       $goto("/");
       return false;
@@ -43,11 +42,10 @@
     }
     return true;
   });
-  
-  const checkPageAccess = (isAuthenticated) => {
-    if($page.path == '/_fallback')
-      return;
-    
+
+  const checkPageAccess = isAuthenticated => {
+    if ($page.path == "/_fallback") return;
+
     if ($page.meta.redirectIfAuthenticated && isAuthenticated) {
       $goto("/");
     }
@@ -64,12 +62,12 @@
       $goto("/auth/login", {
         returnUrl: `${window.location.pathname}${window.location.search}`
       });
-  }  
-  
-  $:checkPageAccess($isAuthenticated);
+  };
+
+  $: checkPageAccess($isAuthenticated);
 </script>
 
-<main class='flex'>
+<main class="flex">
   <Nav />
   <Screen>
     <slot />

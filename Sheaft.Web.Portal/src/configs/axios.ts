@@ -11,9 +11,9 @@ export const configureAxios = () => {
       const authStore = getAuthStore();
       if (!get(authStore.isAuthenticated)) return config;
 
-      const user = get(authStore.user);
+      const tokens = get(authStore.tokens);
       config.headers = {
-        Authorization: `${user.tokens.tokenType} ${user.tokens.accessToken}`
+        Authorization: `${tokens.tokenType} ${tokens.accessToken}`
       };
 
       return config;

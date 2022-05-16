@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Mon May 16 2022 18:42:39 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Mon May 16 2022 22:32:48 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-16T16:42:39.158Z"
+export const __timestamp = "2022-05-16T20:32:48.016Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -75,12 +75,12 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
-            "redirectIfAuthenticated": true
+            "redirectIfAuthenticated": true,
+            "public": true
           },
           "meta": {
-            "public": true,
             "redirectIfAuthenticated": true,
+            "public": true,
             "recursive": true,
             "preload": false,
             "prerender": true
@@ -105,12 +105,12 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
-            "redirectIfAuthenticated": true
+            "redirectIfAuthenticated": true,
+            "public": true
           },
           "meta": {
-            "public": true,
             "redirectIfAuthenticated": true,
+            "public": true,
             "recursive": true,
             "preload": false,
             "prerender": true

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import "./inputs.scss"
-  
+  import "./inputs.scss";
+
   export let value: string = "";
   export let label: string = "";
   export let placeholder: string = "Votre adresse mail";

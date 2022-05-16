@@ -21,6 +21,6 @@
       "$settings/*": ["src/settings/*"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.cjs", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

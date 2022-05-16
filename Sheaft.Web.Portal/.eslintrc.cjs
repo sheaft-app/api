@@ -2,15 +2,13 @@
   parser: "@typescript-eslint/parser",
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
     tsconfigRootDir: __dirname,
     project: ["./tsconfig.json"],
-    extraFileExtensions: [".svelte"]
+    extraFileExtensions: [".svelte", ".cjs"]
   },
   env: {
     es6: true,
@@ -29,5 +27,8 @@
     "svelte3/ignore-styles": () => true
   },
   plugins: ["svelte3", "@typescript-eslint"],
-  ignorePatterns: ["node_modules"]
+  ignorePatterns: ["node_modules"],
+  rules: {
+    "@typescript-eslint/no-unsafe-assignment": "warning"
+  }
 }

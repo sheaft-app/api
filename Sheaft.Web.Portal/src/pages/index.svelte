@@ -1,12 +1,11 @@
-﻿<!-- routify:options index=1 -->
-<!-- routify:options menu=true -->
-<!-- routify:options title="Home" -->
-<!-- routify:options icon="fas#house" -->
-
-<script lang="ts">
+﻿<script lang="ts">
   import logo from "$assets/svelte.png";
 </script>
 
+<!-- routify:options index=1 -->
+<!-- routify:options menu=true -->
+<!-- routify:options title="Home" -->
+<!-- routify:options icon="fas#house" -->
 
 <img src="{logo}" alt="Svelte Logo" />
 <h1>Hello Typescript!</h1>

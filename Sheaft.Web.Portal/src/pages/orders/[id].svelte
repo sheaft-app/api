@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import { page } from "@roxi/routify";
-  
+
   export let id;
 </script>
 

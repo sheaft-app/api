@@ -4,9 +4,9 @@
   import MenuGroup from "./MenuGroup.svelte";
 
   export let entries = [];
-  export let expand:boolean = false;
+  export let expand: boolean = false;
 
-  const canHighlightMenuItem = (entry, currentPath): boolean => {
+  const canHighlightMenuItem = (entry, currentPath: string): boolean => {
     if (currentPath == entry.path) return true;
 
     if (entry.parent)
@@ -15,16 +15,11 @@
   };
 </script>
 
-<menu class="nav-menu flex-grow" 
-      class:h-0='{!expand}'
-      class:hidden='{!expand}'>
+<menu class="nav-menu flex-grow" class:h-0="{!expand}" class:hidden="{!expand}">
   {#each Object.keys(entries) as key}
     {#if entries[key].visible}
       {#if entries[key].pages && entries[key].pages.length > 0}
-        <MenuGroup
-          entry="{entries[key]}"
-          canHighlight="{canHighlightMenuItem(entries[key], $page.path)}"
-        />
+        <MenuGroup entry="{entries[key]}" />
       {:else if entries[key].path && entries[key].path.length > 0}
         <MenuEntry
           entry="{entries[key]}"

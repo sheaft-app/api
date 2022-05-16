@@ -1,6 +1,9 @@
 ﻿import { writable } from "svelte-local-storage-store";
+
 import { derived, get } from "svelte/store";
+
 import axios from "axios";
+
 import jwt_decode from "jwt-decode";
 
 let timer = null;
@@ -55,16 +58,24 @@ const logout = (): boolean => {
 
 const forgot = async (username: string): Promise<boolean> => {
   try {
-    const result = await axios.post("/api/password/forgot", { email: username });
+    await axios.post("/api/password/forgot", { email: username });
     return Promise.resolve(true);
   } catch (e) {
     return Promise.reject(false);
   }
 };
 
-const reset = async (code:string, newPassword: string, confirmPassword: string): Promise<boolean> => {
+const reset = async (
+  code: string,
+  newPassword: string,
+  confirmPassword: string
+): Promise<boolean> => {
   try {
-    const result = await axios.post("/api/password/reset", { resetToken: code, password: newPassword, confirm: confirmPassword });
+    await axios.post("/api/password/reset", {
+      resetToken: code,
+      password: newPassword,
+      confirm: confirmPassword
+    });
     return Promise.resolve(true);
   } catch (e) {
     return Promise.reject(false);
@@ -86,7 +97,7 @@ const refreshToken = async () => {
   } catch (e) {
     console.error("An error occured while refreshing access token");
   }
-}
+};
 
 const isInRoles = (roles?: Array<string>): boolean => {
   if (!roles) return true;
@@ -98,8 +109,13 @@ const isInRoles = (roles?: Array<string>): boolean => {
   return userInRoles.length > 0;
 };
 
-const getUserFromAccessToken = (access_token?) => {
-  const user = { id: "", username: "", email: "", roles: [] };
+const getUserFromAccessToken = (access_token?: string) => {
+  const user: { id: string; username: string; email: string; roles: [] } = {
+    id: "",
+    username: "",
+    email: "",
+    roles: []
+  };
   if (!access_token) return user;
 
   const decoded = jwt_decode<any>(access_token);
@@ -163,6 +179,7 @@ const clearRefreshTokensHandler = () => {
 
 const authStore = {
   user: derived([userStore], ([$userStore]) => $userStore.profile),
+  tokens: derived([userStore], ([$userStore]) => $userStore.tokens),
   isAuthenticated: derived([userStore], ([$userStore]) => $userStore.isAuthenticated),
   isInRoles,
   login,
