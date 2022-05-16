@@ -7,5 +7,6 @@
 <!-- routify:options roles=[] -->
 <!-- routify:options index=true -->
 <!-- routify:options icon="fas#addressBook" -->
+<!-- routify:options default=true -->
 
 Index

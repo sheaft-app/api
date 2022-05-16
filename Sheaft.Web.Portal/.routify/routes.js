@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Sat May 14 2022 21:13:38 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Mon May 16 2022 15:35:07 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-14T19:13:38.666Z"
+export const __timestamp = "2022-05-16T13:35:07.500Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -126,15 +126,8 @@ export const _tree = {
       "isFallback": false,
       "isPage": false,
       "importPath": "../src/pages/auth/_layout.svelte",
-      "ownMeta": {
-        "menu": true,
-        "index": true,
-        "group": "Commandes"
-      },
+      "ownMeta": {},
       "meta": {
-        "menu": true,
-        "index": true,
-        "group": "Commandes",
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -246,7 +239,8 @@ export const _tree = {
             "title": "Index",
             "roles": [],
             "index": true,
-            "icon": "fas#addressBook"
+            "icon": "fas#addressBook",
+            "default": true
           },
           "meta": {
             "public": true,
@@ -255,6 +249,7 @@ export const _tree = {
             "roles": [],
             "index": true,
             "icon": "fas#addressBook",
+            "default": true,
             "recursive": true,
             "preload": false,
             "prerender": true
