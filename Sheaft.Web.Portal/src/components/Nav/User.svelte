@@ -17,15 +17,15 @@
   }
 </script>
 
-<div class='w-full self-end border-t flex items-center justify-center'>
+<div class='w-full self-end border-t flex items-center justify-center text-gray-600'>
   {#if $isAuthenticated}
     <div class='flex items-center justify-center'>
       <div class='m-4 flex cursor-pointer'>
         <img src={logo} width='30' alt='logo' class='mr-4' />
         <span class='overflow-hidden overflow-ellipsis'>{$user.username}</span>
       </div>
-      <div on:click={logout}>
-        <Fa icon={faRightFromBracket} class='m-4 cursor-pointer' />
+      <div on:click={logout} class='hover:text-primary-700 cursor-pointer'>
+        <Fa icon={faRightFromBracket} class='m-4' />
       </div>
     </div>
   {:else}

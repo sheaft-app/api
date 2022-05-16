@@ -1,14 +1,32 @@
 ﻿.menu-group .menu-entry {
-  margin: 0 0 0 3em;
+  margin: 0 1em;
+  padding-left: 2em; 
 }
 
 .menu-group {
   > div.active{
-    @apply text-white bg-primary-700
+    @apply text-primary-600 bg-primary-100
   }
+  
   .menu-entry.active {
     @apply text-primary-600 font-semibold
   }
+  
+  .menu-entry::before {
+    @apply bg-primary-600;
+    content: '';
+    display: inline-block;
+    border-radius: 50px;
+    margin-right: 10px;
+    height: 8px;
+    width: 8px;
+    visibility: hidden;
+  }
+
+  .menu-entry.active::before {
+    visibility: visible;
+  }
+    
   @apply text-gray-600
 }
 
@@ -17,7 +35,7 @@
 }
 
 .menu-entry.active:not(.has-parent) {
-  @apply text-white bg-primary-700 font-semibold
+  @apply text-primary-600 bg-primary-100 font-semibold
 }
 
 .menu-icon {

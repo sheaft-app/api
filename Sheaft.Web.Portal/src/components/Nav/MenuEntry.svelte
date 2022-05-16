@@ -23,18 +23,20 @@
   class:has-parent='{entry.parent}'
   on:click='{() => navigate(entry.path)}'
 >
-  <div class='flex items-center'>
+  <span
+  class:flex={!entry.parent}
+  class:items-center={!entry.parent}>
     {#if !entry.parent}
       {#if entry.icon}
-        <div class='menu-icon'>
+        <span class='menu-icon'>
           <Fa icon={getFaIconFromFullName(entry.icon)} class='menu-icon' />
-        </div>
+        </span>
       {:else}
-        <div class='menu-icon'>
+        <span class='menu-icon'>
           <Fa icon={getFaIcon('fas', 'angleRight')} class='' />
-        </div>
+        </span>
       {/if}
     {/if}
     <span class='ml-2'>{entry.title}</span>
-  </div>
+  </span>
 </li>

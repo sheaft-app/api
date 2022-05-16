@@ -1,4 +1,4 @@
-﻿<!-- routify:options index=true -->
+﻿<!-- routify:options index=1 -->
 <!-- routify:options menu=true -->
 <!-- routify:options title="Home" -->
 <!-- routify:options icon="fas#house" -->

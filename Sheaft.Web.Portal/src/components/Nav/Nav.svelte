@@ -47,17 +47,12 @@
       parent: parent
     }
   }
-
-  const orderMenus = (items): Array<any> => {
-    return items
-  }
-
+  
   const menus = parseAndAssignToMenus($layout.children, menuDefinition)
-  const entries = orderMenus(menus)
 </script>
 
 <nav class='w-80 h-full flex flex-col'>
   <Logo />
-  <Menu entries='{entries}' expand='{true}' />
+  <Menu entries='{menus}' expand='{true}' />
   <User />
 </nav>
