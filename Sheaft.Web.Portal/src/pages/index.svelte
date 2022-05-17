@@ -8,7 +8,7 @@
 <!-- routify:options icon="fas#house" -->
 
 <div class='text-center'>
-  <img src='{logo}' alt='Svelte Logo' />
+  <img data-ujs-name="Welcome" />
   <h1>Hello Typescript!</h1>
   <p>
     Visit <a href='https://svelte.dev'>svelte.dev</a> to learn how to build Svelte apps.
