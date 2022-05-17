@@ -10,7 +10,7 @@
 </script>
 
 <nav class="w-80 h-full flex flex-col justify-between bg-white">
-  <Logo width='40' />
+  <Logo width='80' />
   <Menu entries="{menus}" expand="{true}" />
   <User class='w-full self-end' />
 </nav>

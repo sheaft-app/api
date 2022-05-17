@@ -15,7 +15,7 @@
 
 <div class='{$$props.class} text-gray-600'>
   {#if $isAuthenticated}
-    <div class='flex items-center justify-between'>
+    <div class='flex items-center justify-between border-t'>
       <div class='flex cursor-pointer items-center justify-center my-4 ml-4'>
           <img class="w-10 h-10 rounded-full border border-gray-100 shadow-sm"  alt='profile' src='https://images.unsplash.com/photo-1652117137751-ed18b1ff20da?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHx0b3BpYy1mZWVkfDE0fHRvd0paRnNrcEdnfHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=200&q=60' />        
         <div class='ml-4'>
