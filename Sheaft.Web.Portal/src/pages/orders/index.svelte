@@ -3,8 +3,8 @@
 </script>
 
 <!-- routify:options public=true -->
-<!-- routify:options menu=true -->
-<!-- routify:options title="Index" -->
+<!-- routify:options menu="Vos commandes" -->
+<!-- routify:options title="Vos commandes en cours" -->
 <!-- routify:options roles=[] -->
 <!-- routify:options index=1 -->
 <!-- routify:options icon="fas#addressBook" -->

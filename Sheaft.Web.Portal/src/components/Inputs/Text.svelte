@@ -4,10 +4,10 @@
   export let value: string = "";
   export let label: string = "";
   export let placeholder: string = "";
-  export let className: string = "";
+  export let isLoading: boolean = false
 </script>
 
 <div class="f-input">
-  <input type="text" placeholder="{placeholder}" bind:value class="{className}" />
+  <input type="text" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
   <label>{label}</label>
 </div>

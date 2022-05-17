@@ -3,9 +3,25 @@
 }
 
 html > *{
-  @apply text-gray-500
+  @apply text-gray-500;
+}
+
+h1, h2, h3{
+  @apply font-bold  text-primary-700;
 }
 
 h1{
-  @apply font-bold text-xl text-primary-700 my-8
+  @apply text-2xl my-8;
+}
+
+h2{
+  @apply text-xl my-6;
+}
+
+h3{
+  @apply text-xl my-4;
+}
+
+a {
+  @apply text-blue-600 hover:text-blue-700 focus:text-blue-700 active:text-blue-800 duration-200 transition ease-in-out;
 }

@@ -3,9 +3,9 @@
 </script>
 
 <!-- routify:options public=true -->
-<!-- routify:options menu=true -->
+<!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
-<!-- routify:options title="Create" -->
+<!-- routify:options title="Créer une commande" -->
 <!-- routify:options icon="fas#coffee" -->
 
 <h1>{$page.title}</h1>

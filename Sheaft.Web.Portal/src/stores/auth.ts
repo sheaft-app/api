@@ -1,9 +1,6 @@
 ﻿import { writable } from "svelte-local-storage-store";
-
 import { derived, get } from "svelte/store";
-
 import axios from "axios";
-
 import jwt_decode from "jwt-decode";
 
 let timer = null;
@@ -20,7 +17,11 @@ const userStore = writable("auth", {
   }
 });
 
-const login = async (username: string, password: string): Promise<boolean> => {
+export const user = derived([userStore], ([$userStore]) => $userStore.profile);
+export const tokens = derived([userStore], ([$userStore]) => $userStore.tokens);
+export const isAuthenticated = derived([userStore], ([$userStore]) => $userStore.isAuthenticated);
+
+export const login = async (username: string, password: string): Promise<boolean> => {
   try {
     const result = await axios.post("/api/token/login", { username, password });
 
@@ -39,7 +40,7 @@ const login = async (username: string, password: string): Promise<boolean> => {
   }
 };
 
-const logout = (): boolean => {
+export const logout = (): boolean => {
   try {
     userStore.update(as => {
       as.isAuthenticated = false;
@@ -56,7 +57,7 @@ const logout = (): boolean => {
   }
 };
 
-const forgot = async (username: string): Promise<boolean> => {
+export const forgot = async (username: string): Promise<boolean> => {
   try {
     await axios.post("/api/password/forgot", { email: username });
     return Promise.resolve(true);
@@ -65,7 +66,7 @@ const forgot = async (username: string): Promise<boolean> => {
   }
 };
 
-const reset = async (
+export const reset = async (
   code: string,
   newPassword: string,
   confirmPassword: string
@@ -82,7 +83,17 @@ const reset = async (
   }
 };
 
-const refreshToken = async () => {
+export const register = async (account:any): Promise<boolean> => {
+  try {
+    await axios.post("/api/register", account);
+
+    return Promise.resolve(true);
+  } catch (e) {
+    return Promise.reject(false);
+  }
+};
+
+export const refreshToken = async () => {
   const user = get(userStore);
   try {
     const result = await axios.post("/api/token/refresh", {
@@ -99,7 +110,7 @@ const refreshToken = async () => {
   }
 };
 
-const isInRoles = (roles?: Array<string>): boolean => {
+export const userIsInRoles = (roles?: Array<string>): boolean => {
   if (!roles) return true;
 
   const user = get(userStore);
@@ -177,23 +188,9 @@ const clearRefreshTokensHandler = () => {
   if (timer) clearTimeout(timer);
 };
 
-const authStore = {
-  user: derived([userStore], ([$userStore]) => $userStore.profile),
-  tokens: derived([userStore], ([$userStore]) => $userStore.tokens),
-  isAuthenticated: derived([userStore], ([$userStore]) => $userStore.isAuthenticated),
-  isInRoles,
-  login,
-  logout,
-  forgot,
-  reset,
-  refreshToken
-};
-
-export const getAuthStore = () => {
+export const initAuthStore = async () => {
   if (!initialized) {
     initialized = true;
-    refreshTokensIfRequired();
+    await refreshTokensIfRequired();
   }
-
-  return authStore;
 };

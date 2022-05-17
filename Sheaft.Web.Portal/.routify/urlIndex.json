@@ -1,8 +1,8 @@
 [
-  "/account/register",
+  "/auth/login",
   "/auth/forgot",
   "/auth/reset",
-  "/auth/login",
+  "/auth/register",
   "/unauthorized",
   "/index",
   "/orders/index",

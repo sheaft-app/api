@@ -4,10 +4,10 @@
   export let value: string = "";
   export let label: string = "";
   export let placeholder: string = "Votre adresse mail";
-  export let className: string = "";
+  export let isLoading: boolean = false
 </script>
 
 <div class="f-input">
-  <input type="email" placeholder="{placeholder}" bind:value class="{className}" />
+  <input type="email" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
   <label>{label}</label>
 </div>

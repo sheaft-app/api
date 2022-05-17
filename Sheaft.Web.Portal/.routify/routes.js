@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Mon May 16 2022 23:27:19 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Tue May 17 2022 20:29:16 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-16T21:27:19.122Z"
+export const __timestamp = "2022-05-17T18:29:16.149Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -50,134 +50,15 @@ export const _tree = {
       "component": () => import('../src/pages/_fallback.svelte').then(m => m.default)
     },
     {
-      "isFile": true,
+      "isFile": false,
       "isDir": true,
-      "file": "_reset.svelte",
-      "filepath": "/account/_reset.svelte",
-      "name": "_reset",
-      "ext": "svelte",
+      "file": "auth",
+      "filepath": "/auth",
+      "name": "auth",
+      "ext": "",
       "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/account/_reset.svelte",
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth",
       "children": [
-        {
-          "isFile": true,
-          "isDir": false,
-          "file": "register.svelte",
-          "filepath": "/account/register.svelte",
-          "name": "register",
-          "ext": "svelte",
-          "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/account/register.svelte",
-          "importPath": "../src/pages/account/register.svelte",
-          "isLayout": false,
-          "isReset": false,
-          "isIndex": false,
-          "isFallback": false,
-          "isPage": true,
-          "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
-            "title": "Renseigner vos informations"
-          },
-          "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
-            "title": "Renseigner vos informations",
-            "recursive": true,
-            "preload": false,
-            "prerender": true
-          },
-          "path": "/account/register",
-          "id": "_account_register",
-          "component": () => import('../src/pages/account/register.svelte').then(m => m.default)
-        }
-      ],
-      "isLayout": true,
-      "isReset": true,
-      "isIndex": false,
-      "isFallback": false,
-      "isPage": false,
-      "importPath": "../src/pages/account/_reset.svelte",
-      "ownMeta": {},
-      "meta": {
-        "recursive": true,
-        "preload": false,
-        "prerender": true
-      },
-      "path": "/account",
-      "id": "_account__reset",
-      "component": () => import('../src/pages/account/_reset.svelte').then(m => m.default)
-    },
-    {
-      "isFile": true,
-      "isDir": true,
-      "file": "_reset.svelte",
-      "filepath": "/auth/_reset.svelte",
-      "name": "_reset",
-      "ext": "svelte",
-      "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/_reset.svelte",
-      "children": [
-        {
-          "isFile": true,
-          "isDir": false,
-          "file": "forgot.svelte",
-          "filepath": "/auth/forgot.svelte",
-          "name": "forgot",
-          "ext": "svelte",
-          "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/forgot.svelte",
-          "importPath": "../src/pages/auth/forgot.svelte",
-          "isLayout": false,
-          "isReset": false,
-          "isIndex": false,
-          "isFallback": false,
-          "isPage": true,
-          "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true
-          },
-          "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
-            "recursive": true,
-            "preload": false,
-            "prerender": true
-          },
-          "path": "/auth/forgot",
-          "id": "_auth_forgot",
-          "component": () => import('../src/pages/auth/forgot.svelte').then(m => m.default)
-        },
-        {
-          "isFile": true,
-          "isDir": false,
-          "file": "reset.svelte",
-          "filepath": "/auth/reset.svelte",
-          "name": "reset",
-          "ext": "svelte",
-          "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/reset.svelte",
-          "importPath": "../src/pages/auth/reset.svelte",
-          "isLayout": false,
-          "isReset": false,
-          "isIndex": false,
-          "isFallback": false,
-          "isPage": true,
-          "ownMeta": {
-            "public": true,
-            "redirectIfAuthenticated": true
-          },
-          "meta": {
-            "public": true,
-            "redirectIfAuthenticated": true,
-            "recursive": true,
-            "preload": false,
-            "prerender": true
-          },
-          "path": "/auth/reset",
-          "id": "_auth_reset",
-          "component": () => import('../src/pages/auth/reset.svelte').then(m => m.default)
-        },
         {
           "isFile": true,
           "isDir": false,
@@ -209,23 +90,116 @@ export const _tree = {
           "path": "/auth/login",
           "id": "_auth_login",
           "component": () => import('../src/pages/auth/login.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "forgot.svelte",
+          "filepath": "/auth/forgot.svelte",
+          "name": "forgot",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/forgot.svelte",
+          "importPath": "../src/pages/auth/forgot.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "J'ai oublié mon mot de passe"
+          },
+          "meta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "J'ai oublié mon mot de passe",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/forgot",
+          "id": "_auth_forgot",
+          "component": () => import('../src/pages/auth/forgot.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "reset.svelte",
+          "filepath": "/auth/reset.svelte",
+          "name": "reset",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/reset.svelte",
+          "importPath": "../src/pages/auth/reset.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "public": true,
+            "redirectIfAuthenticated": true,
+            "title": "Modifier votre mot de passe"
+          },
+          "meta": {
+            "public": true,
+            "redirectIfAuthenticated": true,
+            "title": "Modifier votre mot de passe",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/reset",
+          "id": "_auth_reset",
+          "component": () => import('../src/pages/auth/reset.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "register.svelte",
+          "filepath": "/auth/register.svelte",
+          "name": "register",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/register.svelte",
+          "importPath": "../src/pages/auth/register.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations"
+          },
+          "meta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/register",
+          "id": "_auth_register",
+          "component": () => import('../src/pages/auth/register.svelte').then(m => m.default)
         }
       ],
-      "isLayout": true,
-      "isReset": true,
+      "isLayout": false,
+      "isReset": false,
       "isIndex": false,
       "isFallback": false,
       "isPage": false,
-      "importPath": "../src/pages/auth/_reset.svelte",
       "ownMeta": {},
       "meta": {
         "recursive": true,
         "preload": false,
         "prerender": true
       },
-      "path": "/auth",
-      "id": "_auth__reset",
-      "component": () => import('../src/pages/auth/_reset.svelte').then(m => m.default)
+      "path": "/auth"
     },
     {
       "isFile": true,
@@ -276,14 +250,14 @@ export const _tree = {
       "isPage": true,
       "ownMeta": {
         "index": 1,
-        "menu": true,
-        "title": "Home",
+        "menu": "Accueil",
+        "title": "Bienvenue sur votre dashboard",
         "icon": "fas#house"
       },
       "meta": {
         "index": 1,
-        "menu": true,
-        "title": "Home",
+        "menu": "Accueil",
+        "title": "Bienvenue sur votre dashboard",
         "icon": "fas#house",
         "recursive": true,
         "preload": false,
@@ -354,8 +328,8 @@ export const _tree = {
           "isPage": true,
           "ownMeta": {
             "public": true,
-            "menu": true,
-            "title": "Index",
+            "menu": "Vos commandes",
+            "title": "Vos commandes en cours",
             "roles": [],
             "index": 1,
             "icon": "fas#addressBook",
@@ -363,8 +337,8 @@ export const _tree = {
           },
           "meta": {
             "public": true,
-            "menu": true,
-            "title": "Index",
+            "menu": "Vos commandes",
+            "title": "Vos commandes en cours",
             "roles": [],
             "index": 1,
             "icon": "fas#addressBook",
@@ -394,16 +368,16 @@ export const _tree = {
           "isPage": true,
           "ownMeta": {
             "public": true,
-            "menu": true,
+            "menu": "Créer",
             "index": 2,
-            "title": "Create",
+            "title": "Créer une commande",
             "icon": "fas#coffee"
           },
           "meta": {
             "public": true,
-            "menu": true,
+            "menu": "Créer",
             "index": 2,
-            "title": "Create",
+            "title": "Créer une commande",
             "icon": "fas#coffee",
             "recursive": true,
             "preload": false,
@@ -421,15 +395,15 @@ export const _tree = {
       "isPage": false,
       "importPath": "../src/pages/orders/_layout.svelte",
       "ownMeta": {
-        "menu": true,
+        "menu": "Commandes",
         "index": 2,
-        "group": "Commandes",
+        "group": true,
         "icon": "fas#coffee"
       },
       "meta": {
-        "menu": true,
+        "menu": "Commandes",
         "index": 2,
-        "group": "Commandes",
+        "group": true,
         "icon": "fas#coffee",
         "recursive": true,
         "preload": false,
@@ -456,15 +430,15 @@ export const _tree = {
       "isPage": true,
       "ownMeta": {
         "public": true,
-        "menu": true,
-        "title": "Contact",
+        "menu": "Contact",
+        "title": "Contactez-nous",
         "index": 3,
         "icon": "fas#addressBook"
       },
       "meta": {
         "public": true,
-        "menu": true,
-        "title": "Contact",
+        "menu": "Contact",
+        "title": "Contactez-nous",
         "index": 3,
         "icon": "fas#addressBook",
         "recursive": true,

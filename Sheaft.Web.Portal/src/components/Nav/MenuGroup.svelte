@@ -6,7 +6,7 @@
   import Fa from "svelte-fa";
 
   export let entry: {
-    title: string;
+    name: string;
     path: string;
     pages: Array<any>;
     visible: boolean;
@@ -48,7 +48,7 @@
           <Fa icon="{getFaIcon('fas', 'angleRight')}" class="" />
         </div>
       {/if}
-      <span class="ml-2 ">{entry.title}</span>
+      <span class="ml-2 ">{entry.name}</span>
     </div>
     <Menu entries="{entry.pages}" expand="{isGroupActive}" />
   </li>

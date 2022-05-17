@@ -1,19 +1,20 @@
 <script lang="ts">
   import qs from "qs";
   import { page, goto, params } from "@roxi/routify";
-  import { getAuthStore } from "$stores/auth";
+  import { login } from "$stores/auth";
   import Password from "$components/Inputs/Password.svelte";
   import Email from "$components/Inputs/Email.svelte";
-  import Link from "$components/Link.svelte";
-  import Submit from "$components/Buttons/Submit.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
+  import Button from '$components/Buttons/Button.svelte'
 
   let username: string = $params.username;
   let password: string = "";
+  let isLoading:boolean = false;
 
-  const login = async () => {
+  const loginUser = async () => {
     try {
-      const result = await getAuthStore().login(username, password);
+      isLoading = true;
+      const result = await login(username, password);
       if (!result) return;
 
       const search = window.location.search.replace("?", "");
@@ -21,6 +22,7 @@
         search.indexOf("returnUrl") > -1 ? qs.parse(search)["returnUrl"] : "/";
       $goto(returnUrl);
     } catch (e) {
+      isLoading = false;
       console.log(e);
     }
   };
@@ -30,32 +32,24 @@
 <!-- routify:options public=true -->
 <!-- routify:options title="Bienvenue" -->
 
-<section class="h-screen bg-back-100">
-  <div class="container px-6 py-12 h-full">
-    <div class="flex justify-center items-center flex-wrap h-full g-6 text-gray-800">
-      <div class="md:w-8/12 lg:w-6/12 mb-12 md:mb-0">
-        <img
-          src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw1.svg"
-          class="w-full"
-          alt="Phone image"
-        />
-      </div>
-      <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
-        <h1>{$page.title}</h1>
-        <form>
-          <Email bind:value="{username}" className="mb-6 w-full" />
-          <Password bind:value="{password}" className="mb-6 w-full" />
-          <Link href="/auth/forgot?&email={username}">Mot de passe oublié?</Link>
-          <Submit on:click="{() => login()}" className="block w-full mt-8"
-            >Se connecter</Submit
-          >
-          <HorizontalSeparator>
-            <Link href="/account/register?&username={username}"
-              >Je n'ai pas de compte</Link
-            >
-          </HorizontalSeparator>
-        </form>
-      </div>
-    </div>
+<div class="flex justify-center items-center flex-wrap g-6 h-full">
+  <div class="md:w-8/12 lg:w-6/12 mb-12 md:mb-0">
+    <img data-ujs-name="Login" />
   </div>
-</section>
+  <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
+    <h1>{$page.title}</h1>
+    <form>
+      <Email bind:value="{username}" {isLoading} class="mb-6 w-full" />
+      <Password bind:value="{password}" {isLoading} class="mb-6 w-full" />
+      <a href="/auth/forgot?&email={username}">Mot de passe oublié?</a>
+      <Button type='submit' on:click="{loginUser}" class="primary w-full mt-8" {isLoading}
+        >Se connecter</Button
+      >
+      <HorizontalSeparator>
+        <a href="/auth/register?&username={username}"
+          >Je n'ai pas de compte</a
+        >
+      </HorizontalSeparator>
+    </form>
+  </div>
+</div>

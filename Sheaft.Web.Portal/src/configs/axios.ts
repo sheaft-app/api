@@ -1,4 +1,4 @@
-﻿import { getAuthStore } from "$stores/auth";
+﻿import { isAuthenticated, tokens } from "$stores/auth";
 import apiConfig from "$settings/api";
 import axios from "axios";
 import { get } from "svelte/store";
@@ -8,12 +8,11 @@ export const configureAxios = () => {
     function (config) {
       config.baseURL = apiConfig.url;
 
-      const authStore = getAuthStore();
-      if (!get(authStore.isAuthenticated)) return config;
+      if (!get(isAuthenticated)) return config;
 
-      const tokens = get(authStore.tokens);
+      const access_tokens = get(tokens);
       config.headers = {
-        Authorization: `${tokens.tokenType} ${tokens.accessToken}`
+        Authorization: `${access_tokens.tokenType} ${access_tokens.accessToken}`
       };
 
       return config;

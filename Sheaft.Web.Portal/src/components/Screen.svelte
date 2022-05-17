@@ -1,6 +1,6 @@
 <script lang="ts">
 </script>
 
-<div class="text-center p-4 mx-0 my-auto bg-gray-100 w-full h-full">
+<section class="p-8 w-full h-full overflow-auto">
   <slot />
-</div>
+</section>

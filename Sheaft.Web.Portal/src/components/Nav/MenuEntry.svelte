@@ -5,7 +5,7 @@
   import { getFaIcon, getFaIconFromFullName } from "$utils/faIcon";
 
   export let entry: {
-    title: string;
+    name: string;
     path: string;
     pages: Array<any>;
     parent: any;
@@ -42,6 +42,6 @@
         </span>
       {/if}
     {/if}
-    <span class="ml-2">{entry.title}</span>
+    <span class="ml-2">{entry.name}</span>
   </span>
 </li>
