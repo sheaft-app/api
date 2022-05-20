@@ -40,6 +40,7 @@
       <form class=''>
         <Email
           bind:value='{email}'
+          {isLoading}
           placeholder='Adresse mail de votre compte'
           class='mb-6 w-full'
         />

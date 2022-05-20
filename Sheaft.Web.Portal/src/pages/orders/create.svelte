@@ -2,7 +2,6 @@
   import { page } from "@roxi/routify";
 </script>
 
-<!-- routify:options public=true -->
 <!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
 <!-- routify:options title="Créer une commande" -->

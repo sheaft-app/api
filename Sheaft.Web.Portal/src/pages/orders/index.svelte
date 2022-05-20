@@ -2,7 +2,6 @@
   import { page } from "@roxi/routify";
 </script>
 
-<!-- routify:options public=true -->
 <!-- routify:options menu="Vos commandes" -->
 <!-- routify:options title="Vos commandes en cours" -->
 <!-- routify:options roles=[] -->

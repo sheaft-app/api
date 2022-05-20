@@ -42,7 +42,7 @@ public class RegisterAccountCommandShould
 
     private RegisterAccountCommand GetCommand(string email)
     {
-        return new RegisterAccountCommand(email, "password", "password", "test", "test@test.com", "0646654532", "test", "15932477173006", "line", "line", "zip", "city", "first", "last");
+        return new RegisterAccountCommand(email, "password", "password");
     }
 
     private RegisterAccountHandler InitHandler(List<EmailAddress> emails)

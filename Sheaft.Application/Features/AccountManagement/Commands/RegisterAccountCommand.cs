@@ -5,11 +5,7 @@ using Sheaft.Domain.AccountManagement;
 namespace Sheaft.Application.AccountManagement;
 
 public record RegisterAccountCommand
-    (string Email, string Password, string Confirm,
-        string TradeName, string ContactEmail, string ContactPhone, 
-        string CommercialName, string Siret,
-        string AddressLine1, string AddressLine2, string AddressZipcode, string AddressCity,
-        string Firstname, string Lastname) : ICommand<Result<string>>;
+    (string Email, string Password, string Confirm) : ICommand<Result<string>>;
 
 internal class RegisterAccountCommandValidator : AbstractValidator<RegisterAccountCommand>
 {
@@ -21,17 +17,6 @@ internal class RegisterAccountCommandValidator : AbstractValidator<RegisterAccou
         RuleFor(c => c.Password).NotEmpty().WithMessage("Password is required");
         RuleFor(c => c.Confirm).NotEmpty().WithMessage("Confirmation is required");
         RuleFor(c => c.Confirm).Equal(c => c.Password).WithMessage("Confirmation is different.");
-        
-        RuleFor(c => c.TradeName).NotEmpty().WithMessage("TradeName is required");
-        RuleFor(c => c.CommercialName).NotEmpty().WithMessage("CommercialName is required");
-        RuleFor(c => c.Siret).NotEmpty().WithMessage("Siret is required");
-        
-        RuleFor(c => c.ContactEmail).NotEmpty().WithMessage("ContactEmail is required");
-        RuleFor(c => c.ContactEmail).Matches(EmailAddress.EMAIL_REGEX).WithMessage("ContactEmail is invalid");
-
-        RuleFor(c => c.Firstname).NotEmpty().WithMessage("Firstname is required");
-        RuleFor(c => c.Lastname).NotEmpty().WithMessage("Lastname is required");
-
     }
 }
 

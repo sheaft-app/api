@@ -6,7 +6,7 @@
   import HorizontalSeparator from '$components/HorizontalSeparator.svelte'
   import { register } from '$stores/auth'
 
-  export let account: {} = {}
+  export let account: {email:string, password:string, confirm:string} = {}
   let isLoading: boolean = false
 
   const registerAccount = async () => {
@@ -15,7 +15,7 @@
 
       const result = await register(account)
       if (result)
-        $goto('/auth/login')
+        $goto('/auth/login', {username: account.email})
 
       isLoading = false
     } catch (e) {
@@ -35,19 +35,19 @@
   <div class='md:w-8/12 lg:w-5/12 lg:ml-20'>
     <h1>{$page.title}</h1>
     <form>
-      <Email bind:value='{account.username}' class='mb-6 w-full' />
-      <Password bind:value='{account.password}' class='mb-6 w-full' />
+      <Email bind:value='{account.email}' {isLoading} class='mb-6 w-full' />
+      <Password bind:value='{account.password}' {isLoading} class='mb-6 w-full' />
       <Password
-        bind:value='{account.confirmPassword}'
+        bind:value='{account.confirm}'
         placeholder='Confirmation de mot de passe'
         class='mb-6 w-full'
       />
-      <Button type='submit' on:click='{registerAccount}' class='primary w-full mt-8'
+      <Button type='submit' {isLoading} on:click='{registerAccount}' class='primary w-full mt-8'
       >Créer
       </Button
       >
       <HorizontalSeparator>
-        <a href='/auth/login?&username={account.username}'>J'ai déjà un compte</a>
+        <a href='/auth/login?&username={account.email}'>J'ai déjà un compte</a>
       </HorizontalSeparator>
     </form>
   </div>

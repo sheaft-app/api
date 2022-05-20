@@ -20,6 +20,7 @@ const userStore = writable("auth", {
 export const user = derived([userStore], ([$userStore]) => $userStore.profile);
 export const tokens = derived([userStore], ([$userStore]) => $userStore.tokens);
 export const isAuthenticated = derived([userStore], ([$userStore]) => $userStore.isAuthenticated);
+export const isRegistered = derived([userStore], ([$userStore]) => $userStore.isAuthenticated && $userStore.profile.roles.length > 0);
 
 export const login = async (username: string, password: string): Promise<boolean> => {
   try {
@@ -86,6 +87,26 @@ export const reset = async (
 export const register = async (account:any): Promise<boolean> => {
   try {
     await axios.post("/api/register", account);
+
+    return Promise.resolve(true);
+  } catch (e) {
+    return Promise.reject(false);
+  }
+};
+
+export const configureSupplier = async (account:any): Promise<boolean> => {
+  try {
+    await axios.post("/api/account/configure/supplier", account);
+
+    return Promise.resolve(true);
+  } catch (e) {
+    return Promise.reject(false);
+  }
+};
+
+export const configureCustomer = async (account:any): Promise<boolean> => {
+  try {
+    await axios.post("/api/account/configure/customer", account);
 
     return Promise.resolve(true);
   } catch (e) {

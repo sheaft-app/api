@@ -2,6 +2,7 @@
   "/auth/login",
   "/auth/forgot",
   "/auth/reset",
+  "/auth/configure",
   "/auth/register",
   "/unauthorized",
   "/index",

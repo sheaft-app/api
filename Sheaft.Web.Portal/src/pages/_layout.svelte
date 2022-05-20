@@ -1,5 +1,5 @@
 ﻿<script lang='ts'>
-  import { isAuthenticated, userIsInRoles } from '$stores/auth'
+  import { isAuthenticated, isRegistered, userIsInRoles } from '$stores/auth'
   import { checkPageAccess } from '$utils/page'
   import { page, goto, beforeUrlChange, params } from '@roxi/routify'
   import SideNav from '$components/Nav/SideNav.svelte'
@@ -7,14 +7,7 @@
   import Screen from '$components/Screen.svelte'
 
   $beforeUrlChange((event, route) => {
-    if (route.path.indexOf('/auth') > -1)
-      return true
-
-    const pageAccessResult = validateAccessToPage(
-      route.path,
-      route.meta,
-      $isAuthenticated
-    )
+    const pageAccessResult = checkPageAccess(route.path, route.meta, $isAuthenticated, $isRegistered, $params.returnUrl, userIsInRoles)
     if (!pageAccessResult)
       return true
 
@@ -22,35 +15,8 @@
     return false
   })
 
-  const validateAccessToPage = (
-    path: string,
-    meta: any,
-    isAuthenticated: boolean
-  ): any | null => {
-    const url = checkPageAccess(path, meta.redirectIfAuthenticated, isAuthenticated)
-    if (url) return { path: url }
-
-    if (
-      meta.roles &&
-      meta.roles.length > 0 &&
-      (!isAuthenticated || !userIsInRoles(meta.roles))
-    ) {
-      return { path: '/unauthorized' }
-    }
-
-    if (!meta.public && !isAuthenticated)
-      return {
-        path: '/auth/login',
-        params: { returnUrl: $params.returnUrl ?? `${window.location.pathname}${window.location.search}` }
-      }
-  }
-
   $: {
-    const pageAccessResult = validateAccessToPage(
-      $page.path,
-      $page.meta,
-      $isAuthenticated
-    )
+    const pageAccessResult = checkPageAccess($page.path, $page.meta, $isAuthenticated, $isRegistered, $params.returnUrl, userIsInRoles)
     if (pageAccessResult)
       $goto(pageAccessResult.path, pageAccessResult.params)
   }

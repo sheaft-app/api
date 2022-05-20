@@ -36,11 +36,13 @@
     <form>
       <Password
         bind:value='{newPassword}'
+        {isLoading}
         placeholder='Votre nouveau mot de passe'
         class='mb-6 w-full'
       />
       <Password
         bind:value='{confirmPassword}'
+        {isLoading}
         placeholder='Confirmer le nouveau mot de passe'
         class='mb-6 w-full'
       />

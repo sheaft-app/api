@@ -2,6 +2,7 @@
   import logo from '$assets/svelte.png'
 </script>
 
+<!-- routify:options public=true -->
 <!-- routify:options index=1 -->
 <!-- routify:options menu="Accueil" -->
 <!-- routify:options title="Bienvenue sur votre dashboard" -->

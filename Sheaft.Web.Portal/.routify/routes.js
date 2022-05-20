@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Tue May 17 2022 20:32:43 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri May 20 2022 11:13:46 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-17T18:32:43.021Z"
+export const __timestamp = "2022-05-20T09:13:46.827Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -158,6 +158,38 @@ export const _tree = {
         {
           "isFile": true,
           "isDir": false,
+          "file": "configure.svelte",
+          "filepath": "/auth/configure.svelte",
+          "name": "configure",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/auth/configure.svelte",
+          "importPath": "../src/pages/auth/configure.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations"
+          },
+          "meta": {
+            "redirectIfAuthenticated": true,
+            "public": true,
+            "title": "Renseigner vos informations",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/auth/configure",
+          "id": "_auth_configure",
+          "component": () => import('../src/pages/auth/configure.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
           "file": "register.svelte",
           "filepath": "/auth/register.svelte",
           "name": "register",
@@ -249,12 +281,14 @@ export const _tree = {
       "isFallback": false,
       "isPage": true,
       "ownMeta": {
+        "public": true,
         "index": 1,
         "menu": "Accueil",
         "title": "Bienvenue sur votre dashboard",
         "icon": "fas#house"
       },
       "meta": {
+        "public": true,
         "index": 1,
         "menu": "Accueil",
         "title": "Bienvenue sur votre dashboard",
@@ -293,13 +327,11 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
             "index": true,
             "title": "Details",
             "roles": []
           },
           "meta": {
-            "public": true,
             "index": true,
             "title": "Details",
             "roles": [],
@@ -327,7 +359,6 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
             "menu": "Vos commandes",
             "title": "Vos commandes en cours",
             "roles": [],
@@ -336,7 +367,6 @@ export const _tree = {
             "default": true
           },
           "meta": {
-            "public": true,
             "menu": "Vos commandes",
             "title": "Vos commandes en cours",
             "roles": [],
@@ -367,14 +397,12 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
             "menu": "Créer",
             "index": 2,
             "title": "Créer une commande",
             "icon": "fas#coffee"
           },
           "meta": {
-            "public": true,
             "menu": "Créer",
             "index": 2,
             "title": "Créer une commande",
