@@ -7,7 +7,7 @@
   import Screen from '$components/Screen.svelte'
 
   $beforeUrlChange((event, route) => {
-    const pageAccessResult = checkPageAccess(route.path, route.meta, $isAuthenticated, $isRegistered, $params.returnUrl, userIsInRoles)
+    const pageAccessResult = checkPageAccess(route.path, event.url, route.meta, $isAuthenticated, $isRegistered, $params.returnUrl ?? event.url, userIsInRoles)
     if (!pageAccessResult)
       return true
 
@@ -16,7 +16,7 @@
   })
 
   $: {
-    const pageAccessResult = checkPageAccess($page.path, $page.meta, $isAuthenticated, $isRegistered, $params.returnUrl, userIsInRoles)
+    const pageAccessResult = checkPageAccess("/", $page.path, $page.meta, $isAuthenticated, $isRegistered, $params.returnUrl, userIsInRoles)
     if (pageAccessResult)
       $goto(pageAccessResult.path, pageAccessResult.params)
   }

@@ -9,5 +9,5 @@
 
 <div class="f-input">
   <label>{label}</label>
-  <input type="email" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
+  <input type="tel" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
 </div>

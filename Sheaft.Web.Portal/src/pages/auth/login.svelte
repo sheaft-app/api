@@ -1,5 +1,4 @@
 <script lang="ts">
-  import qs from "qs";
   import { page, goto, params } from "@roxi/routify";
   import { login } from "$stores/auth";
   import Password from "$components/Inputs/Password.svelte";
@@ -17,10 +16,7 @@
       const result = await login(username, password);
       if (!result) return;
 
-      const search = window.location.search.replace("?", "");
-      const returnUrl =
-        search.indexOf("returnUrl") > -1 ? qs.parse(search)["returnUrl"] : "/";
-      $goto(returnUrl);
+      $goto($params.returnUrl ?? "/");
     } catch (e) {
       isLoading = false;
       console.log(e);
@@ -28,8 +24,7 @@
   };
 </script>
 
-<!-- routify:options redirectIfAuthenticated=true -->
-<!-- routify:options public=true -->
+<!-- routify:options anonymous=true -->
 <!-- routify:options title="Bienvenue" -->
 
 <div class="flex justify-center items-center flex-wrap g-6 h-full">
@@ -43,10 +38,9 @@
       <Password bind:value="{password}" {isLoading} class="mb-6 w-full" />
       <a href="/auth/forgot?&email={username}">Mot de passe oublié?</a>
       <Button type='submit' on:click="{loginUser}" class="primary w-full mt-8" {isLoading}
-        >Se connecter</Button
-      >
+        >Se connecter</Button>
       <HorizontalSeparator>
-        <a href="/auth/register?&username={username}"
+        <a href="/auth/register?&username={username}&returnUrl={$params.returnUrl}"
           >Je n'ai pas de compte</a
         >
       </HorizontalSeparator>

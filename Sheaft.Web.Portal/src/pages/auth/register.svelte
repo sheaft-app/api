@@ -1,10 +1,10 @@
 ﻿<script lang='ts'>
-  import { page, goto } from '@roxi/routify'
+  import { page, goto, params } from '@roxi/routify'
   import Email from '$components/Inputs/Email.svelte'
   import Password from '$components/Inputs/Password.svelte'
   import Button from '$components/Buttons/Button.svelte'
   import HorizontalSeparator from '$components/HorizontalSeparator.svelte'
-  import { register } from '$stores/auth'
+  import { login, register } from '$stores/auth'
 
   export let account: {email:string, password:string, confirm:string} = {}
   let isLoading: boolean = false
@@ -14,8 +14,13 @@
       isLoading = true
 
       const result = await register(account)
-      if (result)
-        $goto('/auth/login', {username: account.email})
+      if (result) {
+        const loginResult = await login(account.email, account.password);
+        if (loginResult && $params.returnUrl) 
+          $goto($params.returnUrl);        
+        else
+          $goto('/auth/login');
+      }
 
       isLoading = false
     } catch (e) {
@@ -24,8 +29,7 @@
   }
 </script>
 
-<!-- routify:options redirectIfAuthenticated=true -->
-<!-- routify:options public=true -->
+<!-- routify:options anonymous=true -->
 <!-- routify:options title="Renseigner vos informations" -->
 
 <div class='flex justify-center items-center flex-wrap h-full g-6 text-gray-800'>
@@ -47,7 +51,7 @@
       </Button
       >
       <HorizontalSeparator>
-        <a href='/auth/login?&username={account.email}'>J'ai déjà un compte</a>
+        <a href='/auth/login?&username={account.email}&returnUrl={$params.returnUrl}'>J'ai déjà un compte</a>
       </HorizontalSeparator>
     </form>
   </div>

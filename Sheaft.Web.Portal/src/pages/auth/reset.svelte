@@ -23,8 +23,7 @@
   }
 </script>
 
-<!-- routify:options public=true -->
-<!-- routify:options redirectIfAuthenticated=true -->
+<!-- routify:options anonymous=true -->
 <!-- routify:options title="Modifier votre mot de passe" -->
 
 <div class='flex justify-center items-center flex-wrap h-full g-6 text-gray-800'>

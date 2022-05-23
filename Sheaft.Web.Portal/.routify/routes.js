@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Fri May 20 2022 11:13:46 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Mon May 23 2022 19:09:39 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-20T09:13:46.827Z"
+export const __timestamp = "2022-05-23T17:09:39.581Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -75,13 +75,11 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "Bienvenue"
           },
           "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "Bienvenue",
             "recursive": true,
             "preload": false,
@@ -107,13 +105,11 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "J'ai oublié mon mot de passe"
           },
           "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "J'ai oublié mon mot de passe",
             "recursive": true,
             "preload": false,
@@ -139,13 +135,11 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "public": true,
-            "redirectIfAuthenticated": true,
+            "anonymous": true,
             "title": "Modifier votre mot de passe"
           },
           "meta": {
-            "public": true,
-            "redirectIfAuthenticated": true,
+            "anonymous": true,
             "title": "Modifier votre mot de passe",
             "recursive": true,
             "preload": false,
@@ -171,13 +165,9 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
             "title": "Renseigner vos informations"
           },
           "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
             "title": "Renseigner vos informations",
             "recursive": true,
             "preload": false,
@@ -203,13 +193,11 @@ export const _tree = {
           "isFallback": false,
           "isPage": true,
           "ownMeta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "Renseigner vos informations"
           },
           "meta": {
-            "redirectIfAuthenticated": true,
-            "public": true,
+            "anonymous": true,
             "title": "Renseigner vos informations",
             "recursive": true,
             "preload": false,

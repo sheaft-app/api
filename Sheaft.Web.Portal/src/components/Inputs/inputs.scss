@@ -17,11 +17,15 @@
     @apply m-0;
     @apply focus:text-gray-700;
     @apply focus:bg-white;
-    @apply focus:border-blue-600;
+    @apply focus:border-primary-600;
     @apply focus:outline-none;
   }
 
   label {
     @apply text-gray-700;
   }
+}
+
+select{
+  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5;
 }

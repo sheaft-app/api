@@ -32,6 +32,7 @@ const getMenuEntry = (route, title?: string, parent?: any) => {
     name: title ?? route.meta.menu,
     icon: route.meta.icon,
     public: route.meta.public,
+    anonymous: route.meta.anonymous,
     pages: [],
     visible: route.meta.menu && route.meta.menu.length > 0,
     referenced: (route.meta.index > 0 || route.meta.index) ?? false,

@@ -8,6 +8,6 @@
 </script>
 
 <div class="f-input">
-  <input type="text" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
   <label>{label}</label>
+  <input type="text" disabled={isLoading} placeholder="{placeholder}" bind:value class={$$props.class} />
 </div>

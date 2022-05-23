@@ -26,8 +26,7 @@
   }
 </script>
 
-<!-- routify:options redirectIfAuthenticated=true -->
-<!-- routify:options public=true -->
+<!-- routify:options anonymous=true -->
 <!-- routify:options title="J'ai oublié mon mot de passe" -->
 
 <div class='flex justify-center items-center flex-wrap h-full g-6 text-gray-800'>
