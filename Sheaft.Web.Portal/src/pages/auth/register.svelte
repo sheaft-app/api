@@ -5,8 +5,17 @@
   import Button from '$components/Buttons/Button.svelte'
   import HorizontalSeparator from '$components/HorizontalSeparator.svelte'
   import { login, register } from '$stores/auth'
+  import type { IRegisterAccount } from '$types/auth'
+  import Text from '$components/Inputs/Text.svelte'
 
-  export let account: {email:string, password:string, confirm:string} = {}
+  export let account: IRegisterAccount = {
+    email: null,
+    password: null,
+    confirm: null,
+    firstname: null,
+    lastname: null
+  }
+
   let isLoading: boolean = false
 
   const registerAccount = async () => {
@@ -15,11 +24,13 @@
 
       const result = await register(account)
       if (result) {
-        const loginResult = await login(account.email, account.password);
-        if (loginResult && $params.returnUrl) 
-          $goto($params.returnUrl);        
-        else
-          $goto('/auth/login');
+        const loginResult = await login(account.email, account.password)
+        if (loginResult && $params.returnUrl && $params.returnUrl.length > 1) 
+          $goto($params.returnUrl)
+        else if (loginResult)
+          $goto('/')
+        else 
+          $goto('/auth/login')
       }
 
       isLoading = false
@@ -39,19 +50,32 @@
   <div class='md:w-8/12 lg:w-5/12 lg:ml-20'>
     <h1>{$page.title}</h1>
     <form>
-      <Email bind:value='{account.email}' {isLoading} class='mb-6 w-full' />
-      <Password bind:value='{account.password}' {isLoading} class='mb-6 w-full' />
+      <div class='flex justify-between'>
+        <Text bind:value='{account.firstname}' isLoading='{isLoading}' class='w-full' placeholder='Votre prénom' />
+        <Text bind:value='{account.lastname}' isLoading='{isLoading}' class='w-full' placeholder='Votre nom' />
+      </div>
+      <Email bind:value='{account.email}' isLoading='{isLoading}' class='mb-6 w-full' />
+      <Password
+        bind:value='{account.password}'
+        isLoading='{isLoading}'
+        class='mb-6 w-full'
+      />
       <Password
         bind:value='{account.confirm}'
         placeholder='Confirmation de mot de passe'
         class='mb-6 w-full'
       />
-      <Button type='submit' {isLoading} on:click='{registerAccount}' class='primary w-full mt-8'
+      <Button
+        type='submit'
+        isLoading='{isLoading}'
+        on:click='{registerAccount}'
+        class='primary w-full mt-8'
       >Créer
-      </Button
-      >
+      </Button>
       <HorizontalSeparator>
-        <a href='/auth/login?&username={account.email}&returnUrl={$params.returnUrl}'>J'ai déjà un compte</a>
+        <a href='/auth/login?&username={account.email}&returnUrl={$params.returnUrl}'
+        >J'ai déjà un compte</a
+        >
       </HorizontalSeparator>
     </form>
   </div>

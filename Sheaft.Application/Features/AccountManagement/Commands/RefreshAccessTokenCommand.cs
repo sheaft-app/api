@@ -18,13 +18,16 @@ internal class RefreshAccessTokenHandler : ICommandHandler<RefreshAccessTokenCom
 {
     private readonly IUnitOfWork _uow;
     private readonly ISecurityTokensProvider _securityTokensProvider;
+    private readonly IRetrieveProfile _retrieveProfile;
 
     public RefreshAccessTokenHandler(
         IUnitOfWork uow,
-        ISecurityTokensProvider securityTokensProvider)
+        ISecurityTokensProvider securityTokensProvider,
+        IRetrieveProfile retrieveProfile)
     {
         _uow = uow;
         _securityTokensProvider = securityTokensProvider;
+        _retrieveProfile = retrieveProfile;
     }
 
     public async Task<Result<AuthenticationTokenDto>> Handle(RefreshAccessTokenCommand request, CancellationToken token)
@@ -33,9 +36,13 @@ internal class RefreshAccessTokenHandler : ICommandHandler<RefreshAccessTokenCom
         var accountResult = await _uow.Accounts.Get(username, token);
         if (accountResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(accountResult);
-
+        
         var account = accountResult.Value;
-        var refreshResult = account.RefreshAccessToken(refreshTokenId, _securityTokensProvider);
+        var accountProfileResult = await _retrieveProfile.GetAccountProfile(account.Identifier, token);
+        if (accountProfileResult.IsFailure)
+            return Result.Failure<AuthenticationTokenDto>(accountProfileResult);
+
+        var refreshResult = account.RefreshAccessToken(refreshTokenId, _securityTokensProvider, accountProfileResult.Value.HasValue ? accountProfileResult.Value.Value : null);
         if (refreshResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(refreshResult);
 

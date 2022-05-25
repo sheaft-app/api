@@ -8,16 +8,19 @@ public class Account : AggregateRoot
     {
     }
 
-    public Account(Username username, EmailAddress email, HashedPassword password)
+    public Account(Username username, EmailAddress email, HashedPassword password, Firstname firstname, Lastname lastname)
     {
         Identifier = AccountId.New();
         Username = username;
         Email = email;
         Password = password;
+        SetNames(firstname, lastname);
     }
 
-    public AccountId Identifier { get; } 
+    public AccountId Identifier { get; }
     public Username Username { get; private set; }
+    public Firstname Firstname { get; private set; }
+    public Lastname Lastname { get; private set; }
     public EmailAddress Email { get; private set; }
     public HashedPassword Password { get; private set; }
     public ResetPasswordInfo? ResetPasswordInfo { get; private set; }
@@ -32,6 +35,13 @@ public class Account : AggregateRoot
         Email = newEmailAddress;
 
         RaiseEvent(new EmailChanged(Identifier.Value, oldEmail, Email.Value));
+        return Result.Success();
+    }
+    
+    public Result SetNames(Firstname firstname, Lastname lastname)
+    {
+        Firstname = firstname;
+        Lastname = lastname;
         return Result.Success();
     }
 
@@ -52,7 +62,7 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    public Result<AuthenticationResult> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider, string? profileIdentifier = null)
+    public Result<AuthenticationResult> Login(string password, IPasswordHasher hasher, ISecurityTokensProvider securityTokensProvider, Profile profile)
     {
         var passwordIsValid = hasher.PasswordIsValid(password, Password);
         if (!passwordIsValid)
@@ -60,14 +70,14 @@ public class Account : AggregateRoot
         
         RaiseEvent(new AccountLoggedIn(Identifier.Value));
 
-        return GenerateAccessToken(securityTokensProvider, profileIdentifier);
+        return GenerateAccessToken(securityTokensProvider, profile);
     }
 
-    public Result<AuthenticationResult> RefreshAccessToken(RefreshTokenId refreshTokenId, ISecurityTokensProvider securityTokensProvider)
+    public Result<AuthenticationResult> RefreshAccessToken(RefreshTokenId refreshTokenId, ISecurityTokensProvider securityTokensProvider, Profile profile)
     {
         var existingToken = _refreshTokens.SingleOrDefault(rt => rt.Identifier == refreshTokenId);
         if(existingToken is {Expired: false} && existingToken.ExpiresOn > DateTimeOffset.UtcNow)
-            return GenerateAccessToken(securityTokensProvider, null);
+            return GenerateAccessToken(securityTokensProvider, profile);
         
         InvalidateAllRefreshTokens();
         
@@ -112,10 +122,10 @@ public class Account : AggregateRoot
         return Result.Success();
     }
 
-    private Result<AuthenticationResult> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider, string? profileIdentifier)
+    private Result<AuthenticationResult> GenerateAccessToken(ISecurityTokensProvider securityTokensProvider, Profile? profile)
     {
         var refreshToken = InsertNewRefreshToken(securityTokensProvider);
-        var accessToken = securityTokensProvider.GenerateAccessToken(this, profileIdentifier);
+        var accessToken = securityTokensProvider.GenerateAccessToken(this, profile);
 
         return Result.Success(new AuthenticationResult(accessToken.Value, refreshToken, accessToken.TokenType,
             accessToken.ExpiresIn));

@@ -2,7 +2,7 @@
 
 public interface ISecurityTokensProvider
 {
-    AccessToken GenerateAccessToken(Account account, string? profileIdentifier);
+    AccessToken GenerateAccessToken(Account account, Profile? profile);
     RefreshToken GenerateRefreshToken(AccountId accountIdentifier);
     (AccountId, RefreshTokenId) RetrieveTokenIdentifierData(string refreshToken);
 }

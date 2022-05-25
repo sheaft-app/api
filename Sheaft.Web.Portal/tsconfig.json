@@ -18,7 +18,9 @@
       "$assets/*": ["src/assets/*"],
       "$configs/*": ["src/configs/*"],
       "$styles/*": ["src/styles/*"],
-      "$settings/*": ["src/settings/*"]
+      "$settings/*": ["src/settings/*"],
+      "$types/*": ["src/types/*"],
+      "$enums/*": ["src/enums/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.cjs", "src/**/*.svelte"],

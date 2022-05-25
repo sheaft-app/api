@@ -33,7 +33,7 @@ internal static class DataHelpers
     public static Account GetDefaultAccount(PasswordHasher hasher, string email = "test@test.com",
         string password = "P@ssword")
     {
-        return new Account(new Username(email), new EmailAddress(email), HashedPassword.Create(password, hasher));
+        return new Account(new Username(email), new EmailAddress(email), HashedPassword.Create(password, hasher), new Firstname("first"), new Lastname("last"));
     }
 
     public static Supplier GetDefaultSupplier(AccountId accountIdentifier, string emailAddress = "test@test.com")

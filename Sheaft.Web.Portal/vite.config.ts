@@ -24,6 +24,8 @@ export default defineConfig({
       $styles: fileURLToPath(new URL("./src/styles", import.meta.url)),
       $configs: fileURLToPath(new URL("./src/configs", import.meta.url)),
       $settings: fileURLToPath(new URL("./src/settings", import.meta.url)),
+      $enums: fileURLToPath(new URL("./src/enums", import.meta.url)),
+      $types: fileURLToPath(new URL("./src/types", import.meta.url)),
     },
   },
   css: {

@@ -41,9 +41,9 @@ const getMenuEntry = (route, title?: string, parent?: any) => {
   };
 };
 
-export const parseLayoutTree = (children) =>{
-  return parseAndAssignToMenus(children, {});  
-}
+export const parseLayoutTree = children => {
+  return parseAndAssignToMenus(children, {});
+};
 
 export const canHighlightMenuItem = (entry, currentPath: string): boolean => {
   if (currentPath == entry.path) return true;
@@ -53,26 +53,22 @@ export const canHighlightMenuItem = (entry, currentPath: string): boolean => {
     return entry.parent.pages.find(p => !p.visible && p.path == currentPath) != null;
 };
 
-export const entryIsGroup = (entry):boolean =>{
-  return entry.pages && entry.pages.length > 0
-}
+export const entryIsGroup = (entry): boolean => {
+  return entry.pages && entry.pages.length > 0;
+};
 
-export const entryIsPage = (entry):boolean =>{
-  return entry.path && entry.path.length > 0
-}
+export const entryIsPage = (entry): boolean => {
+  return entry.path && entry.path.length > 0;
+};
 
-export const canDisplayEntry = (entry, isAuthenticated, isInRoles):boolean => {
-  if(!entry.visible)
-    return false;
+export const canDisplayEntry = (entry, isAuthenticated, isInRoles): boolean => {
+  if (!entry.visible) return false;
 
-  if(entry.public)
-    return true;
+  if (entry.public) return true;
 
-  if(!isAuthenticated)
-    return false;
+  if (!isAuthenticated) return false;
 
-  if(entry.roles && entry.roles.length > 0)
-    return isInRoles(entry.roles);
+  if (entry.roles && entry.roles.length > 0) return isInRoles(entry.roles);
 
   return true;
-}
+};

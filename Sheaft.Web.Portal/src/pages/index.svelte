@@ -1,5 +1,5 @@
-﻿<script lang='ts'>
-  import logo from '$assets/svelte.png'
+﻿<script lang="ts">
+  import logo from "$assets/svelte.png";
 </script>
 
 <!-- routify:options public=true -->
@@ -8,15 +8,15 @@
 <!-- routify:options title="Bienvenue sur votre dashboard" -->
 <!-- routify:options icon="fas#house" -->
 
-<div class='text-center'>
+<div class="text-center">
   <img data-ujs-name="Welcome" />
   <h1>Hello Typescript!</h1>
   <p>
-    Visit <a href='https://svelte.dev'>svelte.dev</a> to learn how to build Svelte apps.
+    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte apps.
   </p>
 
   <p>
-    Check out <a href='https://github.com/sveltejs/kit#readme'>SvelteKit</a> for the officially
+    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for the officially
     supported framework, also powered by Vite!
   </p>
 </div>

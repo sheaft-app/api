@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.Persistence;
 
@@ -22,11 +23,18 @@ public class RetrieveProfile : IRetrieveProfile
             var supplier = await _context.Set<Supplier>()
                 .SingleOrDefaultAsync(s => s.AccountIdentifier == identifier, token);
 
-            if (supplier == null)
-                return Result.Success(Maybe<Profile>.None);
+            if (supplier != null)
+                return Result.Success(
+                    Maybe<Profile>.From(new Profile(supplier.Identifier.Value, supplier.TradeName.Value,
+                        ProfileKind.Supplier)));
 
-            return Result.Success(
-                Maybe<Profile>.From(new Profile(supplier.Identifier.Value, supplier.TradeName.Value)));
+            var customer = await _context.Set<Customer>()
+                .SingleOrDefaultAsync(s => s.AccountIdentifier == identifier, token);
+
+            return Result.Success(customer != null ? 
+                Maybe<Profile>.From(new Profile(customer.Identifier.Value, customer.TradeName.Value, ProfileKind.Customer)) 
+                : Maybe<Profile>.None);
+
         }
         catch (Exception e)
         {

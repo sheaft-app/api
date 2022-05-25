@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Sheaft.Application.AccountManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.UnitTests.Fakes;
@@ -78,11 +79,12 @@ public class RefreshAccessTokenCommandShould
         var account = DataHelpers.GetDefaultAccount(hasher, username, password);
         
         context.Accounts.Add(account);
+        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(account.Identifier));
         context.SaveChanges();
         
-        var loginResult = account.Login(password, hasher, securityTokensProvider);
+        var loginResult = account.Login(password, hasher, securityTokensProvider, new Profile("test", "name", ProfileKind.Supplier));
 
-        var handler = new RefreshAccessTokenHandler(new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()), securityTokensProvider);
+        var handler = new RefreshAccessTokenHandler(new UnitOfWork(new FakeMediator(), context, new FakeLogger<UnitOfWork>()), securityTokensProvider, new RetrieveProfile(context));
             
         return (handler, loginResult.Value, securityTokensProvider);
     }

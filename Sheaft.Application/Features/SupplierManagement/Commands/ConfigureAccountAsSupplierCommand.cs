@@ -25,12 +25,12 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
             request.LegalAddress.Postcode, request.LegalAddress.City);
 
         var shippingAddress = request.ShippingAddress != null
-            ? new ShippingAddress(request.ShippingAddress.Name, new EmailAddress(request.ShippingAddress.Email), request.ShippingAddress.Street, request.ShippingAddress.Complement,
+            ? new ShippingAddress(request.ShippingAddress.Name ?? request.TradeName, new EmailAddress(request.ShippingAddress.Email ?? request.Email), request.ShippingAddress.Street, request.ShippingAddress.Complement,
                 request.ShippingAddress.Postcode, request.ShippingAddress.City)
             : null;
         
         var billingAddress = request.BillingAddress != null
-            ? new BillingAddress(request.BillingAddress.Name, new EmailAddress(request.BillingAddress.Email), request.BillingAddress.Street, request.BillingAddress.Complement,
+            ? new BillingAddress(request.BillingAddress.Name ?? request.TradeName, new EmailAddress(request.BillingAddress.Email ?? request.Email), request.BillingAddress.Street, request.BillingAddress.Complement,
                 request.BillingAddress.Postcode, request.BillingAddress.City)
             : null;
 

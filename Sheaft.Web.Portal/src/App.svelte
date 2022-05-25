@@ -3,11 +3,11 @@
   import { Router } from "@roxi/routify";
   import { routes } from "$routify/routes";
   import { configureAxios } from "$configs/axios";
-  import {initAuthStore} from '$stores/auth'
+  import { initAuthStore } from "$stores/auth";
 
   onMount(async () => {
-    await initAuthStore();
     configureAxios();
+    await initAuthStore();
   });
 </script>
 

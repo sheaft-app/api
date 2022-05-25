@@ -27,5 +27,9 @@
 }
 
 select{
-  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5;
+  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-500 focus:border-primary-500 block w-full p-2;
+}
+
+select:focus-visible{
+  outline: 1px solid rgb(124 58 237);
 }

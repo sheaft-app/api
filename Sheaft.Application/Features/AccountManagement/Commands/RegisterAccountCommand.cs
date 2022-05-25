@@ -5,7 +5,7 @@ using Sheaft.Domain.AccountManagement;
 namespace Sheaft.Application.AccountManagement;
 
 public record RegisterAccountCommand
-    (string Email, string Password, string Confirm) : ICommand<Result<string>>;
+    (string Email, string Password, string Confirm, string Firstname, string Lastname) : ICommand<Result<string>>;
 
 internal class RegisterAccountCommandValidator : AbstractValidator<RegisterAccountCommand>
 {
@@ -17,6 +17,9 @@ internal class RegisterAccountCommandValidator : AbstractValidator<RegisterAccou
         RuleFor(c => c.Password).NotEmpty().WithMessage("Password is required");
         RuleFor(c => c.Confirm).NotEmpty().WithMessage("Confirmation is required");
         RuleFor(c => c.Confirm).Equal(c => c.Password).WithMessage("Confirmation is different.");
+        
+        RuleFor(c => c.Firstname).NotEmpty().WithMessage("Firstname is required");
+        RuleFor(c => c.Lastname).NotEmpty().WithMessage("Lastname is required");
     }
 }
 
@@ -40,6 +43,8 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
             new Username(request.Email),
             email,
             new NewPassword(request.Password, request.Confirm),
+            new Firstname(request.Firstname),
+            new Lastname(request.Lastname),
             token);
 
         if (accountResult.IsFailure)

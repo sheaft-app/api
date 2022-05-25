@@ -25,20 +25,30 @@ public class SecurityTokensProvider : ISecurityTokensProvider
         _securitySettings = securitySettings;
     }
 
-    public AccessToken GenerateAccessToken(Account account, string? profileIdentifier)
+    public AccessToken GenerateAccessToken(Account account, Profile? profile)
     {
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, account.Identifier.Value),
-            new Claim(ClaimTypes.Name, account.Username.Value),
+            new Claim(ClaimTypes.Name, $"{account.Firstname.Value} {account.Lastname.Value}"),
             new Claim(ClaimTypes.Email, account.Email.Value),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
             new Claim(ClaimTypes.NameIdentifier, account.Username.Value),
-            //TODO new Claim("GroupIdentifier", account.Group.Value),
+            new Claim(ClaimTypes.GivenName, account.Firstname.Value),
+            new Claim(ClaimTypes.Surname, account.Lastname.Value)
         };
         
-        if(!string.IsNullOrWhiteSpace(profileIdentifier))
-            claims.Add(new Claim(CustomClaims.ProfileIdentifier, profileIdentifier));
+        if (profile != null)
+        {
+            claims.Add(new Claim(CustomClaims.ProfileIdentifier, profile.Identifier));
+            claims.Add(new Claim(CustomClaims.ProfileKind, profile.Kind.ToString("G")));
+            claims.Add(new Claim(CustomClaims.ProfileName, profile.Name));
+            claims.Add(new Claim(CustomClaims.ProfileStatus, "Registered"));
+        }
+        else
+        {
+            claims.Add(new Claim(CustomClaims.ProfileStatus, "Anonymous"));
+        }
 
         var expires = DateTimeOffset.UtcNow.AddMinutes(_securitySettings.AccessTokenExpirationInMinutes);
         

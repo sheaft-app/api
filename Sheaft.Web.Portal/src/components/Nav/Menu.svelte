@@ -2,12 +2,16 @@
   import { page } from "@roxi/routify";
   import MenuEntry from "./MenuEntry.svelte";
   import MenuGroup from "./MenuGroup.svelte";
-  import { isAuthenticated, userIsInRoles } from '$stores/auth'
-  import { canDisplayEntry, canHighlightMenuItem, entryIsGroup, entryIsPage } from '$components/Nav/menus.js'
+  import { isAuthenticated, userIsInRoles } from "$stores/auth";
+  import {
+    canDisplayEntry,
+    canHighlightMenuItem,
+    entryIsGroup,
+    entryIsPage
+  } from "$components/Nav/menus";
 
   export let entries = [];
   export let expand: boolean = false;
-  
 </script>
 
 <menu class="nav-menu flex-grow" class:h-0="{!expand}" class:hidden="{!expand}">

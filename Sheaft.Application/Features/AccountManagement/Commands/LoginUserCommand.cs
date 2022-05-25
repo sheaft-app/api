@@ -41,15 +41,11 @@ internal class LoginUserHandler : ICommandHandler<LoginUserCommand, Result<Authe
             return Result.Failure<AuthenticationTokenDto>(accountResult);
         
         var account = accountResult.Value;
-        var profileIdentifierResult = await _retrieveProfile.GetAccountProfile(account.Identifier, token);
-        if (profileIdentifierResult.IsFailure)
-            return Result.Failure<AuthenticationTokenDto>(profileIdentifierResult);
-
-        var profileIdentifier = profileIdentifierResult.Value.HasValue
-            ? profileIdentifierResult.Value.Value.Identifier
-            : null;
+        var accountProfileResult = await _retrieveProfile.GetAccountProfile(account.Identifier, token);
+        if (accountProfileResult.IsFailure)
+            return Result.Failure<AuthenticationTokenDto>(accountProfileResult);
         
-        var loginResult = account.Login(request.Password, _passwordHasher, _securityTokensProvider, profileIdentifier);
+        var loginResult = account.Login(request.Password, _passwordHasher, _securityTokensProvider, accountProfileResult.Value.HasValue ? accountProfileResult.Value.Value : null);
         if (loginResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(loginResult);
 

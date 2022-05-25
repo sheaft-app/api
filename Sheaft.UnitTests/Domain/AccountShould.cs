@@ -73,7 +73,7 @@ public class AccountShould
     public void Login_Successfully_If_Password_Is_Valid()
     {
         var account = InitTestAccount();
-        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders);
+        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders, new Profile("test", "name", ProfileKind.Supplier));
 
         Assert.IsTrue(result.IsSuccess);
         Assert.IsTrue(account.Events.Any(e => e.Value is AccountLoggedIn));
@@ -83,7 +83,7 @@ public class AccountShould
     public void Generate_A_Refresh_Token_On_Successfull_Login()
     {
         var account = InitTestAccount();
-        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders);
+        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders, new Profile("test", "name", ProfileKind.Supplier));
 
         Assert.IsTrue(result.IsSuccess);
     }
@@ -92,7 +92,7 @@ public class AccountShould
     public void Invalidate_Old_Refresh_Tokens_On_Successfull_Login()
     {
         var account = InitTestAccount();
-        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders);
+        var result = account.Login("aaaaaaaa", _passwordHasher, _securityTokenProviders, new Profile("test", "name", ProfileKind.Supplier));
 
         Assert.IsTrue(result.IsSuccess);
     }
@@ -101,7 +101,7 @@ public class AccountShould
     public void Fail_If_Password_Is_Invalid()
     {
         var account = InitTestAccount();
-        var result = account.Login("b", _passwordHasher, _securityTokenProviders);
+        var result = account.Login("b", _passwordHasher, _securityTokenProviders, new Profile("test", "name", ProfileKind.Supplier));
 
         Assert.IsTrue(result.IsFailure);
     }
@@ -172,6 +172,8 @@ public class AccountShould
         return new Account(
             new Username("testusername"),
             new EmailAddress(email ?? "test@test.com"),
-            HashedPassword.Create(new Password("aaaaaaaa"), _passwordHasher));
+            HashedPassword.Create(new Password("aaaaaaaa"), _passwordHasher),
+            new Firstname("first"),
+            new Lastname("last"));
     }
 }

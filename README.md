@@ -13,7 +13,7 @@
 ## Evolution du modèle de base de données
 
 Pour mettre à jour le modèle de données, nous utilisons les migrations d'EF.
-Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ../Sheaft.Web.Api/Sheaft.Web.Api.csproj -c AppDbContext
+Il faut donc faire les modifications nécessaires sur AppDbContext puis se placer dans le répertoire Sheaft.Infrastructure et executer:  dotnet-ef migrations add ##REPLACE## -s ../Sheaft.Web.Api/Sheaft.Web.Api.csproj -c AppDbContext  -o .\Persistence\Migrations\
 
 Vous pouvez ensuite appliquer la migration à l'aide de la commande suivante: dotnet-ef database update ##REPLACE###
 
