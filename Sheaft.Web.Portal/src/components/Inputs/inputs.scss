@@ -1,7 +1,7 @@
 ﻿.f-input {
   @apply mb-3;
 
-  input {
+  input, textarea {
     @apply block;
     @apply w-full;
     @apply px-3;
@@ -19,17 +19,52 @@
     @apply focus:bg-white;
     @apply focus:border-primary-600;
     @apply focus:outline-none;
+    @apply disabled:bg-gray-200;    
   }
 
   label {
+    @apply block;
+    @apply mb-2;
+    @apply text-sm;
+    @apply font-medium;
     @apply text-gray-700;
   }
 }
 
 select{
-  @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded focus:ring-primary-500 focus:border-primary-500 block w-full p-2;
+  @apply bg-gray-50;
+  @apply border;
+  @apply border-gray-300;
+  @apply text-gray-900;
+  @apply text-sm;
+  @apply rounded;
+  @apply focus:ring-primary-500;
+  @apply focus:border-primary-500;
+  @apply block;
+  @apply w-full;
+  @apply p-2;
 }
 
 select:focus-visible{
   outline: 1px solid rgb(124 58 237);
+}
+
+.f-radio{
+  @apply grow;
+
+  input{
+    @apply hidden;
+  }
+  
+  label{
+    @apply block;
+    @apply cursor-pointer;
+    @apply select-none;
+    @apply rounded-xl;
+    @apply bg-gray-200;
+    @apply m-2;
+    @apply p-2;
+    @apply text-center;
+    @apply hover:bg-gray-300;
+  }
 }

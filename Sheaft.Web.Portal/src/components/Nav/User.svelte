@@ -25,7 +25,7 @@
         <div class="ml-4">
           <p class="overflow-hidden overflow-ellipsis font-medium">{$account.name}</p>
           <small class="overflow-hidden overflow-ellipsis"
-            ><i>{$account.profile?.name ?? ''}</i></small
+            ><i>{$account.profile?.name ?? ""}</i></small
           >
         </div>
       </div>

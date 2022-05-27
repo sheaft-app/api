@@ -1,28 +1,28 @@
-﻿import type { IAddress } from './address'
-import type { ProfileKind, ProfileStatus } from '$enums/profile'
+﻿import type { IAddress } from "./address";
+import type { ProfileKind, ProfileStatus } from "$enums/profile";
 
 export interface IUser {
   id: string;
   username: string;
-  name: string,
-  firstname: string,
-  lastname: string,
+  name: string;
+  firstname: string;
+  lastname: string;
   email: string;
-  roles: [],
+  roles: [];
   profile: {
-    id: string,
-    name: string,
-    status: ProfileStatus,
-    kind: ProfileKind
-  }
+    id: string;
+    name: string;
+    status: ProfileStatus;
+    kind: ProfileKind;
+  };
 }
 
 export interface IRegisterAccount {
   email: string;
   password: string;
-  confirm: string,
-  firstname: string,
-  lastname: string
+  confirm: string;
+  firstname: string;
+  lastname: string;
 }
 
 export interface IConfigureAccount {

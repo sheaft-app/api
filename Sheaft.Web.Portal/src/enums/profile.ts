@@ -4,6 +4,6 @@
 }
 
 export enum ProfileStatus {
-  Anonymous= "Anonymous",
+  Anonymous = "Anonymous",
   Registered = "Registered"
 }

@@ -4,6 +4,7 @@
   import Fa from "svelte-fa";
   import { faSpinner } from "@fortawesome/free-solid-svg-icons";
   import { getFaIconFromFullName } from "$utils/faIcon";
+  import { nanoid } from "nanoid";
 
   export let isLoading: boolean = false;
   export let disabled: boolean = false;
@@ -19,10 +20,11 @@
 </script>
 
 <button
+  id="{nanoid()}"
   type="{$$props.type}"
   disabled="{disabled || isLoading}"
   class="{$$props.class}"
-  on:click|preventDefault="{dispatchClick}"
+  on:click="{dispatchClick}"
 >
   {#if isLoading}
     <Fa icon="{faSpinner}" spin class="mx-5" scale="1.5" />

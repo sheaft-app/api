@@ -4,10 +4,12 @@
 
   export let value: string = "";
   export let label: string = "";
+  export let min: number = null;
+  export let max: number = null;
   export let placeholder: string = "";
   export let isLoading: boolean = false;
   export let required: boolean = true;
-
+  
   const id = nanoid(10);
 </script>
 
@@ -15,14 +17,13 @@
   <label for="{id}">{label} {required ? '*' : ''}</label>
   <input
     id="{id}"
-    type="text"
+    type="number"
     disabled="{isLoading}"
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"
-    pattern="[0-9]"
-    maxlength="14"
-    minlength="14"
     required='{required}'
+    min='{min ?? 0}'
+    max='{max ?? 9999}'
   />
 </div>

@@ -2,8 +2,8 @@
   import { page } from "@roxi/routify";
 </script>
 
-<!-- routify:options menu="Mes commandes" -->
-<!-- routify:options title="Commandes en cours" -->
+<!-- routify:options menu="Mes livraisons" -->
+<!-- routify:options title="Livraisons" -->
 <!-- routify:options roles=[] -->
 <!-- routify:options index=1 -->
 <!-- routify:options default=true -->

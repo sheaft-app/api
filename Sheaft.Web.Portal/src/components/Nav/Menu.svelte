@@ -19,7 +19,7 @@
     {#if canDisplayEntry(entries[key], $isAuthenticated, userIsInRoles)}
       {#if entryIsGroup(entries[key])}
         <MenuGroup entry="{entries[key]}" />
-      {:else if entryIsPage(entries[key])}
+      {:else if entryIsPage(entries[key]) && !entries[key].default}
         <MenuEntry
           entry="{entries[key]}"
           canHighlight="{canHighlightMenuItem(entries[key], $page.path)}"

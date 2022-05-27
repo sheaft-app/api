@@ -70,7 +70,7 @@
     {/if}
   {/each}
 </div>
-<div class='my-4'>
+<div class="my-4">
   <slot currentPosition="{currentPosition}" />
 </div>
 <div class="flex my-6">

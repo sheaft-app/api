@@ -11,7 +11,7 @@ public record VatRate
             _ => value
         };
 
-        if (value != 0 && value != 550 && value != 700 && value != 1000 && value != 2000)
+        if (value != 0 && value != 55 && value != 70 && value != 100 && value != 200)
             throw new InvalidOperationException("VAT Rate is invalid");
     }
 

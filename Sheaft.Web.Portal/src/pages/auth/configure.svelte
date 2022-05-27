@@ -1,14 +1,8 @@
 ﻿<script lang="ts">
   import { page, goto, params } from "@roxi/routify";
-  import { configureCustomer, configureSupplier, refreshToken } from '$stores/auth'
-  import type {
-    IConfigureCustomer,
-    IConfigureSupplier,
-  } from "$types/auth";
-  import type {
-    IAddress,
-    INamedAddress
-  } from "$types/address";
+  import { configureCustomer, configureSupplier, refreshToken } from "$stores/auth";
+  import type { IConfigureCustomer, IConfigureSupplier } from "$types/auth";
+  import type { IAddress, INamedAddress } from "$types/address";
   import Select from "$components/Inputs/Select.svelte";
   import Text from "$components/Inputs/Text.svelte";
   import Siret from "$components/Inputs/Siret.svelte";
@@ -17,8 +11,8 @@
   import Stepper from "$components/Stepper/Stepper.svelte";
   import Checkbox from "$components/Inputs/Checkbox.svelte";
   import Address from "$components/Inputs/Address.svelte";
-  import { ProfileKind } from '$enums/profile'
-  import NamedAddress from '$components/Inputs/NamedAddress.svelte'
+  import { ProfileKind } from "$enums/profile";
+  import NamedAddress from "$components/Inputs/NamedAddress.svelte";
 
   export let account: IConfigureSupplier | IConfigureCustomer = {
     email: "",
@@ -112,7 +106,7 @@
         isLoading = false;
         return;
       }
-      
+
       await refreshToken();
 
       if ($params.returnUrl && $params.returnUrl.length > 1) $goto($params.returnUrl);
@@ -207,7 +201,12 @@
             label="Mon adresse de facturation est différente"
           />
           {#if hasDifferentBillingAddress}
-            <NamedAddress isLoading="{isLoading}" bind:value="{billingAddress}" showName={true} showEmail={false}/>
+            <NamedAddress
+              isLoading="{isLoading}"
+              bind:value="{billingAddress}"
+              showName="{true}"
+              showEmail="{false}"
+            />
           {/if}
           <Checkbox
             isLoading="{isLoading}"
@@ -215,7 +214,12 @@
             label="Mon adresse d'expedition est différente"
           />
           {#if hasDifferentShippingAddress}
-            <NamedAddress isLoading="{isLoading}" bind:value="{shippingAddress}" showName={true} showEmail={false} />
+            <NamedAddress
+              isLoading="{isLoading}"
+              bind:value="{shippingAddress}"
+              showName="{true}"
+              showEmail="{false}"
+            />
           {/if}
         {/if}
       </Stepper>

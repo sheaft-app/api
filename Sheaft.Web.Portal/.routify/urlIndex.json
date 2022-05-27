@@ -6,7 +6,13 @@
   "/auth/register",
   "/unauthorized",
   "/index",
+  "/products/index",
+  "/products/create",
   "/orders/index",
   "/orders/create",
-  "/contact"
+  "/deliveries/index",
+  "/deliveries/create",
+  "/billings/index",
+  "/billings/create",
+  "/documents/index"
 ]

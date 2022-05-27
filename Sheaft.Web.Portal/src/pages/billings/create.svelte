@@ -4,6 +4,7 @@
 
 <!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
-<!-- routify:options title="Créer une commande" -->
+<!-- routify:options title="Ajouter un nouveau produit" -->
+<!-- routify:options icon="fas#coffee" -->
 
 <h1>{$page.title}</h1>

@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Wed May 25 2022 19:04:45 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri May 27 2022 18:04:31 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-25T17:04:45.538Z"
+export const __timestamp = "2022-05-27T16:04:31.332Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -293,12 +293,186 @@ export const _tree = {
       "isFile": true,
       "isDir": true,
       "file": "_layout.svelte",
+      "filepath": "/products/_layout.svelte",
+      "name": "_layout",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/products/_layout.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "[id].svelte",
+          "filepath": "/products/[id].svelte",
+          "name": "[id]",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/products/[id].svelte",
+          "importPath": "../src/pages/products/[id].svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "index": true,
+            "title": "Details du produit",
+            "roles": []
+          },
+          "meta": {
+            "index": true,
+            "title": "Details du produit",
+            "roles": [],
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/products/:id",
+          "id": "_products__id",
+          "component": () => import('../src/pages/products/[id].svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/products/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/products/index.svelte",
+          "importPath": "../src/pages/products/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes produits",
+            "title": "Mes produits",
+            "roles": [],
+            "index": 1,
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes produits",
+            "title": "Mes produits",
+            "roles": [],
+            "index": 1,
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/products/index",
+          "id": "_products_index",
+          "component": () => import('../src/pages/products/index.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "create.svelte",
+          "filepath": "/products/create.svelte",
+          "name": "create",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/products/create.svelte",
+          "importPath": "../src/pages/products/create.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee"
+          },
+          "meta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/products/create",
+          "id": "_products_create",
+          "component": () => import('../src/pages/products/create.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": false,
+      "importPath": "../src/pages/products/_layout.svelte",
+      "ownMeta": {
+        "menu": "Produits",
+        "index": 2,
+        "group": true,
+        "icon": "fas#barcode"
+      },
+      "meta": {
+        "menu": "Produits",
+        "index": 2,
+        "group": true,
+        "icon": "fas#barcode",
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/products",
+      "id": "_products__layout",
+      "component": () => import('../src/pages/products/_layout.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_layout.svelte",
       "filepath": "/orders/_layout.svelte",
       "name": "_layout",
       "ext": "svelte",
       "badExt": false,
       "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/_layout.svelte",
       "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/orders/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/index.svelte",
+          "importPath": "../src/pages/orders/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes commandes",
+            "title": "Commandes en cours",
+            "roles": [],
+            "index": 1,
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes commandes",
+            "title": "Commandes en cours",
+            "roles": [],
+            "index": 1,
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/orders/index",
+          "id": "_orders_index",
+          "component": () => import('../src/pages/orders/index.svelte').then(m => m.default)
+        },
         {
           "isFile": true,
           "isDir": false,
@@ -316,12 +490,12 @@ export const _tree = {
           "isPage": true,
           "ownMeta": {
             "index": true,
-            "title": "Details",
+            "title": "Details de la commande",
             "roles": []
           },
           "meta": {
             "index": true,
-            "title": "Details",
+            "title": "Details de la commande",
             "roles": [],
             "recursive": true,
             "preload": false,
@@ -330,44 +504,6 @@ export const _tree = {
           "path": "/orders/:id",
           "id": "_orders__id",
           "component": () => import('../src/pages/orders/[id].svelte').then(m => m.default)
-        },
-        {
-          "isFile": true,
-          "isDir": false,
-          "file": "index.svelte",
-          "filepath": "/orders/index.svelte",
-          "name": "index",
-          "ext": "svelte",
-          "badExt": false,
-          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/orders/index.svelte",
-          "importPath": "../src/pages/orders/index.svelte",
-          "isLayout": false,
-          "isReset": false,
-          "isIndex": true,
-          "isFallback": false,
-          "isPage": true,
-          "ownMeta": {
-            "menu": "Vos commandes",
-            "title": "Vos commandes en cours",
-            "roles": [],
-            "index": 1,
-            "icon": "fas#addressBook",
-            "default": true
-          },
-          "meta": {
-            "menu": "Vos commandes",
-            "title": "Vos commandes en cours",
-            "roles": [],
-            "index": 1,
-            "icon": "fas#addressBook",
-            "default": true,
-            "recursive": true,
-            "preload": false,
-            "prerender": true
-          },
-          "path": "/orders/index",
-          "id": "_orders_index",
-          "component": () => import('../src/pages/orders/index.svelte').then(m => m.default)
         },
         {
           "isFile": true,
@@ -387,14 +523,12 @@ export const _tree = {
           "ownMeta": {
             "menu": "Créer",
             "index": 2,
-            "title": "Créer une commande",
-            "icon": "fas#coffee"
+            "title": "Créer une commande"
           },
           "meta": {
             "menu": "Créer",
             "index": 2,
             "title": "Créer une commande",
-            "icon": "fas#coffee",
             "recursive": true,
             "preload": false,
             "prerender": true
@@ -412,15 +546,15 @@ export const _tree = {
       "importPath": "../src/pages/orders/_layout.svelte",
       "ownMeta": {
         "menu": "Commandes",
-        "index": 2,
+        "index": 3,
         "group": true,
-        "icon": "fas#coffee"
+        "icon": "fas#fileLines"
       },
       "meta": {
         "menu": "Commandes",
-        "index": 2,
+        "index": 3,
         "group": true,
-        "icon": "fas#coffee",
+        "icon": "fas#fileLines",
         "recursive": true,
         "preload": false,
         "prerender": true
@@ -431,39 +565,353 @@ export const _tree = {
     },
     {
       "isFile": true,
-      "isDir": false,
-      "file": "contact.svelte",
-      "filepath": "/contact.svelte",
-      "name": "contact",
+      "isDir": true,
+      "file": "_layout.svelte",
+      "filepath": "/deliveries/_layout.svelte",
+      "name": "_layout",
       "ext": "svelte",
       "badExt": false,
-      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/contact.svelte",
-      "importPath": "../src/pages/contact.svelte",
-      "isLayout": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/deliveries/_layout.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "[id].svelte",
+          "filepath": "/deliveries/[id].svelte",
+          "name": "[id]",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/deliveries/[id].svelte",
+          "importPath": "../src/pages/deliveries/[id].svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "index": true,
+            "title": "Details de la livraison",
+            "roles": []
+          },
+          "meta": {
+            "index": true,
+            "title": "Details de la livraison",
+            "roles": [],
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/deliveries/:id",
+          "id": "_deliveries__id",
+          "component": () => import('../src/pages/deliveries/[id].svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/deliveries/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/deliveries/index.svelte",
+          "importPath": "../src/pages/deliveries/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes livraisons",
+            "title": "Livraisons",
+            "roles": [],
+            "index": 1,
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes livraisons",
+            "title": "Livraisons",
+            "roles": [],
+            "index": 1,
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/deliveries/index",
+          "id": "_deliveries_index",
+          "component": () => import('../src/pages/deliveries/index.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "create.svelte",
+          "filepath": "/deliveries/create.svelte",
+          "name": "create",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/deliveries/create.svelte",
+          "importPath": "../src/pages/deliveries/create.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee"
+          },
+          "meta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/deliveries/create",
+          "id": "_deliveries_create",
+          "component": () => import('../src/pages/deliveries/create.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
       "isReset": false,
       "isIndex": false,
       "isFallback": false,
-      "isPage": true,
+      "isPage": false,
+      "importPath": "../src/pages/deliveries/_layout.svelte",
       "ownMeta": {
-        "public": true,
-        "menu": "Contact",
-        "title": "Contactez-nous",
-        "index": 3,
-        "icon": "fas#addressBook"
+        "menu": "Livraisons",
+        "index": 4,
+        "group": true,
+        "icon": "fas#truckRampBox"
       },
       "meta": {
-        "public": true,
-        "menu": "Contact",
-        "title": "Contactez-nous",
-        "index": 3,
-        "icon": "fas#addressBook",
+        "menu": "Livraisons",
+        "index": 4,
+        "group": true,
+        "icon": "fas#truckRampBox",
         "recursive": true,
         "preload": false,
         "prerender": true
       },
-      "path": "/contact",
-      "id": "_contact",
-      "component": () => import('../src/pages/contact.svelte').then(m => m.default)
+      "path": "/deliveries",
+      "id": "_deliveries__layout",
+      "component": () => import('../src/pages/deliveries/_layout.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_layout.svelte",
+      "filepath": "/billings/_layout.svelte",
+      "name": "_layout",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/billings/_layout.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "[id].svelte",
+          "filepath": "/billings/[id].svelte",
+          "name": "[id]",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/billings/[id].svelte",
+          "importPath": "../src/pages/billings/[id].svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "index": true,
+            "title": "Details de la facture",
+            "roles": []
+          },
+          "meta": {
+            "index": true,
+            "title": "Details de la facture",
+            "roles": [],
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/billings/:id",
+          "id": "_billings__id",
+          "component": () => import('../src/pages/billings/[id].svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/billings/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/billings/index.svelte",
+          "importPath": "../src/pages/billings/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes factures",
+            "title": "Factures",
+            "roles": [],
+            "index": 1,
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes factures",
+            "title": "Factures",
+            "roles": [],
+            "index": 1,
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/billings/index",
+          "id": "_billings_index",
+          "component": () => import('../src/pages/billings/index.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "create.svelte",
+          "filepath": "/billings/create.svelte",
+          "name": "create",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/billings/create.svelte",
+          "importPath": "../src/pages/billings/create.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee"
+          },
+          "meta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter un nouveau produit",
+            "icon": "fas#coffee",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/billings/create",
+          "id": "_billings_create",
+          "component": () => import('../src/pages/billings/create.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": false,
+      "importPath": "../src/pages/billings/_layout.svelte",
+      "ownMeta": {
+        "menu": "Facturation",
+        "index": 5,
+        "group": true,
+        "icon": "fas#fileInvoiceDollar"
+      },
+      "meta": {
+        "menu": "Facturation",
+        "index": 5,
+        "group": true,
+        "icon": "fas#fileInvoiceDollar",
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/billings",
+      "id": "_billings__layout",
+      "component": () => import('../src/pages/billings/_layout.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_layout.svelte",
+      "filepath": "/documents/_layout.svelte",
+      "name": "_layout",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/documents/_layout.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/documents/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/documents/index.svelte",
+          "importPath": "../src/pages/documents/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes documents",
+            "title": "Documents",
+            "index": true,
+            "roles": [],
+            "icon": "fas#book",
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes documents",
+            "title": "Documents",
+            "index": true,
+            "roles": [],
+            "icon": "fas#book",
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/documents/index",
+          "id": "_documents_index",
+          "component": () => import('../src/pages/documents/index.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": false,
+      "importPath": "../src/pages/documents/_layout.svelte",
+      "ownMeta": {
+        "menu": "Documents",
+        "group": true,
+        "index": 6,
+        "icon": "fas#book"
+      },
+      "meta": {
+        "menu": "Documents",
+        "group": true,
+        "index": 6,
+        "icon": "fas#book",
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/documents",
+      "id": "_documents__layout",
+      "component": () => import('../src/pages/documents/_layout.svelte').then(m => m.default)
     }
   ],
   "isLayout": true,

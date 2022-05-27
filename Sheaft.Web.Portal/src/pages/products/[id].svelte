@@ -5,7 +5,7 @@
 </script>
 
 <!-- routify:options index=true -->
-<!-- routify:options title="Details de la commande" -->
+<!-- routify:options title="Details du produit" -->
 <!-- routify:options roles=[] -->
 
 <h1>{$page.title}</h1>

@@ -5,7 +5,7 @@
   city: string;
 }
 
-export interface INamedAddress extends IAddress{
+export interface INamedAddress extends IAddress {
   name: string;
   email: string;
 }

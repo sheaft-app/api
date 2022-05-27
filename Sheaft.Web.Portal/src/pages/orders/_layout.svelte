@@ -2,8 +2,8 @@
 </script>
 
 <!-- routify:options menu="Commandes" -->
-<!-- routify:options index=2 -->
+<!-- routify:options index=3 -->
 <!-- routify:options group=true -->
-<!-- routify:options icon="fas#coffee" -->
+<!-- routify:options icon="fas#fileLines" -->
 
 <slot />
