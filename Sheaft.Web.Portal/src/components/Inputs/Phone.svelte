@@ -4,7 +4,7 @@
 
   export let value: string = "";
   export let label: string = "";
-  export let placeholder: string = "Votre adresse mail";
+  export let placeholder: string = "Votre téléphone";
   export let isLoading: boolean = false;
   export let required: boolean = true;
 

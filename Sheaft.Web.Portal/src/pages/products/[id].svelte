@@ -4,9 +4,16 @@
   import { getProduct, product } from '$pages/products/service'
 
   export let id;
+  let isLoading = true;
   
   onMount(async () => {
-    await getProduct(id);
+    isLoading = true;
+    const result = await getProduct(id);
+    if(!result.success){
+      
+    }
+    
+    isLoading = false;
   });
 </script>
 

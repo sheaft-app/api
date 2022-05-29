@@ -4,18 +4,17 @@
   import LongText from "$components/Inputs/LongText.svelte";
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
-  import Number from "$components/Inputs/Number.svelte";
   import type { ICreateProduct } from "./types";
   import { round } from "$utils/number";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Form from "$components/Form/Form.svelte";
-  import { create } from "$stores/products";
+  import { create } from "./service";
 
   let isLoading = false;
   const product: ICreateProduct = {
     price: 0,
     name: "",
-    vat: 5.5
+    vat: 0.0550
   };
 
   const cancelCreate = () => {
@@ -65,7 +64,7 @@
     isLoading="{isLoading}"
   />
   <Vat label="TVA" bind:value="{product.vat}" isLoading="{isLoading}" />
-  <Number
+  <Price
     label="Prix TTC (calculé)"
     value="{fullPrice}"
     disabled="{true}"

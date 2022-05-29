@@ -7,7 +7,7 @@ html > *{
 }
 
 h1, h2, h3{
-  @apply font-bold  text-primary-700;
+  @apply font-bold  text-gray-600;
 }
 
 h1{
@@ -24,4 +24,32 @@ h3{
 
 a {
   @apply text-blue-600 hover:text-blue-700 focus:text-blue-700 active:text-blue-800 duration-200 transition ease-in-out;
+}
+
+table{
+  @apply w-full text-sm text-left text-gray-500;
+  
+  thead{
+    @apply text-xs text-gray-700 uppercase bg-gray-100;
+    
+    tr > th {
+      @apply px-6 py-3
+    }
+  }
+  
+  tbody{
+    @apply bg-white border-b hover:bg-gray-50;
+    
+    tr{
+      @apply cursor-pointer;
+    }
+    
+    th{
+      @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap;
+    }
+    
+    td{
+      @apply px-6 py-4;
+    }
+  }
 }
