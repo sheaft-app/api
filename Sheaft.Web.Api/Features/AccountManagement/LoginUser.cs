@@ -8,15 +8,21 @@ using Sheaft.Application.AccountManagement;
 namespace Sheaft.Web.Api.AccountManagement;
 
 [Route(Routes.TOKEN)]
-public class UserLogin : Feature
+public class LoginUser : Feature
 {
-    public UserLogin(ISheaftMediator mediator)
+    public LoginUser(ISheaftMediator mediator)
         : base(mediator)
     {
     }
 
+    /// <summary>
+    /// Log the user in and generate access token / refresh token
+    /// </summary>
     [AllowAnonymous]
-    [HttpPost("login")]
+    [HttpPost("login", Name = nameof(LoginUser))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenResponse>> Post([FromBody] LoginRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<LoginUserCommand>(), token);

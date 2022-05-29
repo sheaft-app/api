@@ -1,10 +1,13 @@
 ﻿import { isAuthenticated, tokens } from "$stores/auth";
 import apiConfig from "$settings/api";
-import axios from "axios";
 import { get } from "svelte/store";
+import type { Client } from '$types/api'
+import { OpenAPIClientAxios } from 'openapi-client-axios'
 
-export const configureAxios = () => {
-  axios.interceptors.request.use(
+export const api = new OpenAPIClientAxios({ definition: `${apiConfig.url}/swagger/v1/swagger.json`});
+
+export const configureAxios = (client: Client) => {
+  client.interceptors.request.use(
     function (config) {
       config.baseURL = apiConfig.url;
       config.headers = {

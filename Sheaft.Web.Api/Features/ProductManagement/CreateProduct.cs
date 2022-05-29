@@ -14,7 +14,13 @@ public class CreateProduct : Feature
     {
     }
 
-    [HttpPost("")]
+    /// <summary>
+    /// Create a product
+    /// </summary>
+    [HttpPost("", Name = nameof(CreateProduct))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] CreateProductRequest data, CancellationToken token)
     {
         var result =

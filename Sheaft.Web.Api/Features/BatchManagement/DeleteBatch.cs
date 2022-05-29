@@ -14,7 +14,13 @@ public class DeleteBatch : Feature
     {
     }
 
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Remove a batch
+    /// </summary>
+    [HttpDelete("{id}", Name = nameof(DeleteBatch))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new RemoveBatchCommand(new BatchId(id)), token);

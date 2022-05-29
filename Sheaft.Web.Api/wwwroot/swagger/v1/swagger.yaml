@@ -1,0 +1,1727 @@
+openapi: 3.0.1
+info:
+  title: Sheaft API
+  version: v1
+servers:
+  - url: https://localhost:5003
+paths:
+  '/api/agreements/{id}/accept':
+    put:
+      tags:
+        - AcceptAgreement
+      summary: Accept agreeement
+      operationId: AcceptAgreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptAgreementRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AcceptAgreementRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AcceptAgreementRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/accept':
+    post:
+      tags:
+        - AcceptOrder
+      summary: Accept order with id
+      operationId: AcceptOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptOrderRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AcceptOrderRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AcceptOrderRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}/cancel':
+    post:
+      tags:
+        - CancelInvoice
+      summary: Cancel invoice with id
+      operationId: CancelInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelInvoiceRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CancelInvoiceRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CancelInvoiceRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/cancel':
+    post:
+      tags:
+        - CancelOrder
+      summary: Cancel order with id
+      operationId: CancelOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CancelOrderRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/account/configure/customer:
+    post:
+      tags:
+        - ConfigureAccountAsCustomer
+      summary: Configure current user account as customer profile
+      operationId: ConfigureAccountAsCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/account/configure/supplier:
+    post:
+      tags:
+        - ConfigureAccountAsSupplier
+      summary: Configure user account as supplier profile
+      operationId: ConfigureAccountAsSupplier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/batches:
+    post:
+      tags:
+        - CreateBatch
+      summary: Create a batch with specified info
+      operationId: CreateBatch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBatchRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateBatchRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateBatchRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}/credit':
+    post:
+      tags:
+        - CreateCreditNoteDraft
+      summary: Create a credit note for invoice with id
+      operationId: CreateCreditNoteDraft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/deliveries/{id}/invoice':
+    post:
+      tags:
+        - CreateInvoiceForDelivery
+      summary: Create an invoice for delivery with id
+      operationId: CreateInvoiceForDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/orders/drafts:
+    post:
+      tags:
+        - CreateOrderDraft
+      summary: Create a new order draft
+      operationId: CreateOrderDraft
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderDraftRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderDraftRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderDraftRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/documents/preparation:
+    post:
+      tags:
+        - CreatePreparationDocument
+      summary: Create a preparation document for specfified orders
+      operationId: CreatePreparationDocument
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePreparationDocumentRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreatePreparationDocumentRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreatePreparationDocumentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/products:
+    post:
+      tags:
+        - CreateProduct
+      summary: Create a product
+      operationId: CreateProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    get:
+      tags:
+        - ListProducts
+      summary: List available products for supplier
+      operationId: ListProducts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/returnables:
+    post:
+      tags:
+        - CreateReturnable
+      summary: Create a returnable to be used with products
+      operationId: CreateReturnable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReturnableRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CreateReturnableRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CreateReturnableRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/batches/{id}':
+    delete:
+      tags:
+        - DeleteBatch
+      summary: Remove a batch
+      operationId: DeleteBatch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    put:
+      tags:
+        - UpdateBatch
+      summary: Update a batch
+      operationId: UpdateBatch
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBatchRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBatchRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateBatchRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/products/{id}':
+    delete:
+      tags:
+        - DeleteProduct
+      summary: Remove product with id
+      operationId: DeleteProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    get:
+      tags:
+        - GetProduct
+      summary: Retrieve product with id
+      operationId: GetProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    put:
+      tags:
+        - UpdateProduct
+      summary: Update product with id info
+      operationId: UpdateProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/returnables/{id}':
+    delete:
+      tags:
+        - DeleteReturnable
+      summary: Remove returnable with id
+      operationId: DeleteReturnable
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    put:
+      tags:
+        - UpdateReturnable
+      summary: Remove returnable with id info
+      operationId: UpdateReturnable
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReturnableRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReturnableRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateReturnableRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/deliveries/{id}/deliver':
+    post:
+      tags:
+        - DeliverOrder
+      summary: Delivery order with id
+      operationId: DeliverOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeliverOrdersRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/DeliverOrdersRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/DeliverOrdersRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/documents/{id}':
+    post:
+      tags:
+        - DownloadDocument
+      summary: Generate a secured download link for document
+      operationId: DownloadDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      tags:
+        - RemoveDocument
+      summary: Remove document with id
+      operationId: RemoveDocument
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/password/forgot:
+    post:
+      tags:
+        - ForgotPassword
+      summary: Generate and send a reset link on user email
+      operationId: ForgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/fulfill':
+    post:
+      tags:
+        - FulfillOrder
+      summary: Complete order with id
+      operationId: FulfillOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FulfillOrderRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/FulfillOrderRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/FulfillOrderRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/token/login:
+    post:
+      tags:
+        - LoginUser
+      summary: Log the user in and generate access token / refresh token
+      operationId: LoginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}/payed':
+    post:
+      tags:
+        - MarkInvoiceAsPayed
+      summary: Mark invoice with id as payed
+      operationId: MarkInvoiceAsPayed
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkInvoiceAsPayedRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/MarkInvoiceAsPayedRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/MarkInvoiceAsPayedRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/customers/{id}/agreement':
+    post:
+      tags:
+        - ProposeAgreementToCustomer
+      summary: Send an agreement to customer
+      operationId: ProposeAgreementToCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProposeAgreementToCustomerRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ProposeAgreementToCustomerRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ProposeAgreementToCustomerRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/suppliers/{id}/agreement':
+    post:
+      tags:
+        - ProposeAgreementToSupplier
+      summary: Send an agreement to supplier
+      operationId: ProposeAgreementToSupplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}/publish':
+    post:
+      tags:
+        - PublishInvoiceDraft
+      summary: Publish invoice with id
+      operationId: PublishInvoiceDraft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/publish':
+    post:
+      tags:
+        - PublishOrderDraft
+      summary: Publish (and send to supplier) order with id
+      operationId: PublishOrderDraft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishOrderDraftRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/PublishOrderDraftRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/PublishOrderDraftRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/token/refresh:
+    post:
+      tags:
+        - RefreshAccessToken
+      summary: Regenerate an access_token for current user
+      operationId: RefreshAccessToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/refuse':
+    post:
+      tags:
+        - RefuseOrder
+      summary: Refuse customer order with id
+      operationId: RefuseOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefuseOrderRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RefuseOrderRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RefuseOrderRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/register:
+    post:
+      tags:
+        - RegisterAccount
+      summary: Create an account with specified email/password
+      operationId: RegisterAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}':
+    delete:
+      tags:
+        - RemoveInvoiceDraft
+      summary: Remove invoice draft with id
+      operationId: RemoveInvoiceDraft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/password/reset:
+    post:
+      tags:
+        - ResetPassword
+      summary: Reset the password with the token retrieved from email link
+      operationId: ResetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/invoices/{id}/send':
+    post:
+      tags:
+        - SendInvoice
+      summary: Send invoice with id to customer
+      operationId: SendInvoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/customers/{id}':
+    put:
+      tags:
+        - UpdateCustomer
+      summary: Update current user customer profile
+      operationId: UpdateCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{id}/draft':
+    put:
+      tags:
+        - UpdateOrderDraftProducts
+      summary: Update order with id products
+      operationId: UpdateOrderDraftProducts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftProductsRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftProductsRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateDraftProductsRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/suppliers/{id}':
+    put:
+      tags:
+        - UpdateSupplier
+      summary: Update current user supplier profile
+      operationId: UpdateSupplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+components:
+  schemas:
+    AcceptAgreementRequest:
+      type: object
+      properties:
+        deliveryDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayOfWeek'
+          nullable: true
+        orderDelayInHoursBeforeDeliveryDay:
+          type: integer
+          format: int32
+          nullable: true
+      additionalProperties: false
+    AcceptOrderRequest:
+      type: object
+      properties:
+        newDeliveryDate:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    AddressDto:
+      type: object
+      properties:
+        street:
+          type: string
+          nullable: true
+        complement:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+      additionalProperties: false
+    BatchDateKind:
+      enum:
+        - 0
+        - 1
+        - 2
+      type: integer
+      format: int32
+    CancelInvoiceRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CancelOrderRequest:
+      type: object
+      properties:
+        cancellationReason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateBatchRequest:
+      type: object
+      properties:
+        number:
+          type: string
+          nullable: true
+        dateKind:
+          $ref: '#/components/schemas/BatchDateKind'
+        date:
+          $ref: '#/components/schemas/DateOnly'
+      additionalProperties: false
+    CreateOrderDraftRequest:
+      type: object
+      properties:
+        supplierIdentifier:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreatePreparationDocumentRequest:
+      type: object
+      properties:
+        orderIdentifiers:
+          type: array
+          items:
+            type: string
+          nullable: true
+        autoAcceptPendingOrders:
+          type: boolean
+          nullable: true
+      additionalProperties: false
+    CreateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+        description:
+          type: string
+          nullable: true
+        returnableIdentifier:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CreateReturnableRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+      additionalProperties: false
+    CustomerInfoRequest:
+      type: object
+      properties:
+        tradeName:
+          type: string
+          nullable: true
+        corporateName:
+          type: string
+          nullable: true
+        siret:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        legalAddress:
+          $ref: '#/components/schemas/AddressDto'
+        deliveryAddress:
+          $ref: '#/components/schemas/NamedAddressDto'
+        billingAddress:
+          $ref: '#/components/schemas/NamedAddressDto'
+      additionalProperties: false
+    DateOnly:
+      type: object
+      properties:
+        year:
+          type: integer
+          format: int32
+        month:
+          type: integer
+          format: int32
+        day:
+          type: integer
+          format: int32
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        dayOfYear:
+          type: integer
+          format: int32
+          readOnly: true
+        dayNumber:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    DayOfWeek:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      format: int32
+    DeliverOrdersRequest:
+      type: object
+      properties:
+        productsAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineAdjustmentRequest'
+          nullable: true
+        returnedReturnables:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineAdjustmentRequest'
+          nullable: true
+      additionalProperties: false
+    DeliveryLineRequest:
+      type: object
+      properties:
+        productIdentifier:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+        batchIdentifiers:
+          type: array
+          items:
+            type: string
+          nullable: true
+      additionalProperties: false
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+      additionalProperties: false
+    FulfillOrderRequest:
+      type: object
+      properties:
+        deliveryLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryLineRequest'
+          nullable: true
+        newDeliveryDate:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    LineAdjustmentRequest:
+      type: object
+      properties:
+        identifier:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+      additionalProperties: false
+    MarkInvoiceAsPayedRequest:
+      type: object
+      properties:
+        reference:
+          type: string
+          nullable: true
+        payedOn:
+          type: string
+          format: date-time
+        paymentKind:
+          $ref: '#/components/schemas/PaymentKind'
+      additionalProperties: false
+    NamedAddressDto:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        complement:
+          type: string
+          nullable: true
+        postcode:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+      additionalProperties: false
+    PaymentKind:
+      enum:
+        - 0
+        - 1
+      type: integer
+      format: int32
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        reference:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+      additionalProperties: false
+    ProductDtoPaginatedResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDto'
+          nullable: true
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        pageNumber:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+      additionalProperties: false
+    ProductQuantityDto:
+      type: object
+      properties:
+        productIdentifier:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+      additionalProperties: false
+    ProposeAgreementToCustomerRequest:
+      type: object
+      properties:
+        deliveryDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayOfWeek'
+          nullable: true
+        orderDelayInHoursBeforeDeliveryDay:
+          type: integer
+          format: int32
+          nullable: true
+      additionalProperties: false
+    PublishOrderDraftRequest:
+      type: object
+      properties:
+        deliveryDate:
+          type: string
+          format: date-time
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductQuantityDto'
+          nullable: true
+      additionalProperties: false
+    RefreshTokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RefuseOrderRequest:
+      type: object
+      properties:
+        refusalReason:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+        confirm:
+          type: string
+          nullable: true
+        firstname:
+          type: string
+          nullable: true
+        lastname:
+          type: string
+          nullable: true
+      additionalProperties: false
+    ResetPasswordRequest:
+      type: object
+      properties:
+        resetToken:
+          type: string
+          nullable: true
+        password:
+          type: string
+          nullable: true
+        confirm:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SupplierInfoRequest:
+      type: object
+      properties:
+        tradeName:
+          type: string
+          nullable: true
+        corporateName:
+          type: string
+          nullable: true
+        siret:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        legalAddress:
+          $ref: '#/components/schemas/AddressDto'
+        shippingAddress:
+          $ref: '#/components/schemas/NamedAddressDto'
+        billingAddress:
+          $ref: '#/components/schemas/NamedAddressDto'
+      additionalProperties: false
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          nullable: true
+        refresh_token:
+          type: string
+          nullable: true
+        token_type:
+          type: string
+          nullable: true
+        expires_in:
+          type: integer
+          format: int32
+      additionalProperties: false
+    UpdateBatchRequest:
+      type: object
+      properties:
+        number:
+          type: string
+          nullable: true
+        dateKind:
+          $ref: '#/components/schemas/BatchDateKind'
+        date:
+          $ref: '#/components/schemas/DateOnly'
+      additionalProperties: false
+    UpdateDraftProductsRequest:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductQuantityDto'
+          nullable: true
+      additionalProperties: false
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+        description:
+          type: string
+          nullable: true
+        returnableIdentifier:
+          type: string
+          nullable: true
+      additionalProperties: false
+    UpdateReturnableRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+      additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: http
+      description: JWT containing userid claim
+      scheme: Bearer

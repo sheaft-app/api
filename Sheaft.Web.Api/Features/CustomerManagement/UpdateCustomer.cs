@@ -13,7 +13,13 @@ public class UpdateCustomer : Feature
     {
     }
 
-    [HttpPut("{id}")]
+    /// <summary>
+    /// Update current user customer profile
+    /// </summary>
+    [HttpPut("{id}", Name = nameof(UpdateCustomer))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] CustomerInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<UpdateCustomerCommand>(), token);

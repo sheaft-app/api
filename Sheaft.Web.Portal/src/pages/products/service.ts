@@ -1,8 +1,9 @@
 ﻿import { derived, writable } from "svelte/store";
-import axios from "axios";
 import type { IListResult, IResult } from "$types/http";
 import { StatusCode } from "$enums/http";
 import type { ICreateProduct } from "./types";
+import { api } from '$configs/axios'
+import type { Client } from '$types/api'
 
 const store = writable({
   products: [],
@@ -21,7 +22,8 @@ export const product = derived(
 
 export const listProducts = async (page:number, take:number): Promise<IListResult<any>> => {
   try {
-    const result = await axios.get(`/api/products?page=${page}&take=${take}`);
+    const client = await api.getClient<Client>();
+    const result = await client.ListProducts({page, take});
     store.update(ps => {
       ps.products = result.data.items;
       return ps;
@@ -39,7 +41,8 @@ export const listProducts = async (page:number, take:number): Promise<IListResul
 
 export const getProduct = async (identifier: string): Promise<IResult<any>> => {
   try {
-    const result = await axios.get(`/api/products/${identifier}`);
+    const client = await api.getClient<Client>();
+    const result = await client.GetProduct({id:identifier});
     store.update(ps => {
       ps.product = result.data;
       return ps;
@@ -57,7 +60,8 @@ export const getProduct = async (identifier: string): Promise<IResult<any>> => {
 
 export const create = async (product: ICreateProduct): Promise<IResult<string>> => {
   try {
-    const result = await axios.post("/api/products", product);
+    const client = await api.getClient<Client>();
+    const result = await client.CreateProduct(null, product);
     return Promise.resolve({
       success: true,
       status: StatusCode.CREATED,

@@ -14,7 +14,13 @@ public class CreateOrderDraft : Feature
     {
     }
 
-    [HttpPost("drafts")]
+    /// <summary>
+    /// Create a new order draft
+    /// </summary>
+    [HttpPost("drafts", Name = nameof(CreateOrderDraft))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] CreateOrderDraftRequest data, CancellationToken token)
     {
         var result =

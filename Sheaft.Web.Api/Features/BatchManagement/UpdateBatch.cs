@@ -14,7 +14,13 @@ public class UpdateBatch : Feature
     {
     }
 
-    [HttpPut("{id}")]
+    /// <summary>
+    /// Update a batch
+    /// </summary>
+    [HttpPut("{id}", Name = nameof(UpdateBatch))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateBatchRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new UpdateBatchCommand(new BatchId(id), data.Number, data.DateKind,  data.Date), token);

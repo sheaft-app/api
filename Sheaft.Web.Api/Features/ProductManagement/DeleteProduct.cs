@@ -13,7 +13,13 @@ public class DeleteProduct : Feature
     {
     }
 
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Remove product with id
+    /// </summary>
+    [HttpDelete("{id}", Name = nameof(DeleteProduct))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new RemoveProductCommand(new ProductId(id)), token);

@@ -16,7 +16,13 @@ public class UpdateSupplier : Feature
     {
     }
 
-    [HttpPut("{id}")]
+    /// <summary>
+    /// Update current user supplier profile
+    /// </summary>
+    [HttpPut("{id}", Name = nameof(UpdateSupplier))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] SupplierInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<UpdateSupplierCommand>(), token);

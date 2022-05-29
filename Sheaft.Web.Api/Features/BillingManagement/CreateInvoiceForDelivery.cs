@@ -14,7 +14,13 @@ public class CreateInvoiceForDelivery : Feature
     {
     }
 
-    [HttpPost("{id}/invoice")]
+    /// <summary>
+    /// Create an invoice for delivery with id
+    /// </summary>
+    [HttpPost("{id}/invoice", Name = nameof(CreateInvoiceForDelivery))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new CreateInvoiceForDeliveryCommand(new DeliveryId(id)), token);

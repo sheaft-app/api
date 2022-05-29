@@ -14,7 +14,13 @@ public class GetProduct : Feature
     {
     }
 
-    [HttpGet("{id}")]
+    /// <summary>
+    /// Retrieve product with id
+    /// </summary>
+    [HttpGet("{id}", Name = nameof(GetProduct))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDto>> Get(string id, CancellationToken token)
     {
         var result = await Mediator.Query(new GetProductQuery(new ProductId(id)), token);

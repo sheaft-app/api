@@ -16,6 +16,8 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    var isInMemory = args.Length > 0;
+
     builder.Host.UseSerilog((ctx, lc) =>
         lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
     
@@ -30,7 +32,7 @@ try
 
     builder.Services.AddDomain();
     builder.Services.AddApplicationServices(builder.Configuration);
-    builder.Services.AddInfrastructureServices(builder.Configuration);
+    builder.Services.AddInfrastructureServices(builder.Configuration, isInMemory);
 
     builder.Services.AddLogging(config => { config.AddSerilog(dispose: true); });
 
@@ -51,7 +53,8 @@ try
         app.UseHsts();
     }
 
-    app.ApplyMigrations(app.Services.GetService<ILogger<Program>>());
+    if(!isInMemory)
+        app.ApplyMigrations(app.Services.GetService<ILogger<Program>>());
 
     app.UseCors("CORS");
     app.UseSerilogRequestLogging();
@@ -60,8 +63,8 @@ try
     app.UseAuthorization();
     app.UseWebSockets();
     
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseStaticFiles();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sheaft API v1"));
 
     app.UseEndpoints(endpoints =>
     {

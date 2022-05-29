@@ -13,8 +13,14 @@ public class AcceptAgreement : Feature
     {
     }
 
-    [HttpPut("{id}/accept")]
-    public async Task<ActionResult<string>> Post([FromRoute] string id, [FromBody] AcceptAgreementRequest data, CancellationToken token)
+    /// <summary>
+    /// Accept agreeement
+    /// </summary>
+    [HttpPut("{id}/accept", Name = nameof(AcceptAgreement))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] AcceptAgreementRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new AcceptAgreementCommand(new AgreementId(id), data.DeliveryDays, data.OrderDelayInHoursBeforeDeliveryDay), token);
         return HandleCommandResult(result);

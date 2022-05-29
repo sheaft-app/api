@@ -14,7 +14,13 @@ public class ConfigureAccountAsCustomer : Feature
     {
     }
 
-    [HttpPost("configure/customer")]
+    /// <summary>
+    /// Configure current user account as customer profile
+    /// </summary>
+    [HttpPost("configure/customer", Name = nameof(ConfigureAccountAsCustomer))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] CustomerInfoRequest data, CancellationToken token)
     {
         var result =

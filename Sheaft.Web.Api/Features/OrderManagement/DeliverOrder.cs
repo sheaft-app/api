@@ -14,7 +14,13 @@ public class DeliverOrder : Feature
     {
     }
 
-    [HttpPost("{id}/deliver")]
+    /// <summary>
+    /// Delivery order with id
+    /// </summary>
+    [HttpPost("{id}/deliver", Name = nameof(DeliverOrder))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] DeliverOrdersRequest? data, CancellationToken token)
     {
         var result = await Mediator.Execute(

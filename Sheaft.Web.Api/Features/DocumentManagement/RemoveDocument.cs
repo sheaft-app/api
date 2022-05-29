@@ -14,7 +14,13 @@ public class RemoveDocument : Feature
     {
     }
 
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Remove document with id
+    /// </summary>
+    [HttpDelete("{id}", Name = nameof(RemoveDocument))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new RemoveDocumentCommand(new DocumentId(id)), token);

@@ -2,6 +2,7 @@ import postcss from "./postcss.config.js";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 import { fileURLToPath, URL } from "url";
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 const production = process.env.NODE_ENV === 'production'
 
@@ -11,7 +12,8 @@ export default defineConfig({
     outDir: "./wwwroot",
   },
   plugins: [
-    svelte()
+    svelte(),
+    nodeResolve()
   ],
   resolve: {
     alias: {

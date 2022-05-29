@@ -13,7 +13,13 @@ public class SendInvoice : Feature
     {
     }
 
-    [HttpPost("{id}/send")]
+    /// <summary>
+    /// Send invoice with id to customer
+    /// </summary>
+    [HttpPost("{id}/send", Name = nameof(SendInvoice))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new SendInvoiceCommand(new InvoiceId(id)), token);

@@ -1,6 +1,5 @@
 ﻿import { writable } from "svelte-local-storage-store";
 import { derived, get } from "svelte/store";
-import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { ProfileKind, ProfileStatus } from "$enums/profile";
 import type {
@@ -9,6 +8,8 @@ import type {
   IConfigureSupplier,
   IUser
 } from "$types/auth";
+import { api } from '$configs/axios'
+import type { Client } from '$types/api'
 
 let timer = null;
 let initialized = false;
@@ -48,7 +49,8 @@ export const isRegistered = derived(
 
 export const login = async (username: string, password: string): Promise<boolean> => {
   try {
-    const result = await axios.post("/api/token/login", { username, password });
+    const client = await api.getClient<Client>();
+    const result = await client.LoginUser(null, { username, password });
 
     userStore.update(as => {
       as.isAuthenticated = true;
@@ -84,7 +86,8 @@ export const logout = (): boolean => {
 
 export const forgot = async (username: string): Promise<boolean> => {
   try {
-    await axios.post("/api/password/forgot", { email: username });
+    const client = await api.getClient<Client>();
+    await client.ForgotPassword(null, { email: username });
     return Promise.resolve(true);
   } catch (e) {
     return Promise.reject(false);
@@ -97,7 +100,8 @@ export const reset = async (
   confirmPassword: string
 ): Promise<boolean> => {
   try {
-    await axios.post("/api/password/reset", {
+    const client = await api.getClient<Client>();
+    await client.ResetPassword(null, {
       resetToken: code,
       password: newPassword,
       confirm: confirmPassword
@@ -110,7 +114,8 @@ export const reset = async (
 
 export const register = async (account: IRegisterAccount): Promise<boolean> => {
   try {
-    await axios.post("/api/register", account);
+    const client = await api.getClient<Client>();
+    await client.RegisterAccount(null, account);
 
     return Promise.resolve(true);
   } catch (e) {
@@ -131,14 +136,15 @@ export const configureCustomer = async (
 };
 
 const configure = async (
-  account: IConfigureCustomer,
+  account: any,
   type: ProfileKind
 ): Promise<boolean> => {
   try {
-    await axios.post(
-      `/api/account/configure/${type == ProfileKind.Customer ? "customer" : "supplier"}`,
-      account
-    );
+    const client = await api.getClient<Client>();
+    if(type == ProfileKind.Customer)
+      await client.ConfigureAccountAsCustomer(null, account);
+    else
+      await client.ConfigureAccountAsSupplier(null, account);  
 
     return Promise.resolve(true);
   } catch (e) {
@@ -152,8 +158,9 @@ export const refreshToken = async () => {
     return;
   
   try {
-    const result = await axios.post("/api/token/refresh", {
-      token: user.tokens.refreshToken
+    const client = await api.getClient<Client>();
+    const result = await client.RefreshAccessToken(null, {
+      token: user.tokens.refreshToken,
     });
 
     userStore.update(as => {

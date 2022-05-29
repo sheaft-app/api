@@ -14,9 +14,15 @@ public class ResetPassword : Feature
     {
     }
 
+    /// <summary>
+    /// Reset the password with the token retrieved from email link
+    /// </summary>
     [AllowAnonymous]
-    [HttpPost("reset")]
-    public async Task<ActionResult<string>> Post([FromBody] ResetPasswordRequest data, CancellationToken token)
+    [HttpPost("reset", Name = nameof(ResetPassword))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> Post([FromBody] ResetPasswordRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<ResetPasswordCommand>(), token);
         return HandleCommandResult(result);

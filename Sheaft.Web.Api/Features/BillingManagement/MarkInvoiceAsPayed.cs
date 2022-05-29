@@ -6,14 +6,20 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.BillingManagement;
 
 [Route(Routes.INVOICES)]
-public class SendInvoiceDraft : Feature
+public class MarkInvoiceAsPayed : Feature
 {
-    public SendInvoiceDraft(ISheaftMediator mediator)
+    public MarkInvoiceAsPayed(ISheaftMediator mediator)
         : base(mediator)
     {
     }
 
-    [HttpPost("{id}/payed")]
+    /// <summary>
+    /// Mark invoice with id as payed
+    /// </summary>
+    [HttpPost("{id}/payed", Name = nameof(MarkInvoiceAsPayed))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, MarkInvoiceAsPayedRequest data, CancellationToken token)
     {
         var result =

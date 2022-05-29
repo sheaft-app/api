@@ -13,7 +13,13 @@ public class RemoveInvoiceDraft : Feature
     {
     }
 
-    [HttpDelete("{id}")]
+    /// <summary>
+    /// Remove invoice draft with id
+    /// </summary>
+    [HttpDelete("{id}", Name = nameof(RemoveInvoiceDraft))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new RemoveInvoiceDraftCommand(new InvoiceId(id)), token);

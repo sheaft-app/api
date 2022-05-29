@@ -15,8 +15,14 @@ public class ForgotPassword : Feature
     {
     }
 
+    /// <summary>
+    /// Generate and send a reset link on user email
+    /// </summary>
     [AllowAnonymous]
-    [HttpPost("forgot")]
+    [HttpPost("forgot", Name = nameof(ForgotPassword))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] ForgotPasswordRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<ForgotPasswordCommand>(), token);

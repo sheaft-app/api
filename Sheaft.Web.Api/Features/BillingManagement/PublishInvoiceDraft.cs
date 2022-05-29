@@ -13,7 +13,13 @@ public class PublishInvoiceDraft : Feature
     {
     }
 
-    [HttpPost("{id}/publish")]
+    /// <summary>
+    /// Publish invoice with id
+    /// </summary>
+    [HttpPost("{id}/publish", Name = nameof(PublishInvoiceDraft))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
     {
         var result = await Mediator.Execute(new PublishInvoiceDraftCommand(new InvoiceId(id)), token);

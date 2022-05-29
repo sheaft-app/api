@@ -2,6 +2,7 @@ using Amazon;
 using Amazon.SimpleEmail;
 using DataModel;
 using Hangfire;
+using Hangfire.MemoryStorage;
 using Hangfire.SqlServer;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
@@ -43,18 +44,19 @@ namespace Sheaft.Infrastructure;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration,
+        bool isInMemory)
     {
         RegisterMediator(services);
         RegisterPdfServices(services);
         RegisterEmailServices(services, configuration);
         RegisterRepositories(services, configuration);
         RegisterQueries(services, configuration);
-        RegisterDatabaseServices(services, configuration);
+        RegisterDatabaseServices(services, configuration, isInMemory);
         RegisterSignalr(services);
         RegisterServices(services);
-        
-        RegisterHangfire(services, configuration);
+
+        RegisterHangfire(services, configuration, isInMemory);
 
         services.AddHttpClient();
         services.AddRazorTemplating();
@@ -68,22 +70,22 @@ public static class ServiceCollectionExtensions
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
-        
+
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();
-        
+
         services.AddScoped<ICatalogRepository, CatalogRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IReturnableRepository, ReturnableRepository>();
-        
+
         services.AddScoped<IAgreementRepository, AgreementRepository>();
-        
+
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IDeliveryRepository, DeliveryRepository>();
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-        
+
         services.AddScoped<IBatchRepository, BatchRepository>();
-        
+
         services.AddScoped<IDocumentRepository, DocumentRepository>();
     }
 
@@ -118,18 +120,18 @@ public static class ServiceCollectionExtensions
     private static void RegisterServices(IServiceCollection services)
     {
         services.AddScoped<IRetrieveProfile, RetrieveProfile>();
-        
+
         services.AddScoped<IUniquenessValidator, UniquenessValidator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISecurityTokensProvider, SecurityTokensProvider>();
-        
+
         services.AddScoped<IValidateSupplierRegistration, ValidateSupplierRegistration>();
         services.AddScoped<IValidateCustomerRegistration, ValidateCustomerRegistration>();
-        
+
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
-        
+
         services.AddScoped<IValidateAgreementProposal, ValidateAgreementProposal>();
-        
+
         services.AddScoped<IGenerateDeliveryCode, GenerateDeliveryCode>();
         services.AddScoped<IGenerateOrderCode, GenerateOrderCode>();
         services.AddScoped<IRetrieveAgreementForOrder, RetrieveAgreementForOrder>();
@@ -139,25 +141,26 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateDeliveryReturnedReturnables, CreateDeliveryReturnedReturnables>();
         services.AddScoped<ICreateDeliveryProductAdjustments, CreateDeliveryProductAdjustments>();
         services.AddScoped<ICreateDeliveryLines, CreateDeliveryLines>();
-        
+
         services.AddScoped<IGenerateCreditNoteCode, GenerateCreditNoteCode>();
         services.AddScoped<IGenerateInvoiceCode, GenerateInvoiceCode>();
         services.AddScoped<IRetrieveBillingInformation, RetrieveBillingInformation>();
-        
+
         services.AddScoped<IValidateAlteringBatchCapability, ValidateAlteringBatchCapability>();
-        
+
         services.AddScoped<IDocumentParamsHandler, DocumentParamsHandler>();
         services.AddScoped<IFileStorage, FileStorage>();
         services.AddScoped<IPreparationFileGenerator, PreparationFileGenerator>();
     }
 
-    private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration)
+    private static void RegisterDatabaseServices(IServiceCollection services, IConfiguration configuration,
+        bool isInMemory)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         var appDatabaseConfig =
             configuration.GetSection(AppDatabaseSettings.SETTING).Get<AppDatabaseSettings>();
-        
+
         var connectionStrings = new Dictionary<DatabaseConnectionName, string>
         {
             {DatabaseConnectionName.AppDatabase, appDatabaseConfig.ConnectionString}
@@ -165,35 +168,47 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDictionary<DatabaseConnectionName, string>>(connectionStrings);
         services.AddSingleton<IDbConnectionFactory, SqlDbConnectionFactory>();
-        
+
         services.AddDbContext<IDbContext, AppDbContext>(optionsBuilder =>
         {
-            optionsBuilder.UseSqlServer(appDatabaseConfig.ConnectionString);
+            if (isInMemory)
+                optionsBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString("N"));
+            else
+                optionsBuilder.UseSqlServer(appDatabaseConfig.ConnectionString);
         });
-        
-        services.AddLinqToDBContext<AppDb>((provider, options) => {
-            options
-                .UseSqlServer(appDatabaseConfig.ConnectionString)
-                .UseDefaultLogging(provider);
+
+        services.AddLinqToDBContext<AppDb>((provider, options) =>
+        {
+            if (isInMemory)
+                options
+                    .UseSQLite("Data Source=:memory:")
+                    .UseDefaultLogging(provider);
+            else
+                options
+                    .UseSqlServer(appDatabaseConfig.ConnectionString)
+                    .UseDefaultLogging(provider);
         });
     }
 
-    private static void RegisterHangfire(IServiceCollection services, IConfiguration configuration)
+    private static void RegisterHangfire(IServiceCollection services, IConfiguration configuration, bool isInMemory)
     {
         var jobsDatabaseConfig =
             configuration.GetSection(JobsDatabaseSettings.SETTING).Get<JobsDatabaseSettings>();
-        
+
         services.AddHangfire(hangfireConfig =>
         {
-            hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions
-            {
-                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                QueuePollInterval = TimeSpan.FromSeconds(15),
-                UseRecommendedIsolationLevel = true,
-                DisableGlobalLocks = true,
-                SchemaName = "hf"
-            });
+            if (isInMemory)
+                hangfireConfig.UseMemoryStorage(new MemoryStorageOptions());
+            else
+                hangfireConfig.UseSqlServerStorage(jobsDatabaseConfig.ConnectionString, new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.FromSeconds(15),
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true,
+                    SchemaName = "hf"
+                });
 
             //hangfireConfig.UseMemoryStorage();
 

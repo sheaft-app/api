@@ -13,7 +13,13 @@ public class CancelOrder : Feature
     {
     }
 
-    [HttpPost("{id}/cancel")]
+    /// <summary>
+    /// Cancel order with id
+    /// </summary>
+    [HttpPost("{id}/cancel", Name = nameof(CancelOrder))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] CancelOrderRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new CancelOrderCommand(new OrderId(id), data.CancellationReason), token);

@@ -13,7 +13,13 @@ public class FulfillOrder : Feature
     {
     }
 
-    [HttpPost("{id}/fulfill")]
+    /// <summary>
+    /// Complete order with id
+    /// </summary>
+    [HttpPost("{id}/fulfill", Name = nameof(FulfillOrder))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] FulfillOrderRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(

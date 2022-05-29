@@ -14,7 +14,13 @@ public class ListProducts : Feature
     {
     }
 
-    [HttpGet("")]
+    /// <summary>
+    /// List available products for supplier
+    /// </summary>
+    [HttpGet("", Name = nameof(ListProducts))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaginatedResults<ProductDto>>> List(CancellationToken token, int? page = 1, int? take = 10)
     {
         var result = await Mediator.Query(new ListProductsQuery(CurrentSupplierId, PageInfo.From(page, take)), token);

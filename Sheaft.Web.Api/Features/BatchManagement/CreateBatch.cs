@@ -15,7 +15,13 @@ public class CreateBatch : Feature
     {
     }
 
-    [HttpPost("")]
+    /// <summary>
+    /// Create a batch with specified info
+    /// </summary>
+    [HttpPost("", Name = nameof(CreateBatch))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] CreateBatchRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new CreateBatchCommand(data.Number, data.DateKind,  data.Date, CurrentSupplierId), token);

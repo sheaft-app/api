@@ -1,4 +1,5 @@
 # Svelte + TS + Vite
+- npm install -g openapi-client-axios-typegen
 
 This template should help get you started developing with Svelte and TypeScript in Vite.
 

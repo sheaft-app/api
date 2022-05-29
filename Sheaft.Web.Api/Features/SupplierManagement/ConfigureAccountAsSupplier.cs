@@ -15,7 +15,13 @@ public class ConfigureAccountAsSupplier : Feature
     {
     }
 
-    [HttpPost("configure/supplier")]
+    /// <summary>
+    /// Configure user account as supplier profile
+    /// </summary>
+    [HttpPost("configure/supplier", Name = nameof(ConfigureAccountAsSupplier))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] SupplierInfoRequest data, CancellationToken token)
     {
         var result =

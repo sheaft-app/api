@@ -13,7 +13,13 @@ public class UpdateReturnable : Feature
     {
     }
 
-    [HttpPut("{id}")]
+    /// <summary>
+    /// Remove returnable with id info
+    /// </summary>
+    [HttpPut("{id}", Name = nameof(UpdateReturnable))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateReturnableRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new UpdateReturnableCommand(new ReturnableId(id), data.Name, data.Code,  data.Price, data.Vat), token);

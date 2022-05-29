@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -97,6 +98,17 @@ public static class ServiceCollectionExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Sheaft API",
+                Version = "v1"
+            });
+            
+            c.SwaggerGeneratorOptions.Servers = new List<OpenApiServer>()
+            {
+                new() {Url = "https://localhost:5003" }
+            };
+            
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Reference = new OpenApiReference
@@ -110,6 +122,9 @@ public static class ServiceCollectionExtensions
                 Type = SecuritySchemeType.Http,
                 Scheme = "Bearer"
             });
+
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
 
         return services;

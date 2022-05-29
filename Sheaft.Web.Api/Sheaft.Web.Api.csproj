@@ -6,6 +6,12 @@
     <UserSecretsId>3b20e46e-a22a-4d4c-baab-379c31f04a48</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\Sheaft.Web.Api.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\Sheaft.Web.Api.xml</DocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Mapster" Version="7.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
@@ -18,8 +24,8 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sheaft.Application\Sheaft.Application.csproj" />
@@ -30,4 +36,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <Target Name="OpenAPI" AfterTargets="Build" Condition="$(Configuration)=='Debug'">
+    <Exec Command="swagger tofile --output ./wwwroot/swagger/v1/swagger.yaml --yaml $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="swagger tofile --output ./wwwroot/swagger/v1/swagger.json $(OutputPath)$(AssemblyName).dll v1" WorkingDirectory="$(ProjectDir)" />
+  </Target>
 </Project>

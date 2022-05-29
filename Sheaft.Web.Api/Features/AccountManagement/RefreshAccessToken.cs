@@ -13,8 +13,14 @@ public class RefreshAccessToken : Feature
     {
     }
 
+    /// <summary>
+    /// Regenerate an access_token for current user
+    /// </summary>
     [AllowAnonymous]
-    [HttpPost("refresh")]
+    [HttpPost("refresh", Name = nameof(RefreshAccessToken))]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenResponse>> Post([FromBody] RefreshTokenRequest refreshToken, CancellationToken token)
     {
         var result = await Mediator.Execute(new RefreshAccessTokenCommand(refreshToken.Token), token);
