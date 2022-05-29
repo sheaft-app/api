@@ -49,26 +49,26 @@
     <h1>{$page.title}</h1>
     <form>
       <div class="flex justify-between">
-        <Text
+        <Text label="Prénom"
           bind:value="{account.firstname}"
           isLoading="{isLoading}"
           class="w-full"
           placeholder="Votre prénom"
         />
-        <Text
+        <Text label="Nom"
           bind:value="{account.lastname}"
           isLoading="{isLoading}"
           class="w-full"
           placeholder="Votre nom"
         />
       </div>
-      <Email bind:value="{account.email}" isLoading="{isLoading}" class="mb-6 w-full" />
-      <Password
+      <Email label="Adresse mail" bind:value="{account.email}" isLoading="{isLoading}" class="mb-6 w-full" />
+      <Password label="Mot de passe"
         bind:value="{account.password}"
         isLoading="{isLoading}"
         class="mb-6 w-full"
       />
-      <Password
+      <Password label="Confirmer le mot de passe"
         bind:value="{account.confirm}"
         placeholder="Confirmation de mot de passe"
         class="mb-6 w-full"

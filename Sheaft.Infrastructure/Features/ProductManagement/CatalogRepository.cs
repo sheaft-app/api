@@ -19,7 +19,7 @@ internal class CatalogRepository : Repository<Catalog, CatalogId>, ICatalogRepos
             var result = await Values
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -33,6 +33,6 @@ internal class CatalogRepository : Repository<Catalog, CatalogId>, ICatalogRepos
             Result.Success(await Values
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
-                .SingleOrDefaultAsync(e => e.SupplierIdentifier == supplierIdentifier && e.IsDefault, token)?? Maybe<Catalog>.None));
+                .SingleOrDefaultAsync(e => e.SupplierId == supplierIdentifier && e.IsDefault, token)?? Maybe<Catalog>.None));
     }
 }

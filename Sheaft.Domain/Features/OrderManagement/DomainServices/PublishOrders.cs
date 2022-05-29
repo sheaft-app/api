@@ -41,25 +41,25 @@ public class PublishOrders : IPublishOrders
 
         var order = orderResult.Value;
         
-        var agreementExistsForOrder = await _retrieveAgreementForOrder.IsExistingBetweenSupplierAndCustomer(order.SupplierIdentifier, order.CustomerIdentifier, token);
+        var agreementExistsForOrder = await _retrieveAgreementForOrder.IsExistingBetweenSupplierAndCustomer(order.SupplierId, order.CustomerId, token);
         if (agreementExistsForOrder.IsFailure)
             return Result.Failure(agreementExistsForOrder);
         
-        var deliveryDateValidityResult = await _validateOrderDeliveryDate.Validate(deliveryDate, order.CustomerIdentifier, order.SupplierIdentifier, token);
+        var deliveryDateValidityResult = await _validateOrderDeliveryDate.Validate(deliveryDate, order.CustomerId, order.SupplierId, token);
         if (deliveryDateValidityResult.IsFailure)
             return Result.Failure(deliveryDateValidityResult);
         
         var lines = order.Lines;
         if (orderProducts.Any())
         {
-            var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierIdentifier, token);
+            var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierId, token);
             if (linesResult.IsFailure)
                 return Result.Failure(linesResult);
 
             lines = linesResult.Value;
         }
 
-        var codeResult = _generateOrderCode.GenerateNextCode(order.SupplierIdentifier);
+        var codeResult = _generateOrderCode.GenerateNextCode(order.SupplierId);
         if (codeResult.IsFailure)
             return Result.Failure(codeResult);
 
@@ -67,11 +67,11 @@ public class PublishOrders : IPublishOrders
         if (publishResult.IsFailure)
             return Result.Failure(publishResult);
 
-        var customerDeliveryAddress = await _retrieveOrderCustomer.GetDeliveryAddress(order.Identifier, token);
+        var customerDeliveryAddress = await _retrieveOrderCustomer.GetDeliveryAddress(order.Id, token);
         if (customerDeliveryAddress.IsFailure)
             return Result.Failure(customerDeliveryAddress);
 
-        var delivery = new Delivery(deliveryDate, customerDeliveryAddress.Value, order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
+        var delivery = new Delivery(deliveryDate, customerDeliveryAddress.Value, order.SupplierId, order.CustomerId, new List<Order> {order});
         
         _deliveryRepository.Add(delivery);
         _orderRepository.Update(order);

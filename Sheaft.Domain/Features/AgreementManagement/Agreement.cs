@@ -6,14 +6,16 @@ public class Agreement : AggregateRoot
 {
     private Agreement(){}
     
-    private Agreement(AgreementOwner owner, SupplierId supplierIdentifier, CustomerId customerIdentifier, CatalogId catalogIdentifier)
+    private Agreement(AgreementOwner owner, SupplierId supplierId, CustomerId customerId, CatalogId catalogId)
     {
-        Identifier = AgreementId.New();
+        Id = AgreementId.New();
         Owner = owner;
-        SupplierIdentifier = supplierIdentifier;
-        CustomerIdentifier = customerIdentifier;
-        CatalogIdentifier = catalogIdentifier;
+        SupplierId = supplierId;
+        CustomerId = customerId;
+        CatalogId = catalogId;
         Status = AgreementStatus.Pending;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
     public static Agreement CreateAndSendAgreementToSupplier(SupplierId supplierIdentifier, CustomerId customerIdentifier,
@@ -31,13 +33,15 @@ public class Agreement : AggregateRoot
         return agreement;
     }
     
-    public AgreementId Identifier { get; }
+    public AgreementId Id { get; }
     public AgreementStatus Status { get; private set; }
     public AgreementOwner Owner { get; private set; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
     public int OrderDelayInHoursBeforeDeliveryDay { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
-    public CustomerId CustomerIdentifier { get; private set; }
-    public CatalogId CatalogIdentifier { get; private set; }
+    public SupplierId SupplierId { get; private set; }
+    public CustomerId CustomerId { get; private set; }
+    public CatalogId CatalogId { get; private set; }
     public string? FailureReason { get; private set; }
     public IEnumerable<DeliveryDay> DeliveryDays { get; private set; } = new List<DeliveryDay>();
 
@@ -52,6 +56,7 @@ public class Agreement : AggregateRoot
         
         DeliveryDays = new List<DeliveryDay>(days);
         OrderDelayInHoursBeforeDeliveryDay = orderDelayInHoursBeforeDeliveryDay ?? 0;
+        UpdatedOn = DateTimeOffset.UtcNow;
 
         return Result.Success();
     }
@@ -68,6 +73,7 @@ public class Agreement : AggregateRoot
         if(deliveryDays == null || orderDelayInHoursBeforeDeliveryDay == null)
             return Result.Failure(ErrorKind.BadRequest, "agreement.accept.requires.days.or.delay");
                 
+        UpdatedOn = DateTimeOffset.UtcNow;
         return SetDelivery(deliveryDays, orderDelayInHoursBeforeDeliveryDay);
     }
 
@@ -81,6 +87,7 @@ public class Agreement : AggregateRoot
         
         Status = AgreementStatus.Revoked;
         FailureReason = revokeReason;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
@@ -91,6 +98,7 @@ public class Agreement : AggregateRoot
 
         Status = AgreementStatus.Refused;
         FailureReason = refusalReason;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 }

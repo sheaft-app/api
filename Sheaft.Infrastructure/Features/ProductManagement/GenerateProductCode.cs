@@ -23,7 +23,7 @@ internal class GenerateProductCode : IGenerateProductCode
             if (_currentReference == null)
             {
                 var references = _context.Set<Product>()
-                    .Where(o => o.SupplierIdentifier == supplierIdentifier)
+                    .Where(o => o.SupplierId == supplierIdentifier)
                     .OrderByDescending(o => o.Reference)
                     .Select(o => o.Reference)
                     .ToList();

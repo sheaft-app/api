@@ -21,18 +21,18 @@ public class RetrieveProfile : IRetrieveProfile
         try
         {
             var supplier = await _context.Set<Supplier>()
-                .SingleOrDefaultAsync(s => s.AccountIdentifier == identifier, token);
+                .SingleOrDefaultAsync(s => s.AccountId == identifier, token);
 
             if (supplier != null)
                 return Result.Success(
-                    Maybe<Profile>.From(new Profile(supplier.Identifier.Value, supplier.TradeName.Value,
+                    Maybe<Profile>.From(new Profile(supplier.Id.Value, supplier.TradeName.Value,
                         ProfileKind.Supplier)));
 
             var customer = await _context.Set<Customer>()
-                .SingleOrDefaultAsync(s => s.AccountIdentifier == identifier, token);
+                .SingleOrDefaultAsync(s => s.AccountId == identifier, token);
 
             return Result.Success(customer != null ? 
-                Maybe<Profile>.From(new Profile(customer.Identifier.Value, customer.TradeName.Value, ProfileKind.Customer)) 
+                Maybe<Profile>.From(new Profile(customer.Id.Value, customer.TradeName.Value, ProfileKind.Customer)) 
                 : Maybe<Profile>.None);
 
         }

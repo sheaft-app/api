@@ -4,7 +4,7 @@ export interface IResult<T> {
   success: boolean;
   status: StatusCode;
   data?: T;
-  error?:any;
+  error?: any;
 }
 
 export interface IListResult<T> extends IResult<T> {}

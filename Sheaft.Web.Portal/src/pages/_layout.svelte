@@ -6,7 +6,7 @@
   import TopNav from "$components/Nav/TopNav.svelte";
   import Screen from "$components/Screen.svelte";
 
-  $beforeUrlChange((event, route) => {
+  $beforeUrlChange((event: any, route) => {
     const pageAccessResult = checkPageAccess(
       route.path,
       event.url,

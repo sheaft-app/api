@@ -8,33 +8,37 @@ public class Document : AggregateRoot
     {
     }
 
-    private Document(SupplierId supplierIdentifier, DocumentCategory category, DocumentKind kind, DocumentExtension extension, DocumentName name, string data)
+    private Document(OwnerId ownerId, DocumentCategory category, DocumentKind kind, DocumentExtension extension, DocumentName name, string data)
     {
-        Identifier = DocumentId.New();
+        Id = DocumentId.New();
         Category = category;
         Kind = kind;
         Status = DocumentStatus.Waiting;
-        SupplierIdentifier = supplierIdentifier;
+        OwnerId = ownerId;
         Extension = extension;
         Name = name;
         _params = data;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
     public static Document CreatePreparationDocument(DocumentName name, IDocumentParamsHandler documentParamsHandler,
-        List<OrderId> orderIdentifiers, SupplierId supplierIdentifier)
+        List<OrderId> orderIdentifiers, OwnerId ownerId)
     {
-        return new Document(supplierIdentifier, DocumentCategory.Orders, DocumentKind.Preparation, DocumentExtension.xlsx, name,
+        return new Document(ownerId, DocumentCategory.Orders, DocumentKind.Preparation, DocumentExtension.xlsx, name,
             documentParamsHandler.SerializeParams(new PreparationDocumentParams(orderIdentifiers)));
     }
 
-    public DocumentId Identifier { get; }
+    public DocumentId Id { get; }
     public DocumentCategory Category { get; }
     public DocumentKind Kind { get; }
     public DocumentExtension Extension { get; set; }
     public DocumentStatus Status { get; private set; }
     public DocumentName Name { get; private set; }
-    public SupplierId SupplierIdentifier { get; set; }
+    public OwnerId OwnerId { get; set; }
     public string? ErrorMessage { get; private set; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
 
     public T GetParams<T>(IDocumentParamsHandler documentParamsHandler) where T: class
     {
@@ -44,18 +48,21 @@ public class Document : AggregateRoot
     public Result StartProcessing()
     {
         Status = DocumentStatus.Processing;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
     public Result CompleteProcessing()
     {
         Status = DocumentStatus.Done;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
     public void SetProcessingError(string message)
     {
         Status = DocumentStatus.InError;
+        UpdatedOn = DateTimeOffset.UtcNow;
         ErrorMessage = message;
     }
 }

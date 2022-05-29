@@ -19,6 +19,7 @@ public record InvoiceLine
         IsEditable = editable;
         Order = order;
         Delivery = delivery;
+        CreatedOn = DateTimeOffset.UtcNow;
     }
 
     public static InvoiceLine CreateLineForDeliveryOrder(string identifier, string name, Quantity quantity, UnitPrice unitPrice, VatRate vat, InvoiceDelivery delivery, DeliveryOrder order)
@@ -34,4 +35,5 @@ public record InvoiceLine
     public bool IsEditable { get; }
     public DeliveryOrder Order { get; }
     public InvoiceDelivery Delivery { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
 }

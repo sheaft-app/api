@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Sheaft.Application.DocumentManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.DocumentManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.CustomerManagement;
 using Sheaft.Infrastructure.DocumentManagement;
 using Sheaft.Infrastructure.OrderManagement;
@@ -26,7 +27,7 @@ public class ProcessDocumentCommandShould
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var document = context.Documents.Single(d => d.Identifier == documentId);
+        var document = context.Documents.Single(d => d.Id == documentId);
         Assert.AreEqual(DocumentStatus.Done, document.Status);
     }
 
@@ -38,7 +39,7 @@ public class ProcessDocumentCommandShould
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var document = context.Documents.Single(d => d.Identifier == documentId);
+        var document = context.Documents.Single(d => d.Id == documentId);
         Assert.AreEqual(DocumentStatus.InError, document.Status);
         Assert.AreEqual("file.error", document.ErrorMessage);
     }
@@ -69,16 +70,19 @@ public class ProcessDocumentCommandShould
                 fileGeneratorMocked.Object,
                 fileProviderMocked.Object));
         
-        var supplierId = AccountId.New();
-        var customerId = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerId, new DeliveryDay(DayOfWeek.Friday)}};
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customerId},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierId, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplierId, supplierProducts}});
+            new List<AccountId> {customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
         
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
@@ -87,14 +91,14 @@ public class ProcessDocumentCommandShould
         order.Accept();
         context.Add(order);
         
-        var orders = new List<OrderId> {order.Identifier};
+        var orders = new List<OrderId> {order.Id};
 
         var document =
-            Document.CreatePreparationDocument(new DocumentName("test"), new DocumentParamsHandler(), orders, supplier.Identifier);
+            Document.CreatePreparationDocument(new DocumentName("test"), new DocumentParamsHandler(), orders, new OwnerId(supplier.Id));
         
         context.Add(document);
         context.SaveChanges();
 
-        return (document.Identifier, context, handler);
+        return (document.Id, context, handler);
     }
 }

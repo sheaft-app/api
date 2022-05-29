@@ -37,11 +37,11 @@ export const account = derived([userStore], ([$userStore]) => $userStore.account
 export const tokens = derived([userStore], ([$userStore]) => $userStore.tokens);
 export const isAuthenticated = derived(
   [userStore],
-  ([$userStore]) => $userStore.isAuthenticated
+  ([$userStore]) => $userStore && $userStore.isAuthenticated
 );
 export const isRegistered = derived(
   [userStore],
-  ([$userStore]) =>
+  ([$userStore]) => $userStore &&
     $userStore.isAuthenticated &&
     $userStore.account.profile.status == ProfileStatus.Registered
 );
@@ -148,6 +148,9 @@ const configure = async (
 
 export const refreshToken = async () => {
   const user = get(userStore);
+  if(!user)
+    return;
+  
   try {
     const result = await axios.post("/api/token/refresh", {
       token: user.tokens.refreshToken
@@ -167,6 +170,9 @@ export const userIsInRoles = (roles?: Array<string>): boolean => {
   if (!roles) return true;
 
   const user = get(userStore);
+  if(!user)
+    return false;
+  
   if (!user.account.roles) user.account.roles = [];
 
   const userInRoles = roles.filter(r => user.account.roles.includes(r));
@@ -239,6 +245,9 @@ const getTokens = (data?) => {
 
 const refreshTokensIfRequired = async () => {
   let user = get(userStore);
+  if(!user)
+    return;
+  
   if (!user.isAuthenticated) {
     clearRefreshTokensHandler();
     return;

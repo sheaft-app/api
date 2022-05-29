@@ -9,23 +9,7 @@ internal class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.OwnsOne(c => c.Password);
         builder.OwnsOne(c => c.ResetPasswordInfo);
@@ -60,13 +44,9 @@ internal class AccountConfiguration : IEntityTypeConfiguration<Account>
             .HasMaxLength(EmailAddress.MAXLENGTH);
         
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
             
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
-        
         builder
             .HasIndex(c => c.Username)
             .IsUnique();

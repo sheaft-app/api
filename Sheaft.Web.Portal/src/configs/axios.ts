@@ -7,13 +7,14 @@ export const configureAxios = () => {
   axios.interceptors.request.use(
     function (config) {
       config.baseURL = apiConfig.url;
+      config.headers = {
+        Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      };
 
       if (!get(isAuthenticated)) return config;
 
       const access_tokens = get(tokens);
-      config.headers = {
-        Authorization: `${access_tokens.tokenType} ${access_tokens.accessToken}`
-      };
+      config.headers.Authorization = `${access_tokens.tokenType} ${access_tokens.accessToken}`;
 
       return config;
     },

@@ -21,4 +21,4 @@ public class UpdateReturnable : Feature
     }
 }
 
-public record UpdateReturnableRequest(string Name, string Code, int Price, int Vat);
+public record UpdateReturnableRequest(string Name, string Code, decimal Price, decimal Vat);

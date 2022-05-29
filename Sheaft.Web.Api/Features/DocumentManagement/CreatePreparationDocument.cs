@@ -17,7 +17,7 @@ public class CreatePreparationDocument : Feature
     [HttpPost("preparation")]
     public async Task<ActionResult<string>> Post([FromBody] CreatePreparationDocumentRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreatePreparationDocumentCommand(data.OrderIdentifiers.Select(o => new OrderId(o)).ToList(), CurrentSupplierId, data.AutoAcceptPendingOrders ?? false), token);
+        var result = await Mediator.Execute(new CreatePreparationDocumentCommand(data.OrderIdentifiers.Select(o => new OrderId(o)).ToList(), new OwnerId(CurrentSupplierId), data.AutoAcceptPendingOrders ?? false), token);
         return HandleCommandResult(result);
     }
 }

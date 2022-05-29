@@ -2,13 +2,13 @@
 
 public record UnitPrice
 {
-    public UnitPrice(int value)
+    public UnitPrice(decimal value)
     {
         if (value < 0)
             throw new InvalidOperationException("Price cannot be lower than 0");
 
-        Value = value;
+        Value = Math.Round(value, 2, MidpointRounding.ToEven);
     }
 
-    public int Value { get; }
+    public decimal Value { get; }
 }

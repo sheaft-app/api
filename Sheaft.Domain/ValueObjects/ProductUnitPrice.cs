@@ -6,7 +6,7 @@ public record ProductUnitPrice : UnitPrice
     {
     }
 
-    public ProductUnitPrice(int value) : base(value)
+    public ProductUnitPrice(decimal value) : base(value)
     {
         if(value <= 0)
             throw new InvalidOperationException("Product price must be greater than 0");

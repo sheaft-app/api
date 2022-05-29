@@ -36,13 +36,14 @@ public class CreateCreditNoteDraftHandler : ICommandHandler<CreateCreditNoteDraf
         if (customerBillingResult.IsFailure)
             return Result.Failure<string>(customerBillingResult);
 
-        var creditNote = Invoice.CreateCreditNoteDraft(supplierBillingResult.Value, customerBillingResult.Value, invoice);
+        var creditNote = invoice.CreateCreditNoteDraft(supplierBillingResult.Value, customerBillingResult.Value);
+        
         _uow.Invoices.Add(creditNote);
         _uow.Invoices.Update(invoice);
 
         var result = await _uow.Save(token);
         return result.IsSuccess
-            ? Result.Success(creditNote.Identifier.Value)
+            ? Result.Success(creditNote.Id.Value)
             : Result.Failure<string>(result);
     }
 }

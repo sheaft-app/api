@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Sheaft.Application.BatchManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
 
@@ -25,7 +26,7 @@ public class CreateBatchCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
-        var batch = context.Batches.Single(s => s.Identifier == new BatchId(result.Value));
+        var batch = context.Batches.Single(s => s.Id == new BatchId(result.Value));
         Assert.IsNotNull(batch);
         Assert.AreEqual("test", batch.Number.Value);
         Assert.AreEqual(BatchDateKind.DDC, batch.DateKind);
@@ -49,12 +50,15 @@ public class CreateBatchCommandShould
 
         var handler = new CreateBatchHandler(uow);
 
-        var supplierId = SupplierId.New();
+        var supplierAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAcct.Id);
+        context.Add(supplierAcct);
+        context.Add(supplier);
 
-        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow), supplierId));
+        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow), supplier.Id));
         context.SaveChanges();
         
-        return (supplierId, context, handler);
+        return (supplier.Id, context, handler);
     }
 
     private CreateBatchCommand GetCommand(SupplierId supplierIdentifier, string? number = null)

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
 
@@ -24,7 +26,7 @@ public class CreateReturnableCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
-        var returnable = context.Returnables.Single(s => s.Identifier == new ReturnableId(result.Value));
+        var returnable = context.Returnables.Single(s => s.Id == new ReturnableId(result.Value));
         Assert.IsNotNull(returnable);
     }
 
@@ -44,19 +46,23 @@ public class CreateReturnableCommandShould
 
         var handler = new CreateReturnableHandler(uow);
 
-        var supplierId = SupplierId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
 
         context.Add(new Returnable(new ReturnableName("Test"), new ReturnableReference("Existing"), new UnitPrice(2000),
-            new VatRate(2000), supplierId));
+            new VatRate(0), supplier.Id));
 
         context.SaveChanges();
         
-        return (supplierId, context, handler);
+        return (supplier.Id, context, handler);
     }
 
     private CreateReturnableCommand GetCommand(SupplierId supplierIdentifier, int price = 1200, string? code = "Code")
     {
-        var command = new CreateReturnableCommand("Test", code, price, 2000, supplierIdentifier);
+        var command = new CreateReturnableCommand("Test", code, price, 0, supplierIdentifier);
         return command;
     }
 }

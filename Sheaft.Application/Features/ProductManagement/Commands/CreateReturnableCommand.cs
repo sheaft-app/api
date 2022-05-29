@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record CreateReturnableCommand(string Name, string Reference, int Price, int Vat, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
+public record CreateReturnableCommand(string Name, string Reference, decimal Price, decimal Vat, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
 
 internal class CreateReturnableHandler : ICommandHandler<CreateReturnableCommand, Result<string>>
 {
@@ -30,7 +30,7 @@ internal class CreateReturnableHandler : ICommandHandler<CreateReturnableCommand
         var result = await _uow.Save(token);
         
         return result.IsSuccess 
-            ? Result.Success(returnable.Identifier.Value) 
+            ? Result.Success(returnable.Id.Value) 
             : Result.Failure<string>(result);
     }
 }

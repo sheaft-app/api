@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain;
 
-public record ResetPasswordInfo(string Token, DateTimeOffset ExpiresOn);
+public record ResetPasswordInfo(string Token, DateTimeOffset CreatedOn, DateTimeOffset ExpiresOn);

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
+using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.CustomerManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -9,23 +11,7 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.Property(b => b.Email)
             .HasMaxLength(EmailAddress.MAXLENGTH);
@@ -110,17 +96,15 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasConversion(name => name.Value, value => new TradeName(value));
         
         builder
-            .Property(p => p.AccountIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(identifier => identifier.Value, value => new AccountId(value));
+            .Property(c => c.Id)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
-            .Property(c => c.Identifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
-            
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
+            .HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(c => c.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         
         builder.ToTable("Customer");
     }

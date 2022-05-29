@@ -9,31 +9,9 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder
-            .Property<long?>("ReturnableId");
-
-        builder.HasKey("Id");
+        builder.HasKey(c => c.Id);
+        builder.Property<ReturnableId?>("ReturnableId");
         
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
-
-        builder.HasOne(c => c.Returnable)
-            .WithMany()
-            .HasForeignKey("ReturnableId");
-
         builder
             .Property(p => p.Name)
             .HasMaxLength(ProductName.MAXLENGTH)
@@ -46,23 +24,21 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder
             .Property(p => p.Vat)
+            .HasPrecision(18, 2)
             .HasConversion(vat => vat.Value, value => new VatRate(value));
+        
+        builder
+            .Property(c => c.Id)
+            .HasMaxLength(Constants.IDS_LENGTH);
 
         builder
-            .Property(p => p.SupplierIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(vat => vat.Value, value => new SupplierId(value));
+            .HasOne(c => c.Returnable)
+            .WithMany()
+            .HasForeignKey("ReturnableId")
+            .OnDelete(DeleteBehavior.NoAction);;
         
         builder
-            .Property(c => c.Identifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
-        
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
-        
-        builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
+            .HasIndex(c => new {c.SupplierId, c.Reference})
             .IsUnique();
         
         builder.ToTable("Product");

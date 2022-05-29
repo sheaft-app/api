@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
 
@@ -23,7 +24,7 @@ public class CancelOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var cancelOrderCommand = new CancelOrderCommand(order.Identifier);
+        var cancelOrderCommand = new CancelOrderCommand(order.Id);
         var result =
             await handler.Handle(
                 cancelOrderCommand,
@@ -40,7 +41,7 @@ public class CancelOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
 
-        var cancelOrderCommand = new CancelOrderCommand(order.Identifier, "reason");
+        var cancelOrderCommand = new CancelOrderCommand(order.Id, "reason");
         var result = await handler.Handle(cancelOrderCommand, CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
@@ -53,7 +54,7 @@ public class CancelOrderCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var result = await handler.Handle(new CancelOrderCommand(order.Identifier), CancellationToken.None);
+        var result = await handler.Handle(new CancelOrderCommand(order.Id), CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
@@ -64,16 +65,19 @@ public class CancelOrderCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<CancelOrderHandler>();
 
-        var supplier = AccountId.New();
-        var customer = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
+            new List<AccountId> {customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
 
         var handler = new CancelOrderHandler(uow);
 

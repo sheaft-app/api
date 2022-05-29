@@ -29,7 +29,7 @@ public class SecurityTokensProvider : ISecurityTokensProvider
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, account.Identifier.Value),
+            new Claim(JwtRegisteredClaimNames.Sub, account.Id.Value),
             new Claim(ClaimTypes.Name, $"{account.Firstname.Value} {account.Lastname.Value}"),
             new Claim(ClaimTypes.Email, account.Email.Value),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),

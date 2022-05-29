@@ -13,14 +13,15 @@
 
 <div class="f-input">
   {#if label && label.length > 0}
-    <label for="{id}">{label} {required ? '*' : ''}</label>
+    <label for="{id}">{label} {required ? "*" : ""}</label>
   {/if}
-  <select 
-    id="{id}" 
-    disabled="{isLoading}" 
-    bind:value 
-    class="{$$props.class}" 
-    required='{required}'>
+  <select
+    id="{id}"
+    disabled="{isLoading}"
+    bind:value
+    class="{$$props.class}"
+    required="{required}"
+  >
     {#each options as option}
       <option value="{option.value}">{option.label}</option>
     {/each}

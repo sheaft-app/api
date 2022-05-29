@@ -48,7 +48,7 @@ internal class HandleProductCode : IHandleProductCode
         if (existingProductResult.Value.HasNoValue)
             return Result.Success(new ProductReference(code));
 
-        if(productIdentifier != null && existingProductResult.Value.Value.Identifier == productIdentifier)
+        if(productIdentifier != null && existingProductResult.Value.Value.Id == productIdentifier)
             return Result.Success(new ProductReference(code));
 
         return Result.Failure<ProductReference>(ErrorKind.Conflict, "product.code.already.exists");

@@ -29,7 +29,7 @@ public class UpdateOrderDraftProductsHandler : ICommandHandler<UpdateOrderDraftP
             .Select(l => new ProductsQuantities(new ProductId(l.ProductIdentifier), new OrderedQuantity(l.Quantity)))
             .ToList() ?? new List<ProductsQuantities>();
         
-        var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierIdentifier, token);
+        var linesResult = await _transformProductsToOrderLines.Transform(orderProducts, order.SupplierId, token);
         if (linesResult.IsFailure)
             return Result.Failure(linesResult);
         

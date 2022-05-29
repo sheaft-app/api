@@ -7,32 +7,37 @@ public class Customer : AggregateRoot
     }
 
     public Customer(TradeName tradeName, EmailAddress email, PhoneNumber phone, Legal legal, 
-        AccountId accountIdentifier, DeliveryAddress? deliveryAddress = null, BillingAddress? billingAddress = null)
+        AccountId accountId, DeliveryAddress? deliveryAddress = null, BillingAddress? billingAddress = null)
     {
-        Identifier = CustomerId.New();
+        Id = CustomerId.New();
         TradeName = tradeName;
         Legal = legal;
         Email = email;
         Phone = phone;
         DeliveryAddress = deliveryAddress ?? new DeliveryAddress(tradeName.Value, email, legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
         BillingAddress = billingAddress ?? new BillingAddress(tradeName.Value, email, legal.Address.Street, legal.Address.Complement, legal.Address.Postcode, legal.Address.City);
-        AccountIdentifier = accountIdentifier;
+        AccountId = accountId;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
-    public CustomerId Identifier { get; }
+    public CustomerId Id { get; }
     public TradeName TradeName { get; private set; }
     public EmailAddress Email { get; private set; }
     public PhoneNumber Phone { get; private set; }
     public Legal Legal { get; private set; }
     public DeliveryAddress DeliveryAddress { get; private set; }
     public BillingAddress BillingAddress { get; private set; }
-    public AccountId AccountIdentifier { get; }
+    public AccountId AccountId { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
 
     public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone)
     {
         TradeName = name;
         Email = email;
         Phone = phone;
+        UpdatedOn = DateTimeOffset.UtcNow;
 
         return Result.Success();
     }
@@ -40,18 +45,21 @@ public class Customer : AggregateRoot
     public Result SetDeliveryAddress(DeliveryAddress deliveryAddress)
     {
         DeliveryAddress = deliveryAddress;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
     public Result SetBillingAddress(BillingAddress billingAddress)
     {
         BillingAddress = billingAddress;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
     public Result SetLegal(CorporateName name, Siret siret, LegalAddress address)
     {
         Legal = new Legal(name, siret, address);
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 }

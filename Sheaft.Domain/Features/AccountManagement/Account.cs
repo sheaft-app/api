@@ -10,19 +10,23 @@ public class Account : AggregateRoot
 
     public Account(Username username, EmailAddress email, HashedPassword password, Firstname firstname, Lastname lastname)
     {
-        Identifier = AccountId.New();
+        Id = AccountId.New();
         Username = username;
         Email = email;
         Password = password;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         SetNames(firstname, lastname);
     }
 
-    public AccountId Identifier { get; }
+    public AccountId Id { get; }
     public Username Username { get; private set; }
     public Firstname Firstname { get; private set; }
     public Lastname Lastname { get; private set; }
     public EmailAddress Email { get; private set; }
     public HashedPassword Password { get; private set; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
     public ResetPasswordInfo? ResetPasswordInfo { get; private set; }
     public IReadOnlyCollection<RefreshTokenInfo> RefreshTokens => _refreshTokens.AsReadOnly();
 
@@ -33,8 +37,9 @@ public class Account : AggregateRoot
 
         var oldEmail = Email.Value;
         Email = newEmailAddress;
+        UpdatedOn = DateTimeOffset.UtcNow;
 
-        RaiseEvent(new EmailChanged(Identifier.Value, oldEmail, Email.Value));
+        RaiseEvent(new EmailChanged(Id.Value, oldEmail, Email.Value));
         return Result.Success();
     }
     
@@ -42,6 +47,8 @@ public class Account : AggregateRoot
     {
         Firstname = firstname;
         Lastname = lastname;
+        UpdatedOn = DateTimeOffset.UtcNow;
+        
         return Result.Success();
     }
 
@@ -57,8 +64,9 @@ public class Account : AggregateRoot
 
         var (hash, salt) = hasher.CreatePassword(changePassword.NewPassword);
         Password = HashedPassword.FromHashedString(hash, salt);
+        UpdatedOn = DateTimeOffset.UtcNow;
         
-        RaiseEvent(new PasswordChanged(Identifier.Value));
+        RaiseEvent(new PasswordChanged(Id.Value));
         return Result.Success();
     }
 
@@ -68,7 +76,7 @@ public class Account : AggregateRoot
         if (!passwordIsValid)
             return Result.Failure<AuthenticationResult>(ErrorKind.BadRequest, "invalid.username.or.password", "Invalid password.");
         
-        RaiseEvent(new AccountLoggedIn(Identifier.Value));
+        RaiseEvent(new AccountLoggedIn(Id.Value));
 
         return GenerateAccessToken(securityTokensProvider, profile);
     }
@@ -98,8 +106,8 @@ public class Account : AggregateRoot
         if (tokenValidityInHours < 1)
             throw new InvalidOperationException("Reset password token validity in hours must be greater or equal than 1 hour.");
         
-        ResetPasswordInfo = new ResetPasswordInfo(Guid.NewGuid().ToString("N"), currentDate.AddHours(tokenValidityInHours));
-        RaiseEvent(new PasswordForgotten(Identifier.Value, ResetPasswordInfo.Token, ResetPasswordInfo.ExpiresOn));
+        ResetPasswordInfo = new ResetPasswordInfo(Guid.NewGuid().ToString("N"), DateTimeOffset.UtcNow, currentDate.AddHours(tokenValidityInHours));
+        RaiseEvent(new PasswordForgotten(Id.Value, ResetPasswordInfo.Token, ResetPasswordInfo.ExpiresOn));
 
         return Result.Success();
     }
@@ -117,8 +125,9 @@ public class Account : AggregateRoot
         
         ResetPasswordInfo = null;
         Password = HashedPassword.Create(newPassword.Value, hasher);
+        UpdatedOn = DateTimeOffset.UtcNow;
         
-        RaiseEvent(new PasswordReset(Identifier.Value));
+        RaiseEvent(new PasswordReset(Id.Value));
         return Result.Success();
     }
 
@@ -135,7 +144,7 @@ public class Account : AggregateRoot
     {
         InvalidateAllRefreshTokens();
         
-        var data = securityTokensProvider.GenerateRefreshToken(Identifier);
+        var data = securityTokensProvider.GenerateRefreshToken(Id);
         _refreshTokens.Add(data.Info);
         
         return data.Token;

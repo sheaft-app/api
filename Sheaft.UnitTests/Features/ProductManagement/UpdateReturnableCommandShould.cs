@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
 
@@ -24,7 +26,7 @@ public class UpdateReturnableCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-        var returnable = context.Returnables.Single(s => s.Identifier == returnableId);
+        var returnable = context.Returnables.Single(s => s.Id == returnableId);
         Assert.IsNotNull(returnable);
         Assert.AreEqual("Code", returnable.Reference.Value);
     }
@@ -45,24 +47,28 @@ public class UpdateReturnableCommandShould
 
         var handler = new UpdateReturnableHandler(uow);
 
-        var supplierId = SupplierId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
 
         var returnable = new Returnable(new ReturnableName("Test1"), new ReturnableReference("Test1"), new UnitPrice(2000),
-            new VatRate(2000), supplierId);
+            new VatRate(0), supplier.Id);
         context.Add(returnable);
         
         var returnable2 = new Returnable(new ReturnableName("Test2"), new ReturnableReference("Existing"), new UnitPrice(2000),
-            new VatRate(2000), supplierId);
+            new VatRate(0), supplier.Id);
         context.Add(returnable2);
 
         context.SaveChanges();
         
-        return (returnable.Identifier, context, handler);
+        return (returnable.Id, context, handler);
     }
 
     private UpdateReturnableCommand GetCommand(ReturnableId returnableId, int price = 1200, string? code = "Code")
     {
-        var command = new UpdateReturnableCommand(returnableId, "Test", code, price, 2000);
+        var command = new UpdateReturnableCommand(returnableId, "Test", code, price, 0);
         return command;
     }
 }

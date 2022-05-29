@@ -9,23 +9,7 @@ internal class CatalogConfiguration : IEntityTypeConfiguration<Catalog>
 {
     public void Configure(EntityTypeBuilder<Catalog> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.HasMany(c => c.Products)
             .WithOne()
@@ -42,17 +26,18 @@ internal class CatalogConfiguration : IEntityTypeConfiguration<Catalog>
             .HasConversion(name => name.Value, value => new CatalogName(value));
 
         builder
-            .Property(p => p.SupplierIdentifier)
+            .Property(p => p.SupplierId)
             .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
         
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
-        
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
+
+        builder.HasMany(c => c.Products)
+            .WithOne()
+            .HasForeignKey(c => c.CatalogId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.ToTable("Catalog");
     }

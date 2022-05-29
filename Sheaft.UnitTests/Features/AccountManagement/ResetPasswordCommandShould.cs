@@ -27,7 +27,7 @@ public class ResetPasswordCommandShould
     {
         var (account, handler) = InitHandler();
 
-        var result = await handler.Handle(new ResetPasswordCommand(account.Identifier.Value, account.ResetPasswordInfo.Token, "newPassword", "newPassword"),
+        var result = await handler.Handle(new ResetPasswordCommand(account.Id.Value, account.ResetPasswordInfo.Token, "newPassword", "newPassword"),
             CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
@@ -51,7 +51,7 @@ public class ResetPasswordCommandShould
     {
         var (account, handler) = InitHandler();
 
-        var result = await handler.Handle(new ResetPasswordCommand(account.Identifier.Value, "invalidToken", "newPassword", "newPassword"),
+        var result = await handler.Handle(new ResetPasswordCommand(account.Id.Value, "invalidToken", "newPassword", "newPassword"),
             CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);

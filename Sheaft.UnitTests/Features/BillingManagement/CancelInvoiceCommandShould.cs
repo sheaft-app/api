@@ -9,6 +9,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
@@ -25,7 +26,7 @@ public class CancelInvoiceCommandShould
     public async Task Set_Invoice_Status_As_Cancelled()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        var command = new CancelInvoiceCommand(invoice.Id, "Reason");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -39,12 +40,12 @@ public class CancelInvoiceCommandShould
     public async Task Remove_InvoiceIdentifier_On_Orders()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        var command = new CancelInvoiceCommand(invoice.Id, "Reason");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var order = context.Orders.SingleOrDefault(s => s.InvoiceIdentifier == invoice.Identifier);
+        var order = context.Orders.SingleOrDefault(s => s.InvoiceId == invoice.Id);
         Assert.IsNull(order);
     }
 
@@ -52,15 +53,15 @@ public class CancelInvoiceCommandShould
     public async Task Generate_CreditNote_With_Amount_Equal_To_Invoice()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        var command = new CancelInvoiceCommand(invoice.Id, "Reason");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotEmpty(invoice.CreditNotes);
-        Assert.AreNotEqual(invoice.Identifier, new InvoiceId(result.Value));
+        Assert.AreNotEqual(invoice.Id, new InvoiceId(result.Value));
 
-        var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
+        var creditNote = context.Invoices.Single(i => i.Id == new InvoiceId(result.Value));
         Assert.IsNotNull(creditNote);
         Assert.AreEqual(invoice.TotalWholeSalePrice, creditNote.TotalWholeSalePrice);
         Assert.AreEqual(invoice.TotalVatPrice, creditNote.TotalVatPrice);
@@ -71,12 +72,12 @@ public class CancelInvoiceCommandShould
     public async Task Generate_Published_CreditNote()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        var command = new CancelInvoiceCommand(invoice.Id, "Reason");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var creditNote = context.Invoices.Single(i => i.Identifier == new InvoiceId(result.Value));
+        var creditNote = context.Invoices.Single(i => i.Id == new InvoiceId(result.Value));
         Assert.IsNotNull(creditNote);
         Assert.AreEqual(InvoiceKind.InvoiceCancellation, creditNote.Kind);
         Assert.AreEqual(InvoiceStatus.Published, creditNote.Status);
@@ -86,7 +87,7 @@ public class CancelInvoiceCommandShould
     public async Task Fail_If_Invoice_Is_Already_Payed()
     {
         var (invoice, context, handler) = InitHandler(true, true, true);
-        var command = new CancelInvoiceCommand(invoice.Identifier, "Reason");
+        var command = new CancelInvoiceCommand(invoice.Id, "Reason");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -99,7 +100,7 @@ public class CancelInvoiceCommandShould
     public async Task Fail_If_Reason_Is_Not_Provided()
     {
         var (invoice, context, handler) = InitHandler(true, false);
-        var command = new CancelInvoiceCommand(invoice.Identifier, "");
+        var command = new CancelInvoiceCommand(invoice.Id, "");
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -117,20 +118,25 @@ public class CancelInvoiceCommandShould
             new CancelInvoices(new InvoiceRepository(context), new OrderRepository(context),
                 new GenerateCreditNoteCode(context)));
 
-        var supplierId = SupplierId.New();
-        var customerId = CustomerId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
-        var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
-        ;
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
+        
+        var customer = DataHelpers.GetDefaultCustomer(customerAccount.Id);
+        context.Add(customer);
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false,
             new List<Product>
-                {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplierId)});
+                {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplier.Id)});
 
         var invoice = Invoice.CreateInvoiceForOrder(
-            DataHelpers.GetDefaultSupplierBilling(supplierId),
-            DataHelpers.GetDefaultCustomerBilling(customerId),
+            DataHelpers.GetDefaultSupplierBilling(supplier.Id),
+            DataHelpers.GetDefaultCustomerBilling(customer.Id),
             new List<InvoiceLine>
             {
                 InvoiceLine.CreateLineForDeliveryOrder("Test1", "Name1", new Quantity(2), new UnitPrice(2000),
@@ -141,7 +147,7 @@ public class CancelInvoiceCommandShould
                     new DeliveryOrder(new OrderReference(0), DateTimeOffset.UtcNow)),
             }, new InvoiceReference(0));
 
-        order.AttachInvoice(invoice.Identifier);
+        order.AttachInvoice(invoice.Id);
 
         if (publish)
             invoice.Publish(new InvoiceReference(0));

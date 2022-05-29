@@ -28,7 +28,7 @@ internal class CreateBatchHandler : ICommandHandler<CreateBatchCommand, Result<s
         var result = await _uow.Save(token);
         
         return result.IsSuccess 
-            ? Result.Success(batch.Identifier.Value) 
+            ? Result.Success(batch.Id.Value) 
             : Result.Failure<string>(result);
     }
 }

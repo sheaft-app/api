@@ -24,7 +24,7 @@ public class RemoveDocumentCommandShould
         var result = await handler.Handle(new RemoveDocumentCommand(documentId), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var document = context.Documents.SingleOrDefault(d => d.Identifier == documentId);
+        var document = context.Documents.SingleOrDefault(d => d.Id == documentId);
         Assert.IsNull(document);
     }
 
@@ -39,11 +39,11 @@ public class RemoveDocumentCommandShould
         var handler = new RemoveDocumentHandler(uow, fileStorageMocked.Object);
 
         var document = Document.CreatePreparationDocument(new DocumentName("tests"), new DocumentParamsHandler(), 
-            new List<OrderId>(), SupplierId.New());
+            new List<OrderId>(), OwnerId.New());
         
         context.Add(document);
         context.SaveChanges();
         
-        return (document.Identifier, context, handler);
+        return (document.Id, context, handler);
     }
 }

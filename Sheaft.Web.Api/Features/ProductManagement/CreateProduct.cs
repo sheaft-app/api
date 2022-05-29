@@ -26,5 +26,5 @@ public class CreateProduct : Feature
     }
 }
 
-public record CreateProductRequest(string Name, string? Code, int Price, int Vat, string? Description,
+public record CreateProductRequest(string Name, string? Code, decimal Price, decimal Vat, string? Description,
     string? ReturnableIdentifier);

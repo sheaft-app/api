@@ -17,7 +17,8 @@ internal class InvoiceRepository : Repository<Invoice, InvoiceId>, IInvoiceRepos
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .Include(e => e.CreditNotes)
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -30,7 +31,7 @@ internal class InvoiceRepository : Repository<Invoice, InvoiceId>, IInvoiceRepos
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.CreditNotes.Any(cn => cn.InvoiceIdentifier == creditNoteIdentifier), token);
+                .SingleOrDefaultAsync(e => e.CreditNotes.Any(cn => cn.Id == creditNoteIdentifier), token);
 
             return Result.Success(result != null ? Maybe.From(result) : Maybe<Invoice>.None);
         });

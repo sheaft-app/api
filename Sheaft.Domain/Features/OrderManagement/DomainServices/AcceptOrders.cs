@@ -36,7 +36,7 @@ public class AcceptOrders : IAcceptOrders
         if (!newDeliveryDate.HasValue) 
             return Result.Success();
         
-        var deliveryResult = await _deliveryRepository.Get(order.DeliveryIdentifier, token);
+        var deliveryResult = await _deliveryRepository.Get(order.DeliveryId, token);
         if (deliveryResult.IsFailure)
             return deliveryResult;
             

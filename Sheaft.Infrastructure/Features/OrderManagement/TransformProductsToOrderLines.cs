@@ -28,7 +28,7 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
                         .ThenInclude(p => p.Returnable)
-                .SingleOrDefaultAsync(c => c.SupplierIdentifier == supplierIdentifier && c.IsDefault, token);
+                .SingleOrDefaultAsync(c => c.SupplierId == supplierIdentifier && c.IsDefault, token);
             
             if (catalog == null)
                 return Result.Failure<IEnumerable<OrderLine>>(ErrorKind.NotFound, "supplier.catalog.not.found");
@@ -38,17 +38,17 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                 .ToList();
             
             var productsToTransform = catalog.Products
-                .Where(cp => productsIdentifiers.Contains(cp.Product.Identifier));
+                .Where(cp => productsIdentifiers.Contains(cp.Product.Id));
             
             var lines = new List<OrderLine>();
             
             lines.AddRange(productsToTransform
                 .Select(cp => 
                     OrderLine.CreateProductLine(
-                        cp.Product.Identifier, 
+                        cp.Product.Id, 
                         cp.Product.Reference, 
                         cp.Product.Name, 
-                        GetProductQuantity(cp.Product.Identifier, productsToProcess), 
+                        GetProductQuantity(cp.Product.Id, productsToProcess), 
                         cp.UnitPrice, 
                         cp.Product.Vat)));
             
@@ -59,10 +59,10 @@ public class TransformProductsToOrderLines : ITransformProductsToOrderLines
                     Debug.Assert(cp.Product.Returnable != null, "cp.Product.Returnable != null");
                     
                     return OrderLine.CreateReturnableLine(
-                        cp.Product.Returnable.Identifier,
+                        cp.Product.Returnable.Id,
                         cp.Product.Returnable.Reference,
                         cp.Product.Returnable.Name,
-                        GetProductQuantity(cp.Product.Identifier, productsToProcess),
+                        GetProductQuantity(cp.Product.Id, productsToProcess),
                         cp.Product.Returnable.UnitPrice,
                         cp.Product.Returnable.Vat);
                 }));

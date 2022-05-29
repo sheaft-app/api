@@ -56,12 +56,12 @@ internal static class DataHelpers
     {
         if (!isDraft)
         {
-            var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+            var order = Order.CreateDraft(supplier.Id, customer.Id);
             if (products != null && products.Any())
             {
                 order.UpdateDraftLines(
-                    products.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p =>
-                        OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                    products.Where(p => p.SupplierId == supplier.Id).Select(p =>
+                        OrderLine.CreateProductLine(p.Id, p.Reference, p.Name,
                             new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
 
                 order.Publish(new OrderReference(++currentOrder), order.Lines);
@@ -70,10 +70,10 @@ internal static class DataHelpers
             return order;
         }
 
-        var orderDraft = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+        var orderDraft = Order.CreateDraft(supplier.Id, customer.Id);
         if(products != null && products.Any())
             orderDraft.UpdateDraftLines(
-                products.Where(p => p.SupplierIdentifier == supplier.Identifier).Select(p => OrderLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
+                products.Where(p => p.SupplierId == supplier.Id).Select(p => OrderLine.CreateProductLine(p.Id, p.Reference, p.Name,
                     new OrderedQuantity(1), new ProductUnitPrice(2000), p.Vat)) ?? new List<OrderLine>());
         
         return orderDraft;
@@ -97,15 +97,15 @@ internal static class DataHelpers
             var supplier = GetDefaultSupplier(supplierInfo.Key);
             context.Add(supplier);
 
-            var catalog = Catalog.CreateDefaultCatalog(supplier.Identifier);
+            var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
             context.Add(catalog);
             
             foreach (var agreementInfo in supplierInfo.Value)
             {
-                var customer = context.Customers.Single(s => s.AccountIdentifier == agreementInfo.Key);
+                var customer = context.Customers.Single(s => s.AccountId == agreementInfo.Key);
             
-                var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier,
-                    catalog.Identifier,
+                var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
+                    catalog.Id,
                     new List<DeliveryDay> {agreementInfo.Value}, 2);
 
                 agreement.Accept();
@@ -117,8 +117,8 @@ internal static class DataHelpers
             
             foreach (var productInfo in productsInfo)
             {
-                var product = new Product(new ProductName(productInfo.Key), new ProductReference(productInfo.Key), new VatRate(2000), null,
-                    supplier.Identifier);
+                var product = new Product(new ProductName(productInfo.Key), new ProductReference(productInfo.Key), new VatRate(0), null,
+                    supplier.Id);
                 
                 catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(productInfo.Value));
                 context.Add(product);

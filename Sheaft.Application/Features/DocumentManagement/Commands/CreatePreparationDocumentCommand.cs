@@ -3,7 +3,7 @@ using Sheaft.Domain.DocumentManagement;
 
 namespace Sheaft.Application.DocumentManagement;
 
-public record CreatePreparationDocumentCommand(List<OrderId> OrderIdentifiers, SupplierId SupplierIdentifier, bool AcceptPendingOrders = false) : Command<Result<string>>;
+public record CreatePreparationDocumentCommand(List<OrderId> OrderIdentifiers, OwnerId OwnerId, bool AcceptPendingOrders = false) : Command<Result<string>>;
     
 public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparationDocumentCommand, Result<string>>
 {
@@ -36,13 +36,13 @@ public class CreatePreparationDocumentHandler : ICommandHandler<CreatePreparatio
             }
         }
 
-        var document = Document.CreatePreparationDocument(new DocumentName($"Préparation du {request.CreatedAt:d}"), _documentParamsHandler, request.OrderIdentifiers, request.SupplierIdentifier);
+        var document = Document.CreatePreparationDocument(new DocumentName($"Préparation du {request.CreatedAt:d}"), _documentParamsHandler, request.OrderIdentifiers, request.OwnerId);
         _uow.Documents.Add(document);
         
         var result = await _uow.Save(token);
         if (result.IsFailure)
             return Result.Failure<string>(result);
 
-        return Result.Success(document.Identifier.Value);
+        return Result.Success(document.Id.Value);
     }
 }

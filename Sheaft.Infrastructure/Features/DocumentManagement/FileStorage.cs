@@ -21,7 +21,7 @@ public class FileStorage : IFileStorage
         var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-        var blobClient = containerClient.GetBlobClient($"users/{document.SupplierIdentifier.Value}/{document.Category}/{document.Identifier.Value}.{document.Extension}");
+        var blobClient = containerClient.GetBlobClient($"users/{document.OwnerId.Value}/{document.Category}/{document.Id.Value}.{document.Extension}");
         await blobClient.DeleteIfExistsAsync(cancellationToken: token);
 
         await using (var ms = new MemoryStream(data))
@@ -35,7 +35,7 @@ public class FileStorage : IFileStorage
         var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-        var blobClient = containerClient.GetBlobClient($"users/{document.SupplierIdentifier.Value}/{document.Category}/{document.Identifier.Value}.{document.Extension}");
+        var blobClient = containerClient.GetBlobClient($"users/{document.OwnerId.Value}/{document.Category}/{document.Id.Value}.{document.Extension}");
 
         var sasBuilder = new BlobSasBuilder
         {
@@ -55,7 +55,7 @@ public class FileStorage : IFileStorage
         var containerClient = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.Containers.Documents);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: token);
 
-        var blobClient = containerClient.GetBlobClient($"users/{document.SupplierIdentifier.Value}/{document.Category}/{document.Identifier.Value}.{document.Extension}");
+        var blobClient = containerClient.GetBlobClient($"users/{document.OwnerId.Value}/{document.Category}/{document.Id.Value}.{document.Extension}");
         var result = await blobClient.DeleteIfExistsAsync(cancellationToken: token);
         
         return !result.Value ? Result.Failure() : Result.Success();

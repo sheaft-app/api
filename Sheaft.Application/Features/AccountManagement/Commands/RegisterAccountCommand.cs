@@ -53,6 +53,6 @@ internal class RegisterAccountHandler : ICommandHandler<RegisterAccountCommand, 
         _uow.Accounts.Add(accountResult.Value);
         var result = await _uow.Save(token);
         
-        return Result.SuccessIf(result, accountResult.Value.Identifier.Value);
+        return Result.SuccessIf(result, accountResult.Value.Id.Value);
     }
 }

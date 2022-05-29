@@ -22,7 +22,7 @@ public class RetrieveDeliveryDays : IRetrieveDeliveryDays
         {
             var agreement = await _context.Set<Agreement>()
                 .SingleOrDefaultAsync(
-                    c => c.SupplierIdentifier == supplierIdentifier && c.CustomerIdentifier == customerIdentifier,
+                    c => c.SupplierId == supplierIdentifier && c.CustomerId == customerIdentifier,
                     token);
 
             return agreement != null

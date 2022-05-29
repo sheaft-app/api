@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.UnitTests.Helpers;
@@ -26,7 +28,7 @@ public class DeleteReturnableCommandShould
         
         Assert.IsTrue(result.IsSuccess);
         
-        var returnable = context.Returnables.SingleOrDefault(s => s.Identifier == returnableId);
+        var returnable = context.Returnables.SingleOrDefault(s => s.Id == returnableId);
         Assert.IsNull(returnable);
     }
     
@@ -45,17 +47,21 @@ public class DeleteReturnableCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateProductHandler>();
 
-        var supplierIdentifier = SupplierId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
         
         var returnable = new Returnable(new ReturnableName("Test1"), new ReturnableReference("Test1"), new UnitPrice(2000),
-            new VatRate(2000), supplierIdentifier);
+            new VatRate(0), supplier.Id);
         context.Add(returnable);
 
         context.SaveChanges();
         
         var handler = new RemoveReturnableHandler(uow);
         
-        return (returnable.Identifier, context, handler);
+        return (returnable.Id, context, handler);
     }
 }
 

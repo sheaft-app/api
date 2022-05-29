@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -26,10 +27,10 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-        var order = context.Orders.Single(c => c.Identifier == new OrderId(result.Value));
+        var order = context.Orders.Single(c => c.Id == new OrderId(result.Value));
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Draft, order.Status);
     }
@@ -42,11 +43,11 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-        var order = context.Orders.Single(c => c.Identifier == new OrderId(result.Value));
-        var delivery = context.Deliveries.SingleOrDefault(c => c.Identifier == order.DeliveryIdentifier);
+        var order = context.Orders.Single(c => c.Id == new OrderId(result.Value));
+        var delivery = context.Deliveries.SingleOrDefault(c => c.Id == order.DeliveryId);
         Assert.IsNull(delivery);
     }
     
@@ -58,15 +59,15 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var order = Order.CreateDraft(supplier.Identifier, customer.Identifier);
+        var order = Order.CreateDraft(supplier.Id, customer.Id);
         
         context.Orders.Add(order);
         context.SaveChanges();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
     
         Assert.IsTrue(result.IsSuccess);
-        Assert.AreEqual(order.Identifier.Value, result.Value);
+        Assert.AreEqual(order.Id.Value, result.Value);
     }
     
     [Test]
@@ -77,7 +78,7 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Identifier, customer.Identifier), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
     
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
@@ -88,18 +89,21 @@ public class CreateOrderDraftCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<CreateOrderDraftHandler>();
 
-        var supplier = AccountId.New();
-        var customer = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
 
         var agreements = new Dictionary<AccountId, DeliveryDay>();
         if (addAgreement)
-            agreements.Add(customer, new DeliveryDay(DayOfWeek.Friday));
+            agreements.Add(customerAccount.Id, new DeliveryDay(DayOfWeek.Friday));
         
         DataHelpers.InitContext(context,
-            new List<AccountId>{customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
+            new List<AccountId>{customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
             new Dictionary<AccountId, Dictionary<string, int>>
-                {{supplier, new Dictionary<string, int> {{"001", 2000}, {"002", 3500}}}});
+                {{supplierAccount.Id, new Dictionary<string, int> {{"001", 2000}, {"002", 3500}}}});
         
         var handler = new CreateOrderDraftHandler(uow, new CreateOrderDraft(new OrderRepository(context), new RetrieveAgreementForOrder(context)));
         

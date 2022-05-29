@@ -41,7 +41,7 @@ public class FulfillOrders : IFulfillOrders
 
         _orderRepository.Update(order);
 
-        var deliveryResult = await _deliveryRepository.Get(order.DeliveryIdentifier, token);
+        var deliveryResult = await _deliveryRepository.Get(order.DeliveryId, token);
         if (deliveryResult.IsFailure)
             return Result.Failure(deliveryResult);
 
@@ -60,7 +60,7 @@ public class FulfillOrders : IFulfillOrders
         if (canDeliverResult.IsFailure)
             return canDeliverResult;
 
-        var deliveryCodeResult = _generateDeliveryCode.GenerateNextCode(delivery.SupplierIdentifier);
+        var deliveryCodeResult = _generateDeliveryCode.GenerateNextCode(delivery.SupplierId);
         if (deliveryCodeResult.IsFailure)
             return Result.Failure(deliveryCodeResult);
         

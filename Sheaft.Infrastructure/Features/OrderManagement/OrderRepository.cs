@@ -17,7 +17,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -30,7 +30,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         return QueryAsync(async () =>
         {
             var result = await Values
-                .Where(e => identifiers.Contains(e.Identifier))
+                .Where(e => identifiers.Contains(e.Id))
                 .ToListAsync(token);
 
             if (result.Count() != identifiers.Count())
@@ -45,7 +45,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         return QueryAsync(async () =>
         {
             var result = await Values
-                .Where(e => e.DeliveryIdentifier == identifier)
+                .Where(e => e.DeliveryId == identifier)
                 .ToListAsync(token);
             
             return Result.Success(result.AsEnumerable());
@@ -57,7 +57,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         return QueryAsync(async () =>
         {
             var result = await Values
-                .Where(e => e.InvoiceIdentifier == identifier)
+                .Where(e => e.InvoiceId == identifier)
                 .ToListAsync(token);
 
             return Result.Success(result.AsEnumerable());
@@ -71,7 +71,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         {
             return Result.Success(await Values
                 .SingleOrDefaultAsync(
-                    e => e.CustomerIdentifier == customerIdentifier && e.SupplierIdentifier == supplierIdentifier,
+                    e => e.CustomerId == customerIdentifier && e.SupplierId == supplierIdentifier,
                     token) ?? Maybe<Order>.None);
         });
     }

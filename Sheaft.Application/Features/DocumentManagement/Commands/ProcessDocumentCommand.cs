@@ -27,7 +27,7 @@ public class ProcessDocumentHandler : ICommandHandler<ProcessDocumentCommand, Re
         var document = documentResult.Value;
         var documentProcessor = _documentProcessorFactory.GetProcessor(document);
         
-        var result = await documentProcessor.Process(document.Identifier, token);
+        var result = await documentProcessor.Process(document.Id, token);
         if (!result.IsFailure)
             return result;
         

@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateProductCommand(ProductId Identifier, string Name, int Vat, string? Code, string? Description, int Price, ReturnableId? ReturnableIdentifier) : ICommand<Result>;
+public record UpdateProductCommand(ProductId Identifier, string Name, decimal Vat, string? Code, string? Description, decimal Price, ReturnableId? ReturnableIdentifier) : ICommand<Result>;
 
 internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Result>
 {
@@ -28,7 +28,7 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
             return Result.Failure(productResult);
 
         var product = productResult.Value;
-        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(product.SupplierIdentifier, token);
+        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(product.SupplierId, token);
         if (catalogResult.IsFailure)
             return Result.Failure(catalogResult);
 
@@ -38,7 +38,7 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
         
         if (request.Code != product.Reference.Value)
         {
-            var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Identifier, product.SupplierIdentifier, token);
+            var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Id, product.SupplierId, token);
             if (codeResult.IsFailure)
                 return Result.Failure(codeResult);
             

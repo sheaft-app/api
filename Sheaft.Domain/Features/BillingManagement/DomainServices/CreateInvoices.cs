@@ -38,20 +38,20 @@ public class CreateInvoices : ICreateInvoices
         var delivery = deliveryResult.Value;
 
         var supplierBillingResult =
-            await _retrieveBillingInformation.GetSupplierBilling(delivery.SupplierIdentifier, token);
+            await _retrieveBillingInformation.GetSupplierBilling(delivery.SupplierId, token);
         if (supplierBillingResult.IsFailure)
             return Result.Failure<Invoice>(supplierBillingResult);
 
         var customerBillingResult =
-            await _retrieveBillingInformation.GetCustomerBilling(delivery.CustomerIdentifier, token);
+            await _retrieveBillingInformation.GetCustomerBilling(delivery.CustomerId, token);
         if (customerBillingResult.IsFailure)
             return Result.Failure<Invoice>(customerBillingResult);
 
-        var ordersResult = await _orderRepository.Find(delivery.Identifier, token);
+        var ordersResult = await _orderRepository.Find(delivery.Id, token);
         if (ordersResult.IsFailure)
             return Result.Failure<Invoice>(ordersResult);
 
-        if (ordersResult.Value.Any(o => o.InvoiceIdentifier != null))
+        if (ordersResult.Value.Any(o => o.InvoiceId != null))
             return Result.Failure<Invoice>(ErrorKind.BadRequest, "invoice.order.already.billed");
 
         var codeResult = _generateInvoiceCode.GenerateNextCode(supplierBillingResult.Value.Identifier);
@@ -67,7 +67,7 @@ public class CreateInvoices : ICreateInvoices
 
         foreach (var order in ordersResult.Value)
         {
-            order.AttachInvoice(invoice.Identifier);
+            order.AttachInvoice(invoice.Id);
             _orderRepository.Update(order);
         }
 

@@ -12,7 +12,7 @@
 </script>
 
 <div class="f-input">
-  <label for="{id}">{label} {required ? '*' : ''}</label>
+  <label for="{id}">{label} {required ? "*" : ""}</label>
   <input
     id="{id}"
     type="text"
@@ -23,6 +23,6 @@
     pattern="[0-9]"
     maxlength="14"
     minlength="14"
-    required='{required}'
+    required="{required}"
   />
 </div>

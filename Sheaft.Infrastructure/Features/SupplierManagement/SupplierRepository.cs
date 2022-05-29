@@ -17,7 +17,7 @@ internal class SupplierRepository : Repository<Supplier, SupplierId>, ISupplierR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -30,7 +30,7 @@ internal class SupplierRepository : Repository<Supplier, SupplierId>, ISupplierR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.AccountIdentifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.AccountId == identifier, token);
 
             return result != null
                 ? Result.Success(result)

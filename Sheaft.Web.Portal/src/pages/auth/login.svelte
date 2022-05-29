@@ -34,8 +34,8 @@
   <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
     <h1>{$page.title}</h1>
     <form>
-      <Email bind:value="{username}" isLoading="{isLoading}" class="mb-6 w-full" />
-      <Password bind:value="{password}" isLoading="{isLoading}" class="mb-6 w-full" />
+      <Email label="Nom d'utilisateur" bind:value="{username}" isLoading="{isLoading}" class="mb-6 w-full" />
+      <Password label="Votre mot de passe" bind:value="{password}" isLoading="{isLoading}" class="mb-6 w-full" />
       <a href="/auth/forgot?&email={username}">Mot de passe oublié?</a>
       <Button
         type="submit"

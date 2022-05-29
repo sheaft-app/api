@@ -24,7 +24,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
         {
             var orders = await _context
                 .Set<Order>()
-                .Where(o => o.DeliveryIdentifier == delivery.Identifier)
+                .Where(o => o.DeliveryId == delivery.Id)
                 .ToListAsync(token);
 
             var orderedProducts = orders
@@ -37,8 +37,8 @@ public class CreateDeliveryLines : ICreateDeliveryLines
             var products = await _context
                 .Set<Product>()
                 .Where(r => 
-                    r.SupplierIdentifier == delivery.SupplierIdentifier 
-                    && productIdentifiers.Contains(r.Identifier))
+                    r.SupplierId == delivery.SupplierId 
+                    && productIdentifiers.Contains(r.Id))
                 .ToListAsync(token);
 
             if (products.Count != productIdentifiers.Count)
@@ -54,7 +54,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
             {
                 var batches = await _context
                     .Set<Batch>()
-                    .Where(b => b.SupplierIdentifier == delivery.SupplierIdentifier)
+                    .Where(b => b.SupplierId == delivery.SupplierId)
                     .ToListAsync(token);
 
                 if (batchIdentifiers.Count != batches.Count)
@@ -64,10 +64,10 @@ public class CreateDeliveryLines : ICreateDeliveryLines
 
             var deliveryProductLines = products
                 .Select(p =>
-                    DeliveryLine.CreateProductLine(p.Identifier, p.Reference, p.Name,
-                        GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
-                        p.Vat, GetProductOrder(p.Identifier, productLines),
-                        GetProductBatches(p.Identifier, productLines)))
+                    DeliveryLine.CreateProductLine(p.Id, p.Reference, p.Name,
+                        GetProductQuantity(p.Id, productLines), GetProductPrice(p.Id, orderedProducts),
+                        p.Vat, GetProductOrder(p.Id, productLines),
+                        GetProductBatches(p.Id, productLines)))
                 .ToList();
 
             var deliveryReturnableLines = products
@@ -76,10 +76,10 @@ public class CreateDeliveryLines : ICreateDeliveryLines
                 {
                     Debug.Assert(p.Returnable != null, "p.Returnable != null");
 
-                    return DeliveryLine.CreateReturnableLine(p.Returnable.Identifier, p.Returnable.Reference,
+                    return DeliveryLine.CreateReturnableLine(p.Returnable.Id, p.Returnable.Reference,
                         p.Returnable.Name,
-                        GetProductQuantity(p.Identifier, productLines), GetProductPrice(p.Identifier, orderedProducts),
-                        p.Vat, GetProductOrder(p.Identifier, productLines));
+                        GetProductQuantity(p.Id, productLines), GetProductPrice(p.Id, orderedProducts),
+                        p.Vat, GetProductOrder(p.Id, productLines));
                 }).ToList();
 
             var deliveryLines = new List<DeliveryLine>();

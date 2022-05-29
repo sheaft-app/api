@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -21,13 +22,13 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Set_Order_Status_To_Pending()
     {
-        var (context, handler) = InitHandler();
+        var (suppAcctId, context, handler) = InitHandler();
 
-        var order = InitDraft(context, true);
+        var order = InitDraft(context, true, suppAcctId);
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
@@ -39,19 +40,19 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Create_Pending_Delivery()
     {
-        var (context, handler) = InitHandler();
-        var order = InitDraft(context, true);
+        var (suppAcctId, context, handler) = InitHandler();
+        var order = InitDraft(context, true,suppAcctId);
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
 
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
 
         Assert.IsNotNull(delivery);
         Assert.AreEqual(OrderStatus.Pending, order.Status);
@@ -61,16 +62,16 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Update_Order_With_Products_From_Order_Supplier_Only()
     {
-        var (context, handler) = InitHandler();
-        var order = InitDraft(context, true);
+        var (suppAcctId, context, handler) = InitHandler();
+        var order = InitDraft(context, true,suppAcctId);
 
         var lines = context.Products
-            .Select(p => new ProductQuantityDto(p.Identifier.Value, 2))
+            .Select(p => new ProductQuantityDto(p.Id.Value, 2))
             .ToList();
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc))), lines),
                 CancellationToken.None);
@@ -82,15 +83,15 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Fail_If_Order_Is_Not_A_Draft()
     {
-        var (context, handler) = InitHandler();
+        var (suppAcctId, context, handler) = InitHandler();
 
-        var order = InitDraft(context, true);
+        var order = InitDraft(context, true,suppAcctId);
         order.Publish(new OrderReference(0), order.Lines);
         context.SaveChanges();
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
@@ -103,13 +104,13 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Fail_If_Order_Has_No_Products()
     {
-        var (context, handler) = InitHandler();
+        var (suppAcctId, context, handler) = InitHandler();
 
-        var order = InitDraft(context, false);
+        var order = InitDraft(context, false,suppAcctId);
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
@@ -122,13 +123,13 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Fail_If_DeliveryDate_Day_Not_In_Agreement_DeliveryDay()
     {
-        var (context, handler) = InitHandler();
+        var (suppAcctId, context, handler) = InitHandler();
 
-        var order = InitDraft(context, true);
+        var order = InitDraft(context, true,suppAcctId);
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 2, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
@@ -141,9 +142,9 @@ public class PublishOrderDraftCommandShould
     [Test]
     public async Task Fail_If_No_Active_Agreement()
     {
-        var (context, handler) = InitHandler();
+        var (suppAcctId, context, handler) = InitHandler();
 
-        var order = InitDraft(context, true);
+        var order = InitDraft(context, true, suppAcctId);
 
         var agreement = context.Agreements.Single();
         agreement.Revoke("reason");
@@ -151,7 +152,7 @@ public class PublishOrderDraftCommandShould
 
         var result =
             await handler.Handle(
-                new PublishOrderDraftCommand(order.Identifier,
+                new PublishOrderDraftCommand(order.Id,
                     new DeliveryDate(new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
                         new DateTimeOffset(new DateTime(2022, 4, 1, 0, 0, 0, DateTimeKind.Utc)))),
                 CancellationToken.None);
@@ -161,24 +162,31 @@ public class PublishOrderDraftCommandShould
         Assert.AreEqual("order.requires.agreement", result.Error.Code);
     }
 
-    private (AppDbContext, PublishOrderDraftHandler) InitHandler()
+    private (AccountId, AppDbContext, PublishOrderDraftHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<PublishOrderDraftHandler>();
 
-        var supplier = AccountId.New();
-        var supplier1 = AccountId.New();
-        var customer = AccountId.New();
+        var supplier1Account  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplier1Account);
+        
+        var supplier2Account  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplier2Account);
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
-        var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
-        var supplier1Products = new Dictionary<string, int> {{"T1", 1000}, {"T2", 5000}};
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        context.SaveChanges();
+        
+        var supplier1agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
+        var supplier1Products = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
+        var supplier2Products = new Dictionary<string, int> {{"T1", 1000}, {"T2", 5000}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customer},
+            new List<AccountId> {customerAccount.Id},
             new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>>
-                {{supplier, agreements}, {supplier1, new Dictionary<AccountId, DeliveryDay>()}},
+                {{supplier1Account.Id, supplier1agreements}, {supplier2Account.Id, new Dictionary<AccountId, DeliveryDay>()}},
             new Dictionary<AccountId, Dictionary<string, int>>
-                {{supplier, supplierProducts}, {supplier1, supplier1Products}});
+                {{supplier1Account.Id, supplier1Products}, {supplier2Account.Id, supplier2Products}});
 
         var handler =
             new PublishOrderDraftHandler(uow,
@@ -191,12 +199,12 @@ public class PublishOrderDraftCommandShould
                     new RetrieveOrderCustomer(context),
                     new RetrieveAgreementForOrder(context)));
 
-        return (context, handler);
+        return (supplier1Account.Id, context, handler);
     }
 
-    private static Order InitDraft(AppDbContext context, bool addProducts)
+    private static Order InitDraft(AppDbContext context, bool addProducts, AccountId supplierId)
     {
-        var supplier = context.Suppliers.First();
+        var supplier = context.Suppliers.First(s => s.AccountId == supplierId);
         var customer = context.Customers.First();
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, true,

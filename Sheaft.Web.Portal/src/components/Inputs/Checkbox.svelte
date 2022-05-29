@@ -6,7 +6,7 @@
   export let label: string = null;
   export let isLoading: boolean = false;
   export let required: boolean = true;
-  
+
   const id = nanoid(10);
 </script>
 
@@ -16,12 +16,13 @@
     type="checkbox"
     bind:checked="{value}"
     disabled="{isLoading}"
-    required='{required}'
+    required="{required}"
     class="{$$props.class}"
   />
   {#if label}
     <label for="{id}" class="form-check-label inline-block text-gray-800">
-      {label} {required ? '*' : ''}
+      {label}
+      {required ? "*" : ""}
     </label>
   {/if}
 </div>

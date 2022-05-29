@@ -8,6 +8,7 @@ using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.SupplierManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -24,7 +25,7 @@ public class AcceptOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, Maybe<DeliveryDate>.None);
+        var acceptOrderCommand = new AcceptOrderCommand(order.Id, Maybe<DeliveryDate>.None);
 
         var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
@@ -38,12 +39,12 @@ public class AcceptOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+        var acceptOrderCommand = new AcceptOrderCommand(order.Id, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
 
         var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
@@ -54,7 +55,7 @@ public class AcceptOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context, true);
-        var acceptOrderCommand = new AcceptOrderCommand(order.Identifier, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
+        var acceptOrderCommand = new AcceptOrderCommand(order.Id, new DeliveryDate(DateTimeOffset.UtcNow.AddDays(4)));
 
         var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
@@ -67,16 +68,19 @@ public class AcceptOrderCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<AcceptOrderHandler>();
 
-        var supplier = AccountId.New();
-        var customer = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+        
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
+            new List<AccountId> {customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
 
         var handler = new AcceptOrderHandler(uow, new AcceptOrders(new OrderRepository(context), new DeliveryRepository(context)));
 
@@ -93,7 +97,7 @@ public class AcceptOrderCommandShould
             order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "", "", "", ""), order.SupplierIdentifier,  customer.Identifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "", "", "", ""), order.SupplierId,  customer.Id, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

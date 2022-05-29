@@ -2,6 +2,6 @@
   code?: string;
   name: string;
   description?: string;
-  price:number;
-  vat:number;
+  price: number;
+  vat: number;
 }

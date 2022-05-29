@@ -9,29 +9,13 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
     public void Configure(EntityTypeBuilder<Document> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
         
         builder
-            .Property(p => p.SupplierIdentifier)
+            .Property(p => p.OwnerId)
             .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(vat => vat.Value, value => new SupplierId(value));
-
+            .HasConversion(vat => vat.Value, value => new OwnerId(value));
+        
         builder
             .Property("_params");
 
@@ -41,12 +25,8 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
             .HasConversion(vat => vat.Value, value => new DocumentName(value));
             
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
-        
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
         
         builder.ToTable("Document");
     }

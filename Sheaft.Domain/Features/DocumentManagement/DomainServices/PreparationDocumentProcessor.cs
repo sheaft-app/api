@@ -87,14 +87,14 @@ public class PreparationDocumentProcessor : IDocumentProcessor
     private async Task<Result<IEnumerable<ClientOrdersToPrepare>>> GetPreparationClientsToPrepare(
         IEnumerable<Order> orders, CancellationToken token)
     {
-        var customerIdentifiers = orders.Select(o => o.CustomerIdentifier).Distinct().ToList();
+        var customerIdentifiers = orders.Select(o => o.CustomerId).Distinct().ToList();
         var customersNameResult = await _customerRepository.GetInfo(customerIdentifiers, token);
         if (customersNameResult.IsFailure)
             return Result.Failure<IEnumerable<ClientOrdersToPrepare>>(customersNameResult);
 
         try
         {
-            var clients = orders.GroupBy(o => o.CustomerIdentifier)
+            var clients = orders.GroupBy(o => o.CustomerId)
                 .Select(o =>
                     new ClientOrdersToPrepare(
                         customersNameResult.Value.Single(c => c.Identifier == o.Key).Name,
@@ -123,7 +123,7 @@ public class PreparationDocumentProcessor : IDocumentProcessor
                             new ProductReference(l.Identifier),
                             new ProductName(l.Name),
                             l.Quantity,
-                            order.CustomerIdentifier,
+                            order.CustomerId,
                             order.Reference)).ToList());
             }
 

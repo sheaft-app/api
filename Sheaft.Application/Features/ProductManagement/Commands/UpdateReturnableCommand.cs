@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateReturnableCommand(ReturnableId Identifier, string Name, string Reference, int Price, int Vat) : ICommand<Result>;
+public record UpdateReturnableCommand(ReturnableId Identifier, string Name, string Reference, decimal Price, decimal Vat) : ICommand<Result>;
 
 internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand, Result>
 {
@@ -25,11 +25,11 @@ internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand
         {
             var existingReturnableResult =
                 await _uow.Returnables.FindWithReference(new ReturnableReference(request.Reference),
-                    returnable.SupplierIdentifier, token);
+                    returnable.SupplierId, token);
             if (existingReturnableResult.IsFailure)
                 return Result.Failure<string>(existingReturnableResult);
 
-            if (existingReturnableResult.Value.HasValue && existingReturnableResult.Value.Value.Identifier != returnable.Identifier)
+            if (existingReturnableResult.Value.HasValue && existingReturnableResult.Value.Value.Id != returnable.Id)
                 return Result.Failure<string>(ErrorKind.Conflict, "returnable.with.reference.already.exists");
         }
 

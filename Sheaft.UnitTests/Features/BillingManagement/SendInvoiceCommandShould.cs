@@ -22,7 +22,7 @@ public class SendInvoiceCommandShould
     public async Task Set_Invoice_Status_As_Sent()
     {
         var (invoice, context, handler) = InitHandler(true, false);
-        var command = new SendInvoiceCommand(invoice.Identifier);
+        var command = new SendInvoiceCommand(invoice.Id);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -35,7 +35,7 @@ public class SendInvoiceCommandShould
     public async Task Fail_If_Not_In_Published_Status()
     {
         var (invoice, context, handler) = InitHandler(false, false);
-        var command = new SendInvoiceCommand(invoice.Identifier);
+        var command = new SendInvoiceCommand(invoice.Id);
     
         var result = await handler.Handle(command, CancellationToken.None);
     

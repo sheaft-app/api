@@ -23,4 +23,4 @@ public class CreateReturnable : Feature
     }
 }
 
-public record CreateReturnableRequest(string Name, string Code, int Price, int Vat);
+public record CreateReturnableRequest(string Name, string Code, decimal Price, decimal Vat);

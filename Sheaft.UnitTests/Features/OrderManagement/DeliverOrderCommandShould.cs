@@ -8,6 +8,7 @@ using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.OrderManagement;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -25,11 +26,11 @@ public class DeliverOrderCommandShould
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
 
-        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Id, null, null);
         var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
+        var order = context.Orders.Single(d => delivery.SupplierId == d.SupplierId);
         Assert.IsNotNull(order);
         Assert.AreEqual(OrderStatus.Completed, order.Status);
         Assert.AreEqual(deliverOrderCommand.CreatedAt, order.CompletedOn);
@@ -41,11 +42,11 @@ public class DeliverOrderCommandShould
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
 
-        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null, null);
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Id, null, null);
         var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var order = context.Orders.Single(d => delivery.SupplierIdentifier == d.SupplierIdentifier);
+        var order = context.Orders.Single(d => delivery.SupplierId == d.SupplierId);
         Assert.IsNotNull(order);
         Assert.AreEqual(DeliveryStatus.Delivered, delivery.Status);
         Assert.AreEqual(deliverOrderCommand.CreatedAt, delivery.DeliveredOn);
@@ -57,26 +58,26 @@ public class DeliverOrderCommandShould
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
         var products = context.Products.ToList();
-        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier,
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Id,
             new List<ProductAdjustment>
             {
-                new ProductAdjustment(products.First().Identifier, new Quantity(1)),
-                new ProductAdjustment(products.Skip(1).First().Identifier, new Quantity(-1))
+                new ProductAdjustment(products.First().Id, new Quantity(1)),
+                new ProductAdjustment(products.Skip(1).First().Id, new Quantity(-1))
             }, null);
         
         var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(3, delivery.Adjustments.Count());
-        var firstProduct = delivery.Adjustments.First(a => a.Identifier == products.First().Identifier.Value);
+        var firstProduct = delivery.Adjustments.First(a => a.Identifier == products.First().Id.Value);
         Assert.IsNotNull(firstProduct);
         Assert.AreEqual(DeliveryLineKind.Product, firstProduct.LineKind);
         Assert.AreEqual(1, firstProduct.Quantity.Value);
-        var firstReturnable = delivery.Adjustments.First(a => a.Identifier == products.First().Returnable.Identifier.Value);
+        var firstReturnable = delivery.Adjustments.First(a => a.Identifier == products.First().Returnable.Id.Value);
         Assert.IsNotNull(firstReturnable);
         Assert.AreEqual(DeliveryLineKind.Returnable, firstReturnable.LineKind);
         Assert.AreEqual(1, firstReturnable.Quantity.Value);
-        var secondProduct = delivery.Adjustments.First(a => a.Identifier == products.Skip(1).First().Identifier.Value);
+        var secondProduct = delivery.Adjustments.First(a => a.Identifier == products.Skip(1).First().Id.Value);
         Assert.IsNotNull(secondProduct);
         Assert.AreEqual(DeliveryLineKind.Product, secondProduct.LineKind);
         Assert.AreEqual(-1, secondProduct.Quantity.Value);
@@ -88,10 +89,10 @@ public class DeliverOrderCommandShould
         var (context, handler) = InitHandler();
         var delivery = InitDelivery(context);
         var returnable = context.Returnables.First();
-        var deliverOrderCommand = new DeliverOrderCommand(delivery.Identifier, null,
+        var deliverOrderCommand = new DeliverOrderCommand(delivery.Id, null,
             new List<ReturnedReturnable>
             {
-                new ReturnedReturnable(returnable.Identifier, new Quantity(-1))
+                new ReturnedReturnable(returnable.Id, new Quantity(-1))
             });
         
         var result = await handler.Handle(deliverOrderCommand, CancellationToken.None);
@@ -100,7 +101,7 @@ public class DeliverOrderCommandShould
         Assert.AreEqual(1, delivery.Adjustments.Count());
         var deliveryLine = delivery.Adjustments.First();
         Assert.AreEqual(DeliveryLineKind.ReturnedReturnable, deliveryLine.LineKind);
-        Assert.AreEqual(returnable.Identifier.Value, deliveryLine.Identifier);
+        Assert.AreEqual(returnable.Id.Value, deliveryLine.Identifier);
         Assert.AreEqual(-1, deliveryLine.Quantity.Value);
     }
 
@@ -108,20 +109,23 @@ public class DeliverOrderCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<DeliverOrderHandler>();
 
-        var supplier = AccountId.New();
-        var customer = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
         
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customer, new DeliveryDay(DayOfWeek.Friday)}};
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customer},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
+            new List<AccountId> {customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
 
         var supplier1 = context.Suppliers.First();
         context.Returnables.Add(new Returnable(new ReturnableName("test"), new ReturnableReference("re"),
-            new UnitPrice(2000), new VatRate(2000), supplier1.Identifier));
+            new UnitPrice(2000), new VatRate(0),supplier1.Id));
 
         context.SaveChanges();
             
@@ -146,7 +150,7 @@ public class DeliverOrderCommandShould
         order.Fulfill();
 
         var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierId, order.CustomerId, new List<Order> {order});
 
         delivery.UpdateLines(order.Lines.Select(o => new DeliveryLine(o.Identifier,
             o.LineKind == OrderLineKind.Product ? DeliveryLineKind.Product : DeliveryLineKind.Returnable, o.Reference,
@@ -160,7 +164,7 @@ public class DeliverOrderCommandShould
         context.Add(delivery);
 
         var returnable = new Returnable(new ReturnableName("er"), new ReturnableReference("code"), new UnitPrice(2000),
-            new VatRate(2000), supplier.Identifier);
+            new VatRate(0), supplier.Id);
         context.Add(returnable);
 
         var product = context.Products.First();

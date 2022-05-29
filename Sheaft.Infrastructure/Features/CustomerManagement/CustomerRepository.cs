@@ -17,7 +17,7 @@ internal class CustomerRepository : Repository<Customer, CustomerId>, ICustomerR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -30,7 +30,7 @@ internal class CustomerRepository : Repository<Customer, CustomerId>, ICustomerR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.AccountIdentifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.AccountId == identifier, token);
 
             return result != null
                 ? Result.Success(result)
@@ -43,8 +43,8 @@ internal class CustomerRepository : Repository<Customer, CustomerId>, ICustomerR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .Where(e => identifiers.Contains(e.Identifier))
-                .Select(e => new CustomerInformation(e.Identifier, e.TradeName.Value))
+                .Where(e => identifiers.Contains(e.Id))
+                .Select(e => new CustomerInformation(e.Id, e.TradeName.Value))
                 .ToListAsync(token);
 
             return Result.Success(result.AsEnumerable());

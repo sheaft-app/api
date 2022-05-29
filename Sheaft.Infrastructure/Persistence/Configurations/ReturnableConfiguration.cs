@@ -9,23 +9,7 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
 {
     public void Configure(EntityTypeBuilder<Returnable> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder
             .Property(p => p.Name)
@@ -39,27 +23,25 @@ internal class ReturnableConfiguration : IEntityTypeConfiguration<Returnable>
 
         builder
             .Property(p => p.UnitPrice)
+            .HasPrecision(18, 2)
             .HasConversion(price => price.Value, value => new UnitPrice(value));
         
         builder
             .Property(p => p.Vat)
+            .HasPrecision(18, 2)
             .HasConversion(vat => vat.Value, value => new VatRate(value));
         
         builder
-            .Property(p => p.SupplierIdentifier)
+            .Property(p => p.SupplierId)
             .HasMaxLength(Constants.IDS_LENGTH)
             .HasConversion(vat => vat.Value, value => new SupplierId(value));
 
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
-        
-        builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
+            .HasIndex(c => new { c.SupplierId, c.Reference})
             .IsUnique();
         
         builder.ToTable("Returnable");

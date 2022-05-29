@@ -22,7 +22,7 @@ public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnab
             var returnedReturnableIdentifiers = returnedReturnables.Select(p => p.Identifier).ToList();
             var returnables = await _context
                 .Set<Returnable>()
-                .Where(r => r.SupplierIdentifier == supplierIdentifier && returnedReturnableIdentifiers.Contains(r.Identifier))
+                .Where(r => r.SupplierId == supplierIdentifier && returnedReturnableIdentifiers.Contains(r.Id))
                 .ToListAsync(token);
             
             if (returnables.Count != returnedReturnables.Count())
@@ -30,8 +30,8 @@ public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnab
                     "delivery.returnables.to.adjust.not.found");
 
             var adjustedReturnables = returnables.Select(p =>
-                DeliveryLine.CreateReturnedReturnableLine(p.Identifier, p.Reference, p.Name,
-                    GetProductQuantity(p.Identifier, returnedReturnables), p.UnitPrice,
+                DeliveryLine.CreateReturnedReturnableLine(p.Id, p.Reference, p.Name,
+                    GetProductQuantity(p.Id, returnedReturnables), p.UnitPrice,
                     p.Vat));
 
             if (adjustedReturnables.Any(r => r.Quantity.Value >= 0))

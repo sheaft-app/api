@@ -59,6 +59,6 @@ public class ConfigureAccountAsCustomerHandler : ICommandHandler<ConfigureAccoun
         if (result.IsFailure)
             return Result.Failure<string>(result);
         
-        return Result.Success(customer.Identifier.Value);
+        return Result.Success(customer.Id.Value);
     }
 }

@@ -18,7 +18,7 @@ internal class AccountRepository : Repository<Account, AccountId>, IAccountRepos
         {
             var result = await Values
                 .Include(c => c.RefreshTokens)
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
             
             return result != null
                 ? Result.Success(result)

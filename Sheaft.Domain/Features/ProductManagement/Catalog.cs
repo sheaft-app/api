@@ -9,38 +9,46 @@ public class Catalog : AggregateRoot
     {
     }
 
-    public Catalog(CatalogName name, SupplierId supplierIdentifier)
+    public Catalog(CatalogName name, SupplierId supplierId)
     {
-        Identifier = CatalogId.New();
+        Id = CatalogId.New();
         Name = name;
-        SupplierIdentifier = supplierIdentifier;
+        SupplierId = supplierId;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
-    public static Catalog CreateDefaultCatalog(SupplierId supplierIdentifier)
+    public static Catalog CreateDefaultCatalog(SupplierId supplierId)
     {
-        return new Catalog(new CatalogName("Catalogue par défaut"), supplierIdentifier) {IsDefault = true};
+        return new Catalog(new CatalogName("Catalogue par défaut"), supplierId) {IsDefault = true};
     }
 
-    public CatalogId Identifier { get; }
+    public CatalogId Id { get; }
     public CatalogName Name { get; private set; }
     public bool IsDefault { get; private set; }
-    public SupplierId SupplierIdentifier { get; private set; }
+    public SupplierId SupplierId { get; private set; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
     public IReadOnlyCollection<CatalogProduct> Products => _products.AsReadOnly();
 
     public Result AddOrUpdateProductPrice(Product product, ProductUnitPrice unitPrice)
     {
-        var existingProduct = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
+        var existingProduct = _products.SingleOrDefault(p => p.Product.Id == product.Id);
         if (existingProduct != null)
-            existingProduct.SetPrice(unitPrice);
+        {
+            var result = existingProduct.SetPrice(unitPrice);
+            if (result.IsFailure)
+                return result;
+        }
         else
-            _products.Add(new CatalogProduct(product, unitPrice));
+            _products.Add(new CatalogProduct(Id, product, unitPrice));
         
         return Result.Success();
     }
 
     public Result RemoveProduct(Product product)
     {
-        var productToRemove = _products.SingleOrDefault(p => p.Product.Identifier == product.Identifier);
+        var productToRemove = _products.SingleOrDefault(p => p.Product.Id == product.Id);
         if (productToRemove == null)
             return Result.Failure(ErrorKind.NotFound, "catalog.product.not.found");
 

@@ -19,7 +19,7 @@ internal class RetrieveBillingInformation : IRetrieveBillingInformation
     public async Task<Result<CustomerBillingInformation>> GetCustomerBilling(CustomerId customerIdentifier, CancellationToken token)
     {
         var customer = await _context.Set<Customer>()
-            .SingleOrDefaultAsync(c => c.Identifier == customerIdentifier, token);
+            .SingleOrDefaultAsync(c => c.Id == customerIdentifier, token);
 
         if (customer == null)
             return Result.Failure<CustomerBillingInformation>(ErrorKind.NotFound, "billing.information.customer.not.found");
@@ -32,7 +32,7 @@ internal class RetrieveBillingInformation : IRetrieveBillingInformation
     public async Task<Result<SupplierBillingInformation>> GetSupplierBilling(SupplierId supplierIdentifier, CancellationToken token)
     {
         var supplier = await _context.Set<Supplier>()
-            .SingleOrDefaultAsync(c => c.Identifier == supplierIdentifier, token);
+            .SingleOrDefaultAsync(c => c.Id == supplierIdentifier, token);
 
         if (supplier == null)
             return Result.Failure<SupplierBillingInformation>(ErrorKind.NotFound, "billing.information.supplier.not.found");

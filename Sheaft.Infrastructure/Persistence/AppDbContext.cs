@@ -61,6 +61,10 @@ internal class AppDbContext : DbContext, IDbContext
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder
+            .Properties<OwnerId>()
+            .HaveConversion<OwnerIdConverter>();
+        
+        configurationBuilder
             .Properties<SupplierId>()
             .HaveConversion<SupplierIdConverter>();
         

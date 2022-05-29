@@ -17,7 +17,7 @@ internal class DocumentRepository : Repository<Document, DocumentId>, IDocumentR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
                 ? Result.Success(result)

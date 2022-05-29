@@ -21,4 +21,4 @@ public class UpdateProduct : Feature
     }
 }
 
-public record UpdateProductRequest(string Name, string? Code, int Price, int Vat, string? Description, string? ReturnableIdentifier);
+public record UpdateProductRequest(string Name, string? Code, decimal Price, decimal Vat, string? Description, string? ReturnableIdentifier);

@@ -8,6 +8,7 @@ using Sheaft.Application.BatchManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.BatchManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -29,7 +30,7 @@ public class UpdateBatchCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
 
-        var batch = context.Batches.Single(b => b.Identifier == batchId);
+        var batch = context.Batches.Single(b => b.Id == batchId);
         Assert.IsNotNull(batch);
         Assert.AreEqual("0002", batch.Number.Value);
         Assert.AreEqual(BatchDateKind.DDM, batch.DateKind);
@@ -66,25 +67,28 @@ public class UpdateBatchCommandShould
 
         var handler = new UpdateBatchHandler(uow, new ValidateAlteringBatchCapability(context));
 
-        var supplierAccount = AccountId.New();
-        var customerAccount = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount, new DeliveryDay(DayOfWeek.Friday)}};
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        var agreements = new Dictionary<AccountId, DeliveryDay> {{customerAccount.Id, new DeliveryDay(DayOfWeek.Friday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customerAccount},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount, supplierProducts}});
+            new List<AccountId> {customerAccount.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
 
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
         context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplier.Identifier));
+            supplier.Id));
         
         var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplier.Identifier);
+            supplier.Id);
 
         if (useBatch)
         {
@@ -93,12 +97,12 @@ public class UpdateBatchCommandShould
             
             var delivery = new Delivery(new DeliveryDate(DateTimeOffset.UtcNow), 
                 new DeliveryAddress("", new EmailAddress("test@est.com"), "", "", "", ""),
-                supplier.Identifier, customer.Identifier, new List<Order> {order});
+                supplier.Id, customer.Id, new List<Order> {order});
 
             delivery.UpdateLines(order.Lines.Select(o => new DeliveryLine(o.Identifier,
                 o.LineKind == OrderLineKind.Product ? DeliveryLineKind.Product : DeliveryLineKind.Returnable, o.Reference,
                 o.Name, o.Quantity, o.PriceInfo.UnitPrice, o.Vat,
-                new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>{batch.Identifier})));
+                new DeliveryOrder(order.Reference, order.PublishedOn.Value), new List<BatchId>{batch.Id})));
 
             delivery.Schedule(new DeliveryReference(0), delivery.ScheduledAt, delivery.ScheduledAt.Value);
 
@@ -109,7 +113,7 @@ public class UpdateBatchCommandShould
         context.Add(batch);
         context.SaveChanges();
         
-        return (batch.Identifier, context, handler);
+        return (batch.Id, context, handler);
     }
 
     private UpdateBatchCommand GetCommand(BatchId batchIdentifier, string number, BatchDateKind batchDateKind, DateTime dateTimeOffset)

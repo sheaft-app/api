@@ -17,7 +17,7 @@ internal class DeliveryRepository : Repository<Delivery, DeliveryId>, IDeliveryR
         return QueryAsync(async () =>
         {
             var result = await Values
-                .SingleOrDefaultAsync(e => e.Identifier == identifier, token);
+                .SingleOrDefaultAsync(e => e.Id == identifier, token);
             
             return result != null
                 ? Result.Success(result)

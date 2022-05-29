@@ -79,7 +79,7 @@ public class RefreshAccessTokenCommandShould
         var account = DataHelpers.GetDefaultAccount(hasher, username, password);
         
         context.Accounts.Add(account);
-        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(account.Identifier));
+        context.Suppliers.Add(DataHelpers.GetDefaultSupplier(account.Id));
         context.SaveChanges();
         
         var loginResult = account.Login(password, hasher, securityTokensProvider, new Profile("test", "name", ProfileKind.Supplier));

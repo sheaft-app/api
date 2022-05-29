@@ -20,7 +20,7 @@ internal class GenerateOrderCode : IGenerateOrderCode
         lock (Locker)
         {
             _currentReference ??= _context.Set<Order>()
-                .Where(o => o.SupplierIdentifier == supplierIdentifier && o.Reference != null)
+                .Where(o => o.SupplierId == supplierIdentifier && o.Reference != null)
                 .OrderByDescending(o => o.Reference)
                 .Select(o => o.Reference)
                 .FirstOrDefault() ?? new OrderReference(0);

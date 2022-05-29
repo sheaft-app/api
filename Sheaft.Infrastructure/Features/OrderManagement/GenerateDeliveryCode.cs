@@ -20,7 +20,7 @@ internal class GenerateDeliveryCode : IGenerateDeliveryCode
         lock (Locker)
         {
             _currentReference ??= _context.Set<Delivery>()
-                .Where(o => o.SupplierIdentifier == supplierIdentifier && o.Reference != null)
+                .Where(o => o.SupplierId == supplierIdentifier && o.Reference != null)
                 .OrderByDescending(o => o.Reference)
                 .Select(o => o.Reference)
                 .FirstOrDefault() ?? new DeliveryReference(0);

@@ -15,6 +15,7 @@ public record OrderLine
         PriceInfo = new LinePrice(unitPrice, vat, quantity);
         Quantity = quantity;
         Vat = vat;
+        CreatedOn = DateTimeOffset.UtcNow;
     }
 
     public static OrderLine CreateProductLine(ProductId productIdentifier, ProductReference reference, ProductName name,
@@ -36,4 +37,5 @@ public record OrderLine
     public LinePrice PriceInfo { get; private set; }
     public Quantity Quantity { get; }
     public VatRate Vat { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
 }

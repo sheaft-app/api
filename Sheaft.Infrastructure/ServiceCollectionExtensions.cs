@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application;
+using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.AgreementManagement;
@@ -57,6 +58,7 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterQueries(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IProductQueries, ProductQueries>();
     }
 
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)

@@ -25,7 +25,7 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
             return Result.Failure<string>(customerResult);
         
         var canCreateAgreementBetweenResult =
-            await _validateAgreementPoposal.CanCreateAgreementBetween(customerResult.Value.Identifier.Value, request.SupplierIdentifier.Value, token);
+            await _validateAgreementPoposal.CanCreateAgreementBetween(customerResult.Value.Id.Value, request.SupplierIdentifier.Value, token);
         if (canCreateAgreementBetweenResult.IsFailure)
             return Result.Failure<string>(canCreateAgreementBetweenResult);
         
@@ -41,14 +41,14 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
         
         var agreement = Agreement.CreateAndSendAgreementToSupplier(
             request.SupplierIdentifier, 
-            customerResult.Value.Identifier, 
-            catalogResult.Value.Value.Identifier);
+            customerResult.Value.Id, 
+            catalogResult.Value.Value.Id);
         
         _uow.Agreements.Add(agreement);
         var result = await _uow.Save(token);
         if (result.IsFailure)
             return Result.Failure<string>(result);
         
-        return Result.Success(agreement.Identifier.Value);
+        return Result.Success(agreement.Id.Value);
     }
 }

@@ -12,7 +12,7 @@
 </script>
 
 <div class="f-input">
-  <label for="{id}">{label} {required ? '*' : ''}</label>
+  <label for="{id}">{label} {required ? "*" : ""}</label>
   <input
     id="{id}"
     type="tel"
@@ -20,6 +20,6 @@
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"
-    required='{required}'
+    required="{required}"
   />
 </div>

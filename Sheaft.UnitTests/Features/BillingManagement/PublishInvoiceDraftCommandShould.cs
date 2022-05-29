@@ -8,6 +8,7 @@ using Sheaft.Application.BillingManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BillingManagement;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.BillingManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -23,7 +24,7 @@ public class PublishInvoiceDraftCommandShould
     public async Task Set_Invoice_Status_As_Published_And_Generate_Reference()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+        var command = new PublishInvoiceDraftCommand(invoice.Id);
     
         var result = await handler.Handle(command, CancellationToken.None);
     
@@ -37,8 +38,8 @@ public class PublishInvoiceDraftCommandShould
     public async Task Update_Customer_Billing_Info_If_They_Have_Changed_Since_Creation()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
-        var customer = context.Customers.Single(c => c.Identifier == invoice.Customer.Identifier);
+        var command = new PublishInvoiceDraftCommand(invoice.Id);
+        var customer = context.Customers.Single(c => c.Id == invoice.Customer.Identifier);
         customer.SetBillingAddress(new BillingAddress("update", new EmailAddress("test@est.com"), "New street", "",
             "7000", "city"));
     
@@ -56,7 +57,7 @@ public class PublishInvoiceDraftCommandShould
     public async Task Set_Invoice_DueDate_In_30_Days()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+        var command = new PublishInvoiceDraftCommand(invoice.Id);
     
         var result = await handler.Handle(command, CancellationToken.None);
     
@@ -69,7 +70,7 @@ public class PublishInvoiceDraftCommandShould
     public async Task Fail_If_Invoice_Has_No_Lines()
     {
         var (invoice, context, handler) = InitHandler();
-        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+        var command = new PublishInvoiceDraftCommand(invoice.Id);
     
         var result = await handler.Handle(command, CancellationToken.None);
     
@@ -82,7 +83,7 @@ public class PublishInvoiceDraftCommandShould
     public async Task Fail_If_Invoice_Is_Not_A_Draft()
     {
         var (invoice, context, handler) = InitHandler(true);
-        var command = new PublishInvoiceDraftCommand(invoice.Identifier);
+        var command = new PublishInvoiceDraftCommand(invoice.Id);
         invoice.Publish(new InvoiceReference(0));
         context.SaveChanges();
 
@@ -103,11 +104,17 @@ public class PublishInvoiceDraftCommandShould
                 new GenerateInvoiceCode(context),
                 new RetrieveBillingInformation(context)));
 
-        var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
-        context.Add(customer);
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
 
-        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
+        var customerAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customerAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
         context.Add(supplier);
+        
+        var customer = DataHelpers.GetDefaultCustomer(customerAccount.Id);
+        context.Add(customer);
 
         var products = new List<InvoiceLine>();
         if (addProducts)
@@ -123,8 +130,8 @@ public class PublishInvoiceDraftCommandShould
         }
         
         var invoice = Invoice.CreateInvoice(
-            DataHelpers.GetDefaultSupplierBilling(supplier.Identifier),
-            DataHelpers.GetDefaultCustomerBilling(customer.Identifier),
+            DataHelpers.GetDefaultSupplierBilling(supplier.Id),
+            DataHelpers.GetDefaultCustomerBilling(customer.Id),
             products);
 
         context.Add(invoice);

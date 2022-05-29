@@ -26,7 +26,7 @@ public class CreateInvoiceForDeliveryHandler : ICommandHandler<CreateInvoiceForD
         
         var result = await _uow.Save(token);
         return result.IsSuccess
-            ? Result.Success(invoiceResult.Value.Identifier.Value)
+            ? Result.Success(invoiceResult.Value.Id.Value)
             : Result.Failure<string>(result);
     }
 }

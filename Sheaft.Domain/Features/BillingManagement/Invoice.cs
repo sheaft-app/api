@@ -11,12 +11,14 @@ public class Invoice : AggregateRoot
     private Invoice(InvoiceKind kind, SupplierBillingInformation supplier,
         CustomerBillingInformation customer, string? comment = null)
     {
-        Identifier = InvoiceId.New();
+        Id = InvoiceId.New();
         Kind = kind;
         Status = InvoiceStatus.Draft;
         Supplier = supplier;
         Customer = customer;
         Comment = comment;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
     private Invoice(InvoiceKind kind, SupplierBillingInformation supplier,
@@ -46,13 +48,13 @@ public class Invoice : AggregateRoot
         return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
     }
 
-    public static Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
-        CustomerBillingInformation customer, Invoice invoice, IEnumerable<InvoiceLine>? lines = null)
+    public Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
+        CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines = null)
     {
         var creditNote = new Invoice(InvoiceKind.CreditNote, supplier, customer, lines,
-            $"Avoir sur la facture n°{invoice.Reference.Value} du {invoice.PublishedOn:d}");
+            $"Avoir sur la facture n°{Reference.Value} du {PublishedOn:d}");
 
-        var result = invoice.AttachCreditNote(creditNote);
+        var result = AttachCreditNote(creditNote);
         if (result.IsFailure)
             throw new InvalidOperationException(result.Error.Code);
 
@@ -62,18 +64,18 @@ public class Invoice : AggregateRoot
     private Result AttachCreditNote(Invoice creditNote)
     {
         var creditNotes = CreditNotes.ToList();
-        if (creditNotes.Any(n => n.InvoiceIdentifier == creditNote.Identifier))
+        if (creditNotes.Any(n => n.Id == creditNote.Id))
             return Result.Failure(ErrorKind.BadRequest, "invoice.already.contains.creditnote");
 
-        creditNotes.Add(new InvoiceCreditNote(creditNote.Identifier));
+        creditNotes.Add(creditNote);
         CreditNotes = creditNotes.ToList();
         return Result.Success();
     }
 
-    public static Result<Invoice> CancelInvoice(Invoice invoice, CreditNoteReference creditNoteReference,
+    public Result<Invoice> Cancel(CreditNoteReference creditNoteReference,
         string cancellationReason, DateTimeOffset? currentDateTime = null)
     {
-        var lines = invoice.Lines
+        var lines = Lines
             .Select(v => InvoiceLine.CreateLineForDeliveryOrder(v.Identifier, v.Name, v.Quantity,
                 v.PriceInfo.UnitPrice, v.Vat,
                 new InvoiceDelivery(v.Delivery.Reference, v.Delivery.DeliveredOn),
@@ -81,22 +83,32 @@ public class Invoice : AggregateRoot
             .ToList();
 
         var creditNote = new Invoice(InvoiceKind.InvoiceCancellation,
-            SupplierBillingInformation.Copy(invoice.Supplier),
-            CustomerBillingInformation.Copy(invoice.Customer),
+            SupplierBillingInformation.Copy(Supplier),
+            CustomerBillingInformation.Copy(Customer),
             lines,
-            $"Avoir d'annulation de la facture n°{invoice.Reference.Value} du {invoice.PublishedOn.Value:d}");
+            $"Avoir pour l'annulation de la facture n°{Reference.Value} du {PublishedOn.Value:d}");
 
         var publishResult = creditNote.Publish(creditNoteReference, currentDateTime);
         if (publishResult.IsFailure)
             return Result.Failure<Invoice>(publishResult);
 
-        var result = invoice.Cancel(creditNote.Identifier, cancellationReason, currentDateTime);
-        return result.IsFailure
-            ? Result.Failure<Invoice>(result)
-            : Result.Success(creditNote);
+        if (Status != InvoiceStatus.Published && Status != InvoiceStatus.Sent)
+            return Result.Failure<Invoice>(ErrorKind.BadRequest, "invoice.cancel.requires.published.or.sent");
+
+        if (string.IsNullOrWhiteSpace(cancellationReason))
+            return Result.Failure<Invoice>(ErrorKind.BadRequest, "invoice.cancel.requires.reason");
+
+        CreditNotes = new List<Invoice> {creditNote};
+        CancellationReason = cancellationReason;
+        Status = InvoiceStatus.Cancelled;
+        CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        
+        return Result.Success(creditNote);
     }
 
-    public InvoiceId Identifier { get; }
+    public InvoiceId Id { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
     public BillingReference? Reference { get; private set; }
     public InvoiceDueDate? DueDate { get; private set; }
     public InvoiceStatus Status { get; private set; }
@@ -112,8 +124,8 @@ public class Invoice : AggregateRoot
     public CustomerBillingInformation Customer { get; private set; }
     public SupplierBillingInformation Supplier { get; private set; }
     public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
-    public IEnumerable<InvoiceCreditNote> CreditNotes { get; private set; } = new List<InvoiceCreditNote>();
     public IEnumerable<InvoicePayment> Payments { get; private set; } = new List<InvoicePayment>();
+    public IEnumerable<Invoice> CreditNotes { get; private set; } = new List<Invoice>();
 
     internal Result Publish(BillingReference reference, DateTimeOffset? currentDateTime = null)
     {
@@ -159,22 +171,6 @@ public class Invoice : AggregateRoot
         return Result.Success();
     }
 
-    private Result Cancel(InvoiceId creditNoteIdentifier, string cancellationReason,
-        DateTimeOffset? currentDateTime = null)
-    {
-        if (Status != InvoiceStatus.Published && Status != InvoiceStatus.Sent)
-            return Result.Failure(ErrorKind.BadRequest, "invoice.cancel.requires.published.or.sent");
-
-        if (string.IsNullOrWhiteSpace(cancellationReason))
-            return Result.Failure(ErrorKind.BadRequest, "invoice.cancel.requires.reason");
-
-        CreditNotes = new List<InvoiceCreditNote> {new InvoiceCreditNote(creditNoteIdentifier)};
-        CancellationReason = cancellationReason;
-        Status = InvoiceStatus.Cancelled;
-        CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
-        return Result.Success();
-    }
-
     private Result SetLines(IEnumerable<InvoiceLine>? lines)
     {
         Lines = lines?.ToList() ?? new List<InvoiceLine>();
@@ -208,7 +204,7 @@ public class Invoice : AggregateRoot
 
     public Result RemoveCreditNote(Invoice creditNote)
     {
-        var existingCreditNote = CreditNotes.FirstOrDefault(c => c.InvoiceIdentifier == creditNote.Identifier);
+        var existingCreditNote = CreditNotes.FirstOrDefault(c => c.Id == creditNote.Id);
         if (existingCreditNote == null)
             return Result.Failure(ErrorKind.BadRequest, "invoice.remove.creditnote.not.found");
 

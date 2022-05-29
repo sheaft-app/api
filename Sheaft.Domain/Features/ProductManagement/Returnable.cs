@@ -6,22 +6,26 @@ public class Returnable : Entity
     {
     }
     
-    public Returnable(ReturnableName name, ReturnableReference reference, UnitPrice unitPrice, VatRate vat, SupplierId supplierIdentifier)
+    public Returnable(ReturnableName name, ReturnableReference reference, UnitPrice unitPrice, VatRate vat, SupplierId supplierId)
     {
-        Identifier = ReturnableId.New();
+        Id = ReturnableId.New();
         Name = name;
         Reference = reference;
         UnitPrice = unitPrice;
         Vat = vat;
-        SupplierIdentifier = supplierIdentifier;
+        SupplierId = supplierId;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
-    public ReturnableId Identifier { get; }
+    public ReturnableId Id { get; }
     public ReturnableName Name { get; private set; }
     public ReturnableReference Reference { get; private set; }
     public UnitPrice UnitPrice { get; private set; }
     public VatRate Vat { get; private set; }
-    public SupplierId SupplierIdentifier { get; }
+    public SupplierId SupplierId { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
 
     public Result UpdateInfo(ReturnableName name, ReturnableReference reference, UnitPrice price, VatRate vat)
     {
@@ -29,6 +33,7 @@ public class Returnable : Entity
         Reference = reference;
         UnitPrice = price;
         Vat = vat;
+        UpdatedOn = DateTimeOffset.UtcNow;
 
         return Result.Success();
     }

@@ -59,6 +59,6 @@ public class ConfigureAccountAsSupplierHandler : ICommandHandler<ConfigureAccoun
         if (result.IsFailure)
             return Result.Failure<string>(result);
         
-        return Result.Success(supplier.Identifier.Value);
+        return Result.Success(supplier.Id.Value);
     }
 }

@@ -25,7 +25,7 @@ internal class RemoveProductHandler : ICommandHandler<RemoveProductCommand, Resu
             return Result.Failure(productResult);
 
         var product = productResult.Value;
-        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(product.SupplierIdentifier, token);
+        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(product.SupplierId, token);
         if (catalogResult.IsFailure)
             return Result.Failure(catalogResult);
         

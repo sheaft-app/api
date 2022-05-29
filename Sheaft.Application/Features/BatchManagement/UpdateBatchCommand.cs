@@ -39,7 +39,7 @@ internal class UpdateBatchHandler : ICommandHandler<UpdateBatchCommand, Result>
             if (batchNumber.IsFailure)
                 return batchNumber;
 
-            if (batchNumber.Value.HasValue && batchNumber.Value.Value.Identifier != batch.Identifier)
+            if (batchNumber.Value.HasValue && batchNumber.Value.Value.Id != batch.Id)
                 return Result.Failure(ErrorKind.Conflict, "batch.number.already.exists");
         }
         

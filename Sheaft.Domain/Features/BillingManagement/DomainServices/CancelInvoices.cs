@@ -45,13 +45,13 @@ public class CancelInvoices : ICancelInvoices
         if (codeResult.IsFailure)
             return Result.Failure<string>(codeResult);
 
-        var creditNoteResult = Invoice.CancelInvoice(invoice, codeResult.Value, cancellationReason, currentDateTime);
+        var creditNoteResult = invoice.Cancel(codeResult.Value, cancellationReason, currentDateTime);
         if (creditNoteResult.IsFailure)
             return Result.Failure<string>(creditNoteResult);
 
-        _invoiceRepository.Update(invoice);
         _invoiceRepository.Add(creditNoteResult.Value);
+        _invoiceRepository.Update(invoice);
         
-        return Result.Success(creditNoteResult.Value.Identifier.Value);
+        return Result.Success(creditNoteResult.Value.Id.Value);
     }
 }

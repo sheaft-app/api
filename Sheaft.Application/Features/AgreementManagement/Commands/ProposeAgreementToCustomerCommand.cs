@@ -26,14 +26,14 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
             return Result.Failure<string>(supplierResult);
 
         var canCreateAgreementBetweenResult =
-            await _validateAgreementPoposal.CanCreateAgreementBetween(supplierResult.Value.Identifier.Value, request.CustomerIdentifier.Value, token);
+            await _validateAgreementPoposal.CanCreateAgreementBetween(supplierResult.Value.Id.Value, request.CustomerIdentifier.Value, token);
         if (canCreateAgreementBetweenResult.IsFailure)
             return Result.Failure<string>(canCreateAgreementBetweenResult);
         
         if(!canCreateAgreementBetweenResult.Value)
             return Result.Failure<string>(ErrorKind.BadRequest, "agreement.already.exists");
         
-        var catalogResult = await _uow.Catalogs.FindDefault(supplierResult.Value.Identifier, token);
+        var catalogResult = await _uow.Catalogs.FindDefault(supplierResult.Value.Id, token);
         if (catalogResult.IsFailure)
             return Result.Failure<string>(catalogResult);
 
@@ -41,9 +41,9 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
             return Result.Failure<string>(ErrorKind.NotFound, "agreement.supplier.catalog.not.found");
 
         var agreement = Agreement.CreateAndSendAgreementToCustomer(
-            supplierResult.Value.Identifier, 
+            supplierResult.Value.Id, 
             request.CustomerIdentifier, 
-            catalogResult.Value.Value.Identifier, 
+            catalogResult.Value.Value.Id, 
             request.DeliveryDays?.Select(d => new DeliveryDay(d)).ToList() ?? new List<DeliveryDay>(), 
             request.OrderDelayInHoursBeforeDeliveryDay);
         
@@ -52,6 +52,6 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
         if (result.IsFailure)
             return Result.Failure<string>(result);
         
-        return Result.Success(agreement.Identifier.Value);
+        return Result.Success(agreement.Id.Value);
     }
 }

@@ -32,7 +32,7 @@ public class CreateOrderDraft : ICreateOrderDraft
             return Result.Failure<string>(orderDraftResult);
 
         if (orderDraftResult.Value.HasValue)
-            return Result.Success<string>(orderDraftResult.Value.Value.Identifier.Value);
+            return Result.Success<string>(orderDraftResult.Value.Value.Id.Value);
 
         var order = Order.CreateDraft(
             supplierIdentifier,
@@ -40,6 +40,6 @@ public class CreateOrderDraft : ICreateOrderDraft
         
         _orderRepository.Add(order);
         
-        return Result.Success<string>(order.Identifier.Value);
+        return Result.Success<string>(order.Id.Value);
     }
 }

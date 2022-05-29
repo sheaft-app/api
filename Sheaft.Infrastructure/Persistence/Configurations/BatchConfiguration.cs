@@ -9,23 +9,7 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
 {
     public void Configure(EntityTypeBuilder<Batch> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
         
         builder
             .Property(p => p.Number)
@@ -33,24 +17,15 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
             .HasConversion(number => number.Value, value => new BatchNumber(value));
 
         builder
-            .Property(p => p.SupplierIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(supplierIdentifier => supplierIdentifier.Value, value => new SupplierId(value));
-
-        builder
             .Property(p => p.Date)
             .HasConversion(date => new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc), value => DateOnly.FromDateTime(value));
 
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
         
         builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
-        
-        builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Number})
+            .HasIndex(c => new {c.SupplierId, c.Number})
             .IsUnique();
         
         builder.ToTable("Batch");

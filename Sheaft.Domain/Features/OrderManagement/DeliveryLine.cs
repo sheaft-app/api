@@ -16,6 +16,7 @@ public record DeliveryLine
         Quantity = quantity;
         Vat = vat;
         Order = order;
+        CreatedOn = DateTimeOffset.UtcNow;
         Batches = batches?.Select(b => new DeliveryBatch(b)).ToList() ?? new List<DeliveryBatch>();
     }
 
@@ -45,5 +46,6 @@ public record DeliveryLine
     public Quantity Quantity { get; }
     public VatRate Vat { get; }
     public DeliveryOrder? Order { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
     public IEnumerable<DeliveryBatch> Batches { get; } = new List<DeliveryBatch>();
 }

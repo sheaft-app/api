@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,6 +6,7 @@ using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.UnitTests.Helpers;
@@ -25,10 +27,10 @@ public class UpdateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Identifier == productId);
-        var catalog = context.Catalogs.Single(c => c.Products.Any(cp => cp.Product.Identifier == productId));
+        var product = context.Products.Single(s => s.Id == productId);
+        var catalog = context.Catalogs.Single(c => c.Products.Any(cp => cp.Product.Id == productId));
         Assert.AreEqual("newcode", product.Reference.Value);
-        Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Identifier == productId).UnitPrice.Value);
+        Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Id == productId).UnitPrice.Value);
     }
 
     [Test]
@@ -40,7 +42,7 @@ public class UpdateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Identifier == productId);
+        var product = context.Products.Single(s => s.Id == productId);
         Assert.AreEqual("0000000000017", product.Reference.Value);
     }
 
@@ -48,15 +50,15 @@ public class UpdateProductCommandShould
     public async Task Assign_Returnable_To_Product()
     {
         var (productId, context, handler) = InitHandler();
-        var returnableId = context.Returnables.First().Identifier;
+        var returnableId = context.Returnables.First().Id;
         var command = GetCommand(productId, returnableId: returnableId);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Identifier == productId);
+        var product = context.Products.Single(s => s.Id == productId);
         Assert.IsNotNull(product?.Returnable);
-        Assert.AreEqual(returnableId.Value, product?.Returnable.Identifier.Value);
+        Assert.AreEqual(returnableId.Value, product?.Returnable.Id.Value);
     }
 
     [Test]
@@ -68,7 +70,7 @@ public class UpdateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Identifier == productId);
+        var product = context.Products.Single(s => s.Id == productId);
         Assert.IsNull(product.Returnable);
     }
 
@@ -89,15 +91,20 @@ public class UpdateProductCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateProductHandler>();
 
-        var supplierIdentifier = SupplierId.New();
-        var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
-        var product = new Product(new ProductName("product"), new ProductReference("test"), new VatRate(2000), null,
-            supplierIdentifier);
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
+        
+        var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
+        var product = new Product(new ProductName("product"), new ProductReference("test"), new VatRate(0), null,
+            supplier.Id);
         catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(2000));
 
         var returnable = new Returnable(new ReturnableName("Test"), new ReturnableReference("code"),
             new UnitPrice(2000),
-            new VatRate(2000), supplierIdentifier);
+            new VatRate(0), supplier.Id);
 
         context.Add(returnable);
         context.Add(catalog);
@@ -110,13 +117,13 @@ public class UpdateProductCommandShould
         var handler = new UpdateProductHandler(uow, new RetrieveDefaultCatalog(new CatalogRepository(context)),
             new HandleProductCode(new ProductRepository(context), new GenerateProductCode(context)));
 
-        return (product.Identifier, context, handler);
+        return (product.Id, context, handler);
     }
 
     private static UpdateProductCommand GetCommand(ProductId identifier, int price = 1200, string? code = null,
         ReturnableId? returnableId = null)
     {
-        var command = new UpdateProductCommand(identifier, "Test", 2000, code, "desc", price, returnableId);
+        var command = new UpdateProductCommand(identifier, "Test", 0, code, "desc", price, returnableId);
         return command;
     }
 }

@@ -9,23 +9,7 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 {
     public void Configure(EntityTypeBuilder<Invoice> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.OwnsMany(o => o.Lines, l =>
         {
@@ -42,18 +26,22 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             {
                 pi
                     .Property(p => p.UnitPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
                 pi
                     .Property(p => p.WholeSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
                 pi
                     .Property(p => p.VatPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
 
                 pi
                     .Property(p => p.OnSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
 
@@ -79,6 +67,7 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
             l
                 .Property(p => p.Vat)
+                .HasPrecision(18, 2)
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
 
             l.WithOwner().HasForeignKey("InvoiceId");
@@ -97,15 +86,6 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
                 .HasConversion(vat => vat.Value, value => new PaymentReference(value));
 
             l.ToTable("Invoice_Payments");
-        });
-
-        builder.OwnsMany(o => o.CreditNotes, l =>
-        {
-            l.Property(c => c.InvoiceIdentifier)
-                .HasMaxLength(Constants.IDS_LENGTH);
-            
-            l.HasKey("InvoiceId", "InvoiceIdentifier");
-            l.ToTable("Invoice_CreditNotes");
         });
 
         builder.OwnsOne(b => b.Customer, bi =>
@@ -204,12 +184,14 @@ internal class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
 
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
 
         builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
+            .HasMany(o => o.CreditNotes)
+            .WithOne()
+            .HasForeignKey("InvoiceId")
+            .OnDelete(DeleteBehavior.NoAction);
 
         // builder
         //     .HasIndex("Supplier_Identifier", "Reference")

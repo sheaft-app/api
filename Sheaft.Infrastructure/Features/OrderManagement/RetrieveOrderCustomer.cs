@@ -19,12 +19,12 @@ public class RetrieveOrderCustomer : IRetrieveOrderCustomer
     {
         try
         {
-            var order = await _context.Set<Order>().SingleOrDefaultAsync(o => o.Identifier == orderIdentifier, token);
+            var order = await _context.Set<Order>().SingleOrDefaultAsync(o => o.Id == orderIdentifier, token);
             if (order == null)
                 return Result.Failure<DeliveryAddress>(ErrorKind.NotFound, "order.not.found");
 
             var customer = await _context.Set<Customer>()
-                .SingleOrDefaultAsync(c => c.Identifier == order.CustomerIdentifier, token);
+                .SingleOrDefaultAsync(c => c.Id == order.CustomerId, token);
             
             return customer != null
                 ? Result.Success(customer.DeliveryAddress)

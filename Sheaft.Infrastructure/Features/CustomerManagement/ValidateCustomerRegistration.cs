@@ -19,7 +19,7 @@ internal class ValidateCustomerRegistration : IValidateCustomerRegistration
         try
         {
             return Result.Success(
-                await _context.Set<Customer>().AllAsync(s => s.AccountIdentifier != identifier, token));
+                await _context.Set<Customer>().AllAsync(s => s.AccountId != identifier, token));
         }
         catch (Exception e)
         {

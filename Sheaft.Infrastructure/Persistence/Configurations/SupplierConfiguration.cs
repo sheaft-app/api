@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
+using Sheaft.Domain.AccountManagement;
+using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.BatchManagement;
+using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
@@ -9,23 +13,7 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 {
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.Property(c => c.Email)
             .HasMaxLength(EmailAddress.MAXLENGTH);
@@ -108,19 +96,40 @@ internal class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
         builder
             .Property(p => p.TradeName)
             .HasConversion(name => name.Value, value => new TradeName(value));
-        
-        builder
-            .Property(p => p.AccountIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(identifier => identifier.Value, value => new AccountId(value));
-        
-        builder
-            .Property(c => c.Identifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
 
         builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
+            .HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(c => c.AccountId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany<Batch>()
+            .WithOne()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany<Catalog>()
+            .WithOne()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany<Product>()
+            .WithOne()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasMany<Returnable>()
+            .WithOne()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .Property(c => c.Id)
+            .HasMaxLength(Constants.IDS_LENGTH);
         
         builder.ToTable("Supplier");
     }

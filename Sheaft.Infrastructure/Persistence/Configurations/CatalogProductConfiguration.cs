@@ -9,29 +9,19 @@ internal class CatalogProductConfiguration : IEntityTypeConfiguration<CatalogPro
 {
     public void Configure(EntityTypeBuilder<CatalogProduct> builder)
     {
-        builder.Property<long>("CatalogId");
-        builder.Property<long>("ProductId");
+        builder.Property<ProductId>("ProductId");
+        
         builder.HasKey("CatalogId", "ProductId");
         
         builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
-        
-        builder
             .Property(p => p.UnitPrice)
+            .HasPrecision(18, 2)
             .HasConversion(price => price.Value, value => new ProductUnitPrice(value));
 
         builder.HasOne(c => c.Product)
             .WithMany()
-            .HasForeignKey("ProductId");
+            .HasForeignKey("ProductId")
+            .OnDelete(DeleteBehavior.NoAction);;
         
         builder.ToTable("Catalog_Products");
     }

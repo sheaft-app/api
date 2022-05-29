@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 using Sheaft.Application.AgreementManagement;
 using Sheaft.Domain;
@@ -10,6 +11,7 @@ using Sheaft.Domain.AgreementManagement;
 using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Domain.SupplierManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.AgreementManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -25,15 +27,15 @@ public class ProposeAgreementToCustomerCommandShould
     public async Task Create_Agreement_With_Supplier_As_Owner()
     {
         var (_, supplier, customer, context, handler) = InitHandler();
-        var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
+        var command = GetCommand(customer.Id, supplier.AccountId, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
 
         var result = await handler.Handle(command, CancellationToken.None);
         Assert.IsTrue(result.IsSuccess);
         
-        var agreement = context.Agreements.Single(a => a.Identifier == new AgreementId(result.Value));
+        var agreement = context.Agreements.Single(a => a.Id == new AgreementId(result.Value));
         Assert.IsNotNull(agreement);
-        Assert.AreEqual(supplier.Identifier, agreement.SupplierIdentifier);
-        Assert.AreEqual(customer.Identifier, agreement.CustomerIdentifier);
+        Assert.AreEqual(supplier.Id, agreement.SupplierId);
+        Assert.AreEqual(customer.Id, agreement.CustomerId);
         Assert.AreEqual(AgreementOwner.Supplier, agreement.Owner);
     }
     
@@ -41,9 +43,9 @@ public class ProposeAgreementToCustomerCommandShould
     public async Task Fail_If_Supplier_Has_Already_A_Pending_Or_Active_Agreement_For_Customer()
     {
         var (catalog, supplier, customer, context, handler) = InitHandler();
-        var command = GetCommand(customer.Identifier, supplier.AccountIdentifier, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
+        var command = GetCommand(customer.Id, supplier.AccountId, new List<DayOfWeek> {DayOfWeek.Monday, DayOfWeek.Friday}, 24);
 
-        context.Add(Agreement.CreateAndSendAgreementToCustomer(supplier.Identifier, customer.Identifier, catalog.Identifier, new List<DeliveryDay>(), 0));
+        context.Add(Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id, catalog.Id, new List<DeliveryDay>(), 0));
         context.SaveChanges();
 
         var result = await handler.Handle(command, CancellationToken.None);
@@ -57,9 +59,16 @@ public class ProposeAgreementToCustomerCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<ProposeAgreementToCustomerHandler>();
 
-        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
-        var customer = DataHelpers.GetDefaultCustomer(AccountId.New());
-        var catalog = Catalog.CreateDefaultCatalog(supplier.Identifier);
+        var supplierAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        var customerAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAcct.Id);
+        var customer = DataHelpers.GetDefaultCustomer(customerAcct.Id);
+        
+        var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
+
+        context.Add(customerAcct);
+        context.Add(supplierAcct);
         context.Add(supplier);
         context.Add(customer);
         context.Add(catalog);

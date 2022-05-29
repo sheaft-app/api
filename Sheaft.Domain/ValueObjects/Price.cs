@@ -2,10 +2,10 @@
 
 public record Price
 {
-    public Price(int value)
+    public Price(decimal value)
     {
-        Value = value;
+        Value = Math.Round(value, 2, MidpointRounding.ToEven);
     }
 
-    public int Value { get; }
+    public decimal Value { get; }
 }

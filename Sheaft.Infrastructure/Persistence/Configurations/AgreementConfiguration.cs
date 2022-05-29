@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
 using Sheaft.Domain.AgreementManagement;
+using Sheaft.Domain.CustomerManagement;
+using Sheaft.Domain.ProductManagement;
+using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
@@ -9,23 +12,7 @@ internal class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
 {
     public void Configure(EntityTypeBuilder<Agreement> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.OwnsMany(a => a.DeliveryDays, dd =>
         {
@@ -40,24 +27,26 @@ internal class AgreementConfiguration : IEntityTypeConfiguration<Agreement>
         });
         
         builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
+
+        builder
+            .HasOne<Customer>()
+            .WithMany()
+            .HasForeignKey(c => c.CustomerId)
+            .OnDelete(DeleteBehavior.NoAction);
         
         builder
-            .Property(c => c.CustomerIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
+            .HasOne<Supplier>()
+            .WithMany()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.NoAction);
         
         builder
-            .Property(c => c.SupplierIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
-        
-        builder
-            .Property(c => c.CatalogIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH);
-        
-        builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
+            .HasOne<Catalog>()
+            .WithMany()
+            .HasForeignKey(c => c.CatalogId)
+            .OnDelete(DeleteBehavior.NoAction);
         
         builder.ToTable("Agreement");
     }

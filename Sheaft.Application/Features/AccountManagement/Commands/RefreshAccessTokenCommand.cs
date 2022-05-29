@@ -38,7 +38,7 @@ internal class RefreshAccessTokenHandler : ICommandHandler<RefreshAccessTokenCom
             return Result.Failure<AuthenticationTokenDto>(accountResult);
         
         var account = accountResult.Value;
-        var accountProfileResult = await _retrieveProfile.GetAccountProfile(account.Identifier, token);
+        var accountProfileResult = await _retrieveProfile.GetAccountProfile(account.Id, token);
         if (accountProfileResult.IsFailure)
             return Result.Failure<AuthenticationTokenDto>(accountProfileResult);
 

@@ -6,14 +6,16 @@ public class Delivery : AggregateRoot
     {
     }
 
-    public Delivery(DeliveryDate date, DeliveryAddress address, SupplierId supplierIdentifier, CustomerId customerIdentifier, IEnumerable<Order> orders)
+    public Delivery(DeliveryDate date, DeliveryAddress address, SupplierId supplierId, CustomerId customerId, IEnumerable<Order> orders)
     {
-        Identifier = DeliveryId.New();
+        Id = DeliveryId.New();
         ScheduledAt = date;
         Address = address;
         Status = DeliveryStatus.Pending;
-        SupplierIdentifier = supplierIdentifier;
-        CustomerIdentifier = customerIdentifier;
+        SupplierId = supplierId;
+        CustomerId = customerId;
+        CreatedOn = DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         
         var result = AssignOrders(orders);
         if (result.IsFailure)
@@ -22,7 +24,7 @@ public class Delivery : AggregateRoot
         CalculatePrices();
     }
 
-    public DeliveryId Identifier { get; }
+    public DeliveryId Id { get; }
     public DeliveryReference? Reference { get; private set; }
     public DeliveryStatus Status { get; private set; }
     public DeliveryDate ScheduledAt { get; private set; }
@@ -31,8 +33,10 @@ public class Delivery : AggregateRoot
     public TotalVatPrice TotalVatPrice { get; private set; }
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public DeliveryAddress Address { get; }
-    public SupplierId SupplierIdentifier { get; }
-    public CustomerId CustomerIdentifier { get; }
+    public SupplierId SupplierId { get; }
+    public CustomerId CustomerId { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
     public IEnumerable<DeliveryLine> Lines { get; private set; } = new List<DeliveryLine>();
     public IEnumerable<DeliveryLine> Adjustments { get; private set; } = new List<DeliveryLine>();
 
@@ -44,20 +48,20 @@ public class Delivery : AggregateRoot
         if (orders.Any(o => o.Status == OrderStatus.Draft))
             return Result.Failure(ErrorKind.BadRequest, "delivery.requires.published.orders");
         
-        if (orders.GroupBy(o => o.CustomerIdentifier).Count() > 1)
+        if (orders.GroupBy(o => o.CustomerId).Count() > 1)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.customer");
         
-        if (orders.First().CustomerIdentifier != CustomerIdentifier)
+        if (orders.First().CustomerId != CustomerId)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.be.from.customer");
         
-        if (orders.GroupBy(o => o.SupplierIdentifier).Count() > 1)
+        if (orders.GroupBy(o => o.SupplierId).Count() > 1)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.have.same.supplier");
         
-        if (orders.First().SupplierIdentifier != SupplierIdentifier)
+        if (orders.First().SupplierId != SupplierId)
             return Result.Failure(ErrorKind.BadRequest, "delivery.orders.must.be.from.supplier");
 
         foreach (var order in orders)
-            order.AssignDelivery(Identifier);
+            order.AssignDelivery(Id);
         
         return Result.Success();
     }

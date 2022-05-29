@@ -45,7 +45,7 @@ public class DeliverOrders : IDeliverOrders
         
         if (returnedReturnables != null && returnedReturnables.Any())
         {
-            var returnedReturnablesResult = await _createDeliveryReturnedReturnables.Get(delivery.SupplierIdentifier, returnedReturnables, token);
+            var returnedReturnablesResult = await _createDeliveryReturnedReturnables.Get(delivery.SupplierId, returnedReturnables, token);
             if (returnedReturnablesResult.IsFailure)
                 return Result.Failure(returnedReturnablesResult);
             
@@ -58,7 +58,7 @@ public class DeliverOrders : IDeliverOrders
         
         _deliveryRepository.Update(delivery);
 
-        var ordersResult = await _orderRepository.Find(delivery.Identifier, token);
+        var ordersResult = await _orderRepository.Find(delivery.Id, token);
         if (ordersResult.IsFailure)
             return Result.Failure(ordersResult);
         

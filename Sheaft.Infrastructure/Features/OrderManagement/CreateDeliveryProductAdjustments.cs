@@ -26,13 +26,13 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                 .Include(c => c.Products)
                     .ThenInclude(cp => cp.Product)
                         .ThenInclude(p => p.Returnable)
-                .SingleOrDefaultAsync(c => c.IsDefault && c.SupplierIdentifier == delivery.SupplierIdentifier, token);
+                .SingleOrDefaultAsync(c => c.IsDefault && c.SupplierId == delivery.SupplierId, token);
 
             if (catalog == null)
                 return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.NotFound, "catalog.not.found");
             
             var productsToAdjust = productAdjustments.Select(p => p.Identifier).ToList();
-            var products = catalog.Products.Where(p => productsToAdjust.Contains(p.Product.Identifier))
+            var products = catalog.Products.Where(p => productsToAdjust.Contains(p.Product.Id))
                 .ToList();
             
             if (products.Count != productAdjustments.Count())
@@ -42,15 +42,15 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
             var adjustedProducts = products.Select(p =>
                 {
                     var existingProduct =
-                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Identifier.Value);
+                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Id.Value);
 
                     var price = p.UnitPrice;
                     var vat = p.Product.Vat;
                     var name = p.Product.Name;
                     var reference = p.Product.Reference;
-                    var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
-                    var batches = GetProductBatches(p.Product.Identifier, delivery.Lines);
-                    var order = GetProductOrder(p.Product.Identifier, delivery.Lines);
+                    var quantity = GetProductQuantity(p.Product.Id, productAdjustments);
+                    var batches = GetProductBatches(p.Product.Id, delivery.Lines);
+                    var order = GetProductOrder(p.Product.Id, delivery.Lines);
 
                     if (existingProduct != null)
                     {
@@ -63,7 +63,7 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                             throw new InvalidOperationException("delivery.adjusted.product.invalid.quantity");
                     }
 
-                    return DeliveryLine.CreateProductLine(p.Product.Identifier, reference, name, quantity, price, vat, order, batches);
+                    return DeliveryLine.CreateProductLine(p.Product.Id, reference, name, quantity, price, vat, order, batches);
                 }).ToList();
             
             adjustedProducts.AddRange(products
@@ -73,14 +73,14 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                     Debug.Assert(p.Product.Returnable != null, "p.Product.Returnable != null");
                     
                     var existingReturnable =
-                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Returnable.Identifier.Value);
+                        delivery.Lines.SingleOrDefault(dl => dl.Identifier == p.Product.Returnable.Id.Value);
 
                     var price = p.Product.Returnable.UnitPrice;
                     var vat = p.Product.Returnable.Vat;
                     var name = p.Product.Returnable.Name;
                     var reference = p.Product.Returnable.Reference;
-                    var quantity = GetProductQuantity(p.Product.Identifier, productAdjustments);
-                    var order = GetProductOrder(p.Product.Identifier, delivery.Lines);
+                    var quantity = GetProductQuantity(p.Product.Id, productAdjustments);
+                    var order = GetProductOrder(p.Product.Id, delivery.Lines);
 
                     if (existingReturnable != null)
                     {
@@ -93,7 +93,7 @@ public class CreateDeliveryProductAdjustments : ICreateDeliveryProductAdjustment
                             throw new InvalidOperationException("delivery.adjusted.returnable.invalid.quantity");
                     }
 
-                    return DeliveryLine.CreateReturnableLine(p.Product.Returnable.Identifier, reference, name, quantity, price, vat, order);
+                    return DeliveryLine.CreateReturnableLine(p.Product.Returnable.Id, reference, name, quantity, price, vat, order);
                 }));
 
             return Result.Success(adjustedProducts.AsEnumerable());

@@ -12,7 +12,7 @@ using Sheaft.Infrastructure.Persistence;
 namespace Sheaft.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220525163128_InitDatabase")]
+    [Migration("20220529125540_InitDatabase")]
     partial class InitDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,16 +26,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.AccountManagement.Account", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 74, DateTimeKind.Unspecified).AddTicks(2272), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -47,20 +43,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
                     b.Property<string>("Lastname")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 74, DateTimeKind.Unspecified).AddTicks(4990), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -72,9 +61,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
-
                     b.HasIndex("Username")
                         .IsUnique();
 
@@ -83,34 +69,23 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.AgreementManagement.Agreement", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<string>("CatalogIdentifier")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 104, DateTimeKind.Unspecified).AddTicks(6692), new TimeSpan(0, 0, 0, 0, 0)));
-
-                    b.Property<string>("CustomerIdentifier")
+                    b.Property<string>("CatalogId")
                         .IsRequired()
-                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("FailureReason")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<int>("OrderDelayInHoursBeforeDeliveryDay")
                         .HasColumnType("int");
@@ -121,36 +96,32 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 104, DateTimeKind.Unspecified).AddTicks(7160), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("CatalogId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("SupplierId");
 
                     b.ToTable("Agreement", (string)null);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.BatchManagement.Batch", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 171, DateTimeKind.Unspecified).AddTicks(547), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -158,32 +129,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("DateKind")
                         .HasColumnType("int");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 171, DateTimeKind.Unspecified).AddTicks(983), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
-
-                    b.HasIndex("SupplierIdentifier", "Number")
+                    b.HasIndex("SupplierId", "Number")
                         .IsUnique();
 
                     b.ToTable("Batch", (string)null);
@@ -191,11 +151,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.BillingManagement.Invoice", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("CancellationReason")
                         .HasColumnType("nvarchar(max)");
@@ -207,16 +165,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 150, DateTimeKind.Unspecified).AddTicks(7689), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset?>("DueDate")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
+                    b.Property<string>("InvoiceId")
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<int>("Kind")
@@ -235,55 +189,42 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalOnSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalVatPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalWholeSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 150, DateTimeKind.Unspecified).AddTicks(8965), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Invoice", (string)null);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.CustomerManagement.Customer", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<string>("AccountIdentifier")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
+                    b.Property<string>("AccountId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(12)");
+
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 86, DateTimeKind.Unspecified).AddTicks(3834), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -296,30 +237,23 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 86, DateTimeKind.Unspecified).AddTicks(4457), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.DocumentManagement.Document", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 171, DateTimeKind.Unspecified).AddTicks(7713), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("nvarchar(max)");
@@ -327,28 +261,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Extension")
                         .HasColumnType("int");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 171, DateTimeKind.Unspecified).AddTicks(8153), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("_params")
                         .IsRequired()
@@ -356,32 +283,24 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
-
                     b.ToTable("Document", (string)null);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.OrderManagement.Delivery", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 113, DateTimeKind.Unspecified).AddTicks(8862), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset?>("DeliveredOn")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("Reference")
                         .HasMaxLength(20)
@@ -393,31 +312,30 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
-                    b.Property<int>("TotalOnSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalVatPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalWholeSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 113, DateTimeKind.Unspecified).AddTicks(9812), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("SupplierIdentifier", "Reference")
+                    b.HasIndex("SupplierId", "Reference")
                         .IsUnique()
                         .HasFilter("[Reference] IS NOT NULL");
 
@@ -426,11 +344,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.OrderManagement.Order", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset?>("AcceptedOn")
                         .HasColumnType("datetimeoffset");
@@ -439,16 +355,13 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 106, DateTimeKind.Unspecified).AddTicks(8689), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("CustomerIdentifier")
+                    b.Property<string>("CustomerId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
-                    b.Property<string>("DeliveryIdentifier")
+                    b.Property<string>("DeliveryId")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
@@ -458,12 +371,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("FulfilledOn")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
-
-                    b.Property<string>("InvoiceIdentifier")
+                    b.Property<string>("InvoiceId")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
@@ -480,31 +388,30 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
-                    b.Property<int>("TotalOnSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalOnSalePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalVatPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalVatPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TotalWholeSalePrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("TotalWholeSalePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 106, DateTimeKind.Unspecified).AddTicks(9664), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("SupplierIdentifier", "Reference")
+                    b.HasIndex("SupplierId", "Reference")
                         .IsUnique()
                         .HasFilter("[Reference] IS NOT NULL");
 
@@ -513,21 +420,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.Catalog", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 99, DateTimeKind.Unspecified).AddTicks(7022), new TimeSpan(0, 0, 0, 0, 0)));
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
@@ -537,44 +435,38 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 99, DateTimeKind.Unspecified).AddTicks(7652), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("SupplierId");
 
                     b.ToTable("Catalog", (string)null);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.CatalogProduct", b =>
                 {
-                    b.Property<long>("CatalogId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("CatalogId")
+                        .HasColumnType("nvarchar(12)");
 
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 102, DateTimeKind.Unspecified).AddTicks(6491), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 102, DateTimeKind.Unspecified).AddTicks(7209), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("CatalogId", "ProductId");
 
@@ -585,24 +477,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.Product", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasMaxLength(12)
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 100, DateTimeKind.Unspecified).AddTicks(7028), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -614,30 +497,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<long?>("ReturnableId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("ReturnableId")
+                        .HasColumnType("nvarchar(12)");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
-                        .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 100, DateTimeKind.Unspecified).AddTicks(7859), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Vat")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Vat")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
-
                     b.HasIndex("ReturnableId");
 
-                    b.HasIndex("SupplierIdentifier", "Reference")
+                    b.HasIndex("SupplierId", "Reference")
                         .IsUnique();
 
                     b.ToTable("Product", (string)null);
@@ -645,21 +523,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.Returnable", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 103, DateTimeKind.Unspecified).AddTicks(2759), new TimeSpan(0, 0, 0, 0, 0)));
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -671,28 +540,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("SupplierIdentifier")
+                    b.Property<string>("SupplierId")
                         .IsRequired()
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 103, DateTimeKind.Unspecified).AddTicks(3439), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("Vat")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Vat")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
-
-                    b.HasIndex("SupplierIdentifier", "Reference")
+                    b.HasIndex("SupplierId", "Reference")
                         .IsUnique();
 
                     b.ToTable("Returnable", (string)null);
@@ -706,13 +572,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("AccountId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("AccountId")
+                        .HasColumnType("nvarchar(12)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 77, DateTimeKind.Unspecified).AddTicks(6790), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("Expired")
                         .HasColumnType("bit");
@@ -726,9 +590,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(36)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 77, DateTimeKind.Unspecified).AddTicks(7291), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -742,31 +604,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.SupplierManagement.Supplier", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<string>("AccountIdentifier")
-                        .IsRequired()
+                    b.Property<string>("Id")
                         .HasMaxLength(12)
                         .HasColumnType("nvarchar(12)");
 
+                    b.Property<string>("AccountId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(12)");
+
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 78, DateTimeKind.Unspecified).AddTicks(3328), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("Identifier")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .HasColumnType("nvarchar(12)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -779,14 +631,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTimeOffset>("UpdatedOn")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetimeoffset")
-                        .HasDefaultValue(new DateTimeOffset(new DateTime(2022, 5, 25, 16, 31, 28, 78, DateTimeKind.Unspecified).AddTicks(4131), new TimeSpan(0, 0, 0, 0, 0)));
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Identifier")
-                        .IsUnique();
+                    b.HasIndex("AccountId");
 
                     b.ToTable("Supplier", (string)null);
                 });
@@ -795,8 +644,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 {
                     b.OwnsOne("Sheaft.Domain.HashedPassword", "Password", b1 =>
                         {
-                            b1.Property<long>("AccountId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("AccountId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Hash")
                                 .IsRequired()
@@ -816,8 +665,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.ResetPasswordInfo", "ResetPasswordInfo", b1 =>
                         {
-                            b1.Property<long>("AccountId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("AccountId")
+                                .HasColumnType("nvarchar(12)");
+
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
 
                             b1.Property<DateTimeOffset>("ExpiresOn")
                                 .HasColumnType("datetimeoffset");
@@ -842,6 +694,24 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.AgreementManagement.Agreement", b =>
                 {
+                    b.HasOne("Sheaft.Domain.ProductManagement.Catalog", null)
+                        .WithMany()
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.CustomerManagement.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.OwnsMany("Sheaft.Domain.DeliveryDay", "DeliveryDays", b1 =>
                         {
                             b1.Property<long>("Id")
@@ -850,8 +720,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<long>("Id"), 1L, 1);
 
-                            b1.Property<long>("AgreementId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("AgreementId")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<int>("Value")
                                 .HasColumnType("int")
@@ -870,24 +741,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("DeliveryDays");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.BatchManagement.Batch", b =>
+                {
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.BillingManagement.Invoice", b =>
                 {
-                    b.OwnsMany("Sheaft.Domain.BillingManagement.InvoiceCreditNote", "CreditNotes", b1 =>
-                        {
-                            b1.Property<long>("InvoiceId")
-                                .HasColumnType("bigint");
-
-                            b1.Property<string>("InvoiceIdentifier")
-                                .HasMaxLength(12)
-                                .HasColumnType("nvarchar(12)");
-
-                            b1.HasKey("InvoiceId", "InvoiceIdentifier");
-
-                            b1.ToTable("Invoice_CreditNotes", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("InvoiceId");
-                        });
+                    b.HasOne("Sheaft.Domain.BillingManagement.Invoice", null)
+                        .WithMany("CreditNotes")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.OwnsMany("Sheaft.Domain.BillingManagement.InvoiceLine", "Lines", b1 =>
                         {
@@ -897,13 +765,17 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<long>("Id"), 1L, 1);
 
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
+
                             b1.Property<string>("Identifier")
                                 .IsRequired()
                                 .HasMaxLength(12)
                                 .HasColumnType("nvarchar(12)");
 
-                            b1.Property<long>("InvoiceId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("InvoiceId")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
@@ -913,8 +785,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                             b1.Property<int>("Quantity")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("Vat")
-                                .HasColumnType("int");
+                            b1.Property<decimal>("Vat")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("Id");
 
@@ -972,17 +845,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                     b2.Property<long>("InvoiceLineId")
                                         .HasColumnType("bigint");
 
-                                    b2.Property<int>("OnSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("OnSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("UnitPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("UnitPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("VatPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("VatPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("WholeSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("WholeSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
                                     b2.HasKey("InvoiceLineId");
 
@@ -1004,8 +881,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsMany("Sheaft.Domain.BillingManagement.InvoicePayment", "Payments", b1 =>
                         {
-                            b1.Property<long>("InvoiceId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("InvoiceId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Reference")
                                 .HasMaxLength(20)
@@ -1027,8 +904,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.CustomerBillingInformation", "Customer", b1 =>
                         {
-                            b1.Property<long>("InvoiceId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("InvoiceId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Email")
                                 .IsRequired()
@@ -1059,8 +936,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.OwnsOne("Sheaft.Domain.Address", "Address", b2 =>
                                 {
-                                    b2.Property<long>("CustomerBillingInformationInvoiceId")
-                                        .HasColumnType("bigint");
+                                    b2.Property<string>("CustomerBillingInformationInvoiceId")
+                                        .HasColumnType("nvarchar(12)");
 
                                     b2.Property<string>("City")
                                         .IsRequired()
@@ -1095,8 +972,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.SupplierBillingInformation", "Supplier", b1 =>
                         {
-                            b1.Property<long>("InvoiceId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("InvoiceId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Email")
                                 .IsRequired()
@@ -1127,8 +1004,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.OwnsOne("Sheaft.Domain.Address", "Address", b2 =>
                                 {
-                                    b2.Property<long>("SupplierBillingInformationInvoiceId")
-                                        .HasColumnType("bigint");
+                                    b2.Property<string>("SupplierBillingInformationInvoiceId")
+                                        .HasColumnType("nvarchar(12)");
 
                                     b2.Property<string>("City")
                                         .IsRequired()
@@ -1161,8 +1038,6 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                 .IsRequired();
                         });
 
-                    b.Navigation("CreditNotes");
-
                     b.Navigation("Customer")
                         .IsRequired();
 
@@ -1176,10 +1051,16 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.CustomerManagement.Customer", b =>
                 {
+                    b.HasOne("Sheaft.Domain.AccountManagement.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Sheaft.Domain.BillingAddress", "BillingAddress", b1 =>
                         {
-                            b1.Property<long>("CustomerId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("CustomerId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -1220,8 +1101,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.DeliveryAddress", "DeliveryAddress", b1 =>
                         {
-                            b1.Property<long>("CustomerId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("CustomerId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -1262,8 +1143,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.Legal", "Legal", b1 =>
                         {
-                            b1.Property<long>("CustomerId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("CustomerId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("CorporateName")
                                 .IsRequired()
@@ -1284,8 +1165,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.OwnsOne("Sheaft.Domain.LegalAddress", "Address", b2 =>
                                 {
-                                    b2.Property<long>("LegalCustomerId")
-                                        .HasColumnType("bigint");
+                                    b2.Property<string>("LegalCustomerId")
+                                        .HasColumnType("nvarchar(12)");
 
                                     b2.Property<string>("City")
                                         .IsRequired()
@@ -1330,10 +1211,22 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.OrderManagement.Delivery", b =>
                 {
+                    b.HasOne("Sheaft.Domain.CustomerManagement.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.OwnsOne("Sheaft.Domain.DeliveryAddress", "Address", b1 =>
                         {
-                            b1.Property<long>("DeliveryId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("DeliveryId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -1380,8 +1273,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<long>("Id"), 1L, 1);
 
-                            b1.Property<long>("DeliveryId")
-                                .HasColumnType("bigint");
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<string>("DeliveryId")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Identifier")
                                 .IsRequired()
@@ -1404,8 +1301,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
-                            b1.Property<int>("Vat")
-                                .HasColumnType("int");
+                            b1.Property<decimal>("Vat")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("Id");
 
@@ -1459,17 +1357,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                     b2.Property<long>("DeliveryLineId")
                                         .HasColumnType("bigint");
 
-                                    b2.Property<int>("OnSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("OnSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("UnitPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("UnitPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("VatPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("VatPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("WholeSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("WholeSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
                                     b2.HasKey("DeliveryLineId");
 
@@ -1495,8 +1397,12 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<long>("Id"), 1L, 1);
 
-                            b1.Property<long>("DeliveryId")
-                                .HasColumnType("bigint");
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<string>("DeliveryId")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Identifier")
                                 .IsRequired()
@@ -1519,8 +1425,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
-                            b1.Property<int>("Vat")
-                                .HasColumnType("int");
+                            b1.Property<decimal>("Vat")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("Id");
 
@@ -1574,17 +1481,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                     b2.Property<long>("DeliveryLineId")
                                         .HasColumnType("bigint");
 
-                                    b2.Property<int>("OnSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("OnSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("UnitPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("UnitPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("VatPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("VatPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("WholeSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("WholeSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
                                     b2.HasKey("DeliveryLineId");
 
@@ -1612,14 +1523,29 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Sheaft.Domain.OrderManagement.Order", b =>
                 {
+                    b.HasOne("Sheaft.Domain.CustomerManagement.Customer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.OwnsMany("Sheaft.Domain.OrderManagement.OrderLine", "Lines", b1 =>
                         {
-                            b1.Property<long>("OrderId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("OrderId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("Identifier")
                                 .HasMaxLength(12)
                                 .HasColumnType("nvarchar(12)");
+
+                            b1.Property<DateTimeOffset>("CreatedOn")
+                                .HasColumnType("datetimeoffset");
 
                             b1.Property<int>("LineKind")
                                 .HasColumnType("int");
@@ -1637,8 +1563,9 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                                 .HasMaxLength(20)
                                 .HasColumnType("nvarchar(20)");
 
-                            b1.Property<int>("Vat")
-                                .HasColumnType("int");
+                            b1.Property<decimal>("Vat")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
 
                             b1.HasKey("OrderId", "Identifier");
 
@@ -1649,23 +1576,27 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.OwnsOne("Sheaft.Domain.LinePrice", "PriceInfo", b2 =>
                                 {
-                                    b2.Property<long>("OrderLineOrderId")
-                                        .HasColumnType("bigint");
+                                    b2.Property<string>("OrderLineOrderId")
+                                        .HasColumnType("nvarchar(12)");
 
                                     b2.Property<string>("OrderLineIdentifier")
                                         .HasColumnType("nvarchar(12)");
 
-                                    b2.Property<int>("OnSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("OnSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("UnitPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("UnitPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("VatPrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("VatPrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
-                                    b2.Property<int>("WholeSalePrice")
-                                        .HasColumnType("int");
+                                    b2.Property<decimal>("WholeSalePrice")
+                                        .HasPrecision(18, 2)
+                                        .HasColumnType("decimal(18,2)");
 
                                     b2.HasKey("OrderLineOrderId", "OrderLineIdentifier");
 
@@ -1682,6 +1613,15 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.Navigation("Lines");
                 });
 
+            modelBuilder.Entity("Sheaft.Domain.ProductManagement.Catalog", b =>
+                {
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.CatalogProduct", b =>
                 {
                     b.HasOne("Sheaft.Domain.ProductManagement.Catalog", null)
@@ -1693,7 +1633,7 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.ProductManagement.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Product");
@@ -1703,9 +1643,25 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("Sheaft.Domain.ProductManagement.Returnable", "Returnable")
                         .WithMany()
-                        .HasForeignKey("ReturnableId");
+                        .HasForeignKey("ReturnableId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Returnable");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.ProductManagement.Returnable", b =>
+                {
+                    b.HasOne("Sheaft.Domain.SupplierManagement.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Sheaft.Domain.RefreshTokenInfo", b =>
@@ -1713,16 +1669,21 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
                     b.HasOne("Sheaft.Domain.AccountManagement.Account", null)
                         .WithMany("RefreshTokens")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Sheaft.Domain.SupplierManagement.Supplier", b =>
                 {
+                    b.HasOne("Sheaft.Domain.AccountManagement.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Sheaft.Domain.ShippingAddress", "ShippingAddress", b1 =>
                         {
-                            b1.Property<long>("SupplierId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("SupplierId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -1763,8 +1724,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.BillingAddress", "BillingAddress", b1 =>
                         {
-                            b1.Property<long>("SupplierId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("SupplierId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -1805,8 +1766,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                     b.OwnsOne("Sheaft.Domain.Legal", "Legal", b1 =>
                         {
-                            b1.Property<long>("SupplierId")
-                                .HasColumnType("bigint");
+                            b1.Property<string>("SupplierId")
+                                .HasColumnType("nvarchar(12)");
 
                             b1.Property<string>("CorporateName")
                                 .IsRequired()
@@ -1827,8 +1788,8 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
 
                             b1.OwnsOne("Sheaft.Domain.LegalAddress", "Address", b2 =>
                                 {
-                                    b2.Property<long>("LegalSupplierId")
-                                        .HasColumnType("bigint");
+                                    b2.Property<string>("LegalSupplierId")
+                                        .HasColumnType("nvarchar(12)");
 
                                     b2.Property<string>("City")
                                         .IsRequired()
@@ -1874,6 +1835,11 @@ namespace Sheaft.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Sheaft.Domain.AccountManagement.Account", b =>
                 {
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Sheaft.Domain.BillingManagement.Invoice", b =>
+                {
+                    b.Navigation("CreditNotes");
                 });
 
             modelBuilder.Entity("Sheaft.Domain.ProductManagement.Catalog", b =>

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.UnitTests.Helpers;
@@ -25,7 +27,7 @@ public class DeleteProductCommandShould
         var result = await handler.Handle(new RemoveProductCommand(productId), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.SingleOrDefault(s => s.Identifier == productId);
+        var product = context.Products.SingleOrDefault(s => s.Id == productId);
         var catalog = context.Catalogs
             .Include(c => c.Products)
             .ThenInclude(cp => cp.Product)
@@ -49,9 +51,14 @@ public class DeleteProductCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateProductHandler>();
 
-        var supplierIdentifier = SupplierId.New();
-        var catalog = Catalog.CreateDefaultCatalog(supplierIdentifier);
-        var product = new Product(new ProductName("product"), new ProductReference("test"),  new VatRate(2000),null, supplierIdentifier);
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
+        context.Add(supplier);
+        
+        var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
+        var product = new Product(new ProductName("product"), new ProductReference("test"),  new VatRate(0),null, supplier.Id);
         catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(2000));
 
         context.Add(catalog);
@@ -59,7 +66,7 @@ public class DeleteProductCommandShould
         
         var handler = new RemoveProductHandler(uow, new RetrieveDefaultCatalog(new CatalogRepository(context)));
         
-        return (product.Identifier, context, handler);
+        return (product.Id, context, handler);
     }
 }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Sheaft.Application.Models;
 using Sheaft.Application.SupplierManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.SupplierManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
 
@@ -24,7 +26,7 @@ public class UpdateSupplierCommandShould
 
         var result = await handler.Handle(command, CancellationToken.None);
 
-        var supplier = context.Suppliers.Single(s => s.Identifier == supplierId);
+        var supplier = context.Suppliers.Single(s => s.Id == supplierId);
         Assert.IsTrue(result.IsSuccess);
         Assert.IsNotNull(supplier);
         Assert.AreEqual("TradeName", supplier.TradeName.Value);
@@ -35,11 +37,14 @@ public class UpdateSupplierCommandShould
         var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateSupplierHandler>();
         var handler = new UpdateSupplierHandler(uow);
 
-        var supplier = DataHelpers.GetDefaultSupplier(AccountId.New());
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+        
+        var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
         context.Suppliers.Add(supplier);
         context.SaveChanges();
         
-        return (supplier.Identifier, context, handler);
+        return (supplier.Id, context, handler);
     }
 
     private static UpdateSupplierCommand GetCommand(SupplierId supplierIdentifier)

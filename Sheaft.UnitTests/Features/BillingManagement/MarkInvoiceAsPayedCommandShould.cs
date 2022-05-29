@@ -24,7 +24,7 @@ public class MarkInvoiceAsPayedCommandShould
     {
         var payedDate = DateTimeOffset.UtcNow.AddDays(-2);
         var (invoice, context, handler) = InitHandler(true, true);
-        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, "VIRDFDFDF", payedDate, PaymentKind.Check);
+        var command = new MarkInvoiceAsPayedCommand(invoice.Id, "VIRDFDFDF", payedDate, PaymentKind.Check);
 
         var result = await handler.Handle(command, CancellationToken.None);
 
@@ -41,7 +41,7 @@ public class MarkInvoiceAsPayedCommandShould
     public async Task Fail_If_Not_In_Sent_Status()
     {
         var (invoice, context, handler) = InitHandler(true, false);
-        var command = new MarkInvoiceAsPayedCommand(invoice.Identifier, "test", DateTimeOffset.Now, PaymentKind.Check);
+        var command = new MarkInvoiceAsPayedCommand(invoice.Id, "test", DateTimeOffset.Now, PaymentKind.Check);
 
         var result = await handler.Handle(command, CancellationToken.None);
 

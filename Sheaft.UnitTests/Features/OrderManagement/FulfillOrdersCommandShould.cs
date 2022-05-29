@@ -8,6 +8,7 @@ using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
 using Sheaft.Domain.BatchManagement;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.OrderManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -24,7 +25,7 @@ public class FulfillOrdersCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
                 .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
 
@@ -40,14 +41,14 @@ public class FulfillOrdersCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
                 .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
     }
@@ -57,7 +58,7 @@ public class FulfillOrdersCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
                 .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())),
             DateTimeOffset.UtcNow.AddDays(4));
@@ -65,7 +66,7 @@ public class FulfillOrdersCommandShould
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(DeliveryStatus.Scheduled, delivery.Status);
         Assert.AreEqual(fulfillOrderCommand.NewDeliveryDate.Value, delivery.ScheduledAt.Value);
@@ -76,14 +77,14 @@ public class FulfillOrdersCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
                 .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
         Assert.IsTrue(delivery.Lines.All(l => l.Quantity.Value == 5));
     }
@@ -95,14 +96,14 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var batch = context.Batches.First();
         
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>{batch.Identifier.Value})), null);
+                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var delivery = context.Deliveries.Single(d => d.Identifier == order.DeliveryIdentifier);
+        var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
         Assert.AreEqual(order.Lines.Count(), delivery.Lines.Sum(l => l.Batches.Count()));
     }
@@ -113,7 +114,7 @@ public class FulfillOrdersCommandShould
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
         
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
                 .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>{BatchId.New().Value})), null);
 
@@ -131,9 +132,9 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var batch = context.Batches.First();
         
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, -1, new List<string>{batch.Identifier.Value})), null);
+                .Select(l => new DeliveryLineDto(l.Identifier, -1, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -149,9 +150,9 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var batch = context.Batches.First();
         
-        var fulfillOrderCommand = new FulfillOrdersCommand(order.Identifier,
+        var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(ProductId.New().Value, -1, new List<string>{batch.Identifier.Value})), null);
+                .Select(l => new DeliveryLineDto(ProductId.New().Value, -1, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -164,18 +165,23 @@ public class FulfillOrdersCommandShould
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<FulfillOrdersHandler>();
 
-        var supplier = AccountId.New();
-        var customer1 = AccountId.New();
-        var customer2 = AccountId.New();
+        var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(supplierAccount);
+
+        var customer1Account  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customer1Account);
+        
+        var customer2Account  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        context.Add(customer2Account);
 
         var agreements = new Dictionary<AccountId, DeliveryDay>
-            {{customer1, new DeliveryDay(DayOfWeek.Friday)}, {customer2, new DeliveryDay(DayOfWeek.Monday)}};
+            {{customer1Account.Id, new DeliveryDay(DayOfWeek.Friday)}, {customer2Account.Id, new DeliveryDay(DayOfWeek.Monday)}};
         var supplierProducts = new Dictionary<string, int> {{"001", 2000}, {"002", 3500}};
 
         DataHelpers.InitContext(context,
-            new List<AccountId> {customer1, customer2},
-            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplier, agreements}},
-            new Dictionary<AccountId, Dictionary<string, int>> {{supplier, supplierProducts}});
+            new List<AccountId> {customer1Account.Id, customer2Account.Id},
+            new Dictionary<AccountId, Dictionary<AccountId, DeliveryDay>> {{supplierAccount.Id, agreements}},
+            new Dictionary<AccountId, Dictionary<string, int>> {{supplierAccount.Id, supplierProducts}});
 
         var handler = new FulfillOrdersHandler(uow,
             new FulfillOrders(new OrderRepository(context), new DeliveryRepository(context),
@@ -190,14 +196,14 @@ public class FulfillOrdersCommandShould
         var customer = context.Customers.First();
 
         context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DLC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplier.Identifier));
+            supplier.Id));
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
 
         order.Accept();
 
         var delivery = new Delivery(new DeliveryDate(deliveryDate ?? DateTimeOffset.UtcNow.AddDays(2)),
-            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierIdentifier, order.CustomerIdentifier, new List<Order> {order});
+            new DeliveryAddress("test", new EmailAddress("ese@ese.com"), "street", "", "70000", "Test"), order.SupplierId, order.CustomerId, new List<Order> {order});
 
         context.Add(order);
         context.Add(delivery);

@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sheaft.Domain;
+using Sheaft.Domain.CustomerManagement;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Domain.SupplierManagement;
 
 namespace Sheaft.Infrastructure.Persistence.Configurations;
 
@@ -9,23 +11,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 {
     public void Configure(EntityTypeBuilder<Delivery> builder)
     {
-        builder
-            .Property<long>("Id")
-            .ValueGeneratedOnAdd();
-
-        builder.HasKey("Id");
-        
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-        
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
+        builder.HasKey(c => c.Id);
 
         builder.OwnsOne(d => d.Address, da =>
         {
@@ -76,18 +62,22 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             {
                 pi
                     .Property(p => p.UnitPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
                 pi
                     .Property(p => p.WholeSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
                 pi
                     .Property(p => p.VatPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
 
                 pi
                     .Property(p => p.OnSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
             
@@ -120,6 +110,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
             l
                 .Property(p => p.Vat)
+                .HasPrecision(18, 2)
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("DeliveryId");
@@ -139,18 +130,22 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
             {
                 pi
                     .Property(p => p.UnitPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(unitPrice => unitPrice.Value, value => new UnitPrice(value));
 
                 pi
                     .Property(p => p.WholeSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineWholeSalePrice(value));
 
                 pi
                     .Property(p => p.VatPrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineVatPrice(value));
 
                 pi
                     .Property(p => p.OnSalePrice)
+                    .HasPrecision(18, 2)
                     .HasConversion(totalPrice => totalPrice.Value, value => new LineOnSalePrice(value));
             });
             
@@ -195,6 +190,7 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 
             l
                 .Property(p => p.Vat)
+                .HasPrecision(18, 2)
                 .HasConversion(vat => vat.Value, value => new VatRate(value));
             
             l.WithOwner().HasForeignKey("DeliveryId");
@@ -204,31 +200,37 @@ internal class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
         
         builder
             .Property(p => p.TotalWholeSalePrice)
+            .HasPrecision(18, 2)
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalWholeSalePrice(value));
         
         builder
             .Property(p => p.TotalVatPrice)
+            .HasPrecision(18, 2)
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalVatPrice(value));
         
         builder
             .Property(p => p.TotalOnSalePrice)
+            .HasPrecision(18, 2)
             .HasConversion(totalPrice => totalPrice.Value, value => new TotalOnSalePrice(value));
         
         builder
-            .Property(p => p.SupplierIdentifier)
-            .HasMaxLength(Constants.IDS_LENGTH)
-            .HasConversion(vat => vat.Value, value => new SupplierId(value));
-        
-        builder
-            .Property(c => c.Identifier)
+            .Property(c => c.Id)
             .HasMaxLength(Constants.IDS_LENGTH);
+
+        builder
+            .HasOne<Supplier>()
+            .WithMany()
+            .HasForeignKey(c => c.SupplierId)
+            .OnDelete(DeleteBehavior.NoAction);
         
         builder
-            .HasIndex(c => c.Identifier)
-            .IsUnique();
-        
+            .HasOne<Customer>()
+            .WithMany()
+            .HasForeignKey(c => c.CustomerId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder
-            .HasIndex(c => new {c.SupplierIdentifier, c.Reference})
+            .HasIndex(c => new {c.SupplierId, c.Reference})
             .IsUnique();
         
         builder.ToTable("Delivery");

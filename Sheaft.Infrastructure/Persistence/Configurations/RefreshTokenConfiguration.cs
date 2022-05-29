@@ -16,19 +16,7 @@ internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken
         builder
             .HasKey("Id");
 
-        builder
-            .Property<DateTimeOffset>("CreatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAdd();
-
-        builder
-            .Property<DateTimeOffset>("UpdatedOn")
-            .HasDefaultValue(DateTimeOffset.UtcNow)
-            .HasValueGenerator(typeof(DateTimeOffsetValueGenerator))
-            .ValueGeneratedOnAddOrUpdate();
-
-        builder.Property<long>("AccountId");
+        builder.Property<AccountId>("AccountId");
 
         builder
             .Property(p => p.Identifier)

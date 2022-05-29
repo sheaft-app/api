@@ -33,7 +33,7 @@ public class SendInvoiceHandler : ICommandHandler<SendInvoiceCommand, Result>
         Debug.Assert(invoice.PublishedOn != null, "invoice.PublishedOn != null");
         
         var emailResult = await _emailingService.SendTemplatedEmail(invoice.Customer.Email.Value, invoice.Customer.Name,
-            $"{(invoice.Kind == InvoiceKind.Invoice ? "Facture" : "Avoir")} n°{invoice.Identifier.Value} du {invoice.PublishedOn.Value:d}",
+            $"{(invoice.Kind == InvoiceKind.Invoice ? "Facture" : "Avoir")} n°{invoice.Id.Value} du {invoice.PublishedOn.Value:d}",
             invoice.Kind == InvoiceKind.Invoice ? EmailTemplates.Invoice : EmailTemplates.CreditNote, new { }, true,
             token);
 

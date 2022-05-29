@@ -20,10 +20,10 @@ public class ValidateAgreementProposal : IValidateAgreementProposal
         {
             var activeAgreementExists = await _context.Set<Agreement>().AnyAsync(a =>
                 (a.Status == AgreementStatus.Active || a.Status == AgreementStatus.Pending)
-                && (a.CustomerIdentifier == new CustomerId(receiver) &&
-                    a.SupplierIdentifier == new SupplierId(requester))
-                || (a.CustomerIdentifier == new CustomerId(requester) &&
-                    a.SupplierIdentifier == new SupplierId(receiver)), token);
+                && (a.CustomerId == new CustomerId(receiver) &&
+                    a.SupplierId == new SupplierId(requester))
+                || (a.CustomerId == new CustomerId(requester) &&
+                    a.SupplierId == new SupplierId(receiver)), token);
             
             return Result.Success(!activeAgreementExists);
         }
