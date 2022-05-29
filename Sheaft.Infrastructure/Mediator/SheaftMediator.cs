@@ -70,13 +70,13 @@ internal class SheaftMediator : ISheaftMediator
         return await _mediatr.Send(command, token);
     }
 
-    public async Task<Result> Query(IQuery<Result> command, CancellationToken token)
+    public async Task<Result> Query(IQuery<Result> query, CancellationToken token)
     {
-        return await _mediatr.Send(command, token);
+        return await _mediatr.Send(query, token);
     }
 
-    public async Task<Result<T>> Query<T>(IQuery<Result<T>> command, CancellationToken token)
+    public async Task<Result<T>> Query<T>(IQuery<Result<T>> query, CancellationToken token)
     {
-        return await _mediatr.Send(command, token);
+        return await _mediatr.Send(query, token);
     }
 }

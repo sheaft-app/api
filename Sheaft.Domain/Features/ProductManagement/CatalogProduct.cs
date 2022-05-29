@@ -6,6 +6,7 @@ public class CatalogProduct
     
     internal CatalogProduct(CatalogId catalogId, Product product, ProductUnitPrice unitPrice)
     {
+        ProductId = product.Id;
         CatalogId = catalogId;
         Product = product;
         SetPrice(unitPrice);
@@ -14,6 +15,7 @@ public class CatalogProduct
     }
 
     public CatalogId CatalogId { get; }
+    public ProductId ProductId { get; }
     public Product Product { get; private set; }
     public ProductUnitPrice UnitPrice { get; private set; }
     public DateTimeOffset CreatedOn { get; private set; }

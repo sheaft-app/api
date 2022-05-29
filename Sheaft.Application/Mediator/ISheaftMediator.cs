@@ -11,6 +11,6 @@ public interface ISheaftMediator
     void Schedule<T>(ICommand<Result<T>> command, TimeSpan delay, string? jobName = null);
     Task<Result> Execute(ICommand<Result> command, CancellationToken token);
     Task<Result<T>> Execute<T>(ICommand<Result<T>> command, CancellationToken token);
-    Task<Result> Query(IQuery<Result> command, CancellationToken token);
-    Task<Result<T>> Query<T>(IQuery<Result<T>> command, CancellationToken token);
+    Task<Result> Query(IQuery<Result> query, CancellationToken token);
+    Task<Result<T>> Query<T>(IQuery<Result<T>> query, CancellationToken token);
 }

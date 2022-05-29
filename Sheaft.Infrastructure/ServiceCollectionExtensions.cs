@@ -1,7 +1,11 @@
 using Amazon;
 using Amazon.SimpleEmail;
+using DataModel;
 using Hangfire;
 using Hangfire.SqlServer;
+using LinqToDB.AspNet;
+using LinqToDB.AspNet.Logging;
+using LinqToDB.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -165,6 +169,12 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<IDbContext, AppDbContext>(optionsBuilder =>
         {
             optionsBuilder.UseSqlServer(appDatabaseConfig.ConnectionString);
+        });
+        
+        services.AddLinqToDBContext<AppDb>((provider, options) => {
+            options
+                .UseSqlServer(appDatabaseConfig.ConnectionString)
+                .UseDefaultLogging(provider);
         });
     }
 

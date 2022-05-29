@@ -12,9 +12,9 @@ public record Query<TResponse> : IQuery<TResponse>
 
 public record PagedResult<T>
 {
-    public PagedResult(IEnumerable<T> items, PageInfo pageInfo, int totalItems)
+    public PagedResult(IEnumerable<T>? items, PageInfo pageInfo, int totalItems)
     {
-        Items = items;
+        Items = items ?? new List<T>();
         PageInfo = pageInfo;
         TotalItems = totalItems;
         TotalPages = (int) Math.Ceiling(totalItems / (double) pageInfo.Take);

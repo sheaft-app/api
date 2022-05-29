@@ -1,5 +1,11 @@
 ﻿<script lang="ts">
   import { page } from "@roxi/routify";
+  import { onMount } from 'svelte'
+  import { listProducts } from '$pages/products/service'
+
+  onMount(async () => {
+    await listProducts(1, 10);
+  });
 </script>
 
 <!-- routify:options menu="Mes produits" -->

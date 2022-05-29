@@ -21,6 +21,8 @@
       <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
       <PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
       <PackageReference Include="Haukcode.WkHtmlToPdfDotNet" Version="1.5.72" />
+      <PackageReference Include="linq2db.AspNet" Version="4.0.1" />
+      <PackageReference Include="linq2db.SqlServer" Version="4.0.1" />
       <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />

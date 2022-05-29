@@ -15,7 +15,7 @@ public class GetProduct : Feature
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ProductDto>> Get([FromQuery] string id, CancellationToken token)
+    public async Task<ActionResult<ProductDto>> Get(string id, CancellationToken token)
     {
         var result = await Mediator.Query(new GetProductQuery(new ProductId(id)), token);
         return HandleCommandResult(result);

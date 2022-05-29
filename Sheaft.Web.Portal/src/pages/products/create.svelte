@@ -5,7 +5,7 @@
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
   import Number from "$components/Inputs/Number.svelte";
-  import type { ICreateProduct } from "$types/product";
+  import type { ICreateProduct } from "./types";
   import { round } from "$utils/number";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Form from "$components/Form/Form.svelte";

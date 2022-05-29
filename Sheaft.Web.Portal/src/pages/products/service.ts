@@ -2,7 +2,7 @@
 import axios from "axios";
 import type { IListResult, IResult } from "$types/http";
 import { StatusCode } from "$enums/http";
-import type { ICreateProduct } from "$types/product";
+import type { ICreateProduct } from "./types";
 
 const productsStore = writable({
   products: [],
@@ -13,14 +13,18 @@ export const products = derived(
   [productsStore],
   ([$productsStore]) => $productsStore.products
 );
+export const product = derived(
+  [productsStore],
+  ([$productsStore]) => $productsStore.product
+);
 export const productsCount = derived(
   [productsStore],
   ([$productsStore]) => $productsStore.products?.length ?? 0
 );
 
-export const list = async (): Promise<IListResult<any>> => {
+export const listProducts = async (page:number, take:number): Promise<IListResult<any>> => {
   try {
-    const result = await axios.get("/api/products");
+    const result = await axios.get(`/api/products?page=${page}&take=${take}`);
     productsStore.update(ps => {
       ps.products = result.data.items;
       return ps;
@@ -36,7 +40,7 @@ export const list = async (): Promise<IListResult<any>> => {
   }
 };
 
-export const get = async (identifier: string): Promise<IResult<any>> => {
+export const getProduct = async (identifier: string): Promise<IResult<any>> => {
   try {
     const result = await axios.get(`/api/products/${identifier}`);
     productsStore.update(ps => {
