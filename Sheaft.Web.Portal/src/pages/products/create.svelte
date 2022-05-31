@@ -4,14 +4,14 @@
   import LongText from "$components/Inputs/LongText.svelte";
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
-  import type { ICreateProduct } from "./types";
   import { round } from "$utils/number";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Form from "$components/Form/Form.svelte";
   import { create } from "./service";
+  import type { Paths } from '$types/api'
 
   let isLoading = false;
-  const product: ICreateProduct = {
+  const product: Paths.CreateProduct.RequestBody = {
     price: 0,
     name: "",
     vat: 0.0550
@@ -42,7 +42,7 @@
 
 <h1>{$page.title}</h1>
 
-<Form class="mt-4">
+<Form class="mt-4 ">
   <Text
     label="Code"
     bind:value="{product.code}"

@@ -1,6 +1,6 @@
-import sveltePreprocess from "svelte-preprocess";
+const sveltePreprocess = require("svelte-preprocess");
 
-export default {
+module.exports = {
   disableDependencyReinclusion: ['@roxi/routify'],
   preprocess: sveltePreprocess(),
 };

@@ -1,6 +1,7 @@
-import colors from 'tailwindcss/colors.js';
+const colors = require('tailwindcss/colors.js');
 
-export default {
+module.exports = {
+  mode: 'jit',
   plugins: [],
   theme: {
     fontFamily: {

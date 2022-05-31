@@ -684,7 +684,7 @@ declare namespace Paths {
 
 export interface OperationMethods {
   /**
-   * AcceptAgreement
+   * AcceptAgreement - Accept agreeement
    */
   'AcceptAgreement'(
     parameters?: Parameters<Paths.AcceptAgreement.PathParameters> | null,
@@ -692,7 +692,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AcceptAgreement.Responses.$204>
   /**
-   * AcceptOrder
+   * AcceptOrder - Accept order with id
    */
   'AcceptOrder'(
     parameters?: Parameters<Paths.AcceptOrder.PathParameters> | null,
@@ -700,7 +700,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AcceptOrder.Responses.$204>
   /**
-   * CancelInvoice
+   * CancelInvoice - Cancel invoice with id
    */
   'CancelInvoice'(
     parameters?: Parameters<Paths.CancelInvoice.PathParameters> | null,
@@ -708,7 +708,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CancelInvoice.Responses.$200>
   /**
-   * CancelOrder
+   * CancelOrder - Cancel order with id
    */
   'CancelOrder'(
     parameters?: Parameters<Paths.CancelOrder.PathParameters> | null,
@@ -716,7 +716,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CancelOrder.Responses.$204>
   /**
-   * ConfigureAccountAsCustomer
+   * ConfigureAccountAsCustomer - Configure current user account as customer profile
    */
   'ConfigureAccountAsCustomer'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -724,7 +724,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ConfigureAccountAsCustomer.Responses.$200>
   /**
-   * ConfigureAccountAsSupplier
+   * ConfigureAccountAsSupplier - Configure user account as supplier profile
    */
   'ConfigureAccountAsSupplier'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -732,7 +732,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ConfigureAccountAsSupplier.Responses.$200>
   /**
-   * CreateBatch
+   * CreateBatch - Create a batch with specified info
    */
   'CreateBatch'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -740,7 +740,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateBatch.Responses.$201>
   /**
-   * CreateCreditNoteDraft
+   * CreateCreditNoteDraft - Create a credit note for invoice with id
    */
   'CreateCreditNoteDraft'(
     parameters?: Parameters<Paths.CreateCreditNoteDraft.PathParameters> | null,
@@ -748,7 +748,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateCreditNoteDraft.Responses.$201>
   /**
-   * CreateInvoiceForDelivery
+   * CreateInvoiceForDelivery - Create an invoice for delivery with id
    */
   'CreateInvoiceForDelivery'(
     parameters?: Parameters<Paths.CreateInvoiceForDelivery.PathParameters> | null,
@@ -756,7 +756,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateInvoiceForDelivery.Responses.$201>
   /**
-   * CreateOrderDraft
+   * CreateOrderDraft - Create a new order draft
    */
   'CreateOrderDraft'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -764,7 +764,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateOrderDraft.Responses.$201>
   /**
-   * CreatePreparationDocument
+   * CreatePreparationDocument - Create a preparation document for specfified orders
    */
   'CreatePreparationDocument'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -772,7 +772,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreatePreparationDocument.Responses.$201>
   /**
-   * ListProducts
+   * ListProducts - List available products for supplier
    */
   'ListProducts'(
     parameters?: Parameters<Paths.ListProducts.QueryParameters> | null,
@@ -780,7 +780,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListProducts.Responses.$200>
   /**
-   * CreateProduct
+   * CreateProduct - Create a product
    */
   'CreateProduct'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -788,7 +788,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateProduct.Responses.$201>
   /**
-   * CreateReturnable
+   * CreateReturnable - Create a returnable to be used with products
    */
   'CreateReturnable'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -796,7 +796,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateReturnable.Responses.$201>
   /**
-   * UpdateBatch
+   * UpdateBatch - Update a batch
    */
   'UpdateBatch'(
     parameters?: Parameters<Paths.UpdateBatch.PathParameters> | null,
@@ -804,7 +804,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateBatch.Responses.$200>
   /**
-   * DeleteBatch
+   * DeleteBatch - Remove a batch
    */
   'DeleteBatch'(
     parameters?: Parameters<Paths.DeleteBatch.PathParameters> | null,
@@ -812,7 +812,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DeleteBatch.Responses.$204>
   /**
-   * GetProduct
+   * GetProduct - Retrieve product with id
    */
   'GetProduct'(
     parameters?: Parameters<Paths.GetProduct.PathParameters> | null,
@@ -820,7 +820,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetProduct.Responses.$200>
   /**
-   * UpdateProduct
+   * UpdateProduct - Update product with id info
    */
   'UpdateProduct'(
     parameters?: Parameters<Paths.UpdateProduct.PathParameters> | null,
@@ -828,7 +828,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateProduct.Responses.$204>
   /**
-   * DeleteProduct
+   * DeleteProduct - Remove product with id
    */
   'DeleteProduct'(
     parameters?: Parameters<Paths.DeleteProduct.PathParameters> | null,
@@ -836,7 +836,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DeleteProduct.Responses.$204>
   /**
-   * UpdateReturnable
+   * UpdateReturnable - Remove returnable with id info
    */
   'UpdateReturnable'(
     parameters?: Parameters<Paths.UpdateReturnable.PathParameters> | null,
@@ -844,7 +844,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateReturnable.Responses.$204>
   /**
-   * DeleteReturnable
+   * DeleteReturnable - Remove returnable with id
    */
   'DeleteReturnable'(
     parameters?: Parameters<Paths.DeleteReturnable.PathParameters> | null,
@@ -852,7 +852,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DeleteReturnable.Responses.$204>
   /**
-   * DeliverOrder
+   * DeliverOrder - Delivery order with id
    */
   'DeliverOrder'(
     parameters?: Parameters<Paths.DeliverOrder.PathParameters> | null,
@@ -860,7 +860,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DeliverOrder.Responses.$204>
   /**
-   * DownloadDocument
+   * DownloadDocument - Generate a secured download link for document
    */
   'DownloadDocument'(
     parameters?: Parameters<Paths.DownloadDocument.PathParameters> | null,
@@ -868,7 +868,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DownloadDocument.Responses.$200>
   /**
-   * RemoveDocument
+   * RemoveDocument - Remove document with id
    */
   'RemoveDocument'(
     parameters?: Parameters<Paths.RemoveDocument.PathParameters> | null,
@@ -876,7 +876,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RemoveDocument.Responses.$204>
   /**
-   * ForgotPassword
+   * ForgotPassword - Generate and send a reset link on user email
    */
   'ForgotPassword'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -884,7 +884,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ForgotPassword.Responses.$204>
   /**
-   * FulfillOrder
+   * FulfillOrder - Complete order with id
    */
   'FulfillOrder'(
     parameters?: Parameters<Paths.FulfillOrder.PathParameters> | null,
@@ -892,7 +892,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.FulfillOrder.Responses.$204>
   /**
-   * LoginUser
+   * LoginUser - Log the user in and generate access token / refresh token
    */
   'LoginUser'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -900,7 +900,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.LoginUser.Responses.$200>
   /**
-   * MarkInvoiceAsPayed
+   * MarkInvoiceAsPayed - Mark invoice with id as payed
    */
   'MarkInvoiceAsPayed'(
     parameters?: Parameters<Paths.MarkInvoiceAsPayed.PathParameters> | null,
@@ -908,7 +908,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.MarkInvoiceAsPayed.Responses.$204>
   /**
-   * ProposeAgreementToCustomer
+   * ProposeAgreementToCustomer - Send an agreement to customer
    */
   'ProposeAgreementToCustomer'(
     parameters?: Parameters<Paths.ProposeAgreementToCustomer.PathParameters> | null,
@@ -916,7 +916,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ProposeAgreementToCustomer.Responses.$201>
   /**
-   * ProposeAgreementToSupplier
+   * ProposeAgreementToSupplier - Send an agreement to supplier
    */
   'ProposeAgreementToSupplier'(
     parameters?: Parameters<Paths.ProposeAgreementToSupplier.PathParameters> | null,
@@ -924,7 +924,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ProposeAgreementToSupplier.Responses.$201>
   /**
-   * PublishInvoiceDraft
+   * PublishInvoiceDraft - Publish invoice with id
    */
   'PublishInvoiceDraft'(
     parameters?: Parameters<Paths.PublishInvoiceDraft.PathParameters> | null,
@@ -932,7 +932,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.PublishInvoiceDraft.Responses.$204>
   /**
-   * PublishOrderDraft
+   * PublishOrderDraft - Publish (and send to supplier) order with id
    */
   'PublishOrderDraft'(
     parameters?: Parameters<Paths.PublishOrderDraft.PathParameters> | null,
@@ -940,7 +940,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.PublishOrderDraft.Responses.$204>
   /**
-   * RefreshAccessToken
+   * RefreshAccessToken - Regenerate an access_token for current user
    */
   'RefreshAccessToken'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -948,7 +948,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RefreshAccessToken.Responses.$200>
   /**
-   * RefuseOrder
+   * RefuseOrder - Refuse customer order with id
    */
   'RefuseOrder'(
     parameters?: Parameters<Paths.RefuseOrder.PathParameters> | null,
@@ -956,7 +956,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RefuseOrder.Responses.$204>
   /**
-   * RegisterAccount
+   * RegisterAccount - Create an account with specified email/password
    */
   'RegisterAccount'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -964,7 +964,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RegisterAccount.Responses.$201>
   /**
-   * RemoveInvoiceDraft
+   * RemoveInvoiceDraft - Remove invoice draft with id
    */
   'RemoveInvoiceDraft'(
     parameters?: Parameters<Paths.RemoveInvoiceDraft.PathParameters> | null,
@@ -972,7 +972,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.RemoveInvoiceDraft.Responses.$204>
   /**
-   * ResetPassword
+   * ResetPassword - Reset the password with the token retrieved from email link
    */
   'ResetPassword'(
     parameters?: Parameters<UnknownParamsObject> | null,
@@ -980,7 +980,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ResetPassword.Responses.$204>
   /**
-   * SendInvoice
+   * SendInvoice - Send invoice with id to customer
    */
   'SendInvoice'(
     parameters?: Parameters<Paths.SendInvoice.PathParameters> | null,
@@ -988,7 +988,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.SendInvoice.Responses.$204>
   /**
-   * UpdateCustomer
+   * UpdateCustomer - Update current user customer profile
    */
   'UpdateCustomer'(
     parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
@@ -996,7 +996,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateCustomer.Responses.$200>
   /**
-   * UpdateOrderDraftProducts
+   * UpdateOrderDraftProducts - Update order with id products
    */
   'UpdateOrderDraftProducts'(
     parameters?: Parameters<Paths.UpdateOrderDraftProducts.PathParameters> | null,
@@ -1004,7 +1004,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateOrderDraftProducts.Responses.$204>
   /**
-   * UpdateSupplier
+   * UpdateSupplier - Update current user supplier profile
    */
   'UpdateSupplier'(
     parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,
@@ -1016,7 +1016,7 @@ export interface OperationMethods {
 export interface PathsDictionary {
   ['/api/agreements/{id}/accept']: {
     /**
-     * AcceptAgreement
+     * AcceptAgreement - Accept agreeement
      */
     'put'(
       parameters?: Parameters<Paths.AcceptAgreement.PathParameters> | null,
@@ -1026,7 +1026,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/accept']: {
     /**
-     * AcceptOrder
+     * AcceptOrder - Accept order with id
      */
     'post'(
       parameters?: Parameters<Paths.AcceptOrder.PathParameters> | null,
@@ -1036,7 +1036,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}/cancel']: {
     /**
-     * CancelInvoice
+     * CancelInvoice - Cancel invoice with id
      */
     'post'(
       parameters?: Parameters<Paths.CancelInvoice.PathParameters> | null,
@@ -1046,7 +1046,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/cancel']: {
     /**
-     * CancelOrder
+     * CancelOrder - Cancel order with id
      */
     'post'(
       parameters?: Parameters<Paths.CancelOrder.PathParameters> | null,
@@ -1056,7 +1056,7 @@ export interface PathsDictionary {
   }
   ['/api/account/configure/customer']: {
     /**
-     * ConfigureAccountAsCustomer
+     * ConfigureAccountAsCustomer - Configure current user account as customer profile
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1066,7 +1066,7 @@ export interface PathsDictionary {
   }
   ['/api/account/configure/supplier']: {
     /**
-     * ConfigureAccountAsSupplier
+     * ConfigureAccountAsSupplier - Configure user account as supplier profile
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1076,7 +1076,7 @@ export interface PathsDictionary {
   }
   ['/api/batches']: {
     /**
-     * CreateBatch
+     * CreateBatch - Create a batch with specified info
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1086,7 +1086,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}/credit']: {
     /**
-     * CreateCreditNoteDraft
+     * CreateCreditNoteDraft - Create a credit note for invoice with id
      */
     'post'(
       parameters?: Parameters<Paths.CreateCreditNoteDraft.PathParameters> | null,
@@ -1096,7 +1096,7 @@ export interface PathsDictionary {
   }
   ['/api/deliveries/{id}/invoice']: {
     /**
-     * CreateInvoiceForDelivery
+     * CreateInvoiceForDelivery - Create an invoice for delivery with id
      */
     'post'(
       parameters?: Parameters<Paths.CreateInvoiceForDelivery.PathParameters> | null,
@@ -1106,7 +1106,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/drafts']: {
     /**
-     * CreateOrderDraft
+     * CreateOrderDraft - Create a new order draft
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1116,7 +1116,7 @@ export interface PathsDictionary {
   }
   ['/api/documents/preparation']: {
     /**
-     * CreatePreparationDocument
+     * CreatePreparationDocument - Create a preparation document for specfified orders
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1126,7 +1126,7 @@ export interface PathsDictionary {
   }
   ['/api/products']: {
     /**
-     * CreateProduct
+     * CreateProduct - Create a product
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1134,7 +1134,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateProduct.Responses.$201>
     /**
-     * ListProducts
+     * ListProducts - List available products for supplier
      */
     'get'(
       parameters?: Parameters<Paths.ListProducts.QueryParameters> | null,
@@ -1144,7 +1144,7 @@ export interface PathsDictionary {
   }
   ['/api/returnables']: {
     /**
-     * CreateReturnable
+     * CreateReturnable - Create a returnable to be used with products
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1154,7 +1154,7 @@ export interface PathsDictionary {
   }
   ['/api/batches/{id}']: {
     /**
-     * DeleteBatch
+     * DeleteBatch - Remove a batch
      */
     'delete'(
       parameters?: Parameters<Paths.DeleteBatch.PathParameters> | null,
@@ -1162,7 +1162,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DeleteBatch.Responses.$204>
     /**
-     * UpdateBatch
+     * UpdateBatch - Update a batch
      */
     'put'(
       parameters?: Parameters<Paths.UpdateBatch.PathParameters> | null,
@@ -1172,7 +1172,7 @@ export interface PathsDictionary {
   }
   ['/api/products/{id}']: {
     /**
-     * DeleteProduct
+     * DeleteProduct - Remove product with id
      */
     'delete'(
       parameters?: Parameters<Paths.DeleteProduct.PathParameters> | null,
@@ -1180,7 +1180,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DeleteProduct.Responses.$204>
     /**
-     * GetProduct
+     * GetProduct - Retrieve product with id
      */
     'get'(
       parameters?: Parameters<Paths.GetProduct.PathParameters> | null,
@@ -1188,7 +1188,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetProduct.Responses.$200>
     /**
-     * UpdateProduct
+     * UpdateProduct - Update product with id info
      */
     'put'(
       parameters?: Parameters<Paths.UpdateProduct.PathParameters> | null,
@@ -1198,7 +1198,7 @@ export interface PathsDictionary {
   }
   ['/api/returnables/{id}']: {
     /**
-     * DeleteReturnable
+     * DeleteReturnable - Remove returnable with id
      */
     'delete'(
       parameters?: Parameters<Paths.DeleteReturnable.PathParameters> | null,
@@ -1206,7 +1206,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DeleteReturnable.Responses.$204>
     /**
-     * UpdateReturnable
+     * UpdateReturnable - Remove returnable with id info
      */
     'put'(
       parameters?: Parameters<Paths.UpdateReturnable.PathParameters> | null,
@@ -1216,7 +1216,7 @@ export interface PathsDictionary {
   }
   ['/api/deliveries/{id}/deliver']: {
     /**
-     * DeliverOrder
+     * DeliverOrder - Delivery order with id
      */
     'post'(
       parameters?: Parameters<Paths.DeliverOrder.PathParameters> | null,
@@ -1226,7 +1226,7 @@ export interface PathsDictionary {
   }
   ['/api/documents/{id}']: {
     /**
-     * DownloadDocument
+     * DownloadDocument - Generate a secured download link for document
      */
     'post'(
       parameters?: Parameters<Paths.DownloadDocument.PathParameters> | null,
@@ -1234,7 +1234,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DownloadDocument.Responses.$200>
     /**
-     * RemoveDocument
+     * RemoveDocument - Remove document with id
      */
     'delete'(
       parameters?: Parameters<Paths.RemoveDocument.PathParameters> | null,
@@ -1244,7 +1244,7 @@ export interface PathsDictionary {
   }
   ['/api/password/forgot']: {
     /**
-     * ForgotPassword
+     * ForgotPassword - Generate and send a reset link on user email
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1254,7 +1254,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/fulfill']: {
     /**
-     * FulfillOrder
+     * FulfillOrder - Complete order with id
      */
     'post'(
       parameters?: Parameters<Paths.FulfillOrder.PathParameters> | null,
@@ -1264,7 +1264,7 @@ export interface PathsDictionary {
   }
   ['/api/token/login']: {
     /**
-     * LoginUser
+     * LoginUser - Log the user in and generate access token / refresh token
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1274,7 +1274,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}/payed']: {
     /**
-     * MarkInvoiceAsPayed
+     * MarkInvoiceAsPayed - Mark invoice with id as payed
      */
     'post'(
       parameters?: Parameters<Paths.MarkInvoiceAsPayed.PathParameters> | null,
@@ -1284,7 +1284,7 @@ export interface PathsDictionary {
   }
   ['/api/customers/{id}/agreement']: {
     /**
-     * ProposeAgreementToCustomer
+     * ProposeAgreementToCustomer - Send an agreement to customer
      */
     'post'(
       parameters?: Parameters<Paths.ProposeAgreementToCustomer.PathParameters> | null,
@@ -1294,7 +1294,7 @@ export interface PathsDictionary {
   }
   ['/api/suppliers/{id}/agreement']: {
     /**
-     * ProposeAgreementToSupplier
+     * ProposeAgreementToSupplier - Send an agreement to supplier
      */
     'post'(
       parameters?: Parameters<Paths.ProposeAgreementToSupplier.PathParameters> | null,
@@ -1304,7 +1304,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}/publish']: {
     /**
-     * PublishInvoiceDraft
+     * PublishInvoiceDraft - Publish invoice with id
      */
     'post'(
       parameters?: Parameters<Paths.PublishInvoiceDraft.PathParameters> | null,
@@ -1314,7 +1314,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/publish']: {
     /**
-     * PublishOrderDraft
+     * PublishOrderDraft - Publish (and send to supplier) order with id
      */
     'post'(
       parameters?: Parameters<Paths.PublishOrderDraft.PathParameters> | null,
@@ -1324,7 +1324,7 @@ export interface PathsDictionary {
   }
   ['/api/token/refresh']: {
     /**
-     * RefreshAccessToken
+     * RefreshAccessToken - Regenerate an access_token for current user
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1334,7 +1334,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/refuse']: {
     /**
-     * RefuseOrder
+     * RefuseOrder - Refuse customer order with id
      */
     'post'(
       parameters?: Parameters<Paths.RefuseOrder.PathParameters> | null,
@@ -1344,7 +1344,7 @@ export interface PathsDictionary {
   }
   ['/api/register']: {
     /**
-     * RegisterAccount
+     * RegisterAccount - Create an account with specified email/password
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1354,7 +1354,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}']: {
     /**
-     * RemoveInvoiceDraft
+     * RemoveInvoiceDraft - Remove invoice draft with id
      */
     'delete'(
       parameters?: Parameters<Paths.RemoveInvoiceDraft.PathParameters> | null,
@@ -1364,7 +1364,7 @@ export interface PathsDictionary {
   }
   ['/api/password/reset']: {
     /**
-     * ResetPassword
+     * ResetPassword - Reset the password with the token retrieved from email link
      */
     'post'(
       parameters?: Parameters<UnknownParamsObject> | null,
@@ -1374,7 +1374,7 @@ export interface PathsDictionary {
   }
   ['/api/invoices/{id}/send']: {
     /**
-     * SendInvoice
+     * SendInvoice - Send invoice with id to customer
      */
     'post'(
       parameters?: Parameters<Paths.SendInvoice.PathParameters> | null,
@@ -1384,7 +1384,7 @@ export interface PathsDictionary {
   }
   ['/api/customers/{id}']: {
     /**
-     * UpdateCustomer
+     * UpdateCustomer - Update current user customer profile
      */
     'put'(
       parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
@@ -1394,7 +1394,7 @@ export interface PathsDictionary {
   }
   ['/api/orders/{id}/draft']: {
     /**
-     * UpdateOrderDraftProducts
+     * UpdateOrderDraftProducts - Update order with id products
      */
     'put'(
       parameters?: Parameters<Paths.UpdateOrderDraftProducts.PathParameters> | null,
@@ -1404,7 +1404,7 @@ export interface PathsDictionary {
   }
   ['/api/suppliers/{id}']: {
     /**
-     * UpdateSupplier
+     * UpdateSupplier - Update current user supplier profile
      */
     'put'(
       parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,

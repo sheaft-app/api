@@ -3,8 +3,6 @@
   import { onMount } from 'svelte'
   import { listProducts, products } from '$pages/products/service'
   import { format, currency, percent } from '$utils/format'
-  import Checkbox from '$components/Inputs/Checkbox.svelte'
-  import Text from '$components/Inputs/Text.svelte'
   import Search from '$components/Inputs/Search.svelte'
 
   let isLoading = true
