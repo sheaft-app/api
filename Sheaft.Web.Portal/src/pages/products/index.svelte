@@ -27,6 +27,10 @@
 <!-- routify:options index=1 -->
 <!-- routify:options default=true -->
 
+<svelte:head>
+  <title>{$page.title}</title>
+</svelte:head>
+
 <h1>{$page.title}</h1>
 
 {#if isLoading}

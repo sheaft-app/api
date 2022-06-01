@@ -1274,7 +1274,7 @@ components:
         code:
           type: string
           nullable: true
-        price:
+        unitPrice:
           type: number
           format: double
         vat:
@@ -1283,7 +1283,7 @@ components:
         description:
           type: string
           nullable: true
-        returnableIdentifier:
+        returnableId:
           type: string
           nullable: true
       additionalProperties: false
@@ -1296,7 +1296,7 @@ components:
         code:
           type: string
           nullable: true
-        price:
+        unitPrice:
           type: number
           format: double
         vat:
@@ -1500,7 +1500,7 @@ components:
         name:
           type: string
           nullable: true
-        reference:
+        code:
           type: string
           nullable: true
         description:
@@ -1691,7 +1691,7 @@ components:
         code:
           type: string
           nullable: true
-        price:
+        unitPrice:
           type: number
           format: double
         vat:
@@ -1700,7 +1700,7 @@ components:
         description:
           type: string
           nullable: true
-        returnableIdentifier:
+        returnableId:
           type: string
           nullable: true
       additionalProperties: false
@@ -1713,7 +1713,7 @@ components:
         code:
           type: string
           nullable: true
-        price:
+        unitPrice:
           type: number
           format: double
         vat:

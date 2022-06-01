@@ -29,7 +29,7 @@ internal class ProductQueries : Queries, IProductQueries
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    Reference = p.Reference,
+                    Code = p.Reference,
                     Vat = p.Vat,
                     UnitPrice = cp.UnitPrice
                 };
@@ -55,7 +55,7 @@ internal class ProductQueries : Queries, IProductQueries
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    Reference = p.Reference,
+                    Code = p.Reference,
                     Vat = p.Vat,
                     UnitPrice = cp.UnitPrice
                 };

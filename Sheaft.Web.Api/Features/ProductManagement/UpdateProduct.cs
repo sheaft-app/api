@@ -22,9 +22,9 @@ public class UpdateProduct : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateProductRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new UpdateProductCommand(new ProductId(id), data.Name, data.Vat, data.Code, data.Description, data.Price, data.ReturnableIdentifier != null ? new ReturnableId(data.ReturnableIdentifier) : null), token);
+        var result = await Mediator.Execute(new UpdateProductCommand(new ProductId(id), data.Name, data.Vat, data.Code, data.Description, data.UnitPrice, data.ReturnableId != null ? new ReturnableId(data.ReturnableId) : null), token);
         return HandleCommandResult(result);
     }
 }
 
-public record UpdateProductRequest(string Name, string? Code, decimal Price, decimal Vat, string? Description, string? ReturnableIdentifier);
+public record UpdateProductRequest(string Name, string? Code, decimal UnitPrice, decimal Vat, string? Description, string? ReturnableId);

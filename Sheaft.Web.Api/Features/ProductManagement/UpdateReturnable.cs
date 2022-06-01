@@ -22,9 +22,9 @@ public class UpdateReturnable : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateReturnableRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new UpdateReturnableCommand(new ReturnableId(id), data.Name, data.Code,  data.Price, data.Vat), token);
+        var result = await Mediator.Execute(new UpdateReturnableCommand(new ReturnableId(id), data.Name, data.Code,  data.UnitPrice, data.Vat), token);
         return HandleCommandResult(result);
     }
 }
 
-public record UpdateReturnableRequest(string Name, string Code, decimal Price, decimal Vat);
+public record UpdateReturnableRequest(string Name, string Code, decimal UnitPrice, decimal Vat);

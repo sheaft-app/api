@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Tue May 31 2022 23:11:27 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Wed Jun 01 2022 22:51:50 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-05-31T21:11:27.080Z"
+export const __timestamp = "2022-06-01T20:51:50.122Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -273,14 +273,14 @@ export const _tree = {
         "index": 1,
         "menu": "Accueil",
         "title": "Bienvenue sur votre dashboard",
-        "icon": "fas#house"
+        "icon": "fas#desktopAlt"
       },
       "meta": {
         "public": true,
         "index": 1,
         "menu": "Accueil",
         "title": "Bienvenue sur votre dashboard",
-        "icon": "fas#house",
+        "icon": "fas#desktopAlt",
         "recursive": true,
         "preload": false,
         "prerender": true

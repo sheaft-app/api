@@ -7,6 +7,10 @@
   > div.active{
     @apply text-primary-600 bg-primary-100
   }
+
+  > div.subactive{
+    @apply bg-primary-100
+  }
   
   .menu-entry.active {
     @apply text-primary-600 font-semibold

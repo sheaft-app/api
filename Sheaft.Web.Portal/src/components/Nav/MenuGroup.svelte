@@ -4,27 +4,20 @@
   import { parseSubActivePath } from "./path";
   import { getFaIcon, getFaIconFromFullName } from "$utils/faIcon";
   import Fa from "svelte-fa";
+  import type { IEntry } from '$components/Nav/menus'
 
-  export let entry: {
-    name: string;
-    path: string;
-    pages: Array<any>;
-    visible: boolean;
-    icon: string;
-  } = null;
+  export let entry: IEntry = { visible:true, default: false, name: '', referenced: true, pages:[] };
 
   let isGroupActive: boolean = false;
+  let isGroupSubActive: boolean = false;
 
   const navigate = (path: string) => {
     if (path) $goto(path);
   };
 
   $: if (entry.pages && entry.pages.length > 0) {
-    isGroupActive =
-      entry.pages.find(p => {
-        //console.log(entry, parseSubActivePath(p.path), $isActive(parseSubActivePath(p.path)))
-        return $isActive(parseSubActivePath(p.path));
-      }) != null;
+    isGroupActive = entry.pages.find((p:IEntry) => $isActive(parseSubActivePath(p.path)) && p.default) != null;    
+    isGroupSubActive = entry.pages.find((p:IEntry) => $isActive(parseSubActivePath(p.path)) && !p.default) != null;
   }
 
   $: isVisible = entry.visible && entry.pages.find(p => p.visible) != null;
@@ -36,6 +29,7 @@
     <div
       class="flex items-center mx-4 p-3 rounded-xl font-medium"
       class:active="{isGroupActive}"
+      class:subactive="{isGroupSubActive}"
       class:cursor-pointer="{defaultPage}"
       on:click="{() => navigate(defaultPage?.path)}"
     >
@@ -50,6 +44,6 @@
       {/if}
       <span class="ml-2 ">{entry.name}</span>
     </div>
-    <Menu entries="{entry.pages}" expand="{isGroupActive}" />
+    <Menu entries="{entry.pages}" expand="{isGroupActive || isGroupSubActive}" />
   </li>
 {/if}

@@ -2077,7 +2077,7 @@
             "type": "string",
             "nullable": true
           },
-          "price": {
+          "unitPrice": {
             "type": "number",
             "format": "double"
           },
@@ -2089,7 +2089,7 @@
             "type": "string",
             "nullable": true
           },
-          "returnableIdentifier": {
+          "returnableId": {
             "type": "string",
             "nullable": true
           }
@@ -2107,7 +2107,7 @@
             "type": "string",
             "nullable": true
           },
-          "price": {
+          "unitPrice": {
             "type": "number",
             "format": "double"
           },
@@ -2387,7 +2387,7 @@
             "type": "string",
             "nullable": true
           },
-          "reference": {
+          "code": {
             "type": "string",
             "nullable": true
           },
@@ -2653,7 +2653,7 @@
             "type": "string",
             "nullable": true
           },
-          "price": {
+          "unitPrice": {
             "type": "number",
             "format": "double"
           },
@@ -2665,7 +2665,7 @@
             "type": "string",
             "nullable": true
           },
-          "returnableIdentifier": {
+          "returnableId": {
             "type": "string",
             "nullable": true
           }
@@ -2683,7 +2683,7 @@
             "type": "string",
             "nullable": true
           },
-          "price": {
+          "unitPrice": {
             "type": "number",
             "format": "double"
           },

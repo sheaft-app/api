@@ -9,6 +9,7 @@
   export let placeholder: string = "";
   export let isLoading: boolean = false;
   export let required: boolean = true;
+  export let disabled: boolean = false;
 
   const id = nanoid(10);
 </script>
@@ -18,7 +19,7 @@
   <input
     id="{id}"
     type="number"
-    disabled="{isLoading}"
+    disabled="{disabled || isLoading}"
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"

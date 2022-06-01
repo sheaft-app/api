@@ -25,12 +25,12 @@ public class CreateProduct : Feature
     {
         var result =
             await Mediator.Execute(
-                new CreateProductCommand(data.Name, data.Code, data.Description, data.Price, data.Vat,
-                    data.ReturnableIdentifier != null ? new ReturnableId(data.ReturnableIdentifier) : null,
+                new CreateProductCommand(data.Name, data.Code, data.Description, data.UnitPrice, data.Vat,
+                    data.ReturnableId != null ? new ReturnableId(data.ReturnableId) : null,
                     CurrentSupplierId), token);
         return HandleCommandResult(result);
     }
 }
 
-public record CreateProductRequest(string Name, string? Code, decimal Price, decimal Vat, string? Description,
-    string? ReturnableIdentifier);
+public record CreateProductRequest(string Name, string? Code, decimal UnitPrice, decimal Vat, string? Description,
+    string? ReturnableId);

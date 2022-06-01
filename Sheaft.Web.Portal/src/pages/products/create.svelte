@@ -12,9 +12,10 @@
 
   let isLoading = false;
   const product: Paths.CreateProduct.RequestBody = {
-    price: 0,
+    unitPrice: 0,
     name: "",
-    vat: 0.0550
+    description: "",
+    vat: 0.0550,
   };
 
   const cancelCreate = () => {
@@ -32,13 +33,17 @@
     isLoading = false;
   };
 
-  $: fullPrice = round(product.price * (1 + product.vat / 100));
+  $: fullPrice = round(product.unitPrice * (1 + product.vat / 100));
 </script>
 
 <!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
 <!-- routify:options title="Ajouter un nouveau produit" -->
 <!-- routify:options icon="fas#coffee" -->
+
+<svelte:head>
+  <title>{$page.title}</title>
+</svelte:head>
 
 <h1>{$page.title}</h1>
 
@@ -59,7 +64,7 @@
   />
   <Price
     label="Prix HT"
-    bind:value="{product.price}"
+    bind:value="{product.unitPrice}"
     placeholder="Prix HT de votre produit en €"
     isLoading="{isLoading}"
   />

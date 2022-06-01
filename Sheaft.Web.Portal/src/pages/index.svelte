@@ -1,12 +1,17 @@
 ﻿<script lang="ts">
   import logo from "$assets/svelte.png";
+  import {page} from "@roxi/routify"
 </script>
 
 <!-- routify:options public=true -->
 <!-- routify:options index=1 -->
 <!-- routify:options menu="Accueil" -->
 <!-- routify:options title="Bienvenue sur votre dashboard" -->
-<!-- routify:options icon="fas#house" -->
+<!-- routify:options icon="fas#desktopAlt" -->
+
+<svelte:head>
+  <title>{$page.title}</title>
+</svelte:head>
 
 <div class="text-center">
   <img data-ujs-name="Welcome" />

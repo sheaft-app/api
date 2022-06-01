@@ -24,9 +24,9 @@ public class CreateReturnable : Feature
     {
         var result =
             await Mediator.Execute(
-                new CreateReturnableCommand(data.Name, data.Code, data.Price, data.Vat, CurrentSupplierId), token);
+                new CreateReturnableCommand(data.Name, data.Code, data.UnitPrice, data.Vat, CurrentSupplierId), token);
         return HandleCommandResult(result);
     }
 }
 
-public record CreateReturnableRequest(string Name, string Code, decimal Price, decimal Vat);
+public record CreateReturnableRequest(string Name, string Code, decimal UnitPrice, decimal Vat);

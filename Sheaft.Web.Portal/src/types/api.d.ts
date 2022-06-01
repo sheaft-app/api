@@ -43,15 +43,15 @@ declare namespace Components {
         export interface CreateProductRequest {
             name?: string | null;
             code?: string | null;
-            price?: number; // double
+            unitPrice?: number; // double
             vat?: number; // double
             description?: string | null;
-            returnableIdentifier?: string | null;
+            returnableId?: string | null;
         }
         export interface CreateReturnableRequest {
             name?: string | null;
             code?: string | null;
-            price?: number; // double
+            unitPrice?: number; // double
             vat?: number; // double
         }
         export interface CustomerInfoRequest {
@@ -122,7 +122,7 @@ declare namespace Components {
         export interface ProductDto {
             id?: string | null;
             name?: string | null;
-            reference?: string | null;
+            code?: string | null;
             description?: string | null;
             unitPrice?: number; // double
             vat?: number; // double
@@ -193,15 +193,15 @@ declare namespace Components {
         export interface UpdateProductRequest {
             name?: string | null;
             code?: string | null;
-            price?: number; // double
+            unitPrice?: number; // double
             vat?: number; // double
             description?: string | null;
-            returnableIdentifier?: string | null;
+            returnableId?: string | null;
         }
         export interface UpdateReturnableRequest {
             name?: string | null;
             code?: string | null;
-            price?: number; // double
+            unitPrice?: number; // double
             vat?: number; // double
         }
     }
