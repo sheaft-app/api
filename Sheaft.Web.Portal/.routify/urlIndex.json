@@ -8,6 +8,8 @@
   "/index",
   "/products/index",
   "/products/create",
+  "/returnables/index",
+  "/returnables/create",
   "/orders/index",
   "/orders/create",
   "/deliveries/index",

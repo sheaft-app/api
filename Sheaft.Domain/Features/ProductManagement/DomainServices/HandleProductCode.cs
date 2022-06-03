@@ -41,15 +41,16 @@ internal class HandleProductCode : IHandleProductCode
         if (string.IsNullOrWhiteSpace(code))
             return _generateProductCode.GenerateNextCode(supplierIdentifier);
 
-        var existingProductResult = await _productRepository.Find(new ProductReference(code), supplierIdentifier, token);
+        var productReference = new ProductReference(code.Replace(" ", "-").ToUpperInvariant());
+        var existingProductResult = await _productRepository.Find(productReference, supplierIdentifier, token);
         if (existingProductResult.IsFailure)
             return Result.Failure<ProductReference>(existingProductResult);
 
         if (existingProductResult.Value.HasNoValue)
-            return Result.Success(new ProductReference(code));
+            return Result.Success(productReference);
 
         if(productIdentifier != null && existingProductResult.Value.Value.Id == productIdentifier)
-            return Result.Success(new ProductReference(code));
+            return Result.Success(productReference);
 
         return Result.Failure<ProductReference>(ErrorKind.Conflict, "product.code.already.exists");
     }

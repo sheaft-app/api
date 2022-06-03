@@ -20,7 +20,7 @@ public class UpdateProduct : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateProductRequest data, CancellationToken token)
+    public async Task<ActionResult> Put([FromRoute] string id, [FromBody] UpdateProductRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(new UpdateProductCommand(new ProductId(id), data.Name, data.Vat, data.Code, data.Description, data.UnitPrice, data.ReturnableId != null ? new ReturnableId(data.ReturnableId) : null), token);
         return HandleCommandResult(result);

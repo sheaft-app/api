@@ -23,6 +23,7 @@ internal class ProductQueries : Queries, IProductQueries
                 from p in _context.Products
                 from cp in _context.CatalogProducts.Where(cp => cp.ProductId == p.Id)
                 from c in _context.Catalogs.Where(c => c.Id == cp.CatalogId && c.IsDefault)
+                from r in _context.Returnables.Where(r => r.Id == p.ReturnableId).DefaultIfEmpty()
                 where p.Id == identifier.Value
                 select new ProductDto
                 {
@@ -31,7 +32,16 @@ internal class ProductQueries : Queries, IProductQueries
                     Description = p.Description,
                     Code = p.Reference,
                     Vat = p.Vat,
-                    UnitPrice = cp.UnitPrice
+                    UnitPrice = cp.UnitPrice,
+                    ReturnableId = r.Id,
+                    Returnable = r.Id != null ? new ReturnableDto
+                    {
+                        Id = r.Id,
+                        Code = r.Reference,
+                        Name = r.Name,
+                        Vat = r.Vat,
+                        UnitPrice = r.UnitPrice
+                    } : null
                 };
 
             var product = await productsQuery.FirstOrDefaultAsync(token);

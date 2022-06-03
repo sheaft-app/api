@@ -15,6 +15,7 @@ public static class ServiceCollectionInitializers
         services.AddScoped<ICreateAccount, CreateAccount>();
         
         services.AddScoped<IHandleProductCode, HandleProductCode>();
+        services.AddScoped<IHandleReturnableCode, HandleReturnableCode>();
         
         services.AddScoped<IRetrieveDefaultCatalog, RetrieveDefaultCatalog>();
         

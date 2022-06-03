@@ -8,6 +8,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.UnitTests.Helpers;
 
 namespace Sheaft.UnitTests.ProductManagement;
@@ -31,6 +32,19 @@ public class CreateReturnableCommandShould
     }
 
     [Test]
+    public async Task Generate_Reference_For_Returnable_If_Not_Provided()
+    {
+        var (supplierId, context, handler) = InitHandler();
+        var command = GetCommand(supplierId, code: null);
+
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        var returnable = context.Returnables.Single(s => s.Id == new ReturnableId(result.Value));
+        Assert.IsTrue(result.IsSuccess);
+        Assert.AreEqual("1000000000016", returnable.Reference.Value);
+    }
+
+    [Test]
     public async Task Fail_To_Insert_Returnable_If_Reference_Already_Exists()
     {
         var (supplierId, context, handler) = InitHandler();
@@ -44,7 +58,7 @@ public class CreateReturnableCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<CreateReturnableHandler>();
 
-        var handler = new CreateReturnableHandler(uow);
+        var handler = new CreateReturnableHandler(new HandleReturnableCode(new ReturnableRepository(context), new GenerateReturnableCode(context)), uow);
 
         var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
         context.Add(supplierAccount);

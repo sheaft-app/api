@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.5
- * File generated Wed Jun 01 2022 22:51:50 GMT+0200 (heure d’été d’Europe centrale)
+ * File generated Fri Jun 03 2022 19:43:47 GMT+0200 (heure d’été d’Europe centrale)
  */
 
 export const __version = "2.18.5"
-export const __timestamp = "2022-06-01T20:51:50.122Z"
+export const __timestamp = "2022-06-03T17:43:47.973Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -431,6 +431,144 @@ export const _tree = {
       "isFile": true,
       "isDir": true,
       "file": "_layout.svelte",
+      "filepath": "/returnables/_layout.svelte",
+      "name": "_layout",
+      "ext": "svelte",
+      "badExt": false,
+      "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/returnables/_layout.svelte",
+      "children": [
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "[id].svelte",
+          "filepath": "/returnables/[id].svelte",
+          "name": "[id]",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/returnables/[id].svelte",
+          "importPath": "../src/pages/returnables/[id].svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "index": true,
+            "title": "Details du produit",
+            "roles": []
+          },
+          "meta": {
+            "index": true,
+            "title": "Details du produit",
+            "roles": [],
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/returnables/:id",
+          "id": "_returnables__id",
+          "component": () => import('../src/pages/returnables/[id].svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "index.svelte",
+          "filepath": "/returnables/index.svelte",
+          "name": "index",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/returnables/index.svelte",
+          "importPath": "../src/pages/returnables/index.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": true,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Mes consignes",
+            "title": "Mes consignes",
+            "roles": [],
+            "index": 1,
+            "default": true
+          },
+          "meta": {
+            "menu": "Mes consignes",
+            "title": "Mes consignes",
+            "roles": [],
+            "index": 1,
+            "default": true,
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/returnables/index",
+          "id": "_returnables_index",
+          "component": () => import('../src/pages/returnables/index.svelte').then(m => m.default)
+        },
+        {
+          "isFile": true,
+          "isDir": false,
+          "file": "create.svelte",
+          "filepath": "/returnables/create.svelte",
+          "name": "create",
+          "ext": "svelte",
+          "badExt": false,
+          "absolutePath": "D:/Projects/Sheaft/api/Sheaft.Web.Portal/src/pages/returnables/create.svelte",
+          "importPath": "../src/pages/returnables/create.svelte",
+          "isLayout": false,
+          "isReset": false,
+          "isIndex": false,
+          "isFallback": false,
+          "isPage": true,
+          "ownMeta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter une nouvelle consigne",
+            "icon": "fas#coffee"
+          },
+          "meta": {
+            "menu": "Créer",
+            "index": 2,
+            "title": "Ajouter une nouvelle consigne",
+            "icon": "fas#coffee",
+            "recursive": true,
+            "preload": false,
+            "prerender": true
+          },
+          "path": "/returnables/create",
+          "id": "_returnables_create",
+          "component": () => import('../src/pages/returnables/create.svelte').then(m => m.default)
+        }
+      ],
+      "isLayout": true,
+      "isReset": false,
+      "isIndex": false,
+      "isFallback": false,
+      "isPage": false,
+      "importPath": "../src/pages/returnables/_layout.svelte",
+      "ownMeta": {
+        "menu": "Consignes",
+        "index": 3,
+        "group": true,
+        "icon": "fas#barcode"
+      },
+      "meta": {
+        "menu": "Consignes",
+        "index": 3,
+        "group": true,
+        "icon": "fas#barcode",
+        "recursive": true,
+        "preload": false,
+        "prerender": true
+      },
+      "path": "/returnables",
+      "id": "_returnables__layout",
+      "component": () => import('../src/pages/returnables/_layout.svelte').then(m => m.default)
+    },
+    {
+      "isFile": true,
+      "isDir": true,
+      "file": "_layout.svelte",
       "filepath": "/orders/_layout.svelte",
       "name": "_layout",
       "ext": "svelte",
@@ -546,13 +684,13 @@ export const _tree = {
       "importPath": "../src/pages/orders/_layout.svelte",
       "ownMeta": {
         "menu": "Commandes",
-        "index": 3,
+        "index": 4,
         "group": true,
         "icon": "fas#fileLines"
       },
       "meta": {
         "menu": "Commandes",
-        "index": 3,
+        "index": 4,
         "group": true,
         "icon": "fas#fileLines",
         "recursive": true,
@@ -684,13 +822,13 @@ export const _tree = {
       "importPath": "../src/pages/deliveries/_layout.svelte",
       "ownMeta": {
         "menu": "Livraisons",
-        "index": 4,
+        "index": 5,
         "group": true,
         "icon": "fas#truckRampBox"
       },
       "meta": {
         "menu": "Livraisons",
-        "index": 4,
+        "index": 5,
         "group": true,
         "icon": "fas#truckRampBox",
         "recursive": true,
@@ -822,13 +960,13 @@ export const _tree = {
       "importPath": "../src/pages/billings/_layout.svelte",
       "ownMeta": {
         "menu": "Facturation",
-        "index": 5,
+        "index": 6,
         "group": true,
         "icon": "fas#fileInvoiceDollar"
       },
       "meta": {
         "menu": "Facturation",
-        "index": 5,
+        "index": 6,
         "group": true,
         "icon": "fas#fileInvoiceDollar",
         "recursive": true,
@@ -897,13 +1035,13 @@ export const _tree = {
       "ownMeta": {
         "menu": "Documents",
         "group": true,
-        "index": 6,
+        "index": 7,
         "icon": "fas#book"
       },
       "meta": {
         "menu": "Documents",
         "group": true,
-        "index": 6,
+        "index": 7,
         "icon": "fas#book",
         "recursive": true,
         "preload": false,

@@ -126,6 +126,8 @@ declare namespace Components {
             description?: string | null;
             unitPrice?: number; // double
             vat?: number; // double
+            returnable?: ReturnableDto;
+            returnableId?: string | null;
         }
         export interface ProductDtoPaginatedResults {
             items?: ProductDto[] | null;
@@ -165,6 +167,22 @@ declare namespace Components {
             resetToken?: string | null;
             password?: string | null;
             confirm?: string | null;
+        }
+        export interface ReturnableDto {
+            id?: string | null;
+            name?: string | null;
+            code?: string | null;
+            unitPrice?: number; // double
+            vat?: number; // double
+        }
+        export interface ReturnableDtoPaginatedResults {
+            items?: ReturnableDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
         }
         export interface SupplierInfoRequest {
             tradeName?: string | null;
@@ -434,6 +452,18 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace GetReturnable {
+        namespace Parameters {
+            export type Id = string;
+        }
+        export interface PathParameters {
+            id: Parameters.Id;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.ReturnableDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace ListProducts {
         namespace Parameters {
             export type Page = number; // int32
@@ -445,6 +475,20 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.ProductDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListReturnables {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.ReturnableDtoPaginatedResults;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -788,6 +832,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateProduct.Responses.$201>
   /**
+   * ListReturnables - List available returnables for supplier
+   */
+  'ListReturnables'(
+    parameters?: Parameters<Paths.ListReturnables.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListReturnables.Responses.$200>
+  /**
    * CreateReturnable - Create a returnable to be used with products
    */
   'CreateReturnable'(
@@ -835,6 +887,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.DeleteProduct.Responses.$204>
+  /**
+   * GetReturnable - Retrieve returnable with id
+   */
+  'GetReturnable'(
+    parameters?: Parameters<Paths.GetReturnable.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetReturnable.Responses.$200>
   /**
    * UpdateReturnable - Remove returnable with id info
    */
@@ -1151,6 +1211,14 @@ export interface PathsDictionary {
       data?: Paths.CreateReturnable.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateReturnable.Responses.$201>
+    /**
+     * ListReturnables - List available returnables for supplier
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListReturnables.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListReturnables.Responses.$200>
   }
   ['/api/batches/{id}']: {
     /**
@@ -1205,6 +1273,14 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DeleteReturnable.Responses.$204>
+    /**
+     * GetReturnable - Retrieve returnable with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetReturnable.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetReturnable.Responses.$200>
     /**
      * UpdateReturnable - Remove returnable with id info
      */

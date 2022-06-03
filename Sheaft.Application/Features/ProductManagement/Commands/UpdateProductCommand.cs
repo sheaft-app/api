@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateProductCommand(ProductId Identifier, string Name, decimal Vat, string? Code, string? Description, decimal Price, ReturnableId? ReturnableIdentifier) : ICommand<Result>;
+public record UpdateProductCommand(ProductId Identifier, string Name, decimal Vat, string? Code, string? Description, decimal Price, ReturnableId? ReturnableId) : ICommand<Result>;
 
 internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Result>
 {
@@ -48,9 +48,9 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
         }
 
         Returnable? returnable = null;
-        if (request.ReturnableIdentifier != null)
+        if (request.ReturnableId != null)
         {
-            var returnableResult = await _uow.Returnables.Get(request.ReturnableIdentifier, token);
+            var returnableResult = await _uow.Returnables.Get(request.ReturnableId, token);
             if (returnableResult.IsFailure)
                 return Result.Failure(returnableResult);
 

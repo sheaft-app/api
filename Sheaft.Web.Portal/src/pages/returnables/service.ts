@@ -4,32 +4,32 @@ import { StatusCode } from '$enums/http'
 import { api } from '$configs/axios'
 import type { Client, Paths, Components } from '$types/api'
 
-interface IProductStore {
-  products: Components.Schemas.ProductDto[] | null | undefined,
-  product: Components.Schemas.ProductDto | null | undefined
+interface IReturnableStore {
+  returnables: Components.Schemas.ReturnableDto[] | null | undefined,
+  returnable: Components.Schemas.ReturnableDto | null | undefined
 }
 
-const store = writable(<IProductStore>{
-  products: [],
-  product: null
+const store = writable(<IReturnableStore>{
+  returnables: [],
+  returnable: null
 })
 
-export const products = derived(
+export const returnables = derived(
   [store],
-  ([$store]) => $store.products
+  ([$store]) => $store.returnables
 )
 
-export const product = derived(
+export const returnable = derived(
   [store],
-  ([$store]) => $store.product
+  ([$store]) => $store.returnable
 )
 
-export const listProducts = async (page: number, take: number): Promise<IListResult<Components.Schemas.ProductDtoPaginatedResults>> => {
+export const listReturnables = async (page: number, take: number): Promise<IListResult<Components.Schemas.ReturnableDtoPaginatedResults>> => {
   try {
     const client = await api.getClient<Client>()
-    const result = await client.ListProducts({ page, take })
+    const result = await client.ListReturnables({ page, take })
     store.update(ps => {
-      ps.products = result.data.items
+      ps.returnables = result.data.items
       return ps
     })
     return Promise.resolve({ success: true, status: StatusCode.OK, data: result.data })
@@ -43,12 +43,12 @@ export const listProducts = async (page: number, take: number): Promise<IListRes
   }
 }
 
-export const getProduct = async (identifier: string): Promise<IResult<Components.Schemas.ProductDto>> => {
+export const getReturnable = async (identifier: string): Promise<IResult<Components.Schemas.ReturnableDto>> => {
   try {
     const client = await api.getClient<Client>()
-    const result = await client.GetProduct({ id: identifier })
+    const result = await client.GetReturnable({ id: identifier })
     store.update(ps => {
-      ps.product = result.data
+      ps.returnable = result.data
       return ps
     })
     return Promise.resolve({ success: true, status: StatusCode.OK, data: result.data })
@@ -62,10 +62,10 @@ export const getProduct = async (identifier: string): Promise<IResult<Components
   }
 }
 
-export const create = async (product: Paths.CreateProduct.RequestBody): Promise<IResult<string>> => {
+export const create = async (returnable: Paths.CreateReturnable.RequestBody): Promise<IResult<string>> => {
   try {
     const client = await api.getClient<Client>()
-    const result = await client.CreateProduct(null, product)
+    const result = await client.CreateReturnable(null, returnable)
     return Promise.resolve({
       success: true,
       status: StatusCode.CREATED,
@@ -80,10 +80,10 @@ export const create = async (product: Paths.CreateProduct.RequestBody): Promise<
     })
   }
 }
-export const update = async (id: string, product: Paths.UpdateProduct.RequestBody |undefined): Promise<IEmptyResult> => {
+export const update = async (id: string, returnable: Paths.UpdateReturnable.RequestBody |undefined): Promise<IEmptyResult> => {
   try {
     const client = await api.getClient<Client>()
-    const result = await client.UpdateProduct(id, product)
+    const result = await client.UpdateReturnable(id, returnable)
     return Promise.resolve({
       success: true,
       status: StatusCode.CREATED

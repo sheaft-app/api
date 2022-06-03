@@ -1,63 +1,52 @@
 ﻿<script lang="ts">
   import { goto, page } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { update, getProduct } from '$pages/products/service'
+  import { update, getReturnable } from '$pages/returnables/service'
   import Form from '$components/Form/Form.svelte'
   import Text from '$components/Inputs/Text.svelte'
   import Price from '$components/Inputs/Price.svelte'
   import Vat from '$components/Inputs/Vat.svelte'
-  import LongText from '$components/Inputs/LongText.svelte'
   import FormFooter from '$components/Form/FormFooter.svelte'
   import type { Components } from '$types/api'
   import { round } from '$utils/number'
-  import Checkbox from '$components/Inputs/Checkbox.svelte'
-  import Select from '$components/Inputs/Select.svelte'
-  import { listReturnables } from '$pages/returnables/service'
 
   export let id;
   let isLoading = true;
-  let isReturnable = false;
-  let returnablesOptions = [];
 
-  let product: Components.Schemas.ProductDto |undefined = {
+  let returnable: Components.Schemas.ReturnableDto |undefined = {
     unitPrice: 0,
     name: "",
-    description: "",
     vat: 0.0550,
   };
   
   onMount(async () => {
     isLoading = true;
-    const result = await getProduct(id);
+    const result = await getReturnable(id);
     if(!result.success){
-      $goto('/products/')
+      $goto('/returnables/')
       return;      
     }
-
-    returnablesOptions = (await listReturnables(1, 1000)).data.items?.map(r => { return {label:r.name, value: r.id}});
     
-    product = result.data;
-    isReturnable = product.returnableId != null;
+    returnable = result.data;
     isLoading = false;
   });
 
   const cancelUpdate = () => {
-    $goto("/products/");
+    $goto("/returnables/");
   };
 
-  const updateProduct = async () => {
+  const updateReturnable = async () => {
     isLoading = true;
-    const res = await update(id, product);
+    const res = await update(id, returnable);
     if (res.success) {
-      $goto(`/products/`);
+      $goto(`/returnables/`);
       return;
     }
 
     isLoading = false;
   };
 
-  $: fullPrice = round(product.unitPrice * (1 + product.vat / 100));
-  $: if(!isReturnable) product.returnableId = null;
+  $: fullPrice = round(returnable.unitPrice * (1 + returnable.vat / 100));
 </script>
 
 <!-- routify:options index=true -->
@@ -73,7 +62,7 @@
 <Form class="mt-4 ">
   <Text
     label="Code"
-    bind:value="{product.code}"
+    bind:value="{returnable.code}"
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre produit (autogénéré si non renseigné)"
@@ -81,17 +70,17 @@
   />
   <Text
     label="Nom"
-    bind:value="{product.name}"
+    bind:value="{returnable.name}"
     placeholder="Le nom de votre produit"
     isLoading="{isLoading}"
   />
   <Price
     label="Prix HT"
-    bind:value="{product.unitPrice}"
+    bind:value="{returnable.unitPrice}"
     placeholder="Prix HT de votre produit en €"
     isLoading="{isLoading}"
   />
-  <Vat label="TVA" bind:value="{product.vat}" isLoading="{isLoading}" />
+  <Vat label="TVA" bind:value="{returnable.vat}" isLoading="{isLoading}"  rates='{[0, 0.055, 0.10, 0.20]}'/>
   <Price
     label="Prix TTC (calculé)"
     value="{fullPrice}"
@@ -99,22 +88,10 @@
     isLoading="{isLoading}"
     required="{false}"
   />
-  <LongText
-    label="Description"
-    bind:value="{product.description}"
-    required="{false}"
-    placeholder="Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser"
-    isLoading="{isLoading}"
-  />
-  <Checkbox label="Ce produit est consigné" {isLoading} bind:value={isReturnable} class='mt-3 mb-6' required='{false}'/>
-  {#if isReturnable}
-    <Select label="Consigne" options='{returnablesOptions}' {isLoading} bind:value={product.returnableId} />
-  {/if}
   <FormFooter
-    submit="{updateProduct}"
+    submit="{updateReturnable}"
     submitText="Mettre à jour"
     cancel="{cancelUpdate}"
     isLoading="{isLoading}"
-    class='block'
   />
 </Form>

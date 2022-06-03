@@ -1,15 +1,20 @@
 ﻿using Sheaft.Domain;
+using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateReturnableCommand(ReturnableId Identifier, string Name, string Reference, decimal Price, decimal Vat) : ICommand<Result>;
+public record UpdateReturnableCommand(ReturnableId Identifier, string Name, string Code, decimal Price, decimal Vat) : ICommand<Result>;
 
 internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand, Result>
 {
+    private readonly IHandleReturnableCode _handleReturnableCode;
     private readonly IUnitOfWork _uow;
 
-    public UpdateReturnableHandler(IUnitOfWork uow)
+    public UpdateReturnableHandler(
+        IHandleReturnableCode handleReturnableCode,
+        IUnitOfWork uow)
     {
+        _handleReturnableCode = handleReturnableCode;
         _uow = uow;
     }
     
@@ -21,20 +26,15 @@ internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand
         
         var returnable = returnableResult.Value;
 
-        if (returnable.Reference != new ReturnableReference(request.Reference))
-        {
-            var existingReturnableResult =
-                await _uow.Returnables.FindWithReference(new ReturnableReference(request.Reference),
-                    returnable.SupplierId, token);
-            if (existingReturnableResult.IsFailure)
-                return Result.Failure<string>(existingReturnableResult);
-
-            if (existingReturnableResult.Value.HasValue && existingReturnableResult.Value.Value.Id != returnable.Id)
-                return Result.Failure<string>(ErrorKind.Conflict, "returnable.with.reference.already.exists");
-        }
-
-        returnable.UpdateInfo(new ReturnableName(request.Name), new ReturnableReference(request.Reference),
+        var referenceResult = await _handleReturnableCode.ValidateOrGenerateNextCodeForReturnable(request.Code, returnable.Id, returnable.SupplierId, token);
+        if (referenceResult.IsFailure)
+            return referenceResult;
+        
+        var updateResult = returnable.UpdateInfo(new ReturnableName(request.Name), referenceResult.Value,
             new UnitPrice(request.Price), new VatRate(request.Vat));
+
+        if (updateResult.IsFailure)
+            return updateResult;
         
         _uow.Returnables.Update(returnable);
         return await _uow.Save(token);

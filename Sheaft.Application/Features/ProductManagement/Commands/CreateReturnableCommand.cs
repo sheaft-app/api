@@ -3,27 +3,28 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record CreateReturnableCommand(string Name, string Reference, decimal Price, decimal Vat, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
+public record CreateReturnableCommand(string Name, string Code, decimal Price, decimal Vat, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
 
 internal class CreateReturnableHandler : ICommandHandler<CreateReturnableCommand, Result<string>>
 {
+    private readonly IHandleReturnableCode _handleReturnableCode;
     private readonly IUnitOfWork _uow;
 
-    public CreateReturnableHandler(IUnitOfWork uow)
+    public CreateReturnableHandler(
+        IHandleReturnableCode handleReturnableCode,
+        IUnitOfWork uow)
     {
+        _handleReturnableCode = handleReturnableCode;
         _uow = uow;
     }
     
     public async Task<Result<string>> Handle(CreateReturnableCommand request, CancellationToken token)
     {
-        var existingReturnableResult = await _uow.Returnables.FindWithReference(new ReturnableReference(request.Reference), request.SupplierIdentifier, token);
-        if (existingReturnableResult.IsFailure)
-            return Result.Failure<string>(existingReturnableResult);
+        var referenceResult = await _handleReturnableCode.ValidateOrGenerateNextCode(request.Code, request.SupplierIdentifier, token);
+        if (referenceResult.IsFailure)
+            return Result.Failure<string>(referenceResult);
         
-        if (existingReturnableResult.Value.HasValue)
-            return Result.Failure<string>(ErrorKind.Conflict, "returnable.with.reference.already.exists");
-        
-        var returnable = new Returnable(new ReturnableName(request.Name), new ReturnableReference(request.Reference),
+        var returnable = new Returnable(new ReturnableName(request.Name), referenceResult.Value,
             new UnitPrice(request.Price), new VatRate(request.Vat), request.SupplierIdentifier);
 
         _uow.Returnables.Add(returnable);

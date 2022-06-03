@@ -8,6 +8,7 @@ using Sheaft.Domain;
 using Sheaft.Domain.ProductManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
+using Sheaft.Infrastructure.ProductManagement;
 using Sheaft.UnitTests.Helpers;
 
 namespace Sheaft.UnitTests.ProductManagement;
@@ -28,7 +29,7 @@ public class UpdateReturnableCommandShould
         Assert.IsTrue(result.IsSuccess);
         var returnable = context.Returnables.Single(s => s.Id == returnableId);
         Assert.IsNotNull(returnable);
-        Assert.AreEqual("Code", returnable.Reference.Value);
+        Assert.AreEqual("CODE", returnable.Reference.Value);
     }
 
     [Test]
@@ -45,7 +46,7 @@ public class UpdateReturnableCommandShould
     {
         var (context, uow, _) = DependencyHelpers.InitDependencies<UpdateReturnableHandler>();
 
-        var handler = new UpdateReturnableHandler(uow);
+        var handler = new UpdateReturnableHandler(new HandleReturnableCode(new ReturnableRepository(context), new GenerateReturnableCode(context)), uow);
 
         var supplierAccount  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
         context.Add(supplierAccount);

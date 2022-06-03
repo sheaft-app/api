@@ -29,7 +29,7 @@ public class UpdateProductCommandShould
         Assert.IsTrue(result.IsSuccess);
         var product = context.Products.Single(s => s.Id == productId);
         var catalog = context.Catalogs.Single(c => c.Products.Any(cp => cp.Product.Id == productId));
-        Assert.AreEqual("newcode", product.Reference.Value);
+        Assert.AreEqual("NEWCODE", product.Reference.Value);
         Assert.AreEqual(1000, catalog.Products.First(p => p.Product.Id == productId).UnitPrice.Value);
     }
 

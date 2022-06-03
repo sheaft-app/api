@@ -65,6 +65,7 @@ public static class ServiceCollectionExtensions
     private static void RegisterQueries(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IProductQueries, ProductQueries>();
+        services.AddScoped<IReturnableQueries, ReturnableQueries>();
     }
 
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)
@@ -129,6 +130,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IValidateCustomerRegistration, ValidateCustomerRegistration>();
 
         services.AddScoped<IGenerateProductCode, GenerateProductCode>();
+        services.AddScoped<IGenerateReturnableCode, GenerateReturnableCode>();
 
         services.AddScoped<IValidateAgreementProposal, ValidateAgreementProposal>();
 
