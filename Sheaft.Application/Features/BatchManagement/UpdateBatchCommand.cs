@@ -43,9 +43,7 @@ internal class UpdateBatchHandler : ICommandHandler<UpdateBatchCommand, Result>
                 return Result.Failure(ErrorKind.Conflict, "batch.number.already.exists");
         }
         
-        var result = batch.Update(new BatchNumber(request.Number), request.DateKind, request.Date);
-        if (result.IsFailure)
-            return result;
+        batch.Update(new BatchNumber(request.Number), request.DateKind, request.Date);
         
         _uow.Batches.Update(batch);
         return await _uow.Save(token);

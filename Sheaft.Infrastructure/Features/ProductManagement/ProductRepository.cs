@@ -17,6 +17,7 @@ internal class ProductRepository : Repository<Product, ProductId>, IProductRepos
         return QueryAsync(async () =>
         {
             var result = await Values
+                .Include(p => p.Returnable)
                 .SingleOrDefaultAsync(e => e.Id == identifier, token);
 
             return result != null
@@ -29,6 +30,9 @@ internal class ProductRepository : Repository<Product, ProductId>, IProductRepos
         CancellationToken token)
     {
         return QueryAsync(async () =>
-            Result.Success(await Values.SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierId == supplierIdentifier, token) ?? Maybe<Product>.None));
+            Result.Success(await Values
+                .Include(p => p.Returnable)
+                .SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierId == supplierIdentifier, token) 
+                           ?? Maybe<Product>.None));
     }
 }

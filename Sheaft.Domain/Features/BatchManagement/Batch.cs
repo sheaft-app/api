@@ -23,13 +23,11 @@ public class Batch : Entity
     public DateOnly Date { get; private set; }
     public SupplierId SupplierId { get; }
 
-    public Result Update(BatchNumber number, BatchDateKind dateKind, DateOnly date)
+    public void Update(BatchNumber number, BatchDateKind dateKind, DateOnly date)
     {
         Number = number;
         DateKind = dateKind;
         Date = date;
         UpdatedOn = DateTimeOffset.UtcNow;
-
-        return Result.Success();
     }
 }

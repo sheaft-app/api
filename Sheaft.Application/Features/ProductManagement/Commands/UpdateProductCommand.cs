@@ -28,47 +28,30 @@ internal class UpdateProductHandler : ICommandHandler<UpdateProductCommand, Resu
             return Result.Failure(productResult);
 
         var product = productResult.Value;
+
+        var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Id, product.SupplierId, token);
+        if (codeResult.IsFailure)
+            return Result.Failure(codeResult);
+        
+        product.UpdateInfo(codeResult.Value, new ProductName(request.Name), new VatRate(request.Vat), request.Description);
+
+        var returnableResult = await _uow.Returnables.Find(request.ReturnableId, token);
+        if (returnableResult.IsFailure)
+            return Result.Failure<string>(returnableResult);
+        
+        if(returnableResult.Value.HasNoValue && request.ReturnableId != null)
+            return Result.Failure<string>(ErrorKind.NotFound, "returnable.not.found");
+        
+        product.SetReturnable(returnableResult.Value);
+        _uow.Products.Update(product);
+        
         var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(product.SupplierId, token);
         if (catalogResult.IsFailure)
             return Result.Failure(catalogResult);
-
-        var updateResult = product.UpdateInfo(new ProductName(request.Name), new VatRate(request.Vat), request.Description);
-        if (updateResult.IsFailure)
-            return updateResult;
         
-        if (request.Code != product.Reference.Value)
-        {
-            var codeResult = await _handleProductCode.ValidateOrGenerateNextCodeForProduct(request.Code, product.Id, product.SupplierId, token);
-            if (codeResult.IsFailure)
-                return Result.Failure(codeResult);
-            
-            var updateCodeResult = product.UpdateCode(codeResult.Value);
-            if (updateCodeResult.IsFailure)
-                return updateCodeResult;
-        }
-
-        Returnable? returnable = null;
-        if (request.ReturnableId != null)
-        {
-            var returnableResult = await _uow.Returnables.Get(request.ReturnableId, token);
-            if (returnableResult.IsFailure)
-                return Result.Failure(returnableResult);
-
-            returnable = returnableResult.Value;
-        }
+        catalogResult.Value.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
         
-        var assignResult = product.SetReturnable(returnable);
-        if (assignResult.IsFailure)
-            return assignResult;
-        
-        _uow.Products.Update(product);
-        
-        var catalog = catalogResult.Value;
-        var catalogPriceResult = catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
-        if (catalogPriceResult.IsFailure)
-            return catalogPriceResult;
-        
-        _uow.Catalogs.Update(catalog);
+        _uow.Catalogs.Update(catalogResult.Value);
         return await _uow.Save(token);
     }
 }

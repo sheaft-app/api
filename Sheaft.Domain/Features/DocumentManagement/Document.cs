@@ -45,18 +45,16 @@ public class Document : AggregateRoot
         return documentParamsHandler.GetParams<T>(_params);
     }
 
-    public Result StartProcessing()
+    public void StartProcessing()
     {
         Status = DocumentStatus.Processing;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 
-    public Result CompleteProcessing()
+    public void CompleteProcessing()
     {
         Status = DocumentStatus.Done;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 
     public void SetProcessingError(string message)

@@ -43,7 +43,7 @@ public class CreateProductCommandShould
         context.Add(anotherSupplier);
         
         context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(0), null,
-            anotherSupplier.Id));
+            anotherSupplier.Id, Maybe<Returnable>.None));
         
         context.SaveChanges();
         var command = GetCommand(supplierId);
@@ -102,7 +102,7 @@ public class CreateProductCommandShould
     {
         var (supplierId, context, handler) = InitHandler();
         context.Products.Add(new Product(new ProductName("tess"), new ProductReference("Code"), new VatRate(0), null,
-            supplierId));
+            supplierId, Maybe<Returnable>.None));
         
         context.SaveChanges();
         var command = GetCommand(supplierId);

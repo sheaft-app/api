@@ -24,41 +24,27 @@ public class UpdateSupplierHandler : ICommandHandler<UpdateSupplierCommand, Resu
             return Result.Failure(supplierResult);
 
         var supplier = supplierResult.Value;
-        var setInfoResult = supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone));
-        if (setInfoResult.IsFailure)
-            return setInfoResult;
+        supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone));
+        supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
         
-        var setLegalResult = supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
-        if (setLegalResult.IsFailure)
-            return setLegalResult;
-        
-        if (request.BillingAddress != null){
-            var billingResult = supplier.SetBillingAddress(new BillingAddress(
+        if (request.BillingAddress != null)
+            supplier.SetBillingAddress(new BillingAddress(
                 request.BillingAddress.Name,
-                new EmailAddress(request.BillingAddress.Email), 
-                request.BillingAddress.Street, 
-                request.BillingAddress.Complement, 
-                request.BillingAddress.Postcode, 
+                new EmailAddress(request.BillingAddress.Email),
+                request.BillingAddress.Street,
+                request.BillingAddress.Complement,
+                request.BillingAddress.Postcode,
                 request.BillingAddress.City));
-            
-            if (billingResult.IsFailure)
-                return billingResult;
-        }
 
         if (request.ShippingAddress != null)
-        {
-            var shippingResult = supplier.SetShippingAddress(new ShippingAddress(
+            supplier.SetShippingAddress(new ShippingAddress(
                 request.ShippingAddress.Name,
                 new EmailAddress(request.ShippingAddress.Email),
                 request.ShippingAddress.Street,
                 request.ShippingAddress.Complement,
                 request.ShippingAddress.Postcode,
                 request.ShippingAddress.City));
-            
-            if (shippingResult.IsFailure)
-                return shippingResult;
-        }
-        
+
         _uow.Suppliers.Update(supplier);
         return await _uow.Save(token);
     }

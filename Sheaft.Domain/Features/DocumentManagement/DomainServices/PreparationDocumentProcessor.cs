@@ -52,9 +52,7 @@ public class PreparationDocumentProcessor : IDocumentProcessor
     {
         var documentParams = document.GetParams<PreparationDocumentParams>(_documentParamsHandler);
 
-        var startResult = document.StartProcessing();
-        if (startResult.IsFailure)
-            return startResult;
+        document.StartProcessing();
 
         var ordersResult = await _orderRepository.Get(documentParams.OrderIdentifiers, token);
         if (ordersResult.IsFailure)
@@ -80,8 +78,8 @@ public class PreparationDocumentProcessor : IDocumentProcessor
         if (saveResult.IsFailure)
             return saveResult;
 
-        var completionResult = document.CompleteProcessing();
-        return completionResult.IsFailure ? completionResult : Result.Success();
+        document.CompleteProcessing();
+        return Result.Success();
     }
 
     private async Task<Result<IEnumerable<ClientOrdersToPrepare>>> GetPreparationClientsToPrepare(

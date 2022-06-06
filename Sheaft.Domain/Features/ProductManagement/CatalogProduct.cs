@@ -21,10 +21,9 @@ public class CatalogProduct
     public DateTimeOffset CreatedOn { get; private set; }
     public DateTimeOffset UpdatedOn { get; private set; }
 
-    public Result SetPrice(ProductUnitPrice newUnitPrice)
+    public void SetPrice(ProductUnitPrice newUnitPrice)
     {
         UnitPrice = newUnitPrice;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 }

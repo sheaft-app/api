@@ -118,7 +118,7 @@ internal static class DataHelpers
             foreach (var productInfo in productsInfo)
             {
                 var product = new Product(new ProductName(productInfo.Key), new ProductReference(productInfo.Key), new VatRate(0), null,
-                    supplier.Id);
+                    supplier.Id, Maybe<Returnable>.None);
                 
                 catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(productInfo.Value));
                 context.Add(product);

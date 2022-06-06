@@ -45,9 +45,7 @@ internal class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Re
         }
 
         var account = accountResult.Value.Value;
-        var forgotPasswordResult = account.ForgotPassword(DateTimeOffset.UtcNow, _securitySettings.ResetPasswordTokenValidityInHours);
-        if (forgotPasswordResult.IsFailure)
-            return forgotPasswordResult;
+        account.ForgotPassword(DateTimeOffset.UtcNow, _securitySettings.ResetPasswordTokenValidityInHours);
 
         _uow.Accounts.Update(account);
         return await _uow.Save(token);

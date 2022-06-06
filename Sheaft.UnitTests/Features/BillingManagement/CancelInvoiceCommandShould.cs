@@ -132,7 +132,7 @@ public class CancelInvoiceCommandShould
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false,
             new List<Product>
-                {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplier.Id)});
+                {new Product(new ProductName("test"), new ProductReference("code"), new VatRate(0), null, supplier.Id, Maybe<Returnable>.None)});
 
         var invoice = Invoice.CreateInvoiceForOrder(
             DataHelpers.GetDefaultSupplierBilling(supplier.Id),

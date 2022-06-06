@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record CreateProductCommand(string Name, string? Code, string? Description, decimal Price, decimal Vat, ReturnableId? ReturnableIdentifier, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
+public record CreateProductCommand(string Name, string? Code, string? Description, decimal Price, decimal Vat, ReturnableId? ReturnableId, SupplierId SupplierId) : ICommand<Result<string>>;
 
 internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Result<string>>
 {
@@ -23,33 +23,27 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
     
     public async Task<Result<string>> Handle(CreateProductCommand request, CancellationToken token)
     {
-        var codeResult = await _handleProductCode.ValidateOrGenerateNextCode(request.Code, request.SupplierIdentifier, token);
+        var codeResult = await _handleProductCode.ValidateOrGenerateNextCode(request.Code, request.SupplierId, token);
         if (codeResult.IsFailure)
             return Result.Failure<string>(codeResult);
+
+        var returnableResult = await _uow.Returnables.Find(request.ReturnableId, token);
+        if (returnableResult.IsFailure)
+            return Result.Failure<string>(returnableResult);
         
-        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(request.SupplierIdentifier, token);
+        if(returnableResult.Value.HasNoValue && request.ReturnableId != null)
+            return Result.Failure<string>(ErrorKind.NotFound, ReturnableCodes.NotFound);
+        
+        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat), 
+            request.Description, request.SupplierId, returnableResult.Value);
+        _uow.Products.Add(product);
+
+        var catalogResult = await _retrieveDefaultCatalog.GetOrCreate(request.SupplierId, token);
         if (catalogResult.IsFailure)
             return Result.Failure<string>(catalogResult);
 
-        Returnable? returnable = null;
-        if (request.ReturnableIdentifier != null)
-        {
-            var returnableResult = await _uow.Returnables.Get(request.ReturnableIdentifier, token);
-            if (returnableResult.IsFailure)
-                return Result.Failure<string>(returnableResult);
-
-            returnable = returnableResult.Value;
-        }
-        
-        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat), request.Description, request.SupplierIdentifier, returnable);
-        _uow.Products.Add(product);
-
-        var catalog = catalogResult.Value;
-        var priceResult = catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
-        if (priceResult.IsFailure)
-            return Result.Failure<string>(priceResult);
-        
-        _uow.Catalogs.Update(catalog);
+        catalogResult.Value.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
+        _uow.Catalogs.Update(catalogResult.Value);
         
         var result = await _uow.Save(token);
         

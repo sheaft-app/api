@@ -25,9 +25,7 @@ public class Invoice : AggregateRoot
         CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines, string? comment = null)
         : this(kind, supplier, customer, comment)
     {
-        var result = SetLines(lines);
-        if (result.IsFailure)
-            throw new InvalidOperationException(result.Error.Code);
+        SetLines(lines);
     }
 
     public static Invoice CreateInvoiceForOrder(SupplierBillingInformation supplier,
@@ -47,6 +45,28 @@ public class Invoice : AggregateRoot
     {
         return new Invoice(InvoiceKind.Invoice, supplier, customer, lines);
     }
+
+    public InvoiceId Id { get; }
+    public DateTimeOffset CreatedOn { get; private set; }
+    public DateTimeOffset UpdatedOn { get; private set; }
+    public BillingReference? Reference { get; private set; }
+    public InvoiceDueDate? DueDate { get; private set; }
+    public InvoiceStatus Status { get; private set; }
+    public InvoiceKind Kind { get; private set; }
+    public DateTimeOffset? PublishedOn { get; private set; }
+    public DateTimeOffset? CancelledOn { get; private set; }
+    public DateTimeOffset? SentOn { get; private set; }
+    public string? Comment { get; private set; }
+    public string? CancellationReason { get; private set; }
+    public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
+    public TotalVatPrice TotalVatPrice { get; private set; }
+    public TotalOnSalePrice TotalOnSalePrice { get; private set; }
+    public CustomerBillingInformation Customer { get; private set; }
+    public SupplierBillingInformation Supplier { get; private set; }
+    public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
+    public IEnumerable<InvoicePayment> Payments { get; private set; } = new List<InvoicePayment>();
+    public IEnumerable<Invoice> CreditNotes { get; private set; } = new List<Invoice>();
+
 
     public Invoice CreateCreditNoteDraft(SupplierBillingInformation supplier,
         CustomerBillingInformation customer, IEnumerable<InvoiceLine>? lines = null)
@@ -102,31 +122,11 @@ public class Invoice : AggregateRoot
         CancellationReason = cancellationReason;
         Status = InvoiceStatus.Cancelled;
         CancelledOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         
         return Result.Success(creditNote);
     }
-
-    public InvoiceId Id { get; }
-    public DateTimeOffset CreatedOn { get; private set; }
-    public DateTimeOffset UpdatedOn { get; private set; }
-    public BillingReference? Reference { get; private set; }
-    public InvoiceDueDate? DueDate { get; private set; }
-    public InvoiceStatus Status { get; private set; }
-    public InvoiceKind Kind { get; private set; }
-    public DateTimeOffset? PublishedOn { get; private set; }
-    public DateTimeOffset? CancelledOn { get; private set; }
-    public DateTimeOffset? SentOn { get; private set; }
-    public string? Comment { get; private set; }
-    public string? CancellationReason { get; private set; }
-    public TotalWholeSalePrice TotalWholeSalePrice { get; private set; }
-    public TotalVatPrice TotalVatPrice { get; private set; }
-    public TotalOnSalePrice TotalOnSalePrice { get; private set; }
-    public CustomerBillingInformation Customer { get; private set; }
-    public SupplierBillingInformation Supplier { get; private set; }
-    public IEnumerable<InvoiceLine> Lines { get; private set; } = new List<InvoiceLine>();
-    public IEnumerable<InvoicePayment> Payments { get; private set; } = new List<InvoicePayment>();
-    public IEnumerable<Invoice> CreditNotes { get; private set; } = new List<Invoice>();
-
+    
     internal Result Publish(BillingReference reference, DateTimeOffset? currentDateTime = null)
     {
         if (Status != InvoiceStatus.Draft)
@@ -144,6 +144,7 @@ public class Invoice : AggregateRoot
         Reference = reference;
         Status = InvoiceStatus.Published;
         PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         DueDate = Kind == InvoiceKind.Invoice ? new InvoiceDueDate((currentDateTime ?? DateTimeOffset.UtcNow).AddDays(30)) : null;
         return Result.Success();
     }
@@ -155,6 +156,7 @@ public class Invoice : AggregateRoot
 
         Status = InvoiceStatus.Sent;
         SentOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
@@ -167,17 +169,18 @@ public class Invoice : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "creditnote.payed.requires.published");
 
         Status = InvoiceStatus.Payed;
+        UpdatedOn = DateTimeOffset.UtcNow;
         Payments = new List<InvoicePayment> {new InvoicePayment(reference, kind, paymentDate)};
         return Result.Success();
     }
 
-    private Result SetLines(IEnumerable<InvoiceLine>? lines)
+    private void SetLines(IEnumerable<InvoiceLine>? lines)
     {
         Lines = lines?.ToList() ?? new List<InvoiceLine>();
         TotalWholeSalePrice = GetTotalWholeSalePrice();
         TotalVatPrice = GetTotalVatPrice();
         TotalOnSalePrice = GetTotalOnSalePrice();
-        return Result.Success();
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
     private TotalWholeSalePrice GetTotalWholeSalePrice()
@@ -195,23 +198,10 @@ public class Invoice : AggregateRoot
         return new TotalOnSalePrice(Lines.Sum(l => l.PriceInfo.OnSalePrice.Value));
     }
 
-    public Result UpdateBillingInformation(SupplierBillingInformation supplier, CustomerBillingInformation customer)
+    public void UpdateBillingInformation(SupplierBillingInformation supplier, CustomerBillingInformation customer)
     {
         Supplier = supplier;
         Customer = customer;
-        return Result.Success();
-    }
-
-    public Result RemoveCreditNote(Invoice creditNote)
-    {
-        var existingCreditNote = CreditNotes.FirstOrDefault(c => c.Id == creditNote.Id);
-        if (existingCreditNote == null)
-            return Result.Failure(ErrorKind.BadRequest, "invoice.remove.creditnote.not.found");
-
-        var creditNotes = CreditNotes.ToList();
-        creditNotes.Remove(existingCreditNote);
-        CreditNotes = creditNotes.ToList();
-        
-        return Result.Success();
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 }

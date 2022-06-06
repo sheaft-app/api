@@ -32,34 +32,29 @@ public class Supplier : AggregateRoot
     public DateTimeOffset CreatedOn { get; private set; }
     public DateTimeOffset UpdatedOn { get; private set; }
 
-    public Result SetInfo(TradeName name, EmailAddress email, PhoneNumber phone)
+    public void SetInfo(TradeName name, EmailAddress email, PhoneNumber phone)
     {
         TradeName = name;
         Email = email;
         Phone = phone;
         UpdatedOn = DateTimeOffset.UtcNow;
-        
-        return Result.Success();
     }
 
-    public Result SetShippingAddress(ShippingAddress shippingAddress)
+    public void SetShippingAddress(ShippingAddress shippingAddress)
     {
         ShippingAddress = shippingAddress;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 
-    public Result SetBillingAddress(BillingAddress billingAddress)
+    public void SetBillingAddress(BillingAddress billingAddress)
     {
         BillingAddress = billingAddress;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 
-    public Result SetLegal(CorporateName name, Siret siret, LegalAddress address)
+    public void SetLegal(CorporateName name, Siret siret, LegalAddress address)
     {
         Legal = new Legal(name, siret, address);
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 }

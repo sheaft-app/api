@@ -24,7 +24,7 @@ public class GenerateProductCodeShould
         var supplier = DataHelpers.GetDefaultSupplier(supplierAccount.Id);
         context.Add(supplier);
         
-        context.Products.Add(new Product(new ProductName("tests"), new ProductReference(1), new VatRate(0), "", supplier.Id));
+        context.Products.Add(new Product(new ProductName("tests"), new ProductReference(1), new VatRate(0), "", supplier.Id, Maybe<Returnable>.None));
         context.SaveChanges();
         var generateCode = new GenerateProductCode(context);
         
@@ -46,7 +46,7 @@ public class GenerateProductCodeShould
         context.Add(supplier);
         
         context.Products.Add(new Product(new ProductName("tests"), new ProductReference("PROD1"), new VatRate(0), "",
-            supplier.Id));
+            supplier.Id, Maybe<Returnable>.None));
         
         context.SaveChanges();
         var generateCode = new GenerateProductCode(context);
@@ -69,11 +69,11 @@ public class GenerateProductCodeShould
         context.Add(supplier);
         
         context.Products.Add(new Product(new ProductName("tests 1"), new ProductReference(1), new VatRate(0), "",
-            supplier.Id));
+            supplier.Id, Maybe<Returnable>.None));
         context.Products.Add(new Product(new ProductName("tests 2"), new ProductReference("PROD1"), new VatRate(0), "",
-            supplier.Id));
+            supplier.Id, Maybe<Returnable>.None));
         context.Products.Add(new Product(new ProductName("tests 3"), new ProductReference(20), new VatRate(0), "",
-            supplier.Id));
+            supplier.Id, Maybe<Returnable>.None));
         
         context.SaveChanges();
         var generateCode = new GenerateProductCode(context);

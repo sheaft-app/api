@@ -110,9 +110,8 @@ public class AccountShould
     public void Generate_Valid_ResetPasswordToken_When_ForgotPassword()
     {
         var account = InitTestAccount();
-        var result = account.ForgotPassword(DateTimeOffset.UtcNow, 24);
+        account.ForgotPassword(DateTimeOffset.UtcNow, 24);
 
-        Assert.IsTrue(result.IsSuccess);
         Assert.IsTrue(account.Events.Any(e => e.Value is PasswordForgotten));
 
         Assert.IsNotNull(account.ResetPasswordInfo.Token);

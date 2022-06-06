@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
@@ -56,8 +57,8 @@ public class UpdateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Id == productId);
-        Assert.IsNotNull(product?.Returnable);
+        var product = context.Products.Include(p => p.Returnable).AsNoTracking().Single(s => s.Id == productId);
+        Assert.IsNotNull(product.Returnable);
         Assert.AreEqual(returnableId.Value, product?.Returnable.Id.Value);
     }
 
@@ -70,7 +71,7 @@ public class UpdateProductCommandShould
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
-        var product = context.Products.Single(s => s.Id == productId);
+        var product = context.Products.Include(p => p.Returnable).AsNoTracking().Single(s => s.Id == productId);
         Assert.IsNull(product.Returnable);
     }
 
@@ -99,7 +100,7 @@ public class UpdateProductCommandShould
         
         var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
         var product = new Product(new ProductName("product"), new ProductReference("test"), new VatRate(0), null,
-            supplier.Id);
+            supplier.Id, Maybe<Returnable>.None);
         catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(2000));
 
         var returnable = new Returnable(new ReturnableName("Test"), new ReturnableReference("code"),

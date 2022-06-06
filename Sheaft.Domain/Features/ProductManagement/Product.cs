@@ -6,7 +6,7 @@ public class Product : AggregateRoot
     {
     }
 
-    public Product(ProductName name, ProductReference reference, VatRate vat, string? description, SupplierId supplierId, Returnable? returnable = null)
+    public Product(ProductName name, ProductReference reference, VatRate vat, string? description, SupplierId supplierId, Maybe<Returnable> returnable)
     {
         Id = ProductId.New();
         Name = name;
@@ -14,7 +14,7 @@ public class Product : AggregateRoot
         Description = description;
         SupplierId = supplierId;
         Vat = vat;
-        Returnable = returnable;
+        Returnable = returnable.HasValue ? returnable.Value : null;
         CreatedOn = DateTimeOffset.UtcNow;
         UpdatedOn = DateTimeOffset.UtcNow;
     }
@@ -29,26 +29,22 @@ public class Product : AggregateRoot
     public DateTimeOffset CreatedOn { get; private set; }
     public DateTimeOffset UpdatedOn { get; private set; }
 
-    public Result UpdateInfo(ProductName name, VatRate vat, string? description)
+    public void UpdateInfo(ProductReference reference, ProductName name, VatRate vat, string? description)
     {
+        Reference = reference;
         Name = name;
         Description = description;
         Vat = vat;
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 
-    public Result UpdateCode(ProductReference reference)
+    public void SetReturnable(Maybe<Returnable> returnable)
     {
-        Reference = reference;
+        if (Returnable?.Id != null && returnable.HasNoValue)
+            Returnable = null;
+        else if (returnable.HasValue)
+            Returnable = returnable.Value;
+        
         UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
-    }
-
-    public Result SetReturnable(Returnable? returnable)
-    {
-        Returnable = returnable;
-        UpdatedOn = DateTimeOffset.UtcNow;
-        return Result.Success();
     }
 }

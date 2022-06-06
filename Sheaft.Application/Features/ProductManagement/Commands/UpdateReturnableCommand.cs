@@ -30,11 +30,8 @@ internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand
         if (referenceResult.IsFailure)
             return referenceResult;
         
-        var updateResult = returnable.UpdateInfo(new ReturnableName(request.Name), referenceResult.Value,
+        returnable.UpdateInfo(new ReturnableName(request.Name), referenceResult.Value,
             new UnitPrice(request.Price), new VatRate(request.Vat));
-
-        if (updateResult.IsFailure)
-            return updateResult;
         
         _uow.Returnables.Update(returnable);
         return await _uow.Save(token);

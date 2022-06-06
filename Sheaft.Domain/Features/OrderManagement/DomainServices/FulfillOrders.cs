@@ -52,9 +52,7 @@ public class FulfillOrders : IFulfillOrders
         if (deliveryProductsResult.IsFailure)
             return Result.Failure(deliveryProductsResult);
 
-        var linesResult = delivery.UpdateLines(deliveryProductsResult.Value);
-        if (linesResult.IsFailure)
-            return Result.Failure(linesResult);
+        delivery.UpdateLines(deliveryProductsResult.Value);
 
         var canDeliverResult = delivery.CanScheduleDelivery(deliveryDate, currentDateTime);
         if (canDeliverResult.IsFailure)

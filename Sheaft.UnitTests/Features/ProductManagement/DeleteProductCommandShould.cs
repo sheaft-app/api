@@ -58,7 +58,7 @@ public class DeleteProductCommandShould
         context.Add(supplier);
         
         var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
-        var product = new Product(new ProductName("product"), new ProductReference("test"),  new VatRate(0),null, supplier.Id);
+        var product = new Product(new ProductName("product"), new ProductReference("test"),  new VatRate(0),null, supplier.Id, Maybe<Returnable>.None);
         catalog.AddOrUpdateProductPrice(product, new ProductUnitPrice(2000));
 
         context.Add(catalog);

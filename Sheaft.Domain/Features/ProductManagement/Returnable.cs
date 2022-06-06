@@ -27,14 +27,17 @@ public class Returnable : Entity
     public DateTimeOffset CreatedOn { get; private set; }
     public DateTimeOffset UpdatedOn { get; private set; }
 
-    public Result UpdateInfo(ReturnableName name, ReturnableReference reference, UnitPrice price, VatRate vat)
+    public void UpdateInfo(ReturnableName name, ReturnableReference reference, UnitPrice price, VatRate vat)
     {
         Name = name;
         Reference = reference;
         UnitPrice = price;
         Vat = vat;
         UpdatedOn = DateTimeOffset.UtcNow;
-
-        return Result.Success();
     }
+}
+
+public static class ReturnableCodes
+{
+    public const string NotFound = "returnable.not.found";
 }

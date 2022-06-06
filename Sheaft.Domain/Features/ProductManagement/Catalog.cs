@@ -31,19 +31,13 @@ public class Catalog : AggregateRoot
     public DateTimeOffset UpdatedOn { get; private set; }
     public IReadOnlyCollection<CatalogProduct> Products => _products.AsReadOnly();
 
-    public Result AddOrUpdateProductPrice(Product product, ProductUnitPrice unitPrice)
+    public void AddOrUpdateProductPrice(Product product, ProductUnitPrice unitPrice)
     {
         var existingProduct = _products.SingleOrDefault(p => p.Product.Id == product.Id);
         if (existingProduct != null)
-        {
-            var result = existingProduct.SetPrice(unitPrice);
-            if (result.IsFailure)
-                return result;
-        }
+            existingProduct.SetPrice(unitPrice);
         else
             _products.Add(new CatalogProduct(Id, product, unitPrice));
-        
-        return Result.Success();
     }
 
     public Result RemoveProduct(Product product)

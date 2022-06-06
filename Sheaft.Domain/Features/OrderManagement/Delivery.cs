@@ -75,15 +75,16 @@ public class Delivery : AggregateRoot
         Reference = reference;
         Status = DeliveryStatus.Scheduled;
         ScheduledAt = scheduledOn;
+        UpdatedOn = DateTimeOffset.UtcNow;
         
         return Result.Success();
     }
 
-    public Result UpdateLines(IEnumerable<DeliveryLine> lines)
+    public void UpdateLines(IEnumerable<DeliveryLine> lines)
     {
         Lines = lines.ToList();
         CalculatePrices();
-        return Result.Success();
+        UpdatedOn = DateTimeOffset.UtcNow;
     }
 
     internal Result CanScheduleDelivery(DeliveryDate scheduledOn, DateTimeOffset? currentDateTime)
@@ -109,6 +110,7 @@ public class Delivery : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "delivery.confirm.requires.incoming.deliverydate");
 
         ScheduledAt = scheduledOn;
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
@@ -119,6 +121,7 @@ public class Delivery : AggregateRoot
 
         Adjustments = adjustments.ToList();
         DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = DateTimeOffset.UtcNow;
         Status = DeliveryStatus.Delivered;
         
         CalculatePrices();

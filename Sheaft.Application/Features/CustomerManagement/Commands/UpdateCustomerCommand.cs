@@ -24,40 +24,27 @@ public class UpdateCustomerHandler : ICommandHandler<UpdateCustomerCommand, Resu
             return Result.Failure(customerResult);
 
         var customer = customerResult.Value;
-        var setInfoResult = customer.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone));
-        if (setInfoResult.IsFailure)
-            return setInfoResult;
         
-        var setLegalResult = customer.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
-        if (setLegalResult.IsFailure)
-            return setLegalResult;
+        customer.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone));
+        customer.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
         
-        if (request.BillingAddress != null){
-            var billingResult = customer.SetBillingAddress(new BillingAddress(
+        if (request.BillingAddress != null)
+            customer.SetBillingAddress(new BillingAddress(
                 request.BillingAddress.Name,
-                new EmailAddress(request.BillingAddress.Email), 
-                request.BillingAddress.Street, 
-                request.BillingAddress.Complement, 
-                request.BillingAddress.Postcode, 
+                new EmailAddress(request.BillingAddress.Email),
+                request.BillingAddress.Street,
+                request.BillingAddress.Complement,
+                request.BillingAddress.Postcode,
                 request.BillingAddress.City));
-            
-            if (billingResult.IsFailure)
-                return billingResult;
-        }
 
         if (request.DeliveryAddress != null)
-        {
-            var deliveryResult = customer.SetDeliveryAddress(new DeliveryAddress(
+            customer.SetDeliveryAddress(new DeliveryAddress(
                 request.DeliveryAddress.Name,
                 new EmailAddress(request.DeliveryAddress.Email),
                 request.DeliveryAddress.Street,
                 request.DeliveryAddress.Complement,
                 request.DeliveryAddress.Postcode,
                 request.DeliveryAddress.City));
-            
-            if (deliveryResult.IsFailure)
-                return deliveryResult;
-        }
 
         _uow.Customers.Update(customer);
         return await _uow.Save(token);

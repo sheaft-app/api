@@ -37,9 +37,7 @@ public class PublishInvoices : IPublishInvoices
         if (supplierBillingResult.IsFailure)
             return Result.Failure<string>(supplierBillingResult);
         
-        var billingResult = invoice.UpdateBillingInformation(supplierBillingResult.Value, customerBillingResult.Value);
-        if (billingResult.IsFailure)
-            return billingResult;
+        invoice.UpdateBillingInformation(supplierBillingResult.Value, customerBillingResult.Value);
         
         var codeResult = _generateInvoiceCode.GenerateNextCode(invoice.Supplier.Identifier);
         if (codeResult.IsFailure)

@@ -43,13 +43,11 @@ public class Account : AggregateRoot
         return Result.Success();
     }
     
-    public Result SetNames(Firstname firstname, Lastname lastname)
+    public void SetNames(Firstname firstname, Lastname lastname)
     {
         Firstname = firstname;
         Lastname = lastname;
         UpdatedOn = DateTimeOffset.UtcNow;
-        
-        return Result.Success();
     }
 
     public Result ChangePassword(ChangePassword changePassword, IPasswordHasher hasher)
@@ -101,15 +99,15 @@ public class Account : AggregateRoot
         return Result.Failure<AuthenticationResult>(ErrorKind.Unexpected, "refresh.token.authentication.required", "You need to reauthenticate yourself");
     }
 
-    public Result ForgotPassword(DateTimeOffset currentDate, int tokenValidityInHours)
+    public void ForgotPassword(DateTimeOffset currentDate, int tokenValidityInHours)
     {
         if (tokenValidityInHours < 1)
             throw new InvalidOperationException("Reset password token validity in hours must be greater or equal than 1 hour.");
         
         ResetPasswordInfo = new ResetPasswordInfo(Guid.NewGuid().ToString("N"), DateTimeOffset.UtcNow, currentDate.AddHours(tokenValidityInHours));
+        UpdatedOn = DateTimeOffset.UtcNow;
+        
         RaiseEvent(new PasswordForgotten(Id.Value, ResetPasswordInfo.Token, ResetPasswordInfo.ExpiresOn));
-
-        return Result.Success();
     }
 
     public Result ResetPassword(string token, NewPassword newPassword, IPasswordHasher hasher)

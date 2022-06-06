@@ -29,7 +29,29 @@ internal class ReturnableRepository : Repository<Returnable, ReturnableId>, IRet
         CancellationToken token)
     {
         return QueryAsync(async () =>
-            Result.Success(await Values.SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierId == supplierIdentifier, token) ?? Maybe<Returnable>.None));
+        {
+            if (string.IsNullOrWhiteSpace(reference.Value))
+                return Result.Success(Maybe<Returnable>.None);
+                
+            return Result.Success(
+                await Values.SingleOrDefaultAsync(
+                    v => v.Reference == reference && v.SupplierId == supplierIdentifier, token) ??
+                Maybe<Returnable>.None);
+        });
+    }
+
+    public Task<Result<Maybe<Returnable>>> Find(ReturnableId? identifier, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            if (string.IsNullOrWhiteSpace(identifier?.Value))
+                return Result.Success(Maybe<Returnable>.None);
+                
+            return Result.Success(
+                await Values.SingleOrDefaultAsync(
+                    v => v.Id == identifier, token) ??
+                Maybe<Returnable>.None);
+        });
     }
 
     public Task<Result<Maybe<Returnable>>> FindWithReference(ReturnableReference reference, SupplierId supplierIdentifier, CancellationToken token)
