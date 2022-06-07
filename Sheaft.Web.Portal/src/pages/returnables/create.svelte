@@ -1,37 +1,31 @@
 ﻿<script lang="ts">
-  import { page, goto } from "@roxi/routify";
+  import { page } from "@roxi/routify";
   import Text from "$components/Inputs/Text.svelte";
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
-  import { round } from "$utils/number";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import Form from "$components/Form/Form.svelte";
-  import { create } from "./service";
-  import type { Paths } from '$types/api'
+  import { create, goToDetails, goToList } from './service'
+  import { calculateOnSalePrice } from '$utils/price'
+  import { createForm } from 'felte';
+  import { Paths } from '$types/api';
 
-  let isLoading = false;
-  const returnable: Paths.CreateReturnable.RequestBody = {
-    unitPrice: 0,
-    name: "",
-    vat: 0.0550,
-  };
-
-  const cancelCreate = () => {
-    $goto("/returnables/");
-  };
-
-  const createReturnable = async () => {
-    isLoading = true;
-    const res = await create(returnable);
-    if (res.success) {
-      $goto(`/returnables/${res.data}`);
-      return;
+  const { form, data, isSubmitting, isValid } = createForm<Paths.CreateReturnable.RequestBody>({
+    onSubmit: async (values) => {
+      const { success, data } = await create(values);
+      if(success)
+        goToDetails(data);
+      
+      return data;
+    },
+    onSuccess: (response)=>{
+      console.log(response);
+    },
+    onError: (error)=>{
+      console.log(error);
     }
-
-    isLoading = false;
-  };
-
-  $: fullPrice = round(returnable.unitPrice * (1 + returnable.vat / 100));
+  })
+  
+  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
 </script>
 
 <!-- routify:options menu="Créer" -->
@@ -45,39 +39,40 @@
 
 <h1>{$page.title}</h1>
 
-<Form class="mt-4 ">
+<form use:form>
   <Text
     label="Code"
-    bind:value="{returnable.code}"
+    bind:value="{$data.code}"
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre consigne (sera autogénéré si non renseigné)"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
   <Text
     label="Nom"
-    bind:value="{returnable.name}"
+    bind:value="{$data.name}"
     placeholder="Le nom de votre consigne"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
   <Price
     label="Prix HT"
-    bind:value="{returnable.unitPrice}"
+    bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre consigne en €"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
-  <Vat label="TVA" bind:value="{returnable.vat}" isLoading="{isLoading}" rates='{[0, 0.055, 0.10, 0.20]}' />
+  <Vat label="TVA" bind:value="{$data.vat}" isLoading="{$isSubmitting}" rates='{[0, 0.055, 0.10, 0.20]}' />
   <Price
     label="Prix TTC (calculé)"
-    value="{fullPrice}"
+    value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
     required="{false}"
   />
   <FormFooter
-    submit="{createReturnable}"
+    submit="{create}"
     submitText="Créer"
-    cancel="{cancelCreate}"
-    isLoading="{isLoading}"
+    cancel="{goToList}"
+    disabled="{$isValid}"
+    isLoading="{$isSubmitting}"
   />
 </Form>

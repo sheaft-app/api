@@ -1,13 +1,9 @@
-﻿import type { StatusCode } from "$enums/http";
-
-export interface IEmptyResult {
+﻿export interface IResult {
   success: boolean;
-  status: StatusCode;
-  error?: any;
+  message?: string;
+  error?: any
 }
 
-export interface IResult<T> extends IEmptyResult {
-  data?: T;
+export interface IDataResult<T> extends IResult{
+  data: T
 }
-
-export interface IListResult<T> extends IResult<T> {}

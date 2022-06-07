@@ -3,12 +3,13 @@ import apiConfig from "$settings/api";
 import { get } from "svelte/store";
 import type { Client } from '$types/api'
 import { OpenAPIClientAxios } from 'openapi-client-axios'
+import { StatusCode } from '$enums/http'
 
 export const api = new OpenAPIClientAxios({ definition: `${apiConfig.url}/swagger/v1/swagger.json`});
 
 export const configureAxios = (client: Client) => {
   client.interceptors.request.use(
-    function (config) {
+    config => {
       config.baseURL = apiConfig.url;
       config.headers = {
         Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -16,13 +17,14 @@ export const configureAxios = (client: Client) => {
 
       if (!get(isAuthenticated)) return config;
 
-      const access_tokens = get(tokens);
-      config.headers.Authorization = `${access_tokens.tokenType} ${access_tokens.accessToken}`;
+      const {tokenType, accessToken} = get(tokens);
+      config.headers.Authorization = `${tokenType} ${accessToken}`;
 
       return config;
     },
-    function (error) {
-      return Promise.reject(error);
+    err => {
+      return Promise.reject(err);
     }
   );
 };
+
