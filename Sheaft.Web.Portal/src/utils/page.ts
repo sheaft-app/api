@@ -20,7 +20,7 @@
       path: from
     };
 
-  if (meta.roles && meta.roles.length > 0 && (!isAuthenticated || !isInRole(meta.roles)))
+  if (meta.roles?.length > 0 && (!isAuthenticated || !isInRole(meta.roles)))
     return { path: "/unauthorized" };
 
   if (!meta.anonymous && !meta.public && !isAuthenticated) {

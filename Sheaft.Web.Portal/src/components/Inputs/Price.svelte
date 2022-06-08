@@ -4,8 +4,8 @@
 
   export let value: number = 0;
   export let label: string = "";
-  export let min: number = null;
-  export let max: number = null;
+  export let min: number|null = null;
+  export let max: number|null = null;
   export let placeholder: string = "";
   export let isLoading: boolean = false;
   export let required: boolean = true;

@@ -1,52 +1,44 @@
 ﻿<script lang="ts">
-  import { goto, page } from '@roxi/routify'
+  import { page } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { update, getReturnable } from '$pages/returnables/service'
+  import { update, getReturnable, returnable } from '$pages/returnables/service'
   import Form from '$components/Form/Form.svelte'
   import Text from '$components/Inputs/Text.svelte'
   import Price from '$components/Inputs/Price.svelte'
   import Vat from '$components/Inputs/Vat.svelte'
   import FormFooter from '$components/Form/FormFooter.svelte'
-  import type { Components } from '$types/api'
-  import { round } from '$utils/number'
+  import { goToList } from '$pages/returnables/router'
+  import { createForm } from 'felte'
+  import { Paths } from '$types/api'
+  import { calculateOnSalePrice } from '$utils/price'
 
   export let id;
   let isLoading = true;
-
-  let returnable: Components.Schemas.ReturnableDto |undefined = {
-    unitPrice: 0,
-    name: "",
-    vat: 0.0550,
-  };
   
   onMount(async () => {
     isLoading = true;
-    const result = await getReturnable(id);
-    if(!result.success){
-      $goto('/returnables/')
-      return;      
-    }
-    
-    returnable = result.data;
+    await getReturnable(id);    
     isLoading = false;
   });
 
-  const cancelUpdate = () => {
-    $goto("/returnables/");
-  };
+  const { form, data, isSubmitting, isValid } = createForm<Paths.CreateReturnable.RequestBody>({
+    onSubmit: async (values) => {
+      const { success, data } = await update(id, values);
+      if(success)
+        goToList();
 
-  const updateReturnable = async () => {
-    isLoading = true;
-    const res = await update(id, returnable);
-    if (res.success) {
-      $goto(`/returnables/`);
-      return;
+      return data;
+    },
+    onSuccess: (response)=>{
+      console.log(response);
+    },
+    onError: (error)=>{
+      console.log(error);
     }
+  })
 
-    isLoading = false;
-  };
-
-  $: fullPrice = round(returnable.unitPrice * (1 + returnable.vat / 100));
+  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
+  $: disabled = isLoading || $isSubmitting;
 </script>
 
 <!-- routify:options index=true -->
@@ -62,36 +54,37 @@
 <Form class="mt-4 ">
   <Text
     label="Code"
-    bind:value="{returnable.code}"
+    bind:value="{$returnable.code}"
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre produit (autogénéré si non renseigné)"
-    isLoading="{isLoading}"
+    isLoading="{$disabled}"
   />
   <Text
     label="Nom"
-    bind:value="{returnable.name}"
+    bind:value="{$returnable.name}"
     placeholder="Le nom de votre produit"
-    isLoading="{isLoading}"
+    isLoading="{$disabled}"
   />
   <Price
     label="Prix HT"
-    bind:value="{returnable.unitPrice}"
+    bind:value="{$returnable.unitPrice}"
     placeholder="Prix HT de votre produit en €"
-    isLoading="{isLoading}"
+    isLoading="{$disabled}"
   />
-  <Vat label="TVA" bind:value="{returnable.vat}" isLoading="{isLoading}"  rates='{[0, 0.055, 0.10, 0.20]}'/>
+  <Vat label="TVA" bind:value="{$returnable.vat}" isLoading="{$disabled}"  rates='{[0, 0.055, 0.10, 0.20]}'/>
   <Price
     label="Prix TTC (calculé)"
-    value="{fullPrice}"
+    value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{isLoading}"
+    isLoading="{$disabled}"
     required="{false}"
   />
   <FormFooter
-    submit="{updateReturnable}"
+    submit="{update}"
     submitText="Mettre à jour"
-    cancel="{cancelUpdate}"
-    isLoading="{isLoading}"
+    cancel="{goToList}"
+    disabled="{!isValid}"
+    isLoading="{$disabled}"
   />
 </Form>

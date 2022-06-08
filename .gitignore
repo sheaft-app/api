@@ -10,3 +10,6 @@ Sheaft.Web.Portal/appsettings.Development.json
 .history
 .idea/*
 *.sln.*.user
+Sheaft.Web.Portal/.routify/config.js
+Sheaft.Web.Portal/.routify/routes.js
+Sheaft.Web.Portal/.routify/urlIndex.json

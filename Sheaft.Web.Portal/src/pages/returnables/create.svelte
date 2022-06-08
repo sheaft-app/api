@@ -4,7 +4,8 @@
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import { create, goToDetails, goToList } from './service'
+  import { create } from './service'
+  import { goToDetails, goToList } from './router'
   import { calculateOnSalePrice } from '$utils/price'
   import { createForm } from 'felte';
   import { Paths } from '$types/api';
@@ -72,7 +73,7 @@
     submit="{create}"
     submitText="Créer"
     cancel="{goToList}"
-    disabled="{$isValid}"
+    disabled="{!$isValid}"
     isLoading="{$isSubmitting}"
   />
 </Form>
