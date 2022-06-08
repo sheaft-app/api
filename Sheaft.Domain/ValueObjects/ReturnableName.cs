@@ -7,6 +7,9 @@ public record ReturnableName
 
     public ReturnableName(string value)
     {
+        // if (string.IsNullOrWhiteSpace(value))
+        //     throw new InvalidOperationException("returnable.name.required");
+        
         Value = value;
     }
 

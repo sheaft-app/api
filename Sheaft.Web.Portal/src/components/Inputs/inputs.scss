@@ -28,6 +28,7 @@
     @apply text-sm;
     @apply font-medium;
     @apply text-gray-700;
+    @apply cursor-pointer;
   }
 }
 
@@ -52,9 +53,9 @@ select:focus-visible{
   @apply grow;
 
   input{
-    @apply hidden;
-  }
-  
+    @apply cursor-pointer;
+    @apply hidden}
+
   label{
     @apply block;
     @apply cursor-pointer;
@@ -65,5 +66,9 @@ select:focus-visible{
     @apply p-2;
     @apply text-center;
     @apply hover:bg-gray-300;
+  }
+  
+  label{
+    @apply cursor-pointer;
   }
 }

@@ -1,9 +1,8 @@
-﻿export interface IResult {
-  success: boolean;
+﻿export interface IErrorResult {
   message?: string;
-  error?: any
+  error?: IError;
 }
 
-export interface IDataResult<T> extends IResult{
-  data: T
+export interface IError {
+  
 }

@@ -12,7 +12,8 @@
   import { round } from '$utils/number'
   import Checkbox from '$components/Inputs/Checkbox.svelte'
   import Select from '$components/Inputs/Select.svelte'
-  import { listReturnables } from '$pages/returnables/service'
+  import { mediator } from '$services/mediator'
+  import { ListReturnablesQuery } from '$queries/returnables/listReturnables'
 
   export let id;
   let isLoading = true;
@@ -28,17 +29,20 @@
   
   onMount(async () => {
     isLoading = true;
-    const result = await getProduct(id);
-    if(!result.success){
-      $goto('/products/')
-      return;      
-    }
+    try {
+      const result = await getProduct(id);
 
-    returnablesOptions = (await listReturnables(1, 1000)).data.items?.map(r => { return {label:r.name, value: r.id}});
-    
-    product = result.data;
-    isReturnable = product.returnableId != null;
-    isLoading = false;
+      const results = await mediator.send(new ListReturnablesQuery(1, 1000));
+      returnablesOptions = results.map(r => { return {label:r.name, value: r.id}})
+
+      product = result.data;
+      isReturnable = product.returnableId != null;
+
+      isLoading = false;
+    }
+    catch(exc){
+      $goto('/products')
+    }
   });
 
   const cancelUpdate = () => {
@@ -47,13 +51,13 @@
 
   const updateProduct = async () => {
     isLoading = true;
-    const res = await update(id, product);
-    if (res.success) {
-      $goto(`/products/`);
-      return;
+    try {
+      const res = await update(id, product);
+      $goto('/products/')
     }
-
-    isLoading = false;
+    catch(exc) {
+      isLoading = false;
+    }
   };
 
   $: fullPrice = round(product.unitPrice * (1 + product.vat / 100));

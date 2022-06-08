@@ -2,14 +2,19 @@
   import "./inputs.scss";
   import { nanoid } from "nanoid";
 
-  export let value: string = "";
-  export let label: string = "";
+  export let id:string|null=null;
+  export let value: string|null = null;
+  export let label: string|null = null;
   export let placeholder: string = "";
   export let isLoading: boolean = false;
   export let minLength: number = 0;
   export let maxLength: number = 250;
 
-  const id = nanoid(10);
+  let name:string|null = null;
+  if(!id)
+    id = nanoid(10);
+  else
+    name = id;
 </script>
 
 <div class="">
@@ -24,7 +29,8 @@
         </svg>
       </div>
       <input
-        id="{id}"
+        id='{id}'
+        name='{name}'
         type="text"
         disabled="{isLoading}"
         placeholder="{placeholder}"

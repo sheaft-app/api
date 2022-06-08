@@ -2,13 +2,18 @@
   import "./inputs.scss";
   import { nanoid } from "nanoid";
 
-  export let value: string = "";
-  export let label: string = "";
+  export let id:string|null=null;
+  export let value: string|null = null;
+  export let label: string|null = null;
   export let options: { label: string; value: string }[] = [];
   export let isLoading: boolean = false;
   export let required: boolean = true;
 
-  const id = nanoid(10);
+  let name:string|null = null;
+  if(!id)
+    id = nanoid(10);
+  else
+    name = id;
 </script>
 
 <div class="f-input">
@@ -16,7 +21,8 @@
     <label for="{id}">{label} {required ? "*" : ""}</label>
   {/if}
   <select
-    id="{id}"
+    id='{id}'
+    name='{name}'
     disabled="{isLoading}"
     bind:value
     class="{$$props.class}"

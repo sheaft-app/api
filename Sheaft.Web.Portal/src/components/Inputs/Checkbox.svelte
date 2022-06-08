@@ -2,16 +2,22 @@
   import './inputs.scss'
   import { nanoid } from 'nanoid'
 
+  export let id:string|null=null;
   export let value: boolean = false
-  export let label: string = null
+  export let label: string|null = null
   export let isLoading: boolean = false
   export let required: boolean = true
 
-  const id = nanoid(10)
+  let name:string|null = null;
+  if(!id)
+    id = nanoid(10);
+  else
+    name = id;
 </script>
 
 <input
   id='{id}'
+  name='{name}'
   type='checkbox'
   bind:checked='{value}'
   disabled='{isLoading}'

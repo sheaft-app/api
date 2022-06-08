@@ -12,7 +12,8 @@
   import Select from '$components/Inputs/Select.svelte'
   import Checkbox from '$components/Inputs/Checkbox.svelte'
   import { onMount } from 'svelte'
-  import { listReturnables } from '$pages/returnables/service'
+  import { mediator } from '$services/mediator'
+  import { ListReturnablesQuery } from '$queries/returnables/listReturnables'
 
   let isLoading = false;
   let isReturnable = false;
@@ -32,18 +33,19 @@
 
   const createProduct = async () => {
     isLoading = true;
-    const res = await create(product);
-    if (res.success) {
-      $goto(`/products/${res.data}`);
-      return;
+    try {
+      const res = await create(product);
+      $goto(`/products/${res}`);
     }
-
-    isLoading = false;
+    catch(exc){
+      isLoading = false;      
+    }
   };
   
   onMount(async () => {
     isLoading = true;
-    returnablesOptions = (await listReturnables(1, 1000)).data.items?.map(r => { return {label:r.name, value: r.id}});
+    const results = await mediator.send(new ListReturnablesQuery(1, 1000));
+    returnablesOptions = results.map(r => { return {label:r.name, value: r.id}})
     isLoading = false;
   })
 
