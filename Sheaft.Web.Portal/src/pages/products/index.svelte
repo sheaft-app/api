@@ -1,18 +1,29 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { listProducts, products } from '$pages/products/service'
   import { format, currency, percent } from '$utils/format'
+  import { mediator } from '$services/mediator'
+  import Loader from '$components/Loader/Loader.svelte'
+  import { getProductModule } from '$pages/products/module'
+  import { ListProductsQuery } from '$queries/products/listProducts'
+  import type { Components } from '$types/api'
 
+  export let pageNumber:number = 1, take:number = 10;
+  
+  const module = getProductModule($goto);
+  
   let isLoading = true
-
-  const navigate = (id: string) => {
-    $goto(`/products/${id}`)
-  }
+  let products: Components.Schemas.ProductDto[] = [];  
 
   onMount(async () => {
-    const result = await listProducts(1, 10)
-    isLoading = false
+    try {
+      isLoading = true
+      products = await mediator.send(new ListProductsQuery(pageNumber, take));
+      isLoading = false
+    }
+    catch(exc){
+      module.goToHome();
+    }
   })
 </script>
 
@@ -29,7 +40,7 @@
 <h1>{$page.title}</h1>
 
 {#if isLoading}
-  <p>Loading</p>
+  <Loader/>
 {:else}
   <div class='relative overflow-x-auto shadow-md sm:rounded-lg'>
     <table>
@@ -41,9 +52,9 @@
       </tr>
       </thead>
       <tbody>
-      {#each $products as product}
-        <tr on:click={() => navigate(product.id)}>
-          <th scope='row'>{product.name}</th>
+      {#each products as product}
+        <tr on:click={() => module.goToDetails(product.id)}>
+          <th>{product.name}</th>
           <td use:format={currency}>{product.unitPrice}</td>
           <td use:format={percent}>{product.vat}</td>
         </tr>

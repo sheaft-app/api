@@ -87,7 +87,7 @@
     </Button>
     <Button
       type='submit'
-      disabled='{$isSubmitting}'
+      disabled='{!$isValid || $isSubmitting}'
       isLoading='{$isSubmitting}'
       class='accent w-full mx-8'
     >Créer

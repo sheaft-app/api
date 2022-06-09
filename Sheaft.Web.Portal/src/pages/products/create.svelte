@@ -4,53 +4,55 @@
   import LongText from "$components/Inputs/LongText.svelte";
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
-  import { round } from "$utils/number";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import Form from "$components/Form/Form.svelte";
-  import { create } from "./service";
-  import type { Paths } from '$types/api'
   import Select from '$components/Inputs/Select.svelte'
   import Checkbox from '$components/Inputs/Checkbox.svelte'
   import { onMount } from 'svelte'
   import { mediator } from '$services/mediator'
+  import Button from '$components/Buttons/Button.svelte'
+  import { createForm } from 'felte'
+  import { calculateOnSalePrice } from '$utils/price'
+  import { getProductModule } from '$pages/products/module'
   import { ListReturnablesQuery } from '$queries/returnables/listReturnables'
+  import { CreateProductRequest } from '$commands/products/createProduct'
+  import type { Components } from '$types/api'
+  import { currency } from '$utils/format'
 
+  const module = getProductModule($goto)
+  
   let isLoading = false;
   let isReturnable = false;
-  let returnablesOptions = [];
-  
-  const product: Paths.CreateProduct.RequestBody = {
-    unitPrice: 0,
-    name: "",
-    description: "",
-    vat: 0.0550,
-    returnableId: null
-  };
+  let returnablesOptions: {label:string,value:string}[] = [];
 
-  const cancelCreate = () => {
-    $goto("/products/");
-  };
-
-  const createProduct = async () => {
-    isLoading = true;
-    try {
-      const res = await create(product);
-      $goto(`/products/${res}`);
+  const { form, data, isSubmitting, isValid } = createForm<Components.Schemas.CreateProductRequest>({
+    onSubmit: async (values) => {
+      return await mediator.send(new CreateProductRequest(
+        values.name, values.unitPrice, values.vat, values.code, values.description, values.returnableId))
+    },
+    onSuccess: (id: string) => {
+      module.goToDetails(id)
+    },
+    onError: (result) => {
     }
-    catch(exc){
-      isLoading = false;      
-    }
-  };
-  
-  onMount(async () => {
-    isLoading = true;
-    const results = await mediator.send(new ListReturnablesQuery(1, 1000));
-    returnablesOptions = results.map(r => { return {label:r.name, value: r.id}})
-    isLoading = false;
   })
 
-  $: fullPrice = round(product.unitPrice * (1 + product.vat / 100));
-  $: if(!isReturnable) product.returnableId = null;
+  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat)
+  
+  onMount(async () => {
+    try {
+      isLoading = true;
+      
+      const results = await mediator.send(new ListReturnablesQuery(1, 1000));
+      returnablesOptions = results.map(r => {
+        return { label: r.name ? `${r.name} - ${currency(r.unitPrice)} HT` : '', value: r.id ?? '' }
+      }) ?? [];
+      
+      isLoading = false;
+    }
+    catch(exc){
+      module.goToList();
+    }
+  })
 </script>
 
 <!-- routify:options menu="Créer" -->
@@ -64,51 +66,79 @@
 
 <h1>{$page.title}</h1>
 
-<Form class="mt-4 ">
+<form use:form>
   <Text
+    id='code'
     label="Code"
-    bind:value="{product.code}"
+    bind:value="{$data.code}"
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre produit (sera autogénéré si non renseigné)"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
   <Text
+    id='name'
     label="Nom"
-    bind:value="{product.name}"
+    bind:value="{$data.name}"
     placeholder="Le nom de votre produit"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
   <Price
+    id='unitPrice'
     label="Prix HT"
-    bind:value="{product.unitPrice}"
+    bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre produit en €"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
-  <Vat label="TVA" bind:value="{product.vat}" isLoading="{isLoading}" />
+  <Vat
+    id='vat'
+    label="TVA" 
+    bind:value="{$data.vat}" 
+    isLoading="{$isSubmitting}" />
   <Price
     label="Prix TTC (calculé)"
-    value="{fullPrice}"
+    value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
     required="{false}"
   />
   <LongText
+    id='description'
     label="Description"
-    bind:value="{product.description}"
+    bind:value="{$data.description}"
     required="{false}"
     placeholder="Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser"
-    isLoading="{isLoading}"
+    isLoading="{$isSubmitting}"
   />
-  <Checkbox label="Ce produit est consigné" {isLoading} bind:value={isReturnable} class='mt-3 mb-6' required='{false}'/>
+  <Checkbox
+    label="Ce produit est consigné"
+    isLoading='{$isSubmitting}'
+    bind:value={isReturnable}
+    class='mt-3 mb-6' 
+    required='{false}'/>
   {#if isReturnable}
-    <Select label="Consigne" options='{returnablesOptions}' {isLoading} bind:value={product.returnableId} />
+    <Select 
+      id='returnableId'
+      label="Consigne" 
+      options='{returnablesOptions}' 
+      isLoading='{$isSubmitting}' 
+      disabled='{isLoading}'
+      bind:value={$data.returnableId} />
   {/if}
-  <FormFooter
-    submit="{createProduct}"
-    submitText="Créer"
-    cancel="{cancelCreate}"
-    isLoading="{isLoading}"
-    class='block'
-  />
-</Form>
+  <FormFooter>
+    <Button
+      type='button'
+      disabled='{$isSubmitting}'
+      class='back w-full mx-8'
+      on:click='{module.goToList}'
+    >Revenir à la liste
+    </Button>
+    <Button
+      type='submit'
+      disabled='{!$isValid || $isSubmitting}'
+      isLoading='{$isSubmitting}'
+      class='accent w-full mx-8'
+    >Créer
+    </Button>
+  </FormFooter>
+</form>

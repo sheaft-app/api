@@ -14,7 +14,7 @@
   import type { Components } from '$types/api'
   import Button from '$components/Buttons/Button.svelte'
 
-  export let id
+  export let id="";
   let initializing = true
   const module = getReturnableModule($goto)
 
@@ -33,8 +33,8 @@
   onMount(async () => {
     initializing = true
     try {
-      const result = await mediator.send(new GetReturnableQuery(id))
-      setData(result)
+      const returnable = await mediator.send(new GetReturnableQuery(id))
+      setData(returnable)
       initializing = false
     }
     catch(exc){ 
@@ -48,7 +48,7 @@
 </script>
 
 <!-- routify:options index=true -->
-<!-- routify:options title="Details du produit" -->
+<!-- routify:options title="Details de la consigne" -->
 <!-- routify:options roles=[] -->
 
 <svelte:head>
@@ -105,7 +105,7 @@
     </Button>
     <Button
       type='submit'
-      disabled='{$isLoading}'
+      disabled='{!$isValid || $isLoading}'
       isLoading='{$isLoading}'
       class='accent w-full mx-8'
     >Sauvegarder

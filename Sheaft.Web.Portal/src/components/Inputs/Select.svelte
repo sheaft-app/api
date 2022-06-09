@@ -8,6 +8,7 @@
   export let options: { label: string; value: string }[] = [];
   export let isLoading: boolean = false;
   export let required: boolean = true;
+  export let disabled: boolean = true;
 
   let name:string|null = null;
   if(!id)
@@ -23,7 +24,7 @@
   <select
     id='{id}'
     name='{name}'
-    disabled="{isLoading}"
+    disabled="{isLoading||disabled}"
     bind:value
     class="{$$props.class}"
     required="{required}"

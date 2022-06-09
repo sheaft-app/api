@@ -1,6 +1,6 @@
 ﻿import type { Client } from '$types/api'
 import { AppModule } from '$services/module'
-import type { IModule } from '$services/module'
+import type { IAppModule } from '$services/module'
 import { mediator } from '$services/mediator'
 import type { GotoHelper } from '@roxi/routify'
 import { CreateReturnableHandler, CreateReturnableRequest } from '$commands/returnables/createReturnable'
@@ -8,7 +8,7 @@ import { UpdateReturnableRequest, UpdateReturnableRequestHandler } from '$comman
 import { GetReturnableHandler, GetReturnableQuery } from '$queries/returnables/getReturnable'
 import { ListReturnablesHandler, ListReturnablesQuery } from '$queries/returnables/listReturnables'
 
-export interface IReturnableModule extends IModule {
+export interface IReturnableModule extends IAppModule {
   goToList(): void;
   goToDetails(id: string): void;
   goToCreate(): void;
@@ -16,7 +16,6 @@ export interface IReturnableModule extends IModule {
 
 class ReturnableModule extends AppModule implements IReturnableModule {
   private _basePath: string = '/returnables'
-  private _goto: GotoHelper | null = null
 
   constructor(private _client: Client) {
     super()
@@ -50,17 +49,6 @@ class ReturnableModule extends AppModule implements IReturnableModule {
 
   goToList = (): void => {
     this.navigate(this._basePath)
-  }
-
-  setGoto = (goto: GotoHelper) => {
-    this._goto = goto
-  }
-  
-  private navigate = (url:string) : void => {
-    if (this._goto)
-      this._goto(url)
-    else 
-      throw '$goto was not provided to getReturnableModule($goto)'
   }
 }
 
