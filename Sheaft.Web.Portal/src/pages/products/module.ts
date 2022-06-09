@@ -7,6 +7,7 @@ import { CreateProductHandler, CreateProductRequest } from '$commands/products/c
 import { UpdateProductRequest, UpdateProductRequestHandler } from '$commands/products/updateProduct'
 import { GetProductHandler, GetProductQuery } from '$queries/products/getProduct'
 import { ListProductsHandler, ListProductsQuery } from '$queries/products/listProducts'
+import { ListReturnablesOptionsHandler, ListReturnablesOptionsQuery } from '$queries/products/listReturnablesOptions'
 
 export interface IProductModule extends IAppModule {
   goToList(): void;
@@ -37,6 +38,10 @@ class ProductModule extends AppModule implements IProductModule {
     mediator.handle(
       ListProductsQuery,
       request => new ListProductsHandler(this._client).handle(request))
+    
+    mediator.handle(
+      ListReturnablesOptionsQuery,
+      request => new ListReturnablesOptionsHandler(this._client).handle(request))
   }
 
   goToCreate = (): void => {

@@ -13,11 +13,10 @@
   import { createForm } from 'felte'
   import { calculateOnSalePrice } from '$utils/price'
   import { getProductModule } from '$pages/products/module'
-  import { ListReturnablesQuery } from '$queries/returnables/listReturnables'
   import { UpdateProductRequest } from '$commands/products/updateProduct'
   import type { Components } from '$types/api'
   import { GetProductQuery } from '$queries/products/getProduct'
-  import { currency } from '$utils/format'
+  import { ListReturnablesOptionsQuery } from '$queries/products/listReturnablesOptions'
 
   export let id="";
   const module = getProductModule($goto)
@@ -47,11 +46,8 @@
       const product = await mediator.send(new GetProductQuery(id));
       isReturnable = !!product.returnableId
       setData(product);
-      
-      const results = await mediator.send(new ListReturnablesQuery(1, 1000));
-      returnablesOptions = results.map(r => {
-        return { label: r.name ? `${r.name} - ${currency(r.unitPrice)} HT` : '', value: r.id ?? '' }
-      }) ?? [];
+
+      returnablesOptions = await mediator.send(new ListReturnablesOptionsQuery());
 
       isLoading = false;
     }
