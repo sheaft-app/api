@@ -1,27 +1,29 @@
 <script lang="ts">
   import { page, goto, params } from "@roxi/routify";
-  import { login } from "$stores/auth";
   import Password from "$components/Inputs/Password.svelte";
   import Email from "$components/Inputs/Email.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Button from "$components/Buttons/Button.svelte";
+  import { createForm } from 'felte'
+  import type { Components } from '$types/api'
+  import { mediator } from '$services/mediator'
+  import { getAuthModule } from '$pages/auth/module'
+  import { LoginRequest } from '$commands/auth/login'
 
-  let username: string = $params.username;
-  let password: string = "";
-  let isLoading: boolean = false;
-
-  const loginUser = async () => {
-    try {
-      isLoading = true;
-      const result = await login(username, password);
-      if (!result) return;
-
-      $goto($params.returnUrl ?? "/");
-    } catch (e) {
-      isLoading = false;
-      console.log(e);
+  const module = getAuthModule($goto);
+  
+  const { form, data, isSubmitting } = createForm<Components.Schemas.LoginRequest>({
+    initialValues: {
+      username:$params.username,
+      password: ''
+    },
+    onSubmit: async (values) => {
+      await mediator.send(new LoginRequest(values.username, values.password))
+    },
+    onSuccess: (id: string) => {
+      module.redirectIfRequired($params.returnUrl)
     }
-  };
+  })
 </script>
 
 <!-- routify:options anonymous=true -->
@@ -33,18 +35,27 @@
   </div>
   <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
     <h1>{$page.title}</h1>
-    <form>
-      <Email label="Nom d'utilisateur" bind:value="{username}" isLoading="{isLoading}" class="mb-6 w-full" />
-      <Password label="Votre mot de passe" bind:value="{password}" isLoading="{isLoading}" class="mb-6 w-full" />
-      <a href="/auth/forgot?&email={username}">Mot de passe oublié?</a>
+    <form use:form>
+      <Email 
+        id='username'
+        label="Nom d'utilisateur" 
+        bind:value="{$data.username}" 
+        isLoading="{$isSubmitting}" 
+        class="mb-6 w-full" />
+      <Password 
+        id='password'
+        label="Votre mot de passe" 
+        bind:value="{$data.password}" 
+        isLoading="{$isSubmitting}" 
+        class="mb-6 w-full" />
+      <a href="/auth/forgot?&email={$data.username}">Mot de passe oublié?</a>
       <Button
         type="submit"
-        on:click="{loginUser}"
         class="primary w-full mt-8"
-        isLoading="{isLoading}">Se connecter</Button
+        isLoading="{$isSubmitting}">Se connecter</Button
       >
       <HorizontalSeparator>
-        <a href="/auth/register?&username={username}&returnUrl={$params.returnUrl}"
+        <a href="/auth/register?&username={$data.username}&returnUrl={$params.returnUrl}"
           >Je n'ai pas de compte</a
         >
       </HorizontalSeparator>

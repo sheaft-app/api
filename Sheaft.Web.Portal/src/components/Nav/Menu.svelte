@@ -2,7 +2,7 @@
   import { page } from "@roxi/routify";
   import MenuEntry from "./MenuEntry.svelte";
   import MenuGroup from "./MenuGroup.svelte";
-  import { isAuthenticated, userIsInRoles } from "$stores/auth";
+  import { authStore } from "$stores/auth";
   import {
     canDisplayEntry,
     canHighlightMenuItem,
@@ -16,7 +16,7 @@
 
 <menu class="nav-menu flex-grow" class:h-0="{!expand}" class:hidden="{!expand}">
   {#each Object.keys(entries) as key}
-    {#if canDisplayEntry(entries[key], $isAuthenticated, userIsInRoles)}
+    {#if canDisplayEntry(entries[key], $authStore.isAuthenticated, authStore.userIsInRoles)}
       {#if entryIsGroup(entries[key])}
         <MenuGroup entry="{entries[key]}" />
       {:else if entryIsPage(entries[key]) && !entries[key].default}

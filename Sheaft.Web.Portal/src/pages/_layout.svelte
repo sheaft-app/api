@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isAuthenticated, isRegistered, userIsInRoles } from "$stores/auth";
+  import { authStore } from "$stores/auth";
   import { checkPageAccess } from "$utils/page";
   import { page, goto, beforeUrlChange, params } from "@roxi/routify";
   import SideNav from "$components/Nav/SideNav.svelte";
@@ -11,10 +11,10 @@
       route.path,
       event.url,
       route.meta,
-      $isAuthenticated,
-      $isRegistered,
+      $authStore.isAuthenticated,
+      $authStore.isRegistered,
       $params.returnUrl ?? event.url,
-      userIsInRoles
+      authStore.userIsInRoles
     );
     if (!pageAccessResult) return true;
 
@@ -27,10 +27,10 @@
       "/",
       $page.path,
       $page.meta,
-      $isAuthenticated,
-      $isRegistered,
+      $authStore.isAuthenticated,
+      $authStore.isRegistered,
       $params.returnUrl,
-      userIsInRoles
+      authStore.userIsInRoles
     );
     if (pageAccessResult) $goto(pageAccessResult.path, pageAccessResult.params);
   }
@@ -38,10 +38,10 @@
 
 <main
   class="flex bg-back-100"
-  class:flex-col="{!$isAuthenticated}"
-  class:flex-row="{$isAuthenticated}"
+  class:flex-col="{!$authStore.isAuthenticated}"
+  class:flex-row="{$authStore.isAuthenticated}"
 >
-  {#if $isAuthenticated}
+  {#if $authStore.isAuthenticated}
     <SideNav />
   {:else}
     <TopNav />

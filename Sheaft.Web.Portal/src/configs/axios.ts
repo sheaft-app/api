@@ -1,9 +1,8 @@
-﻿import { isAuthenticated, tokens } from "$stores/auth";
+﻿import { authStore } from "$stores/auth";
 import apiConfig from "$settings/api";
-import { get } from "svelte/store";
 import type { Client } from '$types/api'
 import { OpenAPIClientAxios } from 'openapi-client-axios'
-import { StatusCode } from '$enums/http'
+import { get } from 'svelte/store'
 
 export const api = new OpenAPIClientAxios({ definition: `${apiConfig.url}/swagger/v1/swagger.json`});
 
@@ -15,9 +14,11 @@ export const configureAxios = (client: Client) => {
         Timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       };
 
-      if (!get(isAuthenticated)) return config;
+      const store = get(authStore);
+      if (!store.isAuthenticated || !store.tokens) 
+        return config;
 
-      const {tokenType, accessToken} = get(tokens);
+      const {tokenType, accessToken} = store.tokens;
       config.headers.Authorization = `${tokenType} ${accessToken}`;
 
       return config;

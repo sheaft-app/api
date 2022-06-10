@@ -2,7 +2,7 @@
   import { layout, page } from "@roxi/routify";
   import User from "$components/Nav/User.svelte";
   import "./nav.scss";
-  import { isAuthenticated } from "$stores/auth";
+  import { authStore } from "$stores/auth";
   import Logo from "$components/Nav/Logo.svelte";
 </script>
 
@@ -11,7 +11,7 @@
   <div class="flex-grow">
     <!--    <Menu entries="{menus}" expand="{true}" />-->
   </div>
-  {#if $isAuthenticated || $page.path.indexOf("/auth") < 0}
+  {#if $authStore.isAuthenticated || $page.path.indexOf("/auth") < 0}
     <User class="mr-4" />
   {/if}
 </nav>

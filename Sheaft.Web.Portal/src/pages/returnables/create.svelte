@@ -20,8 +20,6 @@
     },
     onSuccess: (id: string) => {
       module.goToDetails(id)
-    },
-    onError: (result) => {
     }
   })
 

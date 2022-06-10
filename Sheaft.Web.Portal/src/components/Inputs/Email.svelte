@@ -17,7 +17,9 @@
 </script>
 
 <div class="f-input">
+  {#if label}
   <label for="{id}">{label} {required ? "*" : ""}</label>
+  {/if}
   <input
     id='{id}'
     name='{name}'

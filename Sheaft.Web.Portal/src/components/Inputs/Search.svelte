@@ -19,7 +19,9 @@
 
 <div class="">
   <div class='p-4 bg-white'>
-    <label for='{id}' class='sr-only'>{label}</label>
+    {#if label}
+      <label for='{id}'>{label}</label>
+    {/if}
     <div class='relative mt-1'>
       <div class='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
         <svg class='w-5 h-5 text-gray-500' fill='currentColor' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'>

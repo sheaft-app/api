@@ -4,38 +4,32 @@
   import Password from "$components/Inputs/Password.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
-  import { login, register } from "$stores/auth";
-  import type { IRegisterAccount } from "$types/auth";
   import Text from "$components/Inputs/Text.svelte";
+  import { getAuthModule } from '$pages/auth/module'
+  import { createForm } from 'felte'
+  import type { Components } from '$types/api'
+  import { mediator } from '$services/mediator'
+  import { RegisterRequest } from '$commands/auth/register'
+  import { LoginRequest } from '$commands/auth/login'
 
-  export let account: IRegisterAccount = {
-    email: null,
-    password: null,
-    confirm: null,
-    firstname: null,
-    lastname: null
-  };
+  const module = getAuthModule($goto);
 
-  let isLoading: boolean = false;
-
-  const registerAccount = async () => {
-    try {
-      isLoading = true;
-
-      const result = await register(account);
-      if (result) {
-        const loginResult = await login(account.email, account.password);
-        if (loginResult && $params.returnUrl && $params.returnUrl.length > 1)
-          $goto($params.returnUrl);
-        else if (loginResult) $goto("/");
-        else $goto("/auth/login");
-      }
-
-      isLoading = false;
-    } catch (e) {
-      isLoading = false;
+  const { form, data, isSubmitting } = createForm<Components.Schemas.RegisterRequest>({
+    initialValues: {
+      email:$params.username,
+      password: '',
+      confirm: '',
+      firstname:'',
+      lastname: ''
+    },
+    onSubmit: async (values) => {
+      await mediator.send(new RegisterRequest(values.email, values.password, values.confirm, values.firstname, values.lastname))
+      await mediator.send(new LoginRequest(values.email, values.password));
+    },
+    onSuccess: (id: string) => {
+      module.redirectIfRequired($params.returnUrl)
     }
-  };
+  })
 </script>
 
 <!-- routify:options anonymous=true -->
@@ -47,41 +41,44 @@
   </div>
   <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
     <h1>{$page.title}</h1>
-    <form>
+    <form use:form>
       <div class="flex justify-between">
         <Text label="Prénom"
-          bind:value="{account.firstname}"
-          isLoading="{isLoading}"
+          bind:value="{$data.firstname}"
+          isLoading="{$isSubmitting}"
           class="w-full"
           placeholder="Votre prénom"
         />
         <Text label="Nom"
-          bind:value="{account.lastname}"
-          isLoading="{isLoading}"
+          bind:value="{$data.lastname}"
+          isLoading="{$isSubmitting}"
           class="w-full"
           placeholder="Votre nom"
         />
       </div>
-      <Email label="Adresse mail" bind:value="{account.email}" isLoading="{isLoading}" class="mb-6 w-full" />
+      <Email 
+        label="Adresse mail" 
+        bind:value="{$data.email}" 
+        isLoading="{$isSubmitting}" 
+        class="mb-6 w-full" />
       <Password label="Mot de passe"
-        bind:value="{account.password}"
-        isLoading="{isLoading}"
+        bind:value="{$data.password}"
+        isLoading="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Password label="Confirmer le mot de passe"
-        bind:value="{account.confirm}"
+        bind:value="{$data.confirm}"
         placeholder="Confirmation de mot de passe"
         class="mb-6 w-full"
       />
       <Button
         type="submit"
-        isLoading="{isLoading}"
-        on:click="{registerAccount}"
+        isLoading="{$isSubmitting}"
         class="primary w-full mt-8"
         >Créer
       </Button>
       <HorizontalSeparator>
-        <a href="/auth/login?&username={account.email}&returnUrl={$params.returnUrl}"
+        <a href="/auth/login?&username={$data.email}&returnUrl={$params.returnUrl}"
           >J'ai déjà un compte</a
         >
       </HorizontalSeparator>

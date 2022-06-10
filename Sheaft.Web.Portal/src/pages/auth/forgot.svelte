@@ -1,29 +1,30 @@
 ﻿<script lang="ts">
-  import { page, params } from "@roxi/routify";
-  import { forgot } from "$stores/auth";
+  import { goto, page, params } from '@roxi/routify'
   import Email from "$components/Inputs/Email.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
+  import { getAuthModule } from '$pages/auth/module'
+  import { createForm } from 'felte'
+  import type { Components } from '$types/api'
+  import { mediator } from '$services/mediator'
+  import { ForgotPasswordRequest } from '$commands/auth/forgotPassword'
 
-  let email: string = $params.email;
-  let resetRequested = $params.reset;
-  let isLoading: boolean = false;
+  const module = getAuthModule($goto);
+  let resetRequested = false;
 
-  const forgotPassword = async () => {
-    try {
-      isLoading = true;
-      const result = await forgot(email);
-      if (!result) return;
-
-      isLoading = false;
+  const { form, data, isSubmitting } = createForm<Components.Schemas.ForgotPasswordRequest>({
+    initialValues: {
+      email:$params.username
+    },
+    onSubmit: async (values) => {
+      await mediator.send(new ForgotPasswordRequest(values.email))
+    },
+    onSuccess: () => {
       resetRequested = true;
-    } catch (e) {
-      isLoading = false;
-      console.log(e);
     }
-  };
+  })
 </script>
 
 <!-- routify:options anonymous=true -->
@@ -36,22 +37,22 @@
   <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
     <h1>{$page.title}</h1>
     {#if !resetRequested}
-      <form class="">
+      <form use:form>
         <Email
-          bind:value="{email}"
-          isLoading="{isLoading}"
+          label='Votre adresse mail'
+          bind:value="{$data.email}"
+          isLoading="{$isSubmitting}"
           placeholder="Adresse mail de votre compte"
           class="mb-6 w-full"
         />
         <Button
           type="submit"
-          isLoading="{isLoading}"
-          on:click="{forgotPassword}"
+          isLoading="{$isSubmitting}"
           class="primary w-full mt-8"
           >Reinitialiser
         </Button>
         <HorizontalSeparator>
-          <a href="/auth/login?&username={email}">Finalement je m'en rappel</a>
+          <a href="/auth/login?&username={$data.email}">Finalement je m'en rappel</a>
         </HorizontalSeparator>
       </form>
     {:else}

@@ -1,285 +1,161 @@
-﻿import { writable } from "svelte-local-storage-store";
-import { derived, get } from "svelte/store";
-import jwt_decode from "jwt-decode";
-import { ProfileKind, ProfileStatus } from "$enums/profile";
-import type {
-  IRegisterAccount,
-  IConfigureCustomer,
-  IConfigureSupplier,
-  IUser
-} from "$types/auth";
-import { api } from '$configs/axios'
-import type { Client } from '$types/api'
+﻿import { writable } from 'svelte-local-storage-store'
+import jwt_decode from 'jwt-decode'
+import { ProfileStatus } from '$enums/profile'
+import type { IUser } from '$types/auth'
+import type { Components } from '$types/api'
+import type { Readable } from 'svelte/store'
+import { mediator } from '$services/mediator'
+import { RefreshAccessTokenRequest } from '$commands/auth/refreshAccessToken'
 
-let timer = null;
-let initialized = false;
+export interface ITokens {
+  accessToken?: string,
+  refreshToken?: string,
+  expiresAt?: Date,
+  tokenType?: string
+}
 
-const userStore = writable("auth", {
-  tokens: { accessToken: "", refreshToken: "", expiresAt: null, tokenType: "" },
-  isAuthenticated: false,
-  account: {
-    id: null,
-    username: null,
-    name: null,
-    firstname: null,
-    lastname: null,
-    email: null,
-    roles: [],
-    profile: {
-      id: null,
-      kind: null,
-      name: null,
-      status: ProfileStatus.Anonymous
+export interface IAuthState {
+  tokens?: ITokens;
+  isAuthenticated: boolean;
+  isRegistered: boolean;
+  user?: IUser;
+}
+
+export interface IAuthStore extends Readable<IAuthState> {
+  userIsInRoles(roles?: string[]): boolean;
+  setConnectedUser(token: Components.Schemas.TokenResponse): void;
+  clearConnectedUser(): void;
+  startMonitorUserAccessToken(): Promise<void>;
+}
+
+const store = (): IAuthStore => {
+  let _timer: any = null
+
+  const _state: IAuthState = {
+    isRegistered: false,
+    isAuthenticated: false
+  }
+
+  const { subscribe, set, update } = writable<IAuthState>('auth', _state)
+
+  const userIsInRoles = (roles?: Array<string>): boolean => {
+    if (!_state.isAuthenticated)
+      return false
+
+    if (!roles)
+      return true
+
+    if (!_state.user)
+      return false
+
+    if (!_state.user?.roles) _state.user.roles = []
+
+    const userInRoles = roles.filter(r => _state.user?.roles.includes(r))
+    return userInRoles.length > 0
+  }
+
+  const clearConnectedUser = (): void => {
+    set({isAuthenticated: false, isRegistered:false})
+  }
+
+  const setConnectedUser = (token: Components.Schemas.TokenResponse): void => {
+    updateStateStoreWithToken(token)
+  }
+
+  const getUserFromAccessToken = (accessToken:string): IUser => {
+    if (!accessToken) return {
+      roles: [],
+      profile: {
+        status: ProfileStatus.Anonymous
+      }
+    }
+
+    const decoded = jwt_decode<any>(accessToken)
+
+    return {
+      id: decoded.sub,
+      username: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+      name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      firstname: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
+      lastname: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname'],
+      email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+      roles: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'] ?? [],
+      profile: {
+        id: decoded['http://schemas.sheaft.com/ws/identity/claims/profile/identifier'],
+        kind: decoded['http://schemas.sheaft.com/ws/identity/claims/profile/kind'],
+        name: decoded['http://schemas.sheaft.com/ws/identity/claims/profile/name'],
+        status: decoded['http://schemas.sheaft.com/ws/identity/claims/profile/status']
+      }
     }
   }
-});
 
-export const account = derived([userStore], ([$userStore]) => $userStore.account);
-export const tokens = derived([userStore], ([$userStore]) => $userStore.tokens);
-export const isAuthenticated = derived(
-  [userStore],
-  ([$userStore]) => $userStore && $userStore.isAuthenticated
-);
-export const isRegistered = derived(
-  [userStore],
-  ([$userStore]) => $userStore &&
-    $userStore.isAuthenticated &&
-    $userStore.account.profile.status == ProfileStatus.Registered
-);
+  const updateStateStoreWithToken = (response: Components.Schemas.TokenResponse): void => {
+    if (!response)
+      return
+    
+    update(state => {
+      let user = getUserFromAccessToken(response.access_token ?? '');
+      
+      let expiresAt = new Date()
+      expiresAt.setSeconds(expiresAt.getSeconds() + (response.expires_in ?? 0))
+      
+      state.tokens = {
+        accessToken: response.access_token ?? '',
+        refreshToken: response.refresh_token ?? '',
+        expiresAt: expiresAt,
+        tokenType: response.token_type ?? ''
+      }
+      state.isAuthenticated = true;
+      state.isRegistered = !!user?.id && user.profile?.status == ProfileStatus.Registered;
+      state.user = user;
 
-export const login = async (username: string, password: string): Promise<boolean> => {
-  try {
-    const client = await api.getClient<Client>();
-    const result = await client.LoginUser(null, { username, password });
-
-    userStore.update(as => {
-      as.isAuthenticated = true;
-      as.tokens = getTokens(result.data);
-      as.account = getUserFromAccessToken(as.tokens.accessToken);
-      return as;
-    });
-
-    configureRefreshTokensHandler();
-
-    return Promise.resolve(true);
-  } catch (e) {
-    return Promise.reject(false);
+      return state
+    })
   }
-};
 
-export const logout = (): boolean => {
-  try {
-    userStore.update(as => {
-      as.isAuthenticated = false;
-      as.tokens = getTokens();
-      as.account = getUserFromAccessToken();
-      return as;
-    });
-
-    clearRefreshTokensHandler();
-
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-export const forgot = async (username: string): Promise<boolean> => {
-  try {
-    const client = await api.getClient<Client>();
-    await client.ForgotPassword(null, { email: username });
-    return Promise.resolve(true);
-  } catch (e) {
-    return Promise.reject(false);
-  }
-};
-
-export const reset = async (
-  code: string,
-  newPassword: string,
-  confirmPassword: string
-): Promise<boolean> => {
-  try {
-    const client = await api.getClient<Client>();
-    await client.ResetPassword(null, {
-      resetToken: code,
-      password: newPassword,
-      confirm: confirmPassword
-    });
-    return Promise.resolve(true);
-  } catch (e) {
-    return Promise.reject(false);
-  }
-};
-
-export const register = async (account: IRegisterAccount): Promise<boolean> => {
-  try {
-    const client = await api.getClient<Client>();
-    await client.RegisterAccount(null, account);
-
-    return Promise.resolve(true);
-  } catch (e) {
-    return Promise.reject(false);
-  }
-};
-
-export const configureSupplier = async (
-  account: IConfigureSupplier
-): Promise<boolean> => {
-  return configure(account, ProfileKind.Supplier);
-};
-
-export const configureCustomer = async (
-  account: IConfigureCustomer
-): Promise<boolean> => {
-  return configure(account, ProfileKind.Customer);
-};
-
-const configure = async (
-  account: any,
-  type: ProfileKind
-): Promise<boolean> => {
-  try {
-    const client = await api.getClient<Client>();
-    if(type == ProfileKind.Customer)
-      await client.ConfigureAccountAsCustomer(null, account);
-    else
-      await client.ConfigureAccountAsSupplier(null, account);  
-
-    return Promise.resolve(true);
-  } catch (e) {
-    return Promise.reject(false);
-  }
-};
-
-export const refreshToken = async () => {
-  const user = get(userStore);
-  if(!user)
-    return;
-  
-  try {
-    const client = await api.getClient<Client>();
-    const result = await client.RefreshAccessToken(null, {
-      token: user.tokens.refreshToken,
-    });
-
-    userStore.update(as => {
-      as.tokens = getTokens(result.data);
-      as.account = getUserFromAccessToken(as.tokens.accessToken);
-      return as;
-    });
-  } catch (e) {
-    console.error("An error occured while refreshing access token");
-  }
-};
-
-export const userIsInRoles = (roles?: Array<string>): boolean => {
-  if (!roles) return true;
-
-  const user = get(userStore);
-  if(!user)
-    return false;
-  
-  if (!user.account.roles) user.account.roles = [];
-
-  const userInRoles = roles.filter(r => user.account.roles.includes(r));
-  return userInRoles.length > 0;
-};
-
-const getUserFromAccessToken = (access_token?: string) => {
-  const user: IUser = {
-    id: null,
-    username: null,
-    name: null,
-    firstname: null,
-    lastname: null,
-    email: null,
-    roles: [],
-    profile: {
-      id: null,
-      kind: null,
-      name: null,
-      status: ProfileStatus.Anonymous
+  const monitorUserAccessToken = async (): Promise<void> => {
+    if (!_state.isAuthenticated || !_state.tokens?.expiresAt) {
+      clearRefreshTokensHandler()
+      return Promise.resolve()
     }
-  };
-  if (!access_token) return user;
 
-  const decoded = jwt_decode<any>(access_token);
+    const expiresAt = new Date(_state.tokens.expiresAt)
+    const minRefreshDate = new Date(expiresAt.valueOf() - 5 * 60000)
+    if (minRefreshDate > new Date())
+      return Promise.resolve()
 
-  user.id = decoded.sub;
-  user.username =
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-  user.name = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-  user.firstname =
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"];
-  user.lastname =
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"];
-  user.email =
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
-  user.roles = JSON.parse(
-    decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? "[]"
-  );
-  user.profile = {
-    id: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/identifier"],
-    kind: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/kind"],
-    name: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/name"],
-    status: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/status"]
-  };
+    await refreshToken()
 
-  return user;
-};
-
-const getTokens = (data?) => {
-  const tokens = {
-    accessToken: "",
-    refreshToken: "",
-    expiresAt: null,
-    tokenType: ""
-  };
-
-  if (!data) return tokens;
-
-  let expiresAt = new Date();
-  expiresAt.setSeconds(expiresAt.getSeconds() + data.expires_in);
-
-  tokens.accessToken = data.access_token;
-  tokens.refreshToken = data.refresh_token;
-  tokens.expiresAt = expiresAt;
-  tokens.tokenType = data.token_type;
-
-  return tokens;
-};
-
-const refreshTokensIfRequired = async () => {
-  let user = get(userStore);
-  if(!user)
-    return;
-  
-  if (!user.isAuthenticated) {
-    clearRefreshTokensHandler();
-    return;
+    configureRefreshTokensHandler()
+    return Promise.resolve()
   }
 
-  const expiresAt = new Date(user.tokens.expiresAt);
-  const minRefreshDate = new Date(expiresAt.valueOf() - 5 * 60000);
-  if (minRefreshDate > new Date()) return;
-
-  await refreshToken();
-
-  configureRefreshTokensHandler();
-};
-
-const configureRefreshTokensHandler = () => {
-  timer = setTimeout(refreshTokensIfRequired, 60000);
-};
-
-const clearRefreshTokensHandler = () => {
-  if (timer) clearTimeout(timer);
-};
-
-export const initAuthStore = async () => {
-  if (!initialized) {
-    initialized = true;
-    await refreshTokensIfRequired();
+  const configureRefreshTokensHandler = (): void => {
+    _timer = setTimeout(monitorUserAccessToken, 60000)
   }
-};
+
+  const clearRefreshTokensHandler = (): void => {
+    if (_timer) clearTimeout(_timer)
+  }
+
+  const refreshToken = async () => {
+    if (!_state || !_state.tokens?.refreshToken)
+      return
+
+    try {
+      await mediator.send(new RefreshAccessTokenRequest(_state.tokens.refreshToken))
+    } catch (e) {
+      console.error('An error occured while refreshing access token')
+    }
+  }
+
+  return {
+    subscribe,
+    userIsInRoles,
+    setConnectedUser,
+    clearConnectedUser,
+    startMonitorUserAccessToken: monitorUserAccessToken
+  }
+}
+
+export const authStore = store()

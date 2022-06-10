@@ -1,45 +1,17 @@
-﻿import type { IAddress } from "./address";
-import type { ProfileKind, ProfileStatus } from "$enums/profile";
+﻿import type { ProfileKind, ProfileStatus } from "$enums/profile";
 
 export interface IUser {
-  id: string;
-  username: string;
-  name: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  roles: [];
+  id?: string | null;
+  username?: string | null;
+  name?: string | null;
+  firstname?: string | null;
+  lastname?: string | null;
+  email?: string | null;
+  roles: string [];
   profile: {
-    id: string;
-    name: string;
+    id?: string | null;
+    name?: string | null;
     status: ProfileStatus;
-    kind: ProfileKind;
+    kind?: ProfileKind | null;
   };
-}
-
-export interface IRegisterAccount {
-  email: string;
-  password: string;
-  confirm: string;
-  firstname: string;
-  lastname: string;
-}
-
-export interface IConfigureAccount {
-  tradeName: string;
-  corporateName: string;
-  siret: string;
-  email: string;
-  phone: string;
-  legalAddress: IAddress;
-}
-
-export interface IConfigureSupplier extends IConfigureAccount {
-  billingAddress?: IAddress;
-  shippingAddress?: IAddress;
-}
-
-export interface IConfigureCustomer extends IConfigureAccount {
-  billingAddress?: IAddress;
-  deliveryAddress?: IAddress;
 }

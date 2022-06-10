@@ -32,8 +32,6 @@
     },
     onSuccess: () => {
       module.goToList()
-    },
-    onError: (result) => {
     }
   })
 
