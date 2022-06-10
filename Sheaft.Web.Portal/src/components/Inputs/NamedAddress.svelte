@@ -4,19 +4,15 @@
   import Text from "$components/Inputs/Text.svelte";
   import Email from "$components/Inputs/Email.svelte";
 
-  export let value: INamedAddress = {
-    name: "",
-    email: "",
-    street: "",
-    complement: "",
-    postcode: "",
-    city: ""
-  };
+  export let value: INamedAddress |null = null;  
   export let label: string = "";
   export let isLoading: boolean = false;
   export let showName: boolean = true;
   export let showEmail: boolean = true;
   export let required: boolean = true;
+
+  $: if(!value) value = { street: "", complement: "", postcode: "", city: "" }
+  
 </script>
 
 {#if showName}
@@ -40,6 +36,7 @@
   disabled="{isLoading}"
   placeholder="Complément d'adresse"
   bind:value="{value.complement}"
+  required='{false}'
 />
 <Text
   disabled="{isLoading}"

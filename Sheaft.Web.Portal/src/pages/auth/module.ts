@@ -10,6 +10,7 @@ import { RegisterRequest, RegisterRequestHandler } from '$commands/auth/register
 import { ForgotPasswordRequest, ForgotPasswordRequestHandler } from '$commands/auth/forgotPassword'
 import { ResetPasswordRequest, ResetPasswordRequestHandler } from '$commands/auth/resetPassword'
 import { LogoutRequest, LogoutRequestHandler } from '$commands/auth/logout'
+import { ConfigureAccountRequest, ConfigureAccountRequestHandler } from '$commands/auth/configureAccount'
 
 export interface IAuthModule extends IAppModule {
   redirectIfRequired(redirectUrl?:string): void;
@@ -46,6 +47,10 @@ class AuthModule extends AppModule implements IAuthModule {
     mediator.handle(
       ResetPasswordRequest,
       request => new ResetPasswordRequestHandler(this._client).handle(request))
+    
+    mediator.handle(
+      ConfigureAccountRequest,
+      request => new ConfigureAccountRequestHandler(this._client).handle(request))
   }
 
   redirectIfRequired = (returnUrl:string): void => {

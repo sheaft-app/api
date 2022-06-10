@@ -28,9 +28,6 @@
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"
-    pattern="[0-9]"
-    maxlength="14"
-    minlength="14"
     required="{required}"
   />
 </div>

@@ -3,10 +3,12 @@
   import type { IAddress } from "$types/address";
   import Text from "$components/Inputs/Text.svelte";
 
-  export let value: IAddress = { street: "", complement: "", postcode: "", city: "" };
+  export let value: IAddress | null = null;
   export let label: string = "";
   export let isLoading: boolean = false;
   export let required: boolean = true;
+  
+  $: if(!value) value = { street: "", complement: "", postcode: "", city: "" }
 </script>
 
 <Text
@@ -18,6 +20,7 @@
 <Text
   type="text"
   disabled="{isLoading}"
+  required='{false}'
   placeholder="Complément d'adresse"
   bind:value="{value.complement}"
 />

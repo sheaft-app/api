@@ -8,7 +8,7 @@
   export let options: { label: string; value: string }[] = [];
   export let isLoading: boolean = false;
   export let required: boolean = true;
-  export let disabled: boolean = true;
+  export let disabled: boolean = false;
 
   let name:string|null = null;
   if(!id)
