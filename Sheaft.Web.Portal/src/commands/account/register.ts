@@ -1,6 +1,5 @@
 ﻿import type { Client } from '$types/api'
 import { Request } from 'jimmy-js'
-import type { IAuthStore } from '$stores/auth'
 
 export class RegisterRequest extends Request<Promise<void>> {
   constructor(

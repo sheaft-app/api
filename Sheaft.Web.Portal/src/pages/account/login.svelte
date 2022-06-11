@@ -7,10 +7,10 @@
   import { createForm } from 'felte'
   import type { Components } from '$types/api'
   import { mediator } from '$services/mediator'
-  import { getAuthModule } from '$pages/auth/module'
-  import { LoginRequest } from '$commands/auth/login'
+  import { getAccountModule } from '$pages/account/module'
+  import { LoginRequest } from '$commands/account/login'
 
-  const module = getAuthModule($goto);
+  const module = getAccountModule($goto);
   
   const { form, data, isSubmitting } = createForm<Components.Schemas.LoginRequest>({
     initialValues: {
@@ -48,14 +48,14 @@
         bind:value="{$data.password}" 
         isLoading="{$isSubmitting}" 
         class="mb-6 w-full" />
-      <a href="/auth/forgot?&email={$data.username}">Mot de passe oublié?</a>
+      <a href="/account/forgot?&email={$data.username}">Mot de passe oublié?</a>
       <Button
         type="submit"
         class="primary w-full mt-8"
         isLoading="{$isSubmitting}">Se connecter</Button
       >
       <HorizontalSeparator>
-        <a href="/auth/register?&username={$data.username}&returnUrl={$params.returnUrl}"
+        <a href="/account/register?&username={$data.username}&returnUrl={$params.returnUrl}"
           >Je n'ai pas de compte</a
         >
       </HorizontalSeparator>

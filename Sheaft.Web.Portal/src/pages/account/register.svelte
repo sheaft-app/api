@@ -5,14 +5,14 @@
   import Button from "$components/Buttons/Button.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Text from "$components/Inputs/Text.svelte";
-  import { getAuthModule } from '$pages/auth/module'
+  import { getAccountModule } from '$pages/account/module'
   import { createForm } from 'felte'
   import type { Components } from '$types/api'
   import { mediator } from '$services/mediator'
-  import { RegisterRequest } from '$commands/auth/register'
-  import { LoginRequest } from '$commands/auth/login'
+  import { RegisterRequest } from '$commands/account/register'
+  import { LoginRequest } from '$commands/account/login'
 
-  const module = getAuthModule($goto);
+  const module = getAccountModule($goto);
 
   const { form, data, isSubmitting } = createForm<Components.Schemas.RegisterRequest>({
     initialValues: {
@@ -78,7 +78,7 @@
         >Créer
       </Button>
       <HorizontalSeparator>
-        <a href="/auth/login?&username={$data.email}&returnUrl={$params.returnUrl}"
+        <a href="/account/login?&username={$data.email}&returnUrl={$params.returnUrl}"
           >J'ai déjà un compte</a
         >
       </HorizontalSeparator>

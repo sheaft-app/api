@@ -5,47 +5,57 @@
   import FormFooter from '$components/Form/FormFooter.svelte'
   import Button from '$components/Buttons/Button.svelte'
   import { ProfileKind } from '$enums/profile'
+  import type { IAccountAddresses } from '$commands/account/configureAccount'
+  import Address from '$components/Inputs/Address.svelte'
+  import type { IAccountConfigurationResults } from '$pages/account/account'
 
-  export let initialValues
+  export let initialValues: IAccountAddresses | null
   export let onSubmit
   export let onBack
-  export let accountType:ProfileKind|null = null;
+  export let state:IAccountConfigurationResults
 
-  const { form, data, isSubmitting } = createForm({ initialValues, onSubmit })
+  const { form, data, isSubmitting } = createForm<IAccountAddresses>({ initialValues, onSubmit })
 
-  let hasDifferentBillingAddress = false;
-  let hasDifferentSecondaryAddress = false;
+  let hasDifferentBillingAddress = false
+  let hasDifferentSecondaryAddress = false
 </script>
 
-<h2>Localisation</h2>
 <form use:form>
+  <Address
+    id='legalAddress'
+    isLoading='{$isSubmitting}'
+    bind:value='{$data.legalAddress}' />
   <Checkbox
+    id='billingAddressIsDifferent'
+    class='block'
     isLoading='{$isSubmitting}'
     bind:value='{hasDifferentBillingAddress}'
     label='Mon adresse de facturation est différente'
     required='{false}'
   />
   {#if hasDifferentBillingAddress}
-    <NamedAddress 
+    <NamedAddress
       id='billingAddress'
-      isLoading='{$isSubmitting}' 
+      isLoading='{$isSubmitting}'
       bind:value='{$data.billingAddress}'
-      required='{hasDifferentBillingAddress}'/>
+      required='{hasDifferentBillingAddress}' />
   {/if}
   <Checkbox
+    id='secondaryAddressIsDifferent'
+    class='block'
     isLoading='{$isSubmitting}'
     bind:value='{hasDifferentSecondaryAddress}'
-    label="{accountType === ProfileKind.Customer ? 'Mon adresse de livraison est différente' : 'Mon adresse d\'expedition est différente'}"
+    label="{state.information.values.accountType === ProfileKind.Customer ? 'Mon adresse de livraison est différente' : 'Mon adresse d\'expédition est différente'}"
     required='{false}'
   />
-  {#if hasDifferentSecondaryAddress && accountType === ProfileKind.Customer}
-    <NamedAddress 
+  {#if hasDifferentSecondaryAddress && state.information.values.accountType === ProfileKind.Customer}
+    <NamedAddress
       id='deliveryAddress'
-      isLoading='{$isSubmitting}' 
+      isLoading='{$isSubmitting}'
       bind:value='{$data.deliveryAddress}'
       required='{hasDifferentSecondaryAddress}' />
   {/if}
-  {#if hasDifferentSecondaryAddress && accountType === ProfileKind.Supplier}
+  {#if hasDifferentSecondaryAddress && state.information.values.accountType === ProfileKind.Supplier}
     <NamedAddress
       id='shippingAddress'
       isLoading='{$isSubmitting}'
@@ -56,13 +66,14 @@
     <Button
       class='back w-full mx-8'
       disabled='{$isSubmitting}'
-      type="button" on:click="{() => onBack($data)}">
+      type='button' on:click='{() => onBack($data)}'>
       Précédent
     </Button>
     <Button
       class='primary w-full mx-8'
       disabled='{$isSubmitting}'
       isLoading='{$isSubmitting}'
-      type="submit">Enregistrer</Button>
+      type='submit'>Enregistrer
+    </Button>
   </FormFooter>
 </form>

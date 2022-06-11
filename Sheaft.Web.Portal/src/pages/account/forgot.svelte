@@ -5,13 +5,13 @@
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
-  import { getAuthModule } from '$pages/auth/module'
+  import { getAccountModule } from '$pages/account/module'
   import { createForm } from 'felte'
   import type { Components } from '$types/api'
   import { mediator } from '$services/mediator'
-  import { ForgotPasswordRequest } from '$commands/auth/forgotPassword'
+  import { ForgotPasswordRequest } from '$commands/account/forgotPassword'
 
-  const module = getAuthModule($goto);
+  const module = getAccountModule($goto);
   let resetRequested = false;
 
   const { form, data, isSubmitting } = createForm<Components.Schemas.ForgotPasswordRequest>({
@@ -52,7 +52,7 @@
           >Reinitialiser
         </Button>
         <HorizontalSeparator>
-          <a href="/auth/login?&username={$data.email}">Finalement je m'en rappel</a>
+          <a href="/account/login?&username={$data.email}">Finalement je m'en rappel</a>
         </HorizontalSeparator>
       </form>
     {:else}

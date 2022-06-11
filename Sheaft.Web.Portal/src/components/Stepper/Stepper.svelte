@@ -1,91 +1,87 @@
-<script lang="ts">
-  import CompletedStep from "$components/Stepper/CompletedStep.svelte";
-  import ActiveStep from "$components/Stepper/ActiveStep.svelte";
-  import NextStep from "$components/Stepper/NextStep.svelte";
-  import StepsLink from "$components/Stepper/StepsLink.svelte";
-  import { createEventDispatcher, onMount } from "svelte";
-  import Button from "$components/Buttons/Button.svelte";
+<script lang='ts'>
+  import CompletedStep from './CompletedStep.svelte'
+  import ActiveStep from './ActiveStep.svelte'
+  import NextStep from './NextStep.svelte'
+  import StepsLink from './StepsLink.svelte'
+  import type { IStepDefinition, IStepsDefinition, IStepsResult } from '$components/Stepper/types/stepper'
+  import { onMount } from 'svelte'
 
-  export let steps: { name: string; icon: string }[] = [];
-  export let isLoading: boolean = false;
-  export let startingIndex: number = 0;
-  export let submit = () => {};
-  export let canGoNext = () => true;
+  export let submit = async (results: IStepsResult): Promise<void> => {  }
+  export let cancel = async (): Promise<void> => {  }  
+  export let steps: IStepsDefinition = { }
+  export let results: IStepsResult = { }
+  let pages:Record<string, IStepDefinition<any>> = {};
 
-  let currentPosition: number = 0;
+  let pageNumber = 0
+  let initialized = false;
 
-  const dispatch = createEventDispatcher();
-
-  const goToStep = (position, skipEvent?) => {
-    currentPosition = position;
-    if (skipEvent) return;
-
-    dispatch("stepChanged", {
-      step: steps[currentPosition],
-      position: currentPosition
-    });
-  };
-
-  const next = async () => {
-    if (!canGoNext()) return;
-
-    if (currentPosition + 1 > steps.length - 1) {
-      await submit();
-      return;
+  const onSubmit = async (values: any): Promise<void> => {
+    results[pages[pageNumber].id] = { values };
+    if (pageNumber === pagesCount) {
+      return await submit(results)
     }
 
-    goToStep(++currentPosition);
-  };
+    pageNumber += 1
+    return Promise.resolve()
+  }
 
-  const previous = () => {
-    if (currentPosition - 1 < 0) return;
+  const onBack = async (values: any): Promise<void> => {
+    results[pages[pageNumber].id] = { values };
 
-    goToStep(--currentPosition);
-  };
+    if (pageNumber === 0) {
+      return await cancel()
+    }
 
+    pageNumber -= 1
+    return Promise.resolve()
+  }
+  
   onMount(() => {
-    if (startingIndex > 0) goToStep(startingIndex, true);
-  });
+    initialized = false;
+    Object.entries(steps).map(s => {
+      pages[s[1].index] = <any>{...s[1], id:s[0]};
+    });
+    initialized = true;
+  })
+
+  $: pageSteps = Object.entries(steps).map(s => s[1]);
+  $: pagesCount = pageSteps.length - 1
 </script>
 
-<div class="flex items-center mt-4 mb-16 mx-6">
-  {#each steps as step, index}
-    {#if index < currentPosition}
+{#if initialized}
+<div class='flex items-center mt-4 mb-16 mx-6'>
+  {#each pageSteps as step, index}
+    {#if index < pageNumber}
       <CompletedStep
-        name="{step.name}"
-        icon="{step.icon}"
-        on:click="{() => goToStep(index)}"
+        name='{step.name}'
+        icon='{step.icon}'
+        step='{step.index + 1}'
       />
-    {:else if index === currentPosition}
-      <ActiveStep name="{step.name}" icon="{step.icon}" />
+    {:else if index === pageNumber}
+      <ActiveStep
+        name='{step.name}'
+        icon='{step.icon}'
+        step='{step.index + 1}' />
     {:else}
       <NextStep
-        name="{step.name}"
-        icon="{step.icon}"
-        on:click="{() => goToStep(index)}"
+        name='{step.name}'
+        icon='{step.icon}'
+        step='{step.index + 1}'
       />
     {/if}
-    {#if index < steps.length - 1}
-      <StepsLink isActive="{index < currentPosition}" />
+    {#if index < pagesCount}
+      <StepsLink
+        isActive='{index < pageNumber}' />
     {/if}
   {/each}
 </div>
-<div class="my-4">
-  <slot currentPosition="{currentPosition}" />
+<div class='my-4'>
+  <svelte:component
+    this={pages[pageNumber]?.component}
+    onSubmit={onSubmit}
+    onBack={onBack}
+    initialValues={results[pages[pageNumber].id]?.values}
+    state={results}
+  />
 </div>
-<div class="flex my-6">
-  <Button
-    type="button"
-    disabled="{currentPosition == 0 || isLoading}"
-    on:click="{previous}"
-    class="back w-full mx-8"
-    >Précédent
-  </Button>
-  <Button
-    type="button"
-    isLoading="{isLoading}"
-    on:click="{next}"
-    class="{currentPosition != steps.length - 1 ? 'accent' : 'primary'} w-full mx-8"
-    >{currentPosition != steps.length - 1 ? "Suivant" : "Valider"}
-  </Button>
-</div>
+{/if}

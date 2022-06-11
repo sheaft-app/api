@@ -25,16 +25,16 @@
 
   if (!meta.anonymous && !meta.public && !isAuthenticated) {
     return {
-      path: "/auth/login",
+      path: "/account/login",
       params: {
         returnUrl: returnUrl ?? `${window.location.pathname}${window.location.search}`
       }
     };
   }
 
-  if (from != "/auth/configure" && to != "/auth/configure" && !isRegistered) {
+  if (from != "/account/configure" && to != "/account/configure" && !isRegistered) {
     return {
-      path: "/auth/configure",
+      path: "/account/configure",
       params: {
         returnUrl: returnUrl ?? `${window.location.pathname}${window.location.search}`
       }

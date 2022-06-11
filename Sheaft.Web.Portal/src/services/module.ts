@@ -1,15 +1,21 @@
 ﻿import type { GotoHelper } from '@roxi/routify'
+import type { Request } from 'jimmy-js/types/request'
+import type { AnyType, Constructor, Handler } from 'jimmy-js/types/types'
+import type { Notification } from 'jimmy-js/types/notification'
+import { mediator } from '$services/mediator'
 
 export interface IAppModule{
-  register():void;
+  registerHandlers():void;
   goToHome():void;
 } 
 
-export class AppModule implements IAppModule {
+export abstract class AppModule implements IAppModule {
   protected _goto: GotoHelper | null = null
   
-  register = (): void => {
+  protected constructor() {
   }
+
+  abstract registerHandlers(): void
   
   goToHome = () => {
     this.navigate('/');
@@ -17,6 +23,10 @@ export class AppModule implements IAppModule {
 
   setGoto = (goto: GotoHelper) => {
     this._goto = goto
+  }
+
+  protected registerHandler = <TRequest extends (Request<AnyType> | Notification)>(constructor: Constructor<TRequest>, handler: Handler<TRequest>): void => {
+    mediator.handle(constructor, handler);
   }
 
   protected navigate = (url:string) : void => {

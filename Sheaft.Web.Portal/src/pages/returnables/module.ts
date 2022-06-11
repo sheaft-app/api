@@ -19,22 +19,23 @@ class ReturnableModule extends AppModule implements IReturnableModule {
 
   constructor(private _client: Client) {
     super()
+    this.registerHandlers();
   }
 
-  override register = () => {
-    mediator.handle(
+  override registerHandlers = () => {
+    this.registerHandler(
       CreateReturnableRequest,
       request => new CreateReturnableHandler(this._client).handle(request))
 
-    mediator.handle(
+    this.registerHandler(
       UpdateReturnableRequest,
       request => new UpdateReturnableRequestHandler(this._client).handle(request))
 
-    mediator.handle(
+    this.registerHandler(
       GetReturnableQuery,
       request => new GetReturnableHandler(this._client).handle(request))
-    
-    mediator.handle(
+
+    this.registerHandler(
       ListReturnablesQuery,
       request => new ListReturnablesHandler(this._client).handle(request))
   }
@@ -52,7 +53,7 @@ class ReturnableModule extends AppModule implements IReturnableModule {
   }
 }
 
-let module: IReturnableModule | null = null
+let module: IReturnableModule | null | undefined
 
 export const getReturnableModule = (goto: GotoHelper): IReturnableModule => {
   if (module) {
@@ -68,6 +69,5 @@ export const initReturnableModule = (client: Client): IReturnableModule => {
     return module
 
   module = new ReturnableModule(client)
-  module.register()
   return module
 }

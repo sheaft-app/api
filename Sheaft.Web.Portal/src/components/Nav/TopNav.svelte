@@ -11,7 +11,7 @@
   <div class="flex-grow">
     <!--    <Menu entries="{menus}" expand="{true}" />-->
   </div>
-  {#if $authStore.isAuthenticated || $page.path.indexOf("/auth") < 0}
+  {#if $authStore.isAuthenticated || $page.path.indexOf("/account") < 0}
     <User class="mr-4" />
   {/if}
 </nav>

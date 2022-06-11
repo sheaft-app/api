@@ -1,11 +1,12 @@
 <script lang="ts">
   import "./inputs.scss";
   import { nanoid } from "nanoid";
+  import type { ISelectOption } from '$components/Inputs/types/select'
 
   export let id:string|null=null;
   export let value: string|null = null;
   export let label: string|null = null;
-  export let options: { label: string; value: string }[] = [];
+  export let options: ISelectOption[] = [];
   export let isLoading: boolean = false;
   export let required: boolean = true;
   export let disabled: boolean = false;

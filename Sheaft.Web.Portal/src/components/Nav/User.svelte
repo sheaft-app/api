@@ -4,7 +4,7 @@
   import { faRightFromBracket, faUserLock } from "@fortawesome/free-solid-svg-icons";
   import { goto } from "@roxi/routify";
   import Button from "$components/Buttons/Button.svelte";
-  import { LogoutRequest } from '$commands/auth/logout'
+  import { LogoutRequest } from '$commands/account/logout'
   import { mediator } from '$services/mediator'
 
   const logoutUser = async () => {
@@ -12,7 +12,7 @@
   };
   
   const loginUser = () => {
-    $goto("/auth/login");
+    $goto("/account/login");
   };
   
 </script>

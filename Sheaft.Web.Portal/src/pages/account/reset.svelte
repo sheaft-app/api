@@ -2,13 +2,13 @@
   import { goto, params, page } from "@roxi/routify";
   import Button from "$components/Buttons/Button.svelte";
   import Password from "$components/Inputs/Password.svelte";
-  import { getAuthModule } from '$pages/auth/module'
+  import { getAccountModule } from '$pages/account/module'
   import { createForm } from 'felte'
   import type { Components } from '$types/api'
   import { mediator } from '$services/mediator'
-  import { ResetPasswordRequest } from '$commands/auth/resetPassword'
+  import { ResetPasswordRequest } from '$commands/account/resetPassword'
 
-  const module = getAuthModule($goto);
+  const module = getAccountModule($goto);
 
   const { form, data, isSubmitting } = createForm<Components.Schemas.ResetPasswordRequest>({
     initialValues: {

@@ -1,7 +1,6 @@
 ﻿import type { Client } from '$types/api'
 import { AppModule } from '$services/module'
 import type { IAppModule } from '$services/module'
-import { mediator } from '$services/mediator'
 import type { GotoHelper } from '@roxi/routify'
 import { CreateProductHandler, CreateProductRequest } from '$commands/products/createProduct'
 import { UpdateProductRequest, UpdateProductRequestHandler } from '$commands/products/updateProduct'
@@ -20,26 +19,27 @@ class ProductModule extends AppModule implements IProductModule {
 
   constructor(private _client: Client) {
     super()
+    this.registerHandlers();
   }
 
-  override register = () => {
-    mediator.handle(
+  override registerHandlers = () => {
+    this.registerHandler(
       CreateProductRequest,
       request => new CreateProductHandler(this._client).handle(request))
 
-    mediator.handle(
+    this.registerHandler(
       UpdateProductRequest,
       request => new UpdateProductRequestHandler(this._client).handle(request))
 
-    mediator.handle(
+    this.registerHandler(
       GetProductQuery,
       request => new GetProductHandler(this._client).handle(request))
-    
-    mediator.handle(
+
+    this.registerHandler(
       ListProductsQuery,
       request => new ListProductsHandler(this._client).handle(request))
-    
-    mediator.handle(
+
+    this.registerHandler(
       ListReturnablesOptionsQuery,
       request => new ListReturnablesOptionsHandler(this._client).handle(request))
   }
@@ -57,7 +57,7 @@ class ProductModule extends AppModule implements IProductModule {
   }
 }
 
-let module: IProductModule | null = null
+let module: IProductModule | null | undefined;
 
 export const getProductModule = (goto: GotoHelper): IProductModule => {
   if (module) {
@@ -73,6 +73,5 @@ export const initProductModule = (client: Client): IProductModule => {
     return module
 
   module = new ProductModule(client)
-  module.register()
   return module
 }

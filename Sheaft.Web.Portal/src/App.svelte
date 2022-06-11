@@ -7,15 +7,15 @@
   import type { Client } from '$types/api'
   import { initReturnableModule } from '$pages/returnables/module'
   import { initProductModule } from '$pages/products/module'
-  import { initAuthModule } from '$pages/auth/module'
+  import { initAccountModule } from '$pages/account/module'
 
   onMount(async () => {
     const client = await api.init<Client>();
     configureAxios(client);
 
     await authStore.startMonitorUserAccessToken();
-    
-    initAuthModule(client, authStore);
+
+    initAccountModule(client, authStore);
     initProductModule(client);
     initReturnableModule(client);
        

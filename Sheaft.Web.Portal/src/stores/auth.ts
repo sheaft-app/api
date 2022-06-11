@@ -5,7 +5,7 @@ import type { IUser } from '$types/auth'
 import type { Components } from '$types/api'
 import type { Readable } from 'svelte/store'
 import { mediator } from '$services/mediator'
-import { RefreshAccessTokenRequest } from '$commands/auth/refreshAccessToken'
+import { RefreshAccessTokenRequest } from '$commands/account/refreshAccessToken'
 
 export interface ITokens {
   accessToken?: string,
@@ -143,7 +143,7 @@ const store = (): IAuthStore => {
       return
 
     try {
-      await mediator.send(new RefreshAccessTokenRequest(_state.tokens.refreshToken))
+      await mediator.send(new RefreshAccessTokenRequest())
     } catch (e) {
       console.error('An error occured while refreshing access token')
     }
