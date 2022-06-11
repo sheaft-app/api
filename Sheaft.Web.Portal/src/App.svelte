@@ -5,9 +5,11 @@
   import { api, configureAxios } from "$configs/axios";
   import { authStore } from "$stores/auth";
   import type { Client } from "$types/api";
-  import { initReturnableModule } from "$pages/returnables/module";
-  import { initProductModule } from "$pages/products/module";
-  import { initAccountModule } from "$pages/account/module";
+  import { registerReturnableModule } from "$pages/returnables/module";
+  import { registerProductModule } from "$pages/products/module";
+  import { registerAccountModule } from "$pages/account/module";
+  import { registerCustomerModule } from '$pages/customers/module'
+  import { registerAgreementModule } from '$pages/agreements/module'
 
   onMount(async () => {
     const client = await api.init<Client>();
@@ -15,9 +17,11 @@
 
     await authStore.startMonitorUserAccessToken();
 
-    initAccountModule(client, authStore);
-    initProductModule(client);
-    initReturnableModule(client);
+    registerAccountModule(client, authStore);
+    registerProductModule(client);
+    registerReturnableModule(client);
+    registerAgreementModule(client);
+    registerCustomerModule(client);
   });
 </script>
 

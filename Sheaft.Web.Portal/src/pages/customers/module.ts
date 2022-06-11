@@ -17,14 +17,14 @@ import {
   ListReturnablesOptionsQuery
 } from "$queries/products/listReturnablesOptions";
 
-export interface IProductModule extends IAppModule {
+export interface ICustomerModule extends IAppModule {
   goToList(): void;
   goToDetails(id: string): void;
   goToCreate(): void;
 }
 
-class ProductModule extends AppModule implements IProductModule {
-  private _basePath: string = "/products";
+class CustomerModule extends AppModule implements ICustomerModule {
+  private _basePath: string = "/customers";
 
   constructor(private _client: Client) {
     super();
@@ -32,25 +32,6 @@ class ProductModule extends AppModule implements IProductModule {
   }
 
   override registerHandlers = () => {
-    this.registerHandler(CreateProductRequest, request =>
-      new CreateProductHandler(this._client).handle(request)
-    );
-
-    this.registerHandler(UpdateProductRequest, request =>
-      new UpdateProductRequestHandler(this._client).handle(request)
-    );
-
-    this.registerHandler(GetProductQuery, request =>
-      new GetProductHandler(this._client).handle(request)
-    );
-
-    this.registerHandler(ListProductsQuery, request =>
-      new ListProductsHandler(this._client).handle(request)
-    );
-
-    this.registerHandler(ListReturnablesOptionsQuery, request =>
-      new ListReturnablesOptionsHandler(this._client).handle(request)
-    );
   };
 
   goToCreate = (): void => {
@@ -66,20 +47,20 @@ class ProductModule extends AppModule implements IProductModule {
   };
 }
 
-let module: IProductModule | null | undefined;
+let module: ICustomerModule | null | undefined;
 
-export const getProductModule = (goto: GotoHelper): IProductModule => {
+export const getCustomerModule = (goto: GotoHelper): ICustomerModule => {
   if (module) {
-    (<ProductModule>module).setGoto(goto);
+    (<CustomerModule>module).setGoto(goto);
     return module;
   }
 
-  throw "product module was not initialized, call registerProductModule() in App.svelte";
+  throw "customer module was not initialized, call registerCustomerModule()";
 };
 
-export const registerProductModule = (client: Client): IProductModule => {
+export const registerCustomerModule = (client: Client): ICustomerModule => {
   if (module) return module;
 
-  module = new ProductModule(client);
+  module = new CustomerModule(client);
   return module;
 };

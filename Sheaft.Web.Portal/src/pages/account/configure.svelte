@@ -46,6 +46,7 @@
 </script>
 
 <!-- routify:options title="Compléter votre inscription" -->
+<!-- routify:options anonymous=true -->
 
 <div class="flex justify-center items-center flex-wrap h-full g-6 text-gray-800 mb-6">
   <div class="md:w-8/12 lg:w-6/12 mb-12 sm:hidden lg:visible">

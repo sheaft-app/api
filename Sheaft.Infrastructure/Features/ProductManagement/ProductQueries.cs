@@ -40,7 +40,9 @@ internal class ProductQueries : Queries, IProductQueries
                         Code = r.Reference,
                         Name = r.Name,
                         Vat = r.Vat,
-                        UnitPrice = r.UnitPrice
+                        UnitPrice = r.UnitPrice,
+                        CreatedOn = r.CreatedOn,
+                        UpdatedOn = r.UpdatedOn
                     } : null
                 };
 

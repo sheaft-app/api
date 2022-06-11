@@ -7,4 +7,6 @@ public record ReturnableDto
     public string Code { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal Vat { get; set; }
+    public DateTimeOffset CreatedOn { get; set; }
+    public DateTimeOffset UpdatedOn { get; set; }
 }

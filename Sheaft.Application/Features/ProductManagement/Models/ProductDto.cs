@@ -10,4 +10,6 @@ public record ProductDto
     public decimal Vat { get; set; }
     public ReturnableDto? Returnable { get; set; }
     public string? ReturnableId { get; set; }
+    public DateTimeOffset CreatedOn { get; set; }
+    public DateTimeOffset UpdatedOn { get; set; }
 }

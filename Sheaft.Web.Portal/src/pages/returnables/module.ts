@@ -73,10 +73,10 @@ export const getReturnableModule = (goto: GotoHelper): IReturnableModule => {
     return module;
   }
 
-  throw "returnable module was not initialized, call initReturnableModule()";
+  throw "returnable module was not initialized, call registerReturnableModule() in App.svelte";
 };
 
-export const initReturnableModule = (client: Client): IReturnableModule => {
+export const registerReturnableModule = (client: Client): IReturnableModule => {
   if (module) return module;
 
   module = new ReturnableModule(client);

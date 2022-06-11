@@ -78,10 +78,10 @@ export const getAccountModule = (goto: GotoHelper): IAccountModule => {
     return module;
   }
 
-  throw "account module was not initialized, call initAccountModule()";
+  throw "account module was not initialized, call registerAccountModule() in App.svelte";
 };
 
-export const initAccountModule = (
+export const registerAccountModule = (
   client: Client,
   authStore: IAuthStore
 ): IAccountModule => {
