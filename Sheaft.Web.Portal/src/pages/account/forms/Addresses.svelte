@@ -83,7 +83,7 @@
     bind:value="{hasDifferentSecondaryAddress}"
     label="{state.information.accountType === ProfileKind.Customer
       ? 'Mon adresse de livraison est différente'
-      : "Mon adresse d'expédition est différente"}"
+      : 'Mon adresse d\'expédition est différente'}"
     required="{false}"
   />
   {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Customer}
