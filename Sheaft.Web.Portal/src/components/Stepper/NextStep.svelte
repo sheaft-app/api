@@ -5,29 +5,29 @@
 
   export let name: string = "";
   export let icon: string = "";
-  export let canClick: boolean = false
+  export let canClick: boolean = false;
   export let step: number = 0;
 
   const dispatch = createEventDispatcher();
 
   const dispatchClick = (e: any) => {
-    if (!canClick) return
+    if (!canClick) return;
     dispatch("click", e);
   };
 </script>
 
 <div
   class="flex items-center text-gray-500 relative"
-  class:cursor-pointer={canClick}
+  class:cursor-pointer="{canClick}"
   on:click|preventDefault="{dispatchClick}"
 >
   <div
     class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300"
   >
     {#if !!icon}
-      <Fa icon='{getFaIconFromFullName(icon)}' class='m-auto' />
+      <Fa icon="{getFaIconFromFullName(icon)}" class="m-auto" />
     {:else}
-      <Fa icon='{getFaIconFromFullName("fas#" + step)}' class='m-auto' />
+      <Fa icon="{getFaIconFromFullName('fas#' + step)}" class="m-auto" />
     {/if}
   </div>
   <div

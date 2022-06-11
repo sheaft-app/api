@@ -4,9 +4,15 @@
   import { parseSubActivePath } from "./path";
   import { getFaIcon, getFaIconFromFullName } from "$utils/faIcon";
   import Fa from "svelte-fa";
-  import type { IEntry } from '$components/Nav/menus'
+  import type { IEntry } from "$components/Nav/menus";
 
-  export let entry: IEntry = { visible:true, default: false, name: '', referenced: true, pages:[] };
+  export let entry: IEntry = {
+    visible: true,
+    default: false,
+    name: "",
+    referenced: true,
+    pages: []
+  };
 
   let isGroupActive: boolean = false;
   let isGroupSubActive: boolean = false;
@@ -16,8 +22,14 @@
   };
 
   $: if (entry.pages && entry.pages.length > 0) {
-    isGroupActive = entry.pages.find((p:IEntry) => $isActive(parseSubActivePath(p.path)) && p.default) != null;    
-    isGroupSubActive = entry.pages.find((p:IEntry) => $isActive(parseSubActivePath(p.path)) && !p.default) != null;
+    isGroupActive =
+      entry.pages.find(
+        (p: IEntry) => $isActive(parseSubActivePath(p.path)) && p.default
+      ) != null;
+    isGroupSubActive =
+      entry.pages.find(
+        (p: IEntry) => $isActive(parseSubActivePath(p.path)) && !p.default
+      ) != null;
   }
 
   $: isVisible = entry.visible && entry.pages.find(p => p.visible) != null;

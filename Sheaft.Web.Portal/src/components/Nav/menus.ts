@@ -1,5 +1,5 @@
-﻿const parseAndAssignToMenus = (children: any, menus: any, parent?:string) => {
-  children.forEach((c:any) => {
+﻿const parseAndAssignToMenus = (children: any, menus: any, parent?: string) => {
+  children.forEach((c: any) => {
     let selector = c.meta.group ? c.meta.menu : parent;
 
     //insert or update group
@@ -42,29 +42,35 @@ const getMenuEntry = (route: any, title?: string | null, parent?: any) => {
   };
 };
 
-export const parseLayoutTree = (children:any) => {
+export const parseLayoutTree = (children: any) => {
   return parseAndAssignToMenus(children, {});
 };
 
-export const canHighlightMenuItem = (entry:any, currentPath: string): boolean => {
+export const canHighlightMenuItem = (entry: any, currentPath: string): boolean => {
   if (currentPath == entry.path) return true;
 
   if (entry.parent)
     //should highlight current menu item => /sub only if /sub/1 is found but not visible in menu
-    return entry.parent.pages.find((p:IEntry) => !p.visible && p.path == currentPath) != null;
-  
+    return (
+      entry.parent.pages.find((p: IEntry) => !p.visible && p.path == currentPath) != null
+    );
+
   return false;
 };
 
-export const entryIsGroup = (entry:IEntry): boolean => {
+export const entryIsGroup = (entry: IEntry): boolean => {
   return entry.pages != null && entry.pages.length > 0;
 };
 
-export const entryIsPage = (entry:IEntry): boolean => {
+export const entryIsPage = (entry: IEntry): boolean => {
   return entry.path != null && entry.path.length > 0;
 };
 
-export const canDisplayEntry = (entry:IEntry, isAuthenticated:boolean, isInRoles:any): boolean => {
+export const canDisplayEntry = (
+  entry: IEntry,
+  isAuthenticated: boolean,
+  isInRoles: any
+): boolean => {
   if (!entry.visible) return false;
 
   if (entry.public) return true;
@@ -76,16 +82,16 @@ export const canDisplayEntry = (entry:IEntry, isAuthenticated:boolean, isInRoles
   return true;
 };
 
-export interface IEntry{
-  path?: string,
-  name: string,
-  icon?: string,
-  public?: boolean,
-  anonymous?: boolean,
-  pages?: IEntry[],
-  roles?: string[],
-  visible: boolean,
-  referenced: boolean,
-  default: boolean,
-  parent?: IEntry
+export interface IEntry {
+  path?: string;
+  name: string;
+  icon?: string;
+  public?: boolean;
+  anonymous?: boolean;
+  pages?: IEntry[];
+  roles?: string[];
+  visible: boolean;
+  referenced: boolean;
+  default: boolean;
+  parent?: IEntry;
 }

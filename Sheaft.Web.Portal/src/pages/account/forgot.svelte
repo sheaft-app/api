@@ -1,30 +1,31 @@
 ﻿<script lang="ts">
-  import { goto, page, params } from '@roxi/routify'
+  import { goto, page, params } from "@roxi/routify";
   import Email from "$components/Inputs/Email.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
-  import { getAccountModule } from '$pages/account/module'
-  import { createForm } from 'felte'
-  import type { Components } from '$types/api'
-  import { mediator } from '$services/mediator'
-  import { ForgotPasswordRequest } from '$commands/account/forgotPassword'
+  import { getAccountModule } from "$pages/account/module";
+  import { createForm } from "felte";
+  import type { Components } from "$types/api";
+  import { mediator } from "$services/mediator";
+  import { ForgotPasswordRequest } from "$commands/account/forgotPassword";
 
   const module = getAccountModule($goto);
   let resetRequested = false;
 
-  const { form, data, isSubmitting } = createForm<Components.Schemas.ForgotPasswordRequest>({
-    initialValues: {
-      email:$params.username
-    },
-    onSubmit: async (values) => {
-      await mediator.send(new ForgotPasswordRequest(values.email))
-    },
-    onSuccess: () => {
-      resetRequested = true;
-    }
-  })
+  const { form, data, isSubmitting } =
+    createForm<Components.Schemas.ForgotPasswordRequest>({
+      initialValues: {
+        email: $params.username
+      },
+      onSubmit: async values => {
+        await mediator.send(new ForgotPasswordRequest(values.email));
+      },
+      onSuccess: () => {
+        resetRequested = true;
+      }
+    });
 </script>
 
 <!-- routify:options anonymous=true -->
@@ -39,16 +40,13 @@
     {#if !resetRequested}
       <form use:form>
         <Email
-          label='Votre adresse mail'
+          label="Votre adresse mail"
           bind:value="{$data.email}"
           isLoading="{$isSubmitting}"
           placeholder="Adresse mail de votre compte"
           class="mb-6 w-full"
         />
-        <Button
-          type="submit"
-          isLoading="{$isSubmitting}"
-          class="primary w-full mt-8"
+        <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-8"
           >Reinitialiser
         </Button>
         <HorizontalSeparator>

@@ -1,12 +1,24 @@
-﻿import type { Client } from '$types/api'
-import { AppModule } from '$services/module'
-import type { IAppModule } from '$services/module'
-import { mediator } from '$services/mediator'
-import type { GotoHelper } from '@roxi/routify'
-import { CreateReturnableHandler, CreateReturnableRequest } from '$commands/returnables/createReturnable'
-import { UpdateReturnableRequest, UpdateReturnableRequestHandler } from '$commands/returnables/updateReturnable'
-import { GetReturnableHandler, GetReturnableQuery } from '$queries/returnables/getReturnable'
-import { ListReturnablesHandler, ListReturnablesQuery } from '$queries/returnables/listReturnables'
+﻿import type { Client } from "$types/api";
+import { AppModule } from "$services/module";
+import type { IAppModule } from "$services/module";
+import { mediator } from "$services/mediator";
+import type { GotoHelper } from "@roxi/routify";
+import {
+  CreateReturnableHandler,
+  CreateReturnableRequest
+} from "$commands/returnables/createReturnable";
+import {
+  UpdateReturnableRequest,
+  UpdateReturnableRequestHandler
+} from "$commands/returnables/updateReturnable";
+import {
+  GetReturnableHandler,
+  GetReturnableQuery
+} from "$queries/returnables/getReturnable";
+import {
+  ListReturnablesHandler,
+  ListReturnablesQuery
+} from "$queries/returnables/listReturnables";
 
 export interface IReturnableModule extends IAppModule {
   goToList(): void;
@@ -15,59 +27,58 @@ export interface IReturnableModule extends IAppModule {
 }
 
 class ReturnableModule extends AppModule implements IReturnableModule {
-  private _basePath: string = '/returnables'
+  private _basePath: string = "/returnables";
 
   constructor(private _client: Client) {
-    super()
+    super();
     this.registerHandlers();
   }
 
   override registerHandlers = () => {
-    this.registerHandler(
-      CreateReturnableRequest,
-      request => new CreateReturnableHandler(this._client).handle(request))
+    this.registerHandler(CreateReturnableRequest, request =>
+      new CreateReturnableHandler(this._client).handle(request)
+    );
 
-    this.registerHandler(
-      UpdateReturnableRequest,
-      request => new UpdateReturnableRequestHandler(this._client).handle(request))
+    this.registerHandler(UpdateReturnableRequest, request =>
+      new UpdateReturnableRequestHandler(this._client).handle(request)
+    );
 
-    this.registerHandler(
-      GetReturnableQuery,
-      request => new GetReturnableHandler(this._client).handle(request))
+    this.registerHandler(GetReturnableQuery, request =>
+      new GetReturnableHandler(this._client).handle(request)
+    );
 
-    this.registerHandler(
-      ListReturnablesQuery,
-      request => new ListReturnablesHandler(this._client).handle(request))
-  }
+    this.registerHandler(ListReturnablesQuery, request =>
+      new ListReturnablesHandler(this._client).handle(request)
+    );
+  };
 
   goToCreate = (): void => {
-    this.navigate(`${this._basePath}/create`)
-  }
+    this.navigate(`${this._basePath}/create`);
+  };
 
   goToDetails = (id: string): void => {
-    this.navigate(`${this._basePath}/${id}`)
-  }
+    this.navigate(`${this._basePath}/${id}`);
+  };
 
   goToList = (): void => {
-    this.navigate(this._basePath)
-  }
+    this.navigate(this._basePath);
+  };
 }
 
-let module: IReturnableModule | null | undefined
+let module: IReturnableModule | null | undefined;
 
 export const getReturnableModule = (goto: GotoHelper): IReturnableModule => {
   if (module) {
-    (<ReturnableModule>module).setGoto(goto)
-    return module
+    (<ReturnableModule>module).setGoto(goto);
+    return module;
   }
 
-  throw 'returnable module was not initialized, call initReturnableModule()'
-}
+  throw "returnable module was not initialized, call initReturnableModule()";
+};
 
 export const initReturnableModule = (client: Client): IReturnableModule => {
-  if (module)
-    return module
+  if (module) return module;
 
-  module = new ReturnableModule(client)
-  return module
-}
+  module = new ReturnableModule(client);
+  return module;
+};

@@ -11,7 +11,7 @@
 </script>
 
 <nav class="w-80 h-full flex flex-col justify-between bg-white">
-  <Logo width="{80}" src='{ffd}'/>
+  <Logo width="{80}" src="{ffd}" />
   <Menu entries="{menus}" expand="{true}" />
   <User class="w-full self-end" />
 </nav>

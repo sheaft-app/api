@@ -12,9 +12,9 @@
     class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 bg-primary-600 border-primary-600"
   >
     {#if !!icon}
-      <Fa icon='{getFaIconFromFullName(icon)}' class='m-auto' />
+      <Fa icon="{getFaIconFromFullName(icon)}" class="m-auto" />
     {:else}
-      <Fa icon='{getFaIconFromFullName("fas#" + step)}' class='m-auto' />
+      <Fa icon="{getFaIconFromFullName('fas#' + step)}" class="m-auto" />
     {/if}
   </div>
   <div

@@ -1,6 +1,6 @@
-﻿import type { Client } from '$types/api'
-import { Request } from 'jimmy-js'
-import type { IAuthStore } from '$stores/auth'
+﻿import type { Client } from "$types/api";
+import { Request } from "jimmy-js";
+import type { IAuthStore } from "$stores/auth";
 
 export class LogoutRequest extends Request<Promise<void>> {
   constructor() {
@@ -9,15 +9,15 @@ export class LogoutRequest extends Request<Promise<void>> {
 }
 
 export class LogoutRequestHandler {
-  constructor(private _client: Client, private _authStore:IAuthStore) {}
+  constructor(private _client: Client, private _authStore: IAuthStore) {}
 
-  handle = async (request: LogoutRequest):Promise<void> => {
+  handle = async (request: LogoutRequest): Promise<void> => {
     try {
       this._authStore.clearConnectedUser();
-      return Promise.resolve()
+      return Promise.resolve();
     } catch (exc) {
-      console.error(exc)
-      return Promise.reject({ error : exc })
+      console.error(exc);
+      return Promise.reject({ error: exc });
     }
-  }
+  };
 }

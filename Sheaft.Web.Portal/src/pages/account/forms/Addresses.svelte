@@ -1,79 +1,124 @@
-﻿<script lang='ts'>
-  import Checkbox from '$components/Inputs/Checkbox.svelte'
-  import NamedAddress from '$components/Inputs/NamedAddress.svelte'
-  import { createForm } from 'felte'
-  import FormFooter from '$components/Form/FormFooter.svelte'
-  import Button from '$components/Buttons/Button.svelte'
-  import { ProfileKind } from '$enums/profile'
-  import type { IAccountAddresses } from '$commands/account/configureAccount'
-  import Address from '$components/Inputs/Address.svelte'
-  import type { IAccountConfigurationResults } from '$pages/account/account'
+﻿<script lang="ts">
+  import Checkbox from "$components/Inputs/Checkbox.svelte";
+  import NamedAddress from "$components/Inputs/NamedAddress.svelte";
+  import { createForm } from "felte";
+  import FormFooter from "$components/Form/FormFooter.svelte";
+  import Button from "$components/Buttons/Button.svelte";
+  import { ProfileKind } from "$enums/profile";
+  import type { IAccountAddresses } from "$commands/account/configureAccount";
+  import Address from "$components/Inputs/Address.svelte";
+  import type { IAccountConfigurationResults } from "$pages/account/account";
+  import { onMount } from "svelte";
 
-  export let initialValues: IAccountAddresses | null
-  export let onSubmit
-  export let onBack
-  export let state:IAccountConfigurationResults
+  export let initialValues: IAccountAddresses | null;
+  export let onSubmit;
+  export let onBack;
+  export let state: IAccountConfigurationResults;
 
-  const { form, data, isSubmitting } = createForm<IAccountAddresses>({ initialValues, onSubmit })
+  let hasDifferentBillingAddress = false;
+  let hasDifferentSecondaryAddress = false;
 
-  let hasDifferentBillingAddress = false
-  let hasDifferentSecondaryAddress = false
+  const { form, data, isSubmitting, setData } = createForm<IAccountAddresses>({
+    initialValues,
+    onSubmit
+  });
+
+  $: if (hasDifferentBillingAddress) {
+    setData(<any>"billingAddress.name", value => state.information.tradeName);
+    setData(<any>"billingAddress.email", value => state.information.email);
+  } else {
+    setData(<any>"billingAddress", value => undefined);
+  }
+
+  $: if (
+    hasDifferentSecondaryAddress &&
+    state.information.accountType === ProfileKind.Customer
+  ) {
+    setData(<any>"deliveryAddress.name", value => state.information.tradeName);
+    setData(<any>"deliveryAddress.email", value => state.information.email);
+  } else if (
+    hasDifferentSecondaryAddress &&
+    state.information.accountType === ProfileKind.Supplier
+  ) {
+    setData(<any>"shippingAddress.name", value => state.information.tradeName);
+    setData(<any>"shippingAddress.email", value => state.information.email);
+  } else {
+    setData(<any>"shippingAddress", value => undefined);
+    setData(<any>"deliveryAddress", value => undefined);
+  }
+
+  onMount(() => {
+    hasDifferentBillingAddress = !!state.addresses?.billingAddress;
+    hasDifferentSecondaryAddress =
+      !!state.addresses?.deliveryAddress || !!state.addresses?.shippingAddress;
+  });
 </script>
 
 <form use:form>
   <Address
-    id='legalAddress'
-    isLoading='{$isSubmitting}'
-    bind:value='{$data.legalAddress}' />
+    id="legalAddress"
+    label="Siège social"
+    isLoading="{$isSubmitting}"
+    bind:value="{$data.legalAddress}"
+  />
   <Checkbox
-    id='billingAddressIsDifferent'
-    class='block'
-    isLoading='{$isSubmitting}'
-    bind:value='{hasDifferentBillingAddress}'
-    label='Mon adresse de facturation est différente'
-    required='{false}'
+    id="hasDifferentBillingAddress"
+    isLoading="{$isSubmitting}"
+    bind:value="{hasDifferentBillingAddress}"
+    label="Mon adresse de facturation est différente"
+    required="{false}"
   />
   {#if hasDifferentBillingAddress}
     <NamedAddress
-      id='billingAddress'
-      isLoading='{$isSubmitting}'
-      bind:value='{$data.billingAddress}'
-      required='{hasDifferentBillingAddress}' />
+      id="billingAddress"
+      label="Adresse de facturation"
+      isLoading="{$isSubmitting}"
+      bind:value="{$data.billingAddress}"
+      required="{hasDifferentBillingAddress}"
+    />
   {/if}
   <Checkbox
-    id='secondaryAddressIsDifferent'
-    class='block'
-    isLoading='{$isSubmitting}'
-    bind:value='{hasDifferentSecondaryAddress}'
-    label="{state.information.values.accountType === ProfileKind.Customer ? 'Mon adresse de livraison est différente' : 'Mon adresse d\'expédition est différente'}"
-    required='{false}'
+    id="hasDifferentSecondaryAddress"
+    isLoading="{$isSubmitting}"
+    bind:value="{hasDifferentSecondaryAddress}"
+    label="{state.information.accountType === ProfileKind.Customer
+      ? 'Mon adresse de livraison est différente'
+      : "Mon adresse d'expédition est différente"}"
+    required="{false}"
   />
-  {#if hasDifferentSecondaryAddress && state.information.values.accountType === ProfileKind.Customer}
+  {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Customer}
     <NamedAddress
-      id='deliveryAddress'
-      isLoading='{$isSubmitting}'
-      bind:value='{$data.deliveryAddress}'
-      required='{hasDifferentSecondaryAddress}' />
+      id="deliveryAddress"
+      label="Adresse de livraison"
+      isLoading="{$isSubmitting}"
+      bind:value="{$data.deliveryAddress}"
+      required="{hasDifferentSecondaryAddress}"
+    />
   {/if}
-  {#if hasDifferentSecondaryAddress && state.information.values.accountType === ProfileKind.Supplier}
+  {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Supplier}
     <NamedAddress
-      id='shippingAddress'
-      isLoading='{$isSubmitting}'
-      bind:value='{$data.shippingAddress}'
-      required='{hasDifferentSecondaryAddress}' />
+      id="shippingAddress"
+      label="Adresse d'expédition"
+      isLoading="{$isSubmitting}"
+      bind:value="{$data.shippingAddress}"
+      required="{hasDifferentSecondaryAddress}"
+    />
   {/if}
-  <FormFooter>
+  <FormFooter class="mt-2">
     <Button
-      class='back w-full mx-8'
-      disabled='{$isSubmitting}'
-      type='button' on:click='{() => onBack($data)}'>
+      class="back w-full mx-8"
+      disabled="{$isSubmitting}"
+      type="button"
+      on:click="{() => onBack($data)}"
+    >
       Précédent
     </Button>
     <Button
-      class='primary w-full mx-8'
-      disabled='{$isSubmitting}'
-      isLoading='{$isSubmitting}'
-      type='submit'>Enregistrer
+      class="primary w-full mx-8"
+      disabled="{$isSubmitting}"
+      isLoading="{$isSubmitting}"
+      type="submit"
+      >Enregistrer
     </Button>
   </FormFooter>
 </form>

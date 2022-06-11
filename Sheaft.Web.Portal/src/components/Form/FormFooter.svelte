@@ -1,14 +1,12 @@
-﻿<script lang='ts'>
-  export let showAsterisk = true
+﻿<script lang="ts">
+  export let showAsterisk = true;
 </script>
 
-<div class='{$$props.class}'>
+<div class="{$$props.class}">
   {#if showAsterisk}
-    <small
-    >Veuillez remplir tous les champs requis <b>(*)</b></small
-    >
+    <small>Veuillez remplir tous les champs requis <b>(*)</b></small>
   {/if}
-  <div class='flex my-6'>
-    <slot/>
+  <div class="flex my-6">
+    <slot />
   </div>
 </div>

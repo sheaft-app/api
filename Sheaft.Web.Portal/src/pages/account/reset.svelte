@@ -2,27 +2,30 @@
   import { goto, params, page } from "@roxi/routify";
   import Button from "$components/Buttons/Button.svelte";
   import Password from "$components/Inputs/Password.svelte";
-  import { getAccountModule } from '$pages/account/module'
-  import { createForm } from 'felte'
-  import type { Components } from '$types/api'
-  import { mediator } from '$services/mediator'
-  import { ResetPasswordRequest } from '$commands/account/resetPassword'
+  import { getAccountModule } from "$pages/account/module";
+  import { createForm } from "felte";
+  import type { Components } from "$types/api";
+  import { mediator } from "$services/mediator";
+  import { ResetPasswordRequest } from "$commands/account/resetPassword";
 
   const module = getAccountModule($goto);
 
-  const { form, data, isSubmitting } = createForm<Components.Schemas.ResetPasswordRequest>({
-    initialValues: {
-      resetToken:$params.resetToken,
-      password: '',
-      confirm: ''
-    },
-    onSubmit: async (values) => {
-      await mediator.send(new ResetPasswordRequest(values.resetToken, values.password, values.confirm))
-    },
-    onSuccess: () => {
-      module.redirectIfRequired($params.returnUrl)
-    }
-  })
+  const { form, data, isSubmitting } =
+    createForm<Components.Schemas.ResetPasswordRequest>({
+      initialValues: {
+        resetToken: $params.resetToken,
+        password: "",
+        confirm: ""
+      },
+      onSubmit: async values => {
+        await mediator.send(
+          new ResetPasswordRequest(values.resetToken, values.password, values.confirm)
+        );
+      },
+      onSuccess: () => {
+        module.redirectIfRequired($params.returnUrl);
+      }
+    });
 </script>
 
 <!-- routify:options anonymous=true -->
@@ -36,23 +39,20 @@
     <h1>{$page.title}</h1>
     <form use:form>
       <Password
-        label='Nouveau mot de passe'
+        label="Nouveau mot de passe"
         bind:value="{$data.password}"
         isLoading="{$isSubmitting}"
         placeholder="Votre nouveau mot de passe"
         class="mb-6 w-full"
       />
       <Password
-        label='Confirmer le mot de passe'
+        label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         isLoading="{$isSubmitting}"
         placeholder="Confirmer le nouveau mot de passe"
         class="mb-6 w-full"
       />
-      <Button
-        type="submit"
-        isLoading="{$isSubmitting}"
-        class="primary w-full mt-6"
+      <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-6"
         >Enregistrer
       </Button>
     </form>

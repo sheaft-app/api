@@ -4,17 +4,16 @@
   import { faRightFromBracket, faUserLock } from "@fortawesome/free-solid-svg-icons";
   import { goto } from "@roxi/routify";
   import Button from "$components/Buttons/Button.svelte";
-  import { LogoutRequest } from '$commands/account/logout'
-  import { mediator } from '$services/mediator'
+  import { LogoutRequest } from "$commands/account/logout";
+  import { mediator } from "$services/mediator";
 
   const logoutUser = async () => {
-    await mediator.send(new LogoutRequest())
+    await mediator.send(new LogoutRequest());
   };
-  
+
   const loginUser = () => {
     $goto("/account/login");
   };
-  
 </script>
 
 <div class="{$$props.class} text-gray-600">
@@ -27,7 +26,9 @@
           src="https://images.unsplash.com/photo-1652117137751-ed18b1ff20da?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHx0b3BpYy1mZWVkfDE0fHRvd0paRnNrcEdnfHxlbnwwfHx8fA%3D%3D&auto=format&fit=crop&w=200&q=60"
         />
         <div class="ml-4">
-          <p class="overflow-hidden overflow-ellipsis font-medium">{$authStore.user?.name}</p>
+          <p class="overflow-hidden overflow-ellipsis font-medium">
+            {$authStore.user?.name}
+          </p>
           <small class="overflow-hidden overflow-ellipsis"
             ><i>{$authStore.user?.profile?.name ?? ""}</i></small
           >

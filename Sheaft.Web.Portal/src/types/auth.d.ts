@@ -7,7 +7,7 @@ export interface IUser {
   firstname?: string | null;
   lastname?: string | null;
   email?: string | null;
-  roles: string [];
+  roles: string[];
   profile: {
     id?: string | null;
     name?: string | null;

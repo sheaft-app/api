@@ -1,6 +1,6 @@
-﻿import type { Client, Components } from '$types/api'
-import { Request } from 'jimmy-js'
-import { ProfileKind } from '$enums/profile'
+﻿import type { Client, Components } from "$types/api";
+import { Request } from "jimmy-js";
+import { ProfileKind } from "$enums/profile";
 
 export interface IAccountInformation {
   accountType?: ProfileKind;
@@ -12,60 +12,55 @@ export interface IAccountInformation {
 }
 
 export interface IAccountAddresses {
-  legalAddress?: Components.Schemas.NamedAddressDto;
-  billingAddress?: Components.Schemas.NamedAddressDto;
-  shippingAddress?: Components.Schemas.NamedAddressDto;
-  deliveryAddress?: Components.Schemas.NamedAddressDto;
+  legalAddress?: Components.Schemas.NamedAddressDto | undefined;
+  billingAddress?: Components.Schemas.NamedAddressDto | undefined;
+  shippingAddress?: Components.Schemas.NamedAddressDto | undefined;
+  deliveryAddress?: Components.Schemas.NamedAddressDto | undefined;
 }
 
 export class ConfigureAccountRequest extends Request<Promise<boolean>> {
   constructor(
-    public accountType: ProfileKind | undefined, 
-    public information: IAccountInformation, 
-    public addresses: IAccountAddresses) {
-    super()
+    public accountType: ProfileKind | undefined,
+    public information: IAccountInformation,
+    public addresses: IAccountAddresses
+  ) {
+    super();
   }
 }
 
 export class ConfigureAccountRequestHandler {
-  constructor(private _client: Client) {
-  }
+  constructor(private _client: Client) {}
 
   handle = async (request: ConfigureAccountRequest): Promise<boolean> => {
     try {
-      let apiCalled = false
+      let body:
+        | Components.Schemas.CustomerInfoRequest
+        | Components.Schemas.SupplierInfoRequest = {
+        tradeName: request.information.tradeName,
+        email: request.information.email,
+        phone: request.information.phone,
+        siret: request.information.siret,
+        corporateName: request.information.corporateName,
+        legalAddress: request.addresses.legalAddress,
+        billingAddress: request.addresses.billingAddress
+      };
+
       switch (request.accountType) {
         case ProfileKind.Customer:
-          await this._client.ConfigureAccountAsCustomer(null, {
-            tradeName: request.information.tradeName,
-            email: request.information.email,
-            phone: request.information.phone,
-            siret: request.information.siret,
-            corporateName: request.information.corporateName,
-            legalAddress: request.addresses.legalAddress,
-            billingAddress: request.addresses.billingAddress,
-            deliveryAddress: request.addresses.deliveryAddress
-          })
-          apiCalled = true
-          break
+          (<Components.Schemas.CustomerInfoRequest>body).deliveryAddress =
+            request.addresses.deliveryAddress;
+          await this._client.ConfigureAccountAsCustomer(null, body);
+          break;
         case ProfileKind.Supplier:
-          await this._client.ConfigureAccountAsSupplier(null, {
-            tradeName: request.information.tradeName,
-            email: request.information.email,
-            phone: request.information.phone,
-            siret: request.information.siret,
-            corporateName: request.information.corporateName,
-            legalAddress: request.addresses.legalAddress,
-            billingAddress: request.addresses.billingAddress,
-            shippingAddress: request.addresses.shippingAddress,
-          })
-          apiCalled = true
-          break
+          (<Components.Schemas.SupplierInfoRequest>body).shippingAddress =
+            request.addresses.shippingAddress;
+          await this._client.ConfigureAccountAsSupplier(null, body);
+          break;
       }
-      return Promise.resolve(apiCalled)
+      return Promise.resolve(true);
     } catch (exc) {
-      console.error(exc)
-      return Promise.reject({ error: exc })
+      console.error(exc);
+      return Promise.reject({ error: exc });
     }
-  }
+  };
 }

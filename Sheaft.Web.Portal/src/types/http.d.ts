@@ -3,6 +3,4 @@
   error?: IError;
 }
 
-export interface IError {
-  
-}
+export interface IError {}
