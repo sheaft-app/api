@@ -3,7 +3,7 @@
   import { format, percent } from "$utils/format";
 
   export let id: string | null = null;
-  export let value: string | null = null;
+  export let value: number | null = null;
   export let label: string | null = null;
   export let isLoading: boolean = false;
   export let required: boolean = true;

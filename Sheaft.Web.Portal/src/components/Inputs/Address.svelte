@@ -1,7 +1,7 @@
 <script lang="ts">
   import "./inputs.scss";
   import Text from "$components/Inputs/Text.svelte";
-  import type { IAddress } from "/types/address";
+  import type { IAddress } from "./types/address";
   import { nanoid } from "nanoid";
   import { onMount } from "svelte";
 

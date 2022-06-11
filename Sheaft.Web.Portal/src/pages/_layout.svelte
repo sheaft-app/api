@@ -8,9 +8,9 @@
 
   $beforeUrlChange((event: any, route) => {
     const pageAccessResult = checkPageAccess(
-      route.path,
+      route?.path,
       event.url,
-      route.meta,
+      route?.meta,
       $authStore.isAuthenticated,
       $authStore.isRegistered,
       $params.returnUrl ?? event.url,

@@ -1,7 +1,7 @@
 ﻿export const checkPageAccess = (
-  from: string,
+  from: string | undefined,
   to: string,
-  meta: any,
+  meta: any | undefined,
   isAuthenticated: boolean,
   isRegistered: boolean,
   returnUrl: string,
