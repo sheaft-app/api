@@ -11,6 +11,7 @@
   import { CreateReturnableRequest } from "$commands/returnables/createReturnable";
   import { getReturnableModule } from "$pages/returnables/module";
   import Button from "$components/Buttons/Button.svelte";
+  import PageHeader from '$components/Page/PageHeader.svelte'
 
   const module = getReturnableModule($goto);
 
@@ -39,11 +40,9 @@
 <!-- routify:options title="Ajouter une nouvelle consigne" -->
 <!-- routify:options icon="fas#coffee" -->
 
-<svelte:head>
-  <title>{$page.title}</title>
-</svelte:head>
-
-<h1>{$page.title}</h1>
+<PageHeader
+  title={$page.title}
+/>
 
 <form use:form>
   <Text
@@ -53,34 +52,33 @@
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre consigne (sera autogénéré si non renseigné)"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Text
     id="name"
     label="Nom"
     bind:value="{$data.name}"
     placeholder="Le nom de votre consigne"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Price
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre consigne en €"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Vat
     id="vat"
     label="TVA"
     bind:value="{$data.vat}"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     rates="{[0, 0.055, 0.1, 0.2]}"
   />
   <Price
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{$isSubmitting}"
     required="{false}"
   />
   <FormFooter>

@@ -6,12 +6,12 @@
   export let group: any = null;
   export let value: number | null = null;
   export let label: string | null = null;
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let required: boolean = true;
 </script>
 
 <div class="f-radio">
-  <input class="peer" type="radio" bind:group id="{id}" value="{value}" />
+  <input class="peer" type="radio" bind:group id="{id}" value="{value}" disabled='{disabled}'/>
   {#if label}
     <label
       class="peer-checked:bg-primary-500 peer-checked:font-bold peer-checked:text-white hover:peer-checked:bg-primary-600"

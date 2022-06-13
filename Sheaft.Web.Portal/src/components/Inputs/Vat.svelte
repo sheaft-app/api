@@ -5,7 +5,7 @@
   export let id: string | null = null;
   export let value: number | null = null;
   export let label: string | null = null;
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let required: boolean = true;
   export let rates: number[] = [0.055, 0.1, 0.2];
 
@@ -29,6 +29,7 @@
           bind:group="{value}"
           id="{id}-{rate}"
           value="{getValue(rate)}"
+          disabled='{disabled}'
         />
         <label
           class="peer-checked:bg-primary-500 peer-checked:font-bold peer-checked:text-white hover:peer-checked:bg-primary-600"

@@ -13,6 +13,7 @@
   import { GetReturnableQuery } from "$queries/returnables/getReturnable";
   import type { Components } from "$types/api";
   import Button from "$components/Buttons/Button.svelte";
+  import PageHeader from '$components/Page/PageHeader.svelte'
 
   export let id = "";
   let initializing = true;
@@ -48,6 +49,15 @@
     }
   });
 
+  const actions = [
+    {
+      name:'Supprimer',
+      disabled:false,
+      color:'danger',
+      action: () => {}
+    }
+  ];
+
   $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
   $: isLoading = isSubmitting || initializing;
 </script>
@@ -56,11 +66,10 @@
 <!-- routify:options title="Details de la consigne" -->
 <!-- routify:options roles=[] -->
 
-<svelte:head>
-  <title>{$page.title}</title>
-</svelte:head>
-
-<h1>{$page.title}</h1>
+<PageHeader
+  title={$page.title}
+  actions={actions}
+/>
 
 <form use:form>
   <Text
@@ -70,27 +79,27 @@
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre produit (autogénéré si non renseigné)"
-    isLoading="{$isLoading}"
+    disabled="{$isLoading}"
   />
   <Text
     id="name"
     label="Nom"
     bind:value="{$data.name}"
     placeholder="Le nom de votre produit"
-    isLoading="{$isLoading}"
+    disabled="{$isLoading}"
   />
   <Price
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre produit en €"
-    isLoading="{$isLoading}"
+    disabled="{$isLoading}"
   />
   <Vat
     id="vat"
     label="TVA"
     bind:value="{$data.vat}"
-    isLoading="{$isLoading}"
+    disabled="{$isLoading}"
     rates="{[0, 0.055, 0.1, 0.2]}"
   />
   <Price
@@ -98,7 +107,6 @@
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{$isLoading}"
     required="{false}"
   />
   <FormFooter>

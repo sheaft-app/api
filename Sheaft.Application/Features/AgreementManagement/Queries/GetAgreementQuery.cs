@@ -2,9 +2,9 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record GetAgreementQuery(AgreementId Identifier) : IQuery<Result<AgreementDto>>;
+public record GetAgreementQuery(AgreementId Identifier) : IQuery<Result<AgreementDetailsDto>>;
 
-internal class GetAgreementHandler : IQueryHandler<GetAgreementQuery, Result<AgreementDto>>
+internal class GetAgreementHandler : IQueryHandler<GetAgreementQuery, Result<AgreementDetailsDto>>
 {
     private readonly IAgreementQueries _agreementQueries;
 
@@ -13,7 +13,7 @@ internal class GetAgreementHandler : IQueryHandler<GetAgreementQuery, Result<Agr
         _agreementQueries = agreementQueries;
     }
     
-    public async Task<Result<AgreementDto>> Handle(GetAgreementQuery request, CancellationToken token)
+    public async Task<Result<AgreementDetailsDto>> Handle(GetAgreementQuery request, CancellationToken token)
     {
         return await _agreementQueries.Get(request.Identifier, token);
     }

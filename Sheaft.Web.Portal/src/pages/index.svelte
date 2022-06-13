@@ -9,10 +9,6 @@
 <!-- routify:options title="Bienvenue sur votre dashboard" -->
 <!-- routify:options icon="fas#desktopAlt" -->
 
-<svelte:head>
-  <title>{$page.title}</title>
-</svelte:head>
-
 <div class="text-center">
   <img data-ujs-name="Welcome" />
   <h1>Hello Typescript!</h1>

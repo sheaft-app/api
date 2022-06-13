@@ -15,7 +15,7 @@ internal class ProductQueries : Queries, IProductQueries
         _context = context;
     }
     
-    public Task<Result<ProductDto>> Get(ProductId identifier, CancellationToken token)
+    public Task<Result<ProductDetailsDto>> Get(ProductId identifier, CancellationToken token)
     {
         return QueryAsync(async () =>
         {
@@ -25,7 +25,7 @@ internal class ProductQueries : Queries, IProductQueries
                 from c in _context.Catalogs.Where(c => c.Id == cp.CatalogId && c.IsDefault)
                 from r in _context.Returnables.Where(r => r.Id == p.ReturnableId).DefaultIfEmpty()
                 where p.Id == identifier.Value
-                select new ProductDto
+                select new ProductDetailsDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -33,6 +33,8 @@ internal class ProductQueries : Queries, IProductQueries
                     Code = p.Reference,
                     Vat = p.Vat,
                     UnitPrice = cp.UnitPrice,
+                    CreatedOn = p.CreatedOn,
+                    UpdatedOn = p.UpdatedOn,
                     ReturnableId = r.Id,
                     Returnable = r.Id != null ? new ReturnableDto
                     {
@@ -48,7 +50,7 @@ internal class ProductQueries : Queries, IProductQueries
 
             var product = await productsQuery.FirstOrDefaultAsync(token);
             return product == null
-                ? Result.Failure<ProductDto>(ErrorKind.NotFound, "product.notfound")
+                ? Result.Failure<ProductDetailsDto>(ErrorKind.NotFound, "product.notfound")
                 : Result.Success(product);
         });
     }
@@ -66,10 +68,11 @@ internal class ProductQueries : Queries, IProductQueries
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Description = p.Description,
                     Code = p.Reference,
                     Vat = p.Vat,
-                    UnitPrice = cp.UnitPrice
+                    UnitPrice = cp.UnitPrice,
+                    CreatedOn = p.CreatedOn,
+                    UpdatedOn = p.UpdatedOn,
                 };
 
             var products = await productsQuery

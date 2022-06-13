@@ -42,7 +42,7 @@
         <Email
           label="Votre adresse mail"
           bind:value="{$data.email}"
-          isLoading="{$isSubmitting}"
+          disabled="{$isSubmitting}"
           placeholder="Adresse mail de votre compte"
           class="mb-6 w-full"
         />

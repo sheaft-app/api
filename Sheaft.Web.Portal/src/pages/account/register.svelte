@@ -54,14 +54,14 @@
         <Text
           label="Prénom"
           bind:value="{$data.firstname}"
-          isLoading="{$isSubmitting}"
+          disabled="{$isSubmitting}"
           class="w-full"
           placeholder="Votre prénom"
         />
         <Text
           label="Nom"
           bind:value="{$data.lastname}"
-          isLoading="{$isSubmitting}"
+          disabled="{$isSubmitting}"
           class="w-full"
           placeholder="Votre nom"
         />
@@ -69,19 +69,20 @@
       <Email
         label="Adresse mail"
         bind:value="{$data.email}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Password
         label="Mot de passe"
         bind:value="{$data.password}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Password
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         placeholder="Confirmation de mot de passe"
+        disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-8"

@@ -549,7 +549,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductDto'
+                $ref: '#/components/schemas/ProductDetailsDto'
         '400':
           description: Bad Request
           content:
@@ -816,7 +816,57 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AgreementDto'
+                $ref: '#/components/schemas/AgreementDetailsDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/customers/{id}':
+    get:
+      tags:
+        - GetAvailableCustomer
+      summary: Retrieve customer with id
+      operationId: GetAvailableCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableCustomerDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/suppliers/{id}':
+    get:
+      tags:
+        - GetAvailableSupplier
+      summary: Retrieve supplier with id
+      operationId: GetAvailableSupplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableSupplierDto'
         '400':
           description: Bad Request
           content:
@@ -849,6 +899,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AgreementDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/agreements/customers:
+    get:
+      tags:
+        - ListAvailableCustomers
+      summary: List available customers for current user
+      operationId: ListAvailableCustomers
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableCustomerDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/agreements/suppliers:
+    get:
+      tags:
+        - ListAvailableSuppliers
+      summary: List available suppliers for current user
+      operationId: ListAvailableSuppliers
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableSupplierDtoPaginatedResults'
         '400':
           description: Bad Request
           content:
@@ -1336,7 +1450,7 @@ components:
           type: string
           nullable: true
       additionalProperties: false
-    AgreementDto:
+    AgreementDetailsDto:
       type: object
       properties:
         id:
@@ -1363,6 +1477,24 @@ components:
           nullable: true
         deliveryAddress:
           $ref: '#/components/schemas/AddressDto'
+      additionalProperties: false
+    AgreementDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/AgreementStatus'
+        updatedOn:
+          type: string
+          format: date-time
+        supplierName:
+          type: string
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
       additionalProperties: false
     AgreementDtoPaginatedResults:
       type: object
@@ -1415,6 +1547,96 @@ components:
         - 3
       type: integer
       format: int32
+    AvailableCustomerDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        deliveryAddress:
+          $ref: '#/components/schemas/AddressDto'
+      additionalProperties: false
+    AvailableCustomerDtoPaginatedResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableCustomerDto'
+          nullable: true
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        pageNumber:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+      additionalProperties: false
+    AvailableSupplierDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        shippingAddress:
+          $ref: '#/components/schemas/AddressDto'
+      additionalProperties: false
+    AvailableSupplierDtoPaginatedResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AvailableSupplierDto'
+          nullable: true
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        pageNumber:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+      additionalProperties: false
     BatchDateKind:
       enum:
         - 0
@@ -1692,7 +1914,7 @@ components:
           type: string
           nullable: true
       additionalProperties: { }
-    ProductDto:
+    ProductDetailsDto:
       type: object
       properties:
         id:
@@ -1718,6 +1940,31 @@ components:
         returnableId:
           type: string
           nullable: true
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+      additionalProperties: false
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
         createdOn:
           type: string
           format: date-time

@@ -2,10 +2,14 @@
   import { page, goto } from "@roxi/routify";
   import { onMount } from "svelte";
   import { mediator } from "$services/mediator";
-  import Loader from "$components/Loader/Loader.svelte";
   import { getCustomerModule } from "./module";
   import { ListAgreementsQuery } from "$queries/agreements/listAgreements";
   import type { Components } from "$types/api";
+  import PageHeader from '$components/Page/PageHeader.svelte'
+  import PageContent from '$components/Page/PageContent.svelte'
+  import { formatAgreementStatus } from '$pages/agreements/utils'
+  import { formatDateDistance } from '$utils/date'
+  import { format } from '$utils/format'
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -24,6 +28,16 @@
       module.goToHome();
     }
   });
+  
+  const actions = [
+    {
+      name:'Ajouter',
+      disabled:false,
+      color:'primary',
+      action: () => module.goToCustomers()
+    }
+  ];
+  
 </script>
 
 <!-- routify:options menu="Mes clients" -->
@@ -32,35 +46,29 @@
 <!-- routify:options index=1 -->
 <!-- routify:options default=true -->
 
-<svelte:head>
-  <title>{$page.title}</title>
-</svelte:head>
-
-<h1>{$page.title}</h1>
-
-{#if isLoading}
-  <Loader />
-{:else}
+<PageHeader
+  title={$page.title}
+  actions={actions}
+/>
+<PageContent {isLoading}>
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table>
       <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Status</th>
-          <th>Client depuis</th>
-          <th>Dernière maj</th>
-        </tr>
+      <tr>
+        <th>Nom</th>
+        <th>Statut</th>
+        <th>Dernière maj</th>
+      </tr>
       </thead>
       <tbody>
-        {#each agreements as agreement}
-          <tr on:click="{() => module.goToDetails(agreement.id)}">
-            <th>{agreement.customer.name}</th>
-            <th>{agreement.status}</th>
-            <th>{agreement.createdOn}</th>
-            <th>{agreement.updatedOn}</th>
-          </tr>
-        {/each}
+      {#each agreements as agreement}
+        <tr on:click="{() => module.goToDetails(agreement.id)}">
+          <th>{agreement.customerName}</th>
+          <td use:format={formatAgreementStatus}>{agreement.status}</td>
+          <td use:format={formatDateDistance}>{agreement.updatedOn}</td>
+        </tr>
+      {/each}
       </tbody>
     </table>
-  </div>
-{/if}
+  </div>  
+</PageContent>

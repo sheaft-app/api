@@ -8,9 +8,8 @@
   export let min: number | null = null;
   export let max: number | null = null;
   export let placeholder: string = "";
-  export let isLoading: boolean = false;
-  export let required: boolean = true;
   export let disabled: boolean = false;
+  export let required: boolean = true;
 
   let name: string | null = null;
   if (!id) id = nanoid(10);
@@ -25,7 +24,7 @@
     id="{id}"
     name="{name}"
     type="number"
-    disabled="{disabled || isLoading}"
+    disabled="{disabled}"
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"

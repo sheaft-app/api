@@ -25,7 +25,7 @@ declare namespace Components {
             id?: string | null;
             name?: string | null;
         }
-        export interface AgreementDto {
+        export interface AgreementDetailsDto {
             id?: string | null;
             status?: AgreementStatus /* int32 */;
             createdOn?: string; // date-time
@@ -35,6 +35,13 @@ declare namespace Components {
             catalog?: AgreementCatalogDto;
             deliveryDays?: DayOfWeek /* int32 */[] | null;
             deliveryAddress?: AddressDto;
+        }
+        export interface AgreementDto {
+            id?: string | null;
+            status?: AgreementStatus /* int32 */;
+            updatedOn?: string; // date-time
+            supplierName?: string | null;
+            customerName?: string | null;
         }
         export interface AgreementDtoPaginatedResults {
             items?: AgreementDto[] | null;
@@ -52,6 +59,38 @@ declare namespace Components {
             phone?: string | null;
         }
         export type AgreementStatus = 0 | 1 | 2 | 3; // int32
+        export interface AvailableCustomerDto {
+            id?: string | null;
+            name?: string | null;
+            email?: string | null;
+            phone?: string | null;
+            deliveryAddress?: AddressDto;
+        }
+        export interface AvailableCustomerDtoPaginatedResults {
+            items?: AvailableCustomerDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
+        }
+        export interface AvailableSupplierDto {
+            id?: string | null;
+            name?: string | null;
+            email?: string | null;
+            phone?: string | null;
+            shippingAddress?: AddressDto;
+        }
+        export interface AvailableSupplierDtoPaginatedResults {
+            items?: AvailableSupplierDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
+        }
         export type BatchDateKind = 0 | 1 | 2; // int32
         export interface CancelInvoiceRequest {
             reason?: string | null;
@@ -150,7 +189,7 @@ declare namespace Components {
             detail?: string | null;
             instance?: string | null;
         }
-        export interface ProductDto {
+        export interface ProductDetailsDto {
             id?: string | null;
             name?: string | null;
             code?: string | null;
@@ -160,6 +199,14 @@ declare namespace Components {
             returnable?: ReturnableDto;
             returnableId?: string | null;
             createdOn?: string; // date-time
+            updatedOn?: string; // date-time
+        }
+        export interface ProductDto {
+            id?: string | null;
+            name?: string | null;
+            code?: string | null;
+            unitPrice?: number; // double
+            vat?: number; // double
             updatedOn?: string; // date-time
         }
         export interface ProductDtoPaginatedResults {
@@ -483,7 +530,31 @@ declare namespace Paths {
             id: Parameters.Id;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.AgreementDto;
+            export type $200 = Components.Schemas.AgreementDetailsDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace GetAvailableCustomer {
+        namespace Parameters {
+            export type Id = string;
+        }
+        export interface PathParameters {
+            id: Parameters.Id;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AvailableCustomerDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace GetAvailableSupplier {
+        namespace Parameters {
+            export type Id = string;
+        }
+        export interface PathParameters {
+            id: Parameters.Id;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AvailableSupplierDto;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -495,7 +566,7 @@ declare namespace Paths {
             id: Parameters.Id;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.ProductDto;
+            export type $200 = Components.Schemas.ProductDetailsDto;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -522,6 +593,34 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.AgreementDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListAvailableCustomers {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AvailableCustomerDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListAvailableSuppliers {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AvailableSupplierDtoPaginatedResults;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -1021,6 +1120,22 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetAgreement.Responses.$200>
   /**
+   * GetAvailableCustomer - Retrieve customer with id
+   */
+  'GetAvailableCustomer'(
+    parameters?: Parameters<Paths.GetAvailableCustomer.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetAvailableCustomer.Responses.$200>
+  /**
+   * GetAvailableSupplier - Retrieve supplier with id
+   */
+  'GetAvailableSupplier'(
+    parameters?: Parameters<Paths.GetAvailableSupplier.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetAvailableSupplier.Responses.$200>
+  /**
    * ListAgreements - List available agreements for current user
    */
   'ListAgreements'(
@@ -1028,6 +1143,22 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListAgreements.Responses.$200>
+  /**
+   * ListAvailableCustomers - List available customers for current user
+   */
+  'ListAvailableCustomers'(
+    parameters?: Parameters<Paths.ListAvailableCustomers.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListAvailableCustomers.Responses.$200>
+  /**
+   * ListAvailableSuppliers - List available suppliers for current user
+   */
+  'ListAvailableSuppliers'(
+    parameters?: Parameters<Paths.ListAvailableSuppliers.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
   /**
    * LoginUser - Log the user in and generate access token / refresh token
    */
@@ -1425,6 +1556,26 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetAgreement.Responses.$200>
   }
+  ['/api/agreements/customers/{id}']: {
+    /**
+     * GetAvailableCustomer - Retrieve customer with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetAvailableCustomer.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetAvailableCustomer.Responses.$200>
+  }
+  ['/api/agreements/suppliers/{id}']: {
+    /**
+     * GetAvailableSupplier - Retrieve supplier with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetAvailableSupplier.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetAvailableSupplier.Responses.$200>
+  }
   ['/api/agreements']: {
     /**
      * ListAgreements - List available agreements for current user
@@ -1434,6 +1585,26 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListAgreements.Responses.$200>
+  }
+  ['/api/agreements/customers']: {
+    /**
+     * ListAvailableCustomers - List available customers for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListAvailableCustomers.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListAvailableCustomers.Responses.$200>
+  }
+  ['/api/agreements/suppliers']: {
+    /**
+     * ListAvailableSuppliers - List available suppliers for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListAvailableSuppliers.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
   }
   ['/api/token/login']: {
     /**

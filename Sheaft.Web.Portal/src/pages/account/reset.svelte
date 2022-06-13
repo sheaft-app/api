@@ -41,14 +41,14 @@
       <Password
         label="Nouveau mot de passe"
         bind:value="{$data.password}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         placeholder="Votre nouveau mot de passe"
         class="mb-6 w-full"
       />
       <Password
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         placeholder="Confirmer le nouveau mot de passe"
         class="mb-6 w-full"
       />

@@ -58,12 +58,12 @@
   <Address
     id="legalAddress"
     label="Siège social"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.legalAddress}"
   />
   <Checkbox
     id="hasDifferentBillingAddress"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{hasDifferentBillingAddress}"
     label="Mon adresse de facturation est différente"
     required="{false}"
@@ -72,14 +72,14 @@
     <NamedAddress
       id="billingAddress"
       label="Adresse de facturation"
-      isLoading="{$isSubmitting}"
+      disabled="{$isSubmitting}"
       bind:value="{$data.billingAddress}"
       required="{hasDifferentBillingAddress}"
     />
   {/if}
   <Checkbox
     id="hasDifferentSecondaryAddress"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{hasDifferentSecondaryAddress}"
     label="{state.information.accountType === ProfileKind.Customer
       ? 'Mon adresse de livraison est différente'
@@ -90,7 +90,7 @@
     <NamedAddress
       id="deliveryAddress"
       label="Adresse de livraison"
-      isLoading="{$isSubmitting}"
+      disabled="{$isSubmitting}"
       bind:value="{$data.deliveryAddress}"
       required="{hasDifferentSecondaryAddress}"
     />
@@ -99,7 +99,7 @@
     <NamedAddress
       id="shippingAddress"
       label="Adresse d'expédition"
-      isLoading="{$isSubmitting}"
+      disabled="{$isSubmitting}"
       bind:value="{$data.shippingAddress}"
       required="{hasDifferentSecondaryAddress}"
     />

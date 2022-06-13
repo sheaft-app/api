@@ -5,7 +5,7 @@
   export let id: string | null = null;
   export let value: boolean = false;
   export let label: string | null = null;
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let required: boolean = true;
 
   let name: string | null = null;
@@ -19,7 +19,7 @@
     name="{name}"
     type="checkbox"
     bind:checked="{value}"
-    disabled="{isLoading}"
+    disabled="{disabled}"
     required="{required}"
     class="{$$props.class} w-4 h-4 m-1"
   />

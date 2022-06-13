@@ -7,7 +7,6 @@
   export let value: string | null = null;
   export let label: string | null = null;
   export let options: ISelectOption[] = [];
-  export let isLoading: boolean = false;
   export let required: boolean = true;
   export let disabled: boolean = false;
 
@@ -23,7 +22,7 @@
   <select
     id="{id}"
     name="{name}"
-    disabled="{isLoading || disabled}"
+    disabled="{disabled}"
     bind:value
     class="{$$props.class}"
     required="{required}"

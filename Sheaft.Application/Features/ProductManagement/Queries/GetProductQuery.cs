@@ -2,9 +2,9 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record GetProductQuery(ProductId Identifier) : IQuery<Result<ProductDto>>;
+public record GetProductQuery(ProductId Identifier) : IQuery<Result<ProductDetailsDto>>;
 
-internal class GetProductHandler : IQueryHandler<GetProductQuery, Result<ProductDto>>
+internal class GetProductHandler : IQueryHandler<GetProductQuery, Result<ProductDetailsDto>>
 {
     private readonly IProductQueries _productQueries;
 
@@ -13,7 +13,7 @@ internal class GetProductHandler : IQueryHandler<GetProductQuery, Result<Product
         _productQueries = productQueries;
     }
     
-    public async Task<Result<ProductDto>> Handle(GetProductQuery request, CancellationToken token)
+    public async Task<Result<ProductDetailsDto>> Handle(GetProductQuery request, CancellationToken token)
     {
         return await _productQueries.Get(request.Identifier, token);
     }

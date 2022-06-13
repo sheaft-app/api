@@ -16,6 +16,7 @@
   import { CreateProductRequest } from "$commands/products/createProduct";
   import type { Components } from "$types/api";
   import { ListReturnablesOptionsQuery } from "$queries/products/listReturnablesOptions";
+  import PageHeader from '$components/Page/PageHeader.svelte'
 
   const module = getProductModule($goto);
 
@@ -58,13 +59,10 @@
 <!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
 <!-- routify:options title="Ajouter un nouveau produit" -->
-<!-- routify:options icon="fas#coffee" -->
 
-<svelte:head>
-  <title>{$page.title}</title>
-</svelte:head>
-
-<h1>{$page.title}</h1>
+<PageHeader
+  title={$page.title}
+/>
 
 <form use:form>
   <Text
@@ -74,28 +72,27 @@
     required="{false}"
     maxLength="{30}"
     placeholder="Le code de votre produit (sera autogénéré si non renseigné)"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Text
     id="name"
     label="Nom"
     bind:value="{$data.name}"
     placeholder="Le nom de votre produit"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Price
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre produit en €"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
-  <Vat id="vat" label="TVA" bind:value="{$data.vat}" isLoading="{$isSubmitting}" />
+  <Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{$isSubmitting}" />
   <Price
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"
-    isLoading="{$isSubmitting}"
     required="{false}"
   />
   <LongText
@@ -104,11 +101,11 @@
     bind:value="{$data.description}"
     required="{false}"
     placeholder="Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
   />
   <Checkbox
     label="Ce produit est consigné"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{isReturnable}"
     class="mt-3 mb-6"
     required="{false}"
@@ -118,8 +115,7 @@
       id="returnableId"
       label="Consigne"
       options="{returnablesOptions}"
-      isLoading="{$isSubmitting}"
-      disabled="{isLoading}"
+      disabled="{$isSubmitting|| isLoading}"
       bind:value="{$data.returnableId}"
     />
   {/if}

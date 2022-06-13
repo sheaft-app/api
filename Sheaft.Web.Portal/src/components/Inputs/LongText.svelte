@@ -6,7 +6,7 @@
   export let value: string | null = null;
   export let label: string | null = null;
   export let placeholder: string = "";
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let required: boolean = true;
 
   let name: string | null = null;
@@ -22,7 +22,7 @@
     id="{id}"
     name="{name}"
     bind:value
-    disabled="{isLoading}"
+    disabled="{disabled}"
     placeholder="{placeholder}"
     class="{$$props.class}"
     required="{required}"></textarea>

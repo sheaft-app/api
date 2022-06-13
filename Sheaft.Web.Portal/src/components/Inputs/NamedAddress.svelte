@@ -9,7 +9,7 @@
   export let id: string | null = null;
   export let value: INamedAddress | undefined;
   export let label: string = "";
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let showName: boolean = true;
   export let showEmail: boolean = true;
   export let required: boolean = true;
@@ -38,7 +38,7 @@
       {#if showName}
         <Text
           id="{id}.name"
-          disabled="{isLoading}"
+          disabled="{disabled}"
           placeholder="Destinataire/Emetteur"
           bind:value="{value.name}"
           required="{required}"
@@ -47,7 +47,7 @@
       {#if showEmail}
         <Email
           id="{id}.email"
-          disabled="{isLoading}"
+          disabled="{disabled}"
           placeholder="Mail de contact"
           bind:value="{value.email}"
         />
@@ -56,28 +56,28 @@
     <fieldset>
       <Text
         id="{id}.street"
-        disabled="{isLoading}"
+        disabled="{disabled}"
         placeholder="Adresse"
         bind:value="{value.street}"
         required="{required}"
       />
       <Text
         id="{id}.complement"
-        disabled="{isLoading}"
+        disabled="{disabled}"
         placeholder="Complément d'adresse"
         bind:value="{value.complement}"
         required="{false}"
       />
       <Text
         id="{id}.postcode"
-        disabled="{isLoading}"
+        disabled="{disabled}"
         placeholder="Code postal"
         bind:value="{value.postcode}"
         required="{required}"
       />
       <Text
         id="{id}.city"
-        disabled="{isLoading}"
+        disabled="{disabled}"
         placeholder="Ville"
         bind:value="{value.city}"
         required="{required}"

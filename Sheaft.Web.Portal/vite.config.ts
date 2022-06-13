@@ -17,13 +17,15 @@ export default defineConfig({
       plugins: [
         // Enable rollup polyfills plugin
         // used during production bundling
-        rollupNodePolyFill()
+        rollupNodePolyFill(),
       ]
     }
   },
   plugins: [
     svelte(),
-    nodeResolve()
+    nodeResolve({
+      dedupe: ['svelte', 'svelte/transition', 'svelte/internal'], // important!
+    }),
   ],
   resolve: {
     alias: {

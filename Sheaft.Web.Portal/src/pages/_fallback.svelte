@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
 </script>
-
-<h1>Not found</h1>
+<div class='flex items-center justify-center h-full w-full'>
+  <h1>Page introuvable</h1>  
+</div>

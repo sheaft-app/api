@@ -1,9 +1,5 @@
 ﻿<script lang="ts">
-  import { metatags, page } from "@roxi/routify";
 </script>
-
-<!-- routify:options public=true -->
-<!-- routify:options index=true -->
-<!-- routify:options title="Accès non autorisé" -->
-
-<h1>{$page.title}</h1>
+<div class='flex items-center justify-center h-full w-full'>
+  <h1>Accès non autorisé</h1>
+</div>

@@ -40,14 +40,14 @@
         id="username"
         label="Nom d'utilisateur"
         bind:value="{$data.username}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Password
         id="password"
         label="Votre mot de passe"
         bind:value="{$data.password}"
-        isLoading="{$isSubmitting}"
+        disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <a href="/account/forgot?&email={$data.username}">Mot de passe oublié?</a>

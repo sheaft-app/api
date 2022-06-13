@@ -53,7 +53,9 @@ internal class ReturnableQueries : Queries, IReturnableQueries
                     Name = p.Name,
                     Code = p.Reference,
                     Vat = p.Vat,
-                    UnitPrice = p.UnitPrice
+                    UnitPrice = p.UnitPrice,
+                    CreatedOn = p.CreatedOn,
+                    UpdatedOn = p.UpdatedOn
                 };
 
             var returnables = await returnablesQuery

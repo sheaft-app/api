@@ -6,7 +6,7 @@
   export let value: string | null = null;
   export let label: string | null = null;
   export let placeholder: string = "";
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let minLength: number = 0;
   export let maxLength: number = 250;
 
@@ -38,7 +38,7 @@
         id="{id}"
         name="{name}"
         type="text"
-        disabled="{isLoading}"
+        disabled="{disabled}"
         placeholder="{placeholder}"
         bind:value
         class="{$$props.class} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5"

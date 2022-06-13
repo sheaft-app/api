@@ -8,7 +8,7 @@
   export let id: string | null = null;
   export let value: IAddress | undefined;
   export let label: string = "";
-  export let isLoading: boolean = false;
+  export let disabled: boolean = false;
   export let required: boolean = true;
 
   if (!id) id = nanoid(10);
@@ -34,7 +34,7 @@
 
     <Text
       id="{id}.street"
-      disabled="{isLoading}"
+      disabled="{disabled}"
       placeholder="Adresse"
       bind:value="{value.street}"
       required="{required}"
@@ -42,7 +42,7 @@
     <Text
       id="{id}.complement"
       type="text"
-      disabled="{isLoading}"
+      disabled="{disabled}"
       required="{false}"
       placeholder="Complément d'adresse"
       bind:value="{value.complement}"
@@ -50,7 +50,7 @@
     <Text
       id="{id}.postcode"
       type="text"
-      disabled="{isLoading}"
+      disabled="{disabled}"
       placeholder="Code postal"
       bind:value="{value.postcode}"
       required="{required}"
@@ -58,7 +58,7 @@
     <Text
       id="{id}.city"
       type="text"
-      disabled="{isLoading}"
+      disabled="{disabled}"
       placeholder="Ville"
       bind:value="{value.city}"
       required="{required}"

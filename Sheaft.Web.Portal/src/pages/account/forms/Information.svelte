@@ -31,42 +31,42 @@
     id="accountType"
     label="Je suis"
     options="{accountTypeOptions}"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.accountType}"
     class="mb-6"
   />
   <Text
     id="tradeName"
     label="Nom commercial"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.tradeName}"
     placeholder="ex: Dupont & Fils"
   />
   <Text
     id="corporateName"
     label="Dénomination légale"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.corporateName}"
     placeholder="ex: SARL Dupont"
   />
   <Siret
     id="siret"
     label="SIRET"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.siret}"
     placeholder="Votre numéro de SIRET (14 chiffres)"
   />
   <Email
     id="email"
     label="Mail de contact"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.email}"
     placeholder="Votre adresse mail"
   />
   <Phone
     id="phone"
     label="Téléphone de contact"
-    isLoading="{$isSubmitting}"
+    disabled="{$isSubmitting}"
     bind:value="{$data.phone}"
     placeholder="Votre numéro de téléphone"
   />
@@ -79,7 +79,10 @@
     >
       Annuler
     </Button>
-    <Button class="accent w-full mx-8" disabled="{$isSubmitting}" type="submit"
+    <Button 
+      class="accent w-full mx-8"             
+      isLoading="{$isSubmitting}" 
+      type="submit"
       >Suivant
     </Button>
   </FormFooter>

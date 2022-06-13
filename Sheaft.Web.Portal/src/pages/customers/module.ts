@@ -2,25 +2,18 @@
 import { AppModule } from "$services/module";
 import type { IAppModule } from "$services/module";
 import type { GotoHelper } from "@roxi/routify";
+import { GetAvailableCustomerHandler, GetAvailableCustomerQuery } from '$queries/customers/getAvailableCustomer'
+import { ListAvailableCustomersHandler, ListAvailableCustomersQuery } from '$queries/customers/listAvailableCustomers'
 import {
-  CreateProductHandler,
-  CreateProductRequest
-} from "$commands/products/createProduct";
-import {
-  UpdateProductRequest,
-  UpdateProductRequestHandler
-} from "$commands/products/updateProduct";
-import { GetProductHandler, GetProductQuery } from "$queries/products/getProduct";
-import { ListProductsHandler, ListProductsQuery } from "$queries/products/listProducts";
-import {
-  ListReturnablesOptionsHandler,
-  ListReturnablesOptionsQuery
-} from "$queries/products/listReturnablesOptions";
+  ProposeAgreementToCustomerHandler,
+  ProposeAgreementToCustomerRequest
+} from '$commands/customers/proposeAgreementToCustomer'
 
 export interface ICustomerModule extends IAppModule {
   goToList(): void;
   goToDetails(id: string): void;
-  goToCreate(): void;
+  goToCustomer(id: string): void;
+  goToCustomers(): void;
 }
 
 class CustomerModule extends AppModule implements ICustomerModule {
@@ -32,12 +25,19 @@ class CustomerModule extends AppModule implements ICustomerModule {
   }
 
   override registerHandlers = () => {
-  };
+    this.registerHandler(GetAvailableCustomerQuery, request =>
+      new GetAvailableCustomerHandler(this._client).handle(request)
+    );
 
-  goToCreate = (): void => {
-    this.navigate(`${this._basePath}/create`);
-  };
+    this.registerHandler(ListAvailableCustomersQuery, request =>
+      new ListAvailableCustomersHandler(this._client).handle(request)
+    );
 
+    this.registerHandler(ProposeAgreementToCustomerRequest, request =>
+      new ProposeAgreementToCustomerHandler(this._client).handle(request)
+    );
+  };
+  
   goToDetails = (id: string): void => {
     this.navigate(`${this._basePath}/${id}`);
   };
@@ -45,6 +45,14 @@ class CustomerModule extends AppModule implements ICustomerModule {
   goToList = (): void => {
     this.navigate(this._basePath);
   };
+
+  goToCustomer(id: string): void {
+    this.navigate(`${this._basePath}/search/${id}`);
+  }
+
+  goToCustomers(): void {
+    this.navigate(`${this._basePath}/search`);
+  }
 }
 
 let module: ICustomerModule | null | undefined;

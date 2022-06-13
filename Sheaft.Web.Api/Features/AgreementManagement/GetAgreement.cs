@@ -21,7 +21,7 @@ public class GetAgreement : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<AgreementDto>> Get(string id, CancellationToken token)
+    public async Task<ActionResult<AgreementDetailsDto>> Get(string id, CancellationToken token)
     {
         var result = await Mediator.Query(new GetAgreementQuery(new AgreementId(id)), token);
         return HandleCommandResult(result);
