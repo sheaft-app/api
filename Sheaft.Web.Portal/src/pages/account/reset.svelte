@@ -2,11 +2,11 @@
   import { goto, params, page } from "@roxi/routify";
   import Button from "$components/Buttons/Button.svelte";
   import Password from "$components/Inputs/Password.svelte";
-  import { getAccountModule } from "$pages/account/module";
   import { createForm } from "felte";
-  import type { Components } from "$types/api";
-  import { mediator } from "$services/mediator";
-  import { ResetPasswordRequest } from "$commands/account/resetPassword";
+  import { getAccountModule } from '$features/account/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ResetPasswordCommand } from '$features/account/commands/resetPassword'
 
   const module = getAccountModule($goto);
 
@@ -19,7 +19,7 @@
       },
       onSubmit: async values => {
         await mediator.send(
-          new ResetPasswordRequest(values.resetToken, values.password, values.confirm)
+          new ResetPasswordCommand(values.resetToken, values.password, values.confirm)
         );
       },
       onSuccess: () => {

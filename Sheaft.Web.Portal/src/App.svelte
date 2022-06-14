@@ -2,15 +2,13 @@
   import { onMount } from 'svelte'
   import { Router } from '@roxi/routify'
   import { routes } from '$routify/routes'
-  import { api, configureAxios } from '$configs/axios'
-  import { authStore } from '$stores/auth'
-  import type { Client } from '$types/api'
   import Modal from 'svelte-simple-modal'
-  import { registerReturnableModule } from '$pages/returnables/module'
-  import { registerProductModule } from '$pages/products/module'
-  import { registerAccountModule } from '$pages/account/module'
-  import { registerCustomerModule } from '$pages/customers/module'
-  import { registerAgreementModule } from '$pages/agreements/module'
+  import { registerProductModule } from '$features/products/module'
+  import { registerAccountModule } from '$features/account/module'
+  import { registerAgreementModule } from '$features/agreements/module'
+  import { api, configureAxios } from '$features/axios'
+  import type { Client } from '$features/api'
+  import { authStore } from "$components/Auth/auth";
 
   onMount(async () => {
     const client = await api.init<Client>()
@@ -20,9 +18,7 @@
 
     registerAccountModule(client, authStore)
     registerProductModule(client)
-    registerReturnableModule(client)
     registerAgreementModule(client)
-    registerCustomerModule(client)
   })
 </script>
 

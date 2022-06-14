@@ -2,7 +2,7 @@
   import { page } from "@roxi/routify";
   import MenuEntry from "./MenuEntry.svelte";
   import MenuGroup from "./MenuGroup.svelte";
-  import { authStore } from "$stores/auth";
+  import { authStore } from "$components/Auth/auth";
   import {
     canDisplayEntry,
     canHighlightMenuItem,

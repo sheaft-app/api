@@ -8,16 +8,16 @@
   import Select from "$components/Inputs/Select.svelte";
   import Checkbox from "$components/Inputs/Checkbox.svelte";
   import { onMount } from "svelte";
-  import { mediator } from "$services/mediator";
   import Button from "$components/Buttons/Button.svelte";
   import { createForm } from "felte";
-  import { calculateOnSalePrice } from "$utils/price";
-  import { getProductModule } from "$pages/products/module";
-  import { UpdateProductRequest } from "$commands/products/updateProduct";
-  import type { Components } from "$types/api";
-  import { GetProductQuery } from "$queries/products/getProduct";
-  import { ListReturnablesOptionsQuery } from "$queries/products/listReturnablesOptions";
   import PageHeader from '$components/Page/PageHeader.svelte'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { UpdateProductCommand } from '$features/products/commands/updateProduct'
+  import { calculateOnSalePrice } from '$utils/money'
+  import { GetProductQuery } from '$features/products/queries/getProduct'
+  import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
 
   export let id = "";
   const module = getProductModule($goto);
@@ -30,7 +30,7 @@
     createForm<Components.Schemas.UpdateProductRequest>({
       onSubmit: async values => {
         return await mediator.send(
-          new UpdateProductRequest(
+          new UpdateProductCommand(
             id,
             values.name,
             values.unitPrice,
@@ -42,7 +42,7 @@
         );
       },
       onSuccess: () => {
-        module.goToList();
+        module.goToProductList();
       }
     });
 
@@ -60,7 +60,7 @@
 
       isLoading = false;
     } catch (exc) {
-      module.goToList();
+      module.goToProductList();
     }
   });
 

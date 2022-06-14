@@ -1,20 +1,20 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
   import { onMount } from "svelte";
-  import { mediator } from "$services/mediator";
-  import { getCustomerModule } from "./module";
-  import { ListAgreementsQuery } from "$queries/agreements/listAgreements";
-  import type { Components } from "$types/api";
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import { formatAgreementStatus } from '$pages/agreements/utils'
-  import { formatDateDistance } from '$utils/date'
-  import { format } from '$utils/format'
+  import { getAgreementModule } from '$features/agreements/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ListAgreementsQuery } from '$features/agreements/queries/listAgreements'
+  import { statusStr } from '$features/agreements/utils'
+  import {formatInnerHtml} from '$directives/format'
+  import { dateDistance } from '$utils/dates'
 
   export let pageNumber: number = 1,
     take: number = 10;
 
-  const module = getCustomerModule($goto);
+  const module = getAgreementModule($goto);
 
   let isLoading = true;
   let agreements: Components.Schemas.AgreementDto[] = [];
@@ -34,7 +34,7 @@
       name:'Ajouter',
       disabled:false,
       color:'primary',
-      action: () => module.goToCustomers()
+      action: () => module.goToAvailableCustomers()
     }
   ];
   
@@ -64,8 +64,8 @@
       {#each agreements as agreement}
         <tr on:click="{() => module.goToDetails(agreement.id)}">
           <th>{agreement.customerName}</th>
-          <td use:format={formatAgreementStatus}>{agreement.status}</td>
-          <td use:format={formatDateDistance}>{agreement.updatedOn}</td>
+          <td use:formatInnerHtml={statusStr}>{agreement.status}</td>
+          <td use:formatInnerHtml={dateDistance}>{agreement.updatedOn}</td>
         </tr>
       {/each}
       </tbody>

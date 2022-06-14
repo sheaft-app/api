@@ -1,10 +1,10 @@
 ﻿<script lang="ts">
-  import { authStore } from "$stores/auth";
-  import { checkPageAccess } from "$utils/page";
   import { page, goto, beforeUrlChange, params } from "@roxi/routify";
   import SideNav from "$components/Nav/SideNav.svelte";
   import TopNav from "$components/Nav/TopNav.svelte";
   import Screen from "$components/Screen.svelte";
+  import { checkPageAccess } from '$pages/security'
+  import { authStore } from "$components/Auth/auth";
 
   $beforeUrlChange((event: any, route) => {
     const pageAccessResult = checkPageAccess(

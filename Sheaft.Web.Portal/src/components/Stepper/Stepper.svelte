@@ -7,7 +7,7 @@
     IStepDefinition,
     IStepsDefinition,
     IStepsResult
-  } from "$components/Stepper/types/stepper";
+  } from "$components/Stepper/types";
   import { onMount } from "svelte";
 
   export let submit = async (results: IStepsResult): Promise<void> => {};

@@ -2,9 +2,9 @@
   import { goto, isActive } from "@roxi/routify";
   import Menu from "./Menu.svelte";
   import { parseSubActivePath } from "./path";
-  import { getFaIcon, getFaIconFromFullName } from "$utils/faIcon";
   import Fa from "svelte-fa";
-  import type { IEntry } from "$components/Nav/menus";
+  import type { IEntry } from '$components/Nav/types'
+  import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
 
   export let entry: IEntry = {
     visible: true,

@@ -8,15 +8,15 @@
   import Select from "$components/Inputs/Select.svelte";
   import Checkbox from "$components/Inputs/Checkbox.svelte";
   import { onMount } from "svelte";
-  import { mediator } from "$services/mediator";
   import Button from "$components/Buttons/Button.svelte";
   import { createForm } from "felte";
-  import { calculateOnSalePrice } from "$utils/price";
-  import { getProductModule } from "$pages/products/module";
-  import { CreateProductRequest } from "$commands/products/createProduct";
-  import type { Components } from "$types/api";
-  import { ListReturnablesOptionsQuery } from "$queries/products/listReturnablesOptions";
   import PageHeader from '$components/Page/PageHeader.svelte'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { CreateProductCommand } from '$features/products/commands/createProduct'
+  import { calculateOnSalePrice } from '$utils/money'
+  import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
 
   const module = getProductModule($goto);
 
@@ -28,7 +28,7 @@
     createForm<Components.Schemas.CreateProductRequest>({
       onSubmit: async values => {
         return await mediator.send(
-          new CreateProductRequest(
+          new CreateProductCommand(
             values.name,
             values.unitPrice,
             values.vat,
@@ -39,7 +39,7 @@
         );
       },
       onSuccess: (id: string) => {
-        module.goToDetails(id);
+        module.goToProductDetails(id);
       }
     });
 
@@ -51,7 +51,7 @@
       returnablesOptions = await mediator.send(new ListReturnablesOptionsQuery());
       isLoading = false;
     } catch (exc) {
-      module.goToList();
+      module.goToProductList();
     }
   });
 </script>

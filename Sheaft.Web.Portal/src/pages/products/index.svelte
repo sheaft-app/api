@@ -1,14 +1,16 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { format, currency, percent } from '$utils/format'
-  import { mediator } from '$services/mediator'
-  import { getProductModule } from '$pages/products/module'
-  import { ListProductsQuery } from '$queries/products/listProducts'
-  import type { Components } from '$types/api'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { formatDate, formatDateDistance } from '$utils/date'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ListProductsQuery } from '$features/products/queries/listProducts'
+  import { dateDistance } from '$utils/dates'
+  import { currency } from '$utils/money'
+  import { percent } from '$utils/percent'
+  import { formatInnerHtml } from '$directives/format'
 
   export let pageNumber: number = 1,
     take: number = 10
@@ -33,7 +35,7 @@
       name:'Ajouter',
       disabled:false,
       color:'primary',
-      action: () => module.goToCreate()
+      action: () => module.goToCreateProduct()
     }
   ];
 </script>
@@ -62,11 +64,11 @@
       </thead>
       <tbody>
       {#each products as product}
-        <tr on:click='{() => module.goToDetails(product.id)}'>
+        <tr on:click='{() => module.goToProductDetails(product.id)}'>
           <th>{product.name}</th>
-          <td use:format={currency}>{product.unitPrice}</td>
-          <td use:format={percent}>{product.vat}</td>
-          <td use:format={formatDateDistance}>{product.updatedOn}</td>
+          <td use:formatInnerHtml={currency}>{product.unitPrice}</td>
+          <td use:formatInnerHtml={percent}>{product.vat}</td>
+          <td use:formatInnerHtml={dateDistance}>{product.updatedOn}</td>
         </tr>
       {/each}
       {#if products?.length < 1}

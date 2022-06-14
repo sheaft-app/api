@@ -1,6 +1,4 @@
 ﻿<script lang="ts">
-  import logo from "$assets/svelte.png";
-  import { page } from "@roxi/routify";
 </script>
 
 <!-- routify:options public=true -->

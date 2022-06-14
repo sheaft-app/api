@@ -1,16 +1,13 @@
 ﻿<script lang='ts'>
   import { page, goto, params } from '@roxi/routify'
-  import Information from './forms/Information.svelte'
-  import Addresses from './forms/Addresses.svelte'
   import { getAccountModule } from '$pages/account/module'
-  import { mediator } from '$services/mediator'
-  import { ConfigureAccountRequest } from '$commands/account/configureAccount'
+  import { mediator } from '$features/mediator'
   import Stepper from '$components/Stepper/Stepper.svelte'
-  import { RefreshAccessTokenRequest } from '$commands/account/refreshAccessToken'
-  import type {
-    IAccountConfigurationResults,
-    IAccountConfigurationSteps
-  } from '$pages/account/account'
+  import Information from '$pages/account/_forms/Information.svelte'
+  import Addresses from '$pages/account/_forms/Addresses.svelte'
+  import type { IAccountConfigurationResults, IAccountConfigurationSteps } from '$features/account/types'
+  import { ConfigureAccountCommand } from '$features/account/commands/configureAccount'
+  import { RefreshAccessTokenCommand } from '$features/account/commands/refreshAccessToken'
 
   const module = getAccountModule($goto)
 
@@ -26,13 +23,13 @@
   const submit = async (results: IAccountConfigurationResults): Promise<void> => {
     try {
       await mediator.send(
-        new ConfigureAccountRequest(
+        new ConfigureAccountCommand(
           results.information.accountType,
           results.information,
           results.addresses
         )
       )
-      await mediator.send(new RefreshAccessTokenRequest())
+      await mediator.send(new RefreshAccessTokenCommand())
       module.redirectIfRequired($params.returnUrl)
       return Promise.resolve()
     } catch (exc) {

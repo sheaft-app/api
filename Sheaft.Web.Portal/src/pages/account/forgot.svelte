@@ -5,11 +5,11 @@
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
-  import { getAccountModule } from "$pages/account/module";
   import { createForm } from "felte";
-  import type { Components } from "$types/api";
-  import { mediator } from "$services/mediator";
-  import { ForgotPasswordRequest } from "$commands/account/forgotPassword";
+  import { getAccountModule } from '$features/account/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ForgotPasswordCommand } from '$features/account/commands/forgotPassword'
 
   const module = getAccountModule($goto);
   let resetRequested = false;
@@ -20,7 +20,7 @@
         email: $params.username
       },
       onSubmit: async values => {
-        await mediator.send(new ForgotPasswordRequest(values.email));
+        await mediator.send(new ForgotPasswordCommand(values.email));
       },
       onSuccess: () => {
         resetRequested = true;

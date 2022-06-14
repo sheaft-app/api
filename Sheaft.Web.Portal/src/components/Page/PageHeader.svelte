@@ -1,9 +1,9 @@
 <script lang='ts'>
   import Fa from 'svelte-fa'
   import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
-  import type { IPageAction } from './types/pageHeader'
   import Button from '$components/Buttons/Button.svelte'
   import { goto } from '@roxi/routify'
+  import type { IPageAction } from '$components/Page/types'
 
   export let title: string
   export let subtitle: string

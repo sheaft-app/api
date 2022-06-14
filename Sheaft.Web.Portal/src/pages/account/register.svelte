@@ -5,12 +5,12 @@
   import Button from "$components/Buttons/Button.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Text from "$components/Inputs/Text.svelte";
-  import { getAccountModule } from "$pages/account/module";
   import { createForm } from "felte";
-  import type { Components } from "$types/api";
-  import { mediator } from "$services/mediator";
-  import { RegisterRequest } from "$commands/account/register";
-  import { LoginRequest } from "$commands/account/login";
+  import { getAccountModule } from '$features/account/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { RegisterAccountCommand } from '$features/account/commands/registerAccount'
+  import { LoginUserCommand } from '$features/account/commands/loginUser'
 
   const module = getAccountModule($goto);
 
@@ -24,7 +24,7 @@
     },
     onSubmit: async values => {
       await mediator.send(
-        new RegisterRequest(
+        new RegisterAccountCommand(
           values.email,
           values.password,
           values.confirm,
@@ -32,7 +32,7 @@
           values.lastname
         )
       );
-      await mediator.send(new LoginRequest(values.email, values.password));
+      await mediator.send(new LoginUserCommand(values.email, values.password));
     },
     onSuccess: (id: string) => {
       module.redirectIfRequired($params.returnUrl);

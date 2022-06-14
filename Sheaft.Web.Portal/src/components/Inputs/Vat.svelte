@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./inputs.scss";
-  import { format, percent } from "$utils/format";
+  import { percent } from '$utils/percent'
+  import {formatInnerHtml} from '$directives/format'
 
   export let id: string | null = null;
   export let value: number | null = null;
@@ -34,7 +35,7 @@
         <label
           class="peer-checked:bg-primary-500 peer-checked:font-bold peer-checked:text-white hover:peer-checked:bg-primary-600"
           for="{id}-{rate}"
-          use:format="{percent}">{rate}</label
+          use:formatInnerHtml="{percent}">{rate}</label
         >
       </div>
     {/each}

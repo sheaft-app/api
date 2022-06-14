@@ -2,15 +2,10 @@
   import { isActive, goto, page } from "@roxi/routify";
   import { parseActivePath } from "./path";
   import Fa from "svelte-fa";
-  import { getFaIcon, getFaIconFromFullName } from "$utils/faIcon";
+  import type { IEntry } from '$components/Nav/types'
+  import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
 
-  export let entry: {
-    name: string;
-    path: string;
-    pages: Array<any>;
-    parent: any;
-    icon: string;
-  } = null;
+  export let entry: IEntry = null;
 
   export let canHighlight: boolean;
 

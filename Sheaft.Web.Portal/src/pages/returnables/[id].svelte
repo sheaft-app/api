@@ -5,25 +5,25 @@
   import Price from "$components/Inputs/Price.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import { createForm } from "felte";
-  import { calculateOnSalePrice } from "$utils/price";
   import Vat from "$components/Inputs/Vat.svelte";
-  import { mediator } from "$services/mediator";
-  import { UpdateReturnableRequest } from "$commands/returnables/updateReturnable";
-  import { getReturnableModule } from "$pages/returnables/module";
-  import { GetReturnableQuery } from "$queries/returnables/getReturnable";
-  import type { Components } from "$types/api";
   import Button from "$components/Buttons/Button.svelte";
   import PageHeader from '$components/Page/PageHeader.svelte'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { UpdateReturnableCommand } from '$features/products/commands/updateReturnable'
+  import { GetReturnableQuery } from '$features/products/queries/getReturnable'
+  import { calculateOnSalePrice } from '$utils/money'
 
   export let id = "";
   let initializing = true;
-  const module = getReturnableModule($goto);
+  const module = getProductModule($goto);
 
   const { form, data, isSubmitting, isValid, setData } =
     createForm<Components.Schemas.UpdateReturnableRequest>({
       onSubmit: async values => {
         await mediator.send(
-          new UpdateReturnableRequest(
+          new UpdateReturnableCommand(
             id,
             values.name,
             values.unitPrice,
@@ -33,7 +33,7 @@
         );
       },
       onSuccess: () => {
-        module.goToList();
+        module.goToReturnableList();
       }
     });
 
@@ -45,7 +45,7 @@
       initializing = false;
     } catch (exc) {
       console.error(exc);
-      module.goToList();
+      module.goToReturnableList();
     }
   });
 

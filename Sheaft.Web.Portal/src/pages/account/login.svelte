@@ -5,10 +5,10 @@
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import { createForm } from "felte";
-  import type { Components } from "$types/api";
-  import { mediator } from "$services/mediator";
-  import { getAccountModule } from "$pages/account/module";
-  import { LoginRequest } from "$commands/account/login";
+  import { getAccountModule } from '$features/account/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { LoginUserCommand } from '$features/account/commands/loginUser'
 
   const module = getAccountModule($goto);
 
@@ -18,7 +18,7 @@
       password: ""
     },
     onSubmit: async values => {
-      await mediator.send(new LoginRequest(values.username, values.password));
+      await mediator.send(new LoginUserCommand(values.username, values.password));
     },
     onSuccess: (id: string) => {
       module.redirectIfRequired($params.returnUrl);

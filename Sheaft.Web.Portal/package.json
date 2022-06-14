@@ -16,8 +16,8 @@
     "lint": "eslint ./src/**/*.{js,ts,svelte}",
     "lint:fix": "eslint --fix ./src/**/*.{js,ts,svelte}",
     "prelint": "npm run format",
-    "dev:types": "typegen ..\\Sheaft.Web.Api\\wwwroot\\swagger\\v1\\swagger.yaml > .\\src\\types\\api.d.ts",
-    "build:types": "typegen ..\\Sheaft.Web.Api\\wwwroot\\swagger\\v1\\swagger.yaml > .\\src\\types\\api.d.ts"
+    "dev:types": "typegen ..\\Sheaft.Web.Api\\wwwroot\\swagger\\v1\\swagger.yaml > .\\src\\features\\api.d.ts",
+    "build:types": "typegen ..\\Sheaft.Web.Api\\wwwroot\\swagger\\v1\\swagger.yaml > .\\src\\features\\api.d.ts"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",

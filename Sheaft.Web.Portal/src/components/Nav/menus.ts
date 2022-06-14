@@ -1,4 +1,6 @@
-﻿const parseAndAssignToMenus = (children: any, menus: any, parent?: string) => {
+﻿import type { IEntry } from '$components/Nav/types'
+
+const parseAndAssignToMenus = (children: any, menus: any, parent?: string) => {
   children.forEach((c: any) => {
     let selector = c.meta.group ? c.meta.menu : parent;
 
@@ -81,17 +83,3 @@ export const canDisplayEntry = (
 
   return true;
 };
-
-export interface IEntry {
-  path?: string;
-  name: string;
-  icon?: string;
-  public?: boolean;
-  anonymous?: boolean;
-  pages?: IEntry[];
-  roles?: string[];
-  visible: boolean;
-  referenced: boolean;
-  default: boolean;
-  parent?: IEntry;
-}

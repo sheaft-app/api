@@ -1,7 +1,7 @@
 <script lang="ts">
   import "./inputs.scss";
   import { nanoid } from "nanoid";
-  import type { ISelectOption } from "$components/Inputs/types/select";
+  import type { ISelectOption } from './types'
 
   export let id: string | null = null;
   export let value: string | null = null;

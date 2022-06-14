@@ -4,22 +4,22 @@
   import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import { calculateOnSalePrice } from "$utils/price";
   import { createForm } from "felte";
-  import type { Components } from "$types/api";
-  import { mediator } from "$services/mediator";
-  import { CreateReturnableRequest } from "$commands/returnables/createReturnable";
-  import { getReturnableModule } from "$pages/returnables/module";
   import Button from "$components/Buttons/Button.svelte";
   import PageHeader from '$components/Page/PageHeader.svelte'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { CreateReturnableCommand } from '$features/products/commands/createReturnable'
+  import { calculateOnSalePrice } from '$utils/money'
 
-  const module = getReturnableModule($goto);
+  const module = getProductModule($goto);
 
   const { form, data, isSubmitting, isValid } =
     createForm<Components.Schemas.CreateReturnableRequest>({
       onSubmit: async values => {
         return await mediator.send(
-          new CreateReturnableRequest(
+          new CreateReturnableCommand(
             values.name,
             values.unitPrice,
             values.vat,
@@ -28,7 +28,7 @@
         );
       },
       onSuccess: (id: string) => {
-        module.goToDetails(id);
+        module.goToReturnableDetails(id);
       }
     });
 

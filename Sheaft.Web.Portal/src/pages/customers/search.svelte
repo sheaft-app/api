@@ -1,18 +1,18 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { mediator } from '$services/mediator'
-  import { getCustomerModule } from './module'
-  import type { Components } from '$types/api'
-  import { ListAvailableCustomersQuery } from '$queries/customers/listAvailableCustomers'
-  import { formatAddress } from '$utils/address'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
+  import { getAgreementModule } from '$features/agreements/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ListAvailableCustomersQuery } from '$features/agreements/queries/listAvailableCustomers'
+  import { address } from '$utils/addresses'
 
   export let pageNumber: number = 1,
     take: number = 10
 
-  const module = getCustomerModule($goto)
+  const module = getAgreementModule($goto)
 
   let isLoading = true
   let customers: Components.Schemas.AvailableCustomerDto[] = []
@@ -35,7 +35,7 @@
 <PageHeader
   title={$page.title}
   subtitle="Ce sont les magasins avec lesquels vous n'avez pas encore d'accord commercial"
-  previous='{() => module.goToList()}' />
+  previous='{() => module.goToCustomers()}' />
 
 <PageContent {isLoading}>
   <div class='relative overflow-x-auto shadow-md sm:rounded-lg'>
@@ -50,7 +50,7 @@
       {#each customers as customer}
         <tr on:click='{() => module.goToCustomer(customer.id)}'>
           <th>{customer.name}</th>
-          <th>{@html formatAddress(customer.deliveryAddress)}</th>
+          <th>{@html address(customer.deliveryAddress)}</th>
         </tr>
       {/each}
       {#if customers?.length < 1}

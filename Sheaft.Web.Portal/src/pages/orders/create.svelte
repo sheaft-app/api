@@ -1,9 +1,0 @@
-﻿<script lang="ts">
-  import { page } from "@roxi/routify";
-</script>
-
-<!-- routify:options menu="Créer" -->
-<!-- routify:options index=2 -->
-<!-- routify:options title="Créer une commande" -->
-
-<h1>{$page.title}</h1>

@@ -4,7 +4,7 @@
     "removeComments": true,
     "forceConsistentCasingInFileNames": true,
     "target": "ES6",
-    "module": "ES6",
+    "module": "ES2020",
     "strict": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
@@ -22,16 +22,10 @@
       "$components/*": ["./src/components/*"],
       "$utils/*": ["./src/utils/*"],
       "$assets/*": ["./src/assets/*"],
-      "$configs/*": ["./src/configs/*"],
       "$styles/*": ["./src/styles/*"],
-      "$settings/*": ["./src/settings/*"],
-      "$types/*": ["./src/types/*"],
       "$enums/*": ["./src/enums/*"],
-      "$commands/*": ["./src/commands/*"],
-      "$queries/*": ["./src/queries/*"],
-      "$notifications/*": ["./src/notifications/*"],
-      "$services/*": ["./src/services/*"],
-      "$stores/*": ["./src/stores/*"]
+      "$features/*": ["./src/features/*"],
+      "$directives/*": ["./src/directives/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

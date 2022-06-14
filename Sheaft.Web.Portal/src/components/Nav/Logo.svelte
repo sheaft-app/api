@@ -1,6 +1,4 @@
 <script lang="ts">
-  import logo from "$assets/logos.png";
-
   export let href: string = "/";
   export let width: number = 80;
 </script>

@@ -1,18 +1,20 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import { format, currency, percent } from '$utils/format'
-  import { getReturnableModule } from '$pages/returnables/module'
-  import { mediator } from '$services/mediator'
-  import { ListReturnablesQuery } from '$queries/returnables/listReturnables'
-  import type { Components } from '$types/api'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { formatDate, formatDateDistance } from '$utils/date'
+  import { getProductModule } from '$features/products/module'
+  import type { Components } from '$features/api'
+  import { mediator } from '$features/mediator'
+  import { ListReturnablesQuery } from '$features/products/queries/listReturnables'
+  import { currency } from '$utils/money'
+  import { percent } from '$utils/percent'
+  import { dateDistance } from '$utils/dates'
+  import {formatInnerHtml} from "$directives/format"
 
   export let pageNumber: number = 1,
     take: number = 10
-  const module = getReturnableModule($goto)
+  const module = getProductModule($goto)
 
   let isLoading = true
   let returnables: Components.Schemas.ReturnableDto[] = []
@@ -20,9 +22,7 @@
   onMount(async () => {
     try {
       isLoading = true
-      returnables = await mediator.send<ListReturnablesQuery>(
-        new ListReturnablesQuery(pageNumber, take)
-      )
+      returnables = await mediator.send(new ListReturnablesQuery(pageNumber, take))
       isLoading = false
     } catch (exc) {
       module.goToHome()
@@ -34,7 +34,7 @@
       name:'Ajouter',
       disabled:false,
       color:'primary',
-      action: () => module.goToCreate()
+      action: () => module.goToCreateReturnable()
     }
   ];
 </script>
@@ -62,11 +62,11 @@
       </thead>
       <tbody>
       {#each returnables as returnable}
-        <tr on:click='{() => module.goToDetails(returnable.id)}'>
+        <tr on:click='{() => module.goToReturnableDetails(returnable.id)}'>
           <th>{returnable.name}</th>
-          <td use:format='{currency}'>{returnable.unitPrice}</td>
-          <td use:format='{percent}'>{returnable.vat}</td>
-          <td use:format={formatDateDistance}>{returnable.updatedOn}</td>
+          <td use:formatInnerHtml='{currency}'>{returnable.unitPrice}</td>
+          <td use:formatInnerHtml='{percent}'>{returnable.vat}</td>
+          <td use:formatInnerHtml={dateDistance}>{returnable.updatedOn}</td>
         </tr>
       {/each}
       {#if returnables?.length < 1}
