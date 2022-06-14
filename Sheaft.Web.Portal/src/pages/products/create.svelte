@@ -17,13 +17,16 @@
   import { CreateProductCommand } from '$features/products/commands/createProduct'
   import { calculateOnSalePrice } from '$utils/money'
   import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
+  import { validator } from '@felte/validator-vest'
+  import { createProductValidators } from '$pages/products/validators'
+  import reporterDom from '@felte/reporter-dom';
 
   const module = getProductModule($goto);
 
   let isLoading = false;
   let isReturnable = false;
   let returnablesOptions: { label: string; value: string }[] = [];
-
+  
   const { form, data, isSubmitting, isValid } =
     createForm<Components.Schemas.CreateProductRequest>({
       onSubmit: async values => {
@@ -40,7 +43,11 @@
       },
       onSuccess: (id: string) => {
         module.goToProductDetails(id);
-      }
+      },
+      extend: [
+        <any>validator({ suite: createProductValidators }),
+        reporterDom()
+      ]
     });
 
   $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
@@ -62,6 +69,7 @@
 
 <PageHeader
   title={$page.title}
+  previous='{() => module.goToProductList()}'
 />
 
 <form use:form>
@@ -104,6 +112,7 @@
     disabled="{$isSubmitting}"
   />
   <Checkbox
+    id='hasReturnable'
     label="Ce produit est consigné"
     disabled="{$isSubmitting}"
     bind:value="{isReturnable}"
@@ -129,7 +138,7 @@
     </Button>
     <Button
       type="submit"
-      disabled="{!$isValid || $isSubmitting}"
+      disabled="{$isSubmitting}"
       isLoading="{$isSubmitting}"
       class="accent w-full mx-8"
       >Créer

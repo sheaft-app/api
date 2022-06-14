@@ -8,8 +8,6 @@
   export let placeholder: string = "";
   export let required: boolean = true;
   export let disabled: boolean = false;
-  export let minLength: number = 0;
-  export let maxLength: number = 250;
 
   let name: string | null = null;
   if (!id) id = nanoid(10);
@@ -28,8 +26,16 @@
     placeholder="{placeholder}"
     bind:value
     class="{$$props.class}"
-    required="{required}"
-    minLength="{minLength}"
-    maxLength="{maxLength}"
-  />
+    aria-describedby="{id}-validation"/>
+  <div
+    id="{id}-validation"
+    class='validation-reporter'
+    data-felte-reporter-dom-for="{id}"
+  ></div>
+  <div
+    id="{id}-warning"
+    class='warning-reporter'
+    data-felte-reporter-dom-for="{id}"
+    data-felte-reporter-dom-level="warning"
+  ></div>
 </div>

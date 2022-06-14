@@ -72,3 +72,21 @@ select:focus-visible{
     @apply cursor-pointer;
   }
 }
+
+input[aria-invalid=true], select[aria-invalid=true]{
+  @apply border-red-500
+}
+
+ul[data-felte-reporter-dom-list], ul[data-felte-reporter-dom-single]{    
+  li{
+    @apply ml-0 mt-1;
+  }
+}
+
+div.validation-reporter{
+  @apply text-red-500
+}
+div.warning-reporter{
+  @apply text-teal-500
+}
+

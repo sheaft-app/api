@@ -69,6 +69,7 @@
 <PageHeader
   title={$page.title}
   actions={actions}
+  previous='{() => module.goToReturnableList()}'
 />
 
 <form use:form>

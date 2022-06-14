@@ -81,6 +81,7 @@
 <PageHeader
   title={$page.title}
   actions={actions}
+  previous='{() => module.goToProductList()}'
 />
 
 <form use:form>
