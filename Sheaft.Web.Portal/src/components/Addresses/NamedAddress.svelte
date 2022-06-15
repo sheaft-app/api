@@ -1,7 +1,6 @@
 <script lang="ts">
   import "./inputs.scss";
   import Text from "$components/Inputs/Text.svelte";
-  import Email from "$components/Inputs/Email.svelte";
   import type { INamedAddress } from "./types";
   import { nanoid } from "nanoid";
   import { onMount } from "svelte";
@@ -45,8 +44,9 @@
         />
       {/if}
       {#if showEmail}
-        <Email
+        <Text
           id="{id}.email"
+          type='email'
           disabled="{disabled}"
           placeholder="Mail de contact"
           bind:value="{value.email}"

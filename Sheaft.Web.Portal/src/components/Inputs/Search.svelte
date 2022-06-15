@@ -7,8 +7,6 @@
   export let label: string | null = null;
   export let placeholder: string = "";
   export let disabled: boolean = false;
-  export let minLength: number = 0;
-  export let maxLength: number = 250;
 
   let name: string | null = null;
   if (!id) id = nanoid(10);
@@ -37,13 +35,11 @@
       <input
         id="{id}"
         name="{name}"
-        type="text"
+        type="search"
         disabled="{disabled}"
         placeholder="{placeholder}"
         bind:value
         class="{$$props.class} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5"
-        minLength="{minLength}"
-        maxLength="{maxLength}"
       />
     </div>
   </div>

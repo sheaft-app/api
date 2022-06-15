@@ -3,6 +3,7 @@
   import { nanoid } from "nanoid";
 
   export let id: string | null = null;
+  export let type: string = "text";
   export let value: string | null = null;
   export let label: string | null = null;
   export let placeholder: string = "";
@@ -21,7 +22,7 @@
   <input
     id="{id}"
     name="{id}"
-    type="text"
+    type="{type}"
     disabled="{disabled}"
     placeholder="{placeholder}"
     bind:value

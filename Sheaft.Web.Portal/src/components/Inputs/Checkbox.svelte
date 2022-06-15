@@ -6,7 +6,7 @@
   export let value: boolean = false;
   export let label: string | null = null;
   export let disabled: boolean = false;
-  export let required: boolean = true;
+  export let required: boolean = false;
 
   let name: string | null = null;
   if (!id) id = nanoid(10);

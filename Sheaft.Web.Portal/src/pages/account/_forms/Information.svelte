@@ -1,14 +1,11 @@
 ﻿<script lang="ts">
   import Select from "$components/Inputs/Select.svelte";
   import Text from "$components/Inputs/Text.svelte";
-  import Email from "$components/Inputs/Email.svelte";
-  import Phone from "$components/Inputs/Phone.svelte";
   import { ProfileKind } from "$enums/profile";
   import { createForm } from "felte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import type { ISelectOption } from "$components/Inputs/types/select";
-  import Siret from "$components/Inputs/Siret.svelte";
   import type { IAccountInformation } from '$features/account/types'
 
   export let initialValues: IAccountInformation | null;
@@ -49,22 +46,24 @@
     bind:value="{$data.corporateName}"
     placeholder="ex: SARL Dupont"
   />
-  <Siret
+  <Text
     id="siret"
     label="SIRET"
     disabled="{$isSubmitting}"
     bind:value="{$data.siret}"
     placeholder="Votre numéro de SIRET (14 chiffres)"
   />
-  <Email
+  <Text
     id="email"
+    type='email'
     label="Mail de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.email}"
     placeholder="Votre adresse mail"
   />
-  <Phone
+  <Text
     id="phone"
+    type='tel'
     label="Téléphone de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.phone}"

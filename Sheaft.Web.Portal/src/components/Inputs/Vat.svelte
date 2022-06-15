@@ -21,7 +21,8 @@
       >{label} {required ? "*" : ""}</label
     >
   {/if}
-  <div class="flex">
+  <div class="flex"
+       aria-describedby="{id}-validation">
     {#each rates as rate}
       <div class="f-radio">
         <input
@@ -40,4 +41,15 @@
       </div>
     {/each}
   </div>
+  <div
+    id="{id}-validation"
+    class='validation-reporter'
+    data-felte-reporter-dom-for="{id}"
+  ></div>
+  <div
+    id="{id}-warning"
+    class='warning-reporter'
+    data-felte-reporter-dom-for="{id}"
+    data-felte-reporter-dom-level="warning"
+  ></div>
 </fieldset>

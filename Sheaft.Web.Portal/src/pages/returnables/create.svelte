@@ -1,7 +1,6 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
   import Text from "$components/Inputs/Text.svelte";
-  import Price from "$components/Inputs/Price.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import { createForm } from "felte";
@@ -62,8 +61,9 @@
     placeholder="Le nom de votre consigne"
     disabled="{$isSubmitting}"
   />
-  <Price
+  <Text
     id="unitPrice"
+    type='number'
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre consigne en €"
@@ -76,7 +76,9 @@
     disabled="{$isSubmitting}"
     rates="{[0, 0.055, 0.1, 0.2]}"
   />
-  <Price
+  <Text
+    id="onSalePrice"
+    type='number'
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"

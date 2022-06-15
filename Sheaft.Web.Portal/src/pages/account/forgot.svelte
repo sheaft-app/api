@@ -1,6 +1,5 @@
 ﻿<script lang="ts">
   import { goto, page, params } from "@roxi/routify";
-  import Email from "$components/Inputs/Email.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -10,6 +9,7 @@
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
   import { ForgotPasswordCommand } from '$features/account/commands/forgotPassword'
+  import Text from '$components/Inputs/Text.svelte'
 
   const module = getAccountModule($goto);
   let resetRequested = false;
@@ -39,7 +39,8 @@
     <h1>{$page.title}</h1>
     {#if !resetRequested}
       <form use:form>
-        <Email
+        <Text
+          type='email'
           label="Votre adresse mail"
           bind:value="{$data.email}"
           disabled="{$isSubmitting}"

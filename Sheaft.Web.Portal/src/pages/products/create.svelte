@@ -1,8 +1,7 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
   import Text from "$components/Inputs/Text.svelte";
-  import LongText from "$components/Inputs/LongText.svelte";
-  import Price from "$components/Inputs/Price.svelte";
+  import TextArea from "$components/Inputs/TextArea.svelte";
   import Vat from "$components/Inputs/Vat.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Select from "$components/Inputs/Select.svelte";
@@ -89,7 +88,8 @@
     placeholder="Le nom de votre produit"
     disabled="{$isSubmitting}"
   />
-  <Price
+  <Text
+    type='number'
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"
@@ -97,13 +97,14 @@
     disabled="{$isSubmitting}"
   />
   <Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{$isSubmitting}" />
-  <Price
+  <Text
+    type='number'
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"
     required="{false}"
   />
-  <LongText
+  <TextArea
     id="description"
     label="Description"
     bind:value="{$data.description}"
@@ -117,7 +118,6 @@
     disabled="{$isSubmitting}"
     bind:value="{isReturnable}"
     class="mt-3 mb-6"
-    required="{false}"
   />
   {#if isReturnable}
     <Select

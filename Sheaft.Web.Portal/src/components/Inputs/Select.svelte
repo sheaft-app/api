@@ -25,6 +25,7 @@
     disabled="{disabled}"
     bind:value
     class="{$$props.class}"
+    aria-describedby="{id}-validation"
   >
     {#each options as option}
       <option value="{option.value}">{option.label}</option>

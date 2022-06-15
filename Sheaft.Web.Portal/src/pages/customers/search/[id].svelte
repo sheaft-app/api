@@ -2,8 +2,6 @@
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
   import Text from '$components/Inputs/Text.svelte'
-  import Email from '$components/Inputs/Email.svelte'
-  import Phone from '$components/Inputs/Phone.svelte'
   import Address from '$components/Addresses/Address.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { getContext } from 'svelte';
@@ -66,11 +64,13 @@
   label='Nom'
   value='{customer.name}'
   disabled={true} />
-<Email
+<Text
+  type='email'
   label='Adresse mail'
   value='{customer.email}'
   disabled={true} />
-<Phone
+<Text
+  type='tel'
   label='Numéro de téléphone'
   value='{customer.phone}'
   disabled={true} />

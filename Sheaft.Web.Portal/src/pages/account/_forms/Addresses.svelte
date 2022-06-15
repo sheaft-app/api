@@ -65,7 +65,6 @@
     disabled="{$isSubmitting}"
     bind:value="{hasDifferentBillingAddress}"
     label="Mon adresse de facturation est différente"
-    required="{false}"
   />
   {#if hasDifferentBillingAddress}
     <NamedAddress
@@ -83,7 +82,6 @@
     label="{state.information.accountType === ProfileKind.Customer
       ? 'Mon adresse de livraison est différente'
       : 'Mon adresse d\'expédition est différente'}"
-    required="{false}"
   />
   {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Customer}
     <NamedAddress

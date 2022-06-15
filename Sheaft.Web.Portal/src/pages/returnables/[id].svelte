@@ -89,8 +89,9 @@
     placeholder="Le nom de votre produit"
     disabled="{$isLoading}"
   />
-  <Price
+  <Text
     id="unitPrice"
+    type='number'
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre produit en €"
@@ -103,8 +104,9 @@
     disabled="{$isLoading}"
     rates="{[0, 0.055, 0.1, 0.2]}"
   />
-  <Price
+  <Text
     id="onSalePrice"
+    type='number'
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"

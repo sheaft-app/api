@@ -66,19 +66,22 @@
           placeholder="Votre nom"
         />
       </div>
-      <Email
+      <Text
+        type='email'
         label="Adresse mail"
         bind:value="{$data.email}"
         disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
-      <Password
+      <Text
+        type='password'
         label="Mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
-      <Password
+      <Text
+        type='password'
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         placeholder="Confirmation de mot de passe"

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { page, goto, params } from "@roxi/routify";
-  import Password from "$components/Inputs/Password.svelte";
-  import Email from "$components/Inputs/Email.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import { createForm } from "felte";
@@ -9,6 +7,7 @@
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
   import { LoginUserCommand } from '$features/account/commands/loginUser'
+  import Text from '$components/Inputs/Text.svelte'
 
   const module = getAccountModule($goto);
 
@@ -36,15 +35,17 @@
   <div class="md:w-8/12 lg:w-5/12 lg:ml-20">
     <h1>{$page.title}</h1>
     <form use:form>
-      <Email
+      <Text
         id="username"
+        type='email'
         label="Nom d'utilisateur"
         bind:value="{$data.username}"
         disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
-      <Password
+      <Text
         id="password"
+        type='password'
         label="Votre mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
