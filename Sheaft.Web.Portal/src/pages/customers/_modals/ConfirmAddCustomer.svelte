@@ -8,8 +8,11 @@
   import { mediator } from '$features/mediator'
   import { ProposeAgreementToCustomerCommand } from '$features/agreements/commands/proposeAgreementToCustomer'
   import { address } from '$utils/addresses'
+  import type { IModalResult } from '$components/Modal/types'
+  import { ModalResult } from '$components/Modal/types'
 
   export let customer: Components.Schemas.AvailableCustomerDto
+  export let onClose: (result: IModalResult<string>) => {};
 
   const { close } = getContext('simple-modal')
 
@@ -19,7 +22,9 @@
 
   const validate = async () => {
     try {
-      await mediator.send(new ProposeAgreementToCustomerCommand(customer.id, deliveryDays, orderDelayInHoursBeforeDeliveryDay))
+      const result = await mediator.send(new ProposeAgreementToCustomerCommand(customer.id, deliveryDays, orderDelayInHoursBeforeDeliveryDay))
+      close();
+      await onClose(ModalResult.Success(result));
     } catch (exc) {
       console.error(exc)
     }
@@ -31,7 +36,7 @@
     <p><b>{customer.name}</b></p>
     <p>{@html address(customer.deliveryAddress)}</p></div>
 
-  <p>Veuillez selectionner les jours où vous pouvez livrer ce magasin à l'adresse ci-dessus</p>
+  <p>Veuillez selectionner les jours où vous pouvez livrer ce magasin</p>
   <ul class='m-3'>
     <li>
       <label class='form-check-label inline-block text-gray-800 cursor-pointer'>

@@ -7,32 +7,45 @@
   import { authStore } from "$components/Auth/auth";
 
   $beforeUrlChange((event: any, route) => {
-    const pageAccessResult = checkPageAccess(
-      route?.path,
-      event.url,
-      route?.meta,
-      $authStore.isAuthenticated,
-      $authStore.isRegistered,
-      $params.returnUrl ?? event.url,
-      authStore.userIsInRoles
-    );
-    if (!pageAccessResult) return true;
+    const accessToParentModuleIsRefused = route.parent?.meta?.roles && !authStore.userIsInRoles(route.parent.meta.roles)
+    if (accessToParentModuleIsRefused) {
+      $goto('/unauthorized');
+      return false;
+    }
+    else {
+      const pageAccessResult = checkPageAccess(
+        route?.path,
+        event.url,
+        route?.meta,
+        $authStore.isAuthenticated,
+        $authStore.isRegistered,
+        $params.returnUrl ?? event.url,
+        authStore.userIsInRoles
+      );
+      if (!pageAccessResult) return true;
 
-    $goto(pageAccessResult.path, pageAccessResult.params);
-    return false;
+      $goto(pageAccessResult.path, pageAccessResult.params);
+      return false;
+    }
   });
 
   $: {
-    const pageAccessResult = checkPageAccess(
-      "/",
-      $page.path,
-      $page.meta,
-      $authStore.isAuthenticated,
-      $authStore.isRegistered,
-      $params.returnUrl,
-      authStore.userIsInRoles
-    );
-    if (pageAccessResult) $goto(pageAccessResult.path, pageAccessResult.params);
+    const accessToParentModuleIsRefused = $page.parent?.meta?.roles && !authStore.userIsInRoles($page.parent.meta.roles)
+    if (accessToParentModuleIsRefused) {
+      $goto('/unauthorized');
+    }
+    else {
+      const pageAccessResult = checkPageAccess(
+        "/",
+        $page.path,
+        $page.meta,
+        $authStore.isAuthenticated,
+        $authStore.isRegistered,
+        $params.returnUrl,
+        authStore.userIsInRoles
+      );
+      if (pageAccessResult) $goto(pageAccessResult.path, pageAccessResult.params);
+    }
   }
 </script>
 

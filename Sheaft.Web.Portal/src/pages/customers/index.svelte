@@ -42,7 +42,6 @@
 
 <!-- routify:options menu="Mes clients" -->
 <!-- routify:options title="Mes clients" -->
-<!-- routify:options roles=[] -->
 <!-- routify:options index=1 -->
 <!-- routify:options default=true -->
 

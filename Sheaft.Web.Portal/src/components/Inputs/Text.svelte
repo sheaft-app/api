@@ -22,7 +22,6 @@
   <input
     id="{id}"
     name="{id}"
-    type="{type}"
     disabled="{disabled}"
     placeholder="{placeholder}"
     bind:value

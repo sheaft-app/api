@@ -5,6 +5,7 @@
   import Fa from "svelte-fa";
   import type { IEntry } from '$components/Nav/types'
   import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
+  import { authStore } from '$components/Auth/auth'
 
   export let entry: IEntry = {
     visible: true,

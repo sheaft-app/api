@@ -10,6 +10,7 @@
   import { mediator } from '$features/mediator'
   import { GetAvailableCustomerQuery } from '$features/agreements/queries/getAvailableCustomer'
   import ConfirmAddCustomer from '$pages/customers/_modals/ConfirmAddCustomer.svelte'
+  import type { IModalResult } from '$components/Modal/types'
   
   export let id = ''
   
@@ -30,9 +31,14 @@
     }
   })
   
+  const onClose = (result:IModalResult<string>) => {
+    module.goToAvailableCustomers();
+  }
+  
   const openModal = () => {
     open(ConfirmAddCustomer, {
-        customer
+        customer,
+        onClose
       },
       {
         closeButton: false,
