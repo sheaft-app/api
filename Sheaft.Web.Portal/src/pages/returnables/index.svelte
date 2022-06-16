@@ -71,7 +71,7 @@
       {/each}
       {#if returnables?.length < 1}
         <tr>
-          <td colspan='3' class='text-center'>Aucune consignes disponible <a href='/returnables/create'>créez votre première consigne</a></td>
+          <td colspan='4' class='text-center'>Aucune consigne disponible, <a href='/returnables/create'>créez-en une en cliquant ici</a></td>
         </tr>
       {/if}
       </tbody>

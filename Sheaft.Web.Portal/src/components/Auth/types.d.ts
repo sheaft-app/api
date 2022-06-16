@@ -2,7 +2,7 @@
 import type { Components } from '$features/api'
 import type { Readable } from 'svelte/store'
 
-export interface IUser {
+export interface IAccount {
   id?: string | null;
   username?: string | null;
   name?: string | null;
@@ -29,7 +29,7 @@ export interface IAuthState {
   tokens?: ITokens;
   isAuthenticated: boolean;
   isRegistered: boolean;
-  user?: IUser;
+  account?: IAccount;
 }
 
 export interface IAuthStore extends Readable<IAuthState> {

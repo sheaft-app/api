@@ -21,13 +21,12 @@
   <textarea
     id="{id}"
     name="{name}"
-    bind:value
+    bind:value={value}
     disabled="{disabled}"
     placeholder="{placeholder}"
     class="{$$props.class}"
     required="{required}"
-    aria-describedby="{id}-validation">    
-  </textarea>
+    aria-describedby="{id}-validation"/>
   <div
     id="{id}-validation"
     class='validation-reporter'

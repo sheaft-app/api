@@ -10,12 +10,27 @@ import {
   ProposeAgreementToCustomerCommand
 } from '$features/agreements/commands/proposeAgreementToCustomer'
 import type { Client } from '$features/api'
+import {
+  GetAvailableSupplierHandler,
+  GetAvailableSupplierQuery
+} from '$features/agreements/queries/getAvailableSupplier'
+import {
+  ListAvailableSuppliersHandler,
+  ListAvailableSuppliersQuery
+} from '$features/agreements/queries/listAvailableSuppliers'
+import {
+  ProposeAgreementToSupplierCommand,
+  ProposeAgreementToSupplierHandler
+} from '$features/agreements/commands/proposeAgreementToSupplier'
 
 export interface IAgreementModule extends IAppModule {
   goToDetails(id: string): void;
   goToCustomer(id: string): void;
   goToCustomers(): void;
   goToAvailableCustomers(): void;
+  goToSupplier(id: string): void;
+  goToSuppliers(): void;
+  goToAvailableSuppliers(): void;
 }
 
 class AgreementModule extends AppModule implements IAgreementModule {
@@ -47,6 +62,18 @@ class AgreementModule extends AppModule implements IAgreementModule {
     this.registerHandler(ProposeAgreementToCustomerCommand, request =>
       new ProposeAgreementToCustomerHandler(this._client).handle(request)
     );
+
+    this.registerHandler(GetAvailableSupplierQuery, request =>
+      new GetAvailableSupplierHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(ListAvailableSuppliersQuery, request =>
+      new ListAvailableSuppliersHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(ProposeAgreementToSupplierCommand, request =>
+      new ProposeAgreementToSupplierHandler(this._client).handle(request)
+    );
   };
 
 
@@ -64,6 +91,18 @@ class AgreementModule extends AppModule implements IAgreementModule {
 
   goToAvailableCustomers(): void {
     this.navigate(`${this._customerBasePath}/search`);
+  }
+  
+  goToSuppliers = (): void => {
+    this.navigate(this._supplierBasePath);
+  };
+
+  goToSupplier(id: string): void {
+    this.navigate(`${this._supplierBasePath}/search/${id}`);
+  }
+
+  goToAvailableSuppliers(): void {
+    this.navigate(`${this._supplierBasePath}/search`);
   }
 }
 

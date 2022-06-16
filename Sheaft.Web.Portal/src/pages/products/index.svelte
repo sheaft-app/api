@@ -73,7 +73,7 @@
       {/each}
       {#if products?.length < 1}
         <tr>
-          <td colspan='3' class='text-center'>Aucun produit disponible <a href='/products/create'>créez votre premier produit</a></td>
+          <td colspan='4' class='text-center'>Aucun produit disponible, <a href='/products/create'>créez-en en cliquant ici</a></td>
         </tr>
       {/if}
       </tbody>

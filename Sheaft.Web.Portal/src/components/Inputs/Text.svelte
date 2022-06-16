@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./inputs.scss";
   import { nanoid } from "nanoid";
+  import {setType} from './setType'
 
   export let id: string | null = null;
   export let type: string = "text";
@@ -22,6 +23,7 @@
   <input
     id="{id}"
     name="{id}"
+    use:setType={type}
     disabled="{disabled}"
     placeholder="{placeholder}"
     bind:value

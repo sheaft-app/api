@@ -22,16 +22,7 @@ internal class ReturnableQueries : Queries, IReturnableQueries
             var returnablesQuery =
                 from p in _context.Returnables
                 where p.Id == identifier.Value
-                select new ReturnableDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Code = p.Reference,
-                    Vat = p.Vat,
-                    UnitPrice = p.UnitPrice,
-                    CreatedOn = p.CreatedOn,
-                    UpdatedOn = p.UpdatedOn
-                };
+                select new ReturnableDto(p.Id, p.Name, p.Reference, p.UnitPrice, p.Vat, p.CreatedOn, p.UpdatedOn);
 
             var returnable = await returnablesQuery.FirstOrDefaultAsync(token);
             return returnable == null
@@ -46,8 +37,9 @@ internal class ReturnableQueries : Queries, IReturnableQueries
         {
             var returnablesQuery =
                 from p in _context.Returnables
+                orderby p.Name 
                 where p.SupplierId == supplierId.Value
-                select new ReturnableDto
+                select new 
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -55,16 +47,21 @@ internal class ReturnableQueries : Queries, IReturnableQueries
                     Vat = p.Vat,
                     UnitPrice = p.UnitPrice,
                     CreatedOn = p.CreatedOn,
-                    UpdatedOn = p.UpdatedOn
+                    UpdatedOn = p.UpdatedOn,
+                    TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
-            var returnables = await returnablesQuery
+            var returnables = (await returnablesQuery
                 .Skip(pageInfo.Skip)
                 .Take(pageInfo.Take)
-                .GroupBy(p => new { Total = returnablesQuery.Count() })
-                .FirstOrDefaultAsync(token);
+                .ToListAsync(token))
+                .GroupBy(p => p.TotalCount)
+                .FirstOrDefault();
             
-            return Result.Success(new PagedResult<ReturnableDto>(returnables?.Select(p => p), pageInfo, returnables?.Key.Total ?? 0));
+            return Result.Success(new PagedResult<ReturnableDto>(
+                returnables?
+                    .Select(p => new ReturnableDto(p.Id, p.Name, p.Code, p.UnitPrice, p.Vat, p.CreatedOn, p.UpdatedOn)), 
+                pageInfo, returnables?.Key ?? 0));
         });
     }
 }

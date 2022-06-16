@@ -9,7 +9,7 @@
   import { ProposeAgreementToCustomerCommand } from '$features/agreements/commands/proposeAgreementToCustomer'
   import { address } from '$utils/addresses'
   import type { IModalResult } from '$components/Modal/types'
-  import { ModalResult } from '$components/Modal/types'
+  import { ModalResult } from '$components/Modal/modal'
 
   export let customer: Components.Schemas.AvailableCustomerDto
   export let onClose: (result: IModalResult<string>) => {};

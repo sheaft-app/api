@@ -1965,9 +1965,6 @@ components:
         vat:
           type: number
           format: double
-        createdOn:
-          type: string
-          format: date-time
         updatedOn:
           type: string
           format: date-time

@@ -4,7 +4,7 @@ import { ProfileStatus } from '$enums/profile'
 import { RefreshAccessTokenCommand } from "$features/account/commands/refreshAccessToken";
 import type { Components } from '$features/api'
 import { mediator } from '$features/mediator'
-import type { IAuthState, IAuthStore, IUser } from '$components/Auth/types'
+import type { IAuthState, IAuthStore, IAccount } from '$components/Auth/types'
 
 const store = (): IAuthStore => {
   let _timer: any = null;
@@ -12,7 +12,7 @@ const store = (): IAuthStore => {
   const _state: IAuthState = {
     isRegistered: false,
     isAuthenticated: false,
-    user: null
+    account: null
   };
 
   const { subscribe, set, update } = writable<IAuthState>("auth", _state);
@@ -20,11 +20,11 @@ const store = (): IAuthStore => {
   const sub = subscribe((values) => {
     _state.isAuthenticated = values.isAuthenticated;
     _state.isRegistered = values.isRegistered;
-    _state.user = values.user;
+    _state.account = values.account;
     _state.tokens = values.tokens;
   })
 
-  const userIsInRoles = (roles?: Array<string>): boolean => {
+  const accountIsInRoles = (roles?: Array<string>): boolean => {
     if (!_state.isAuthenticated) return false;
 
     if (!roles) return true;
@@ -32,12 +32,12 @@ const store = (): IAuthStore => {
     if(typeof roles == 'string' && (<string>roles).indexOf('[') > -1)
       roles = JSON.parse((<string>roles).replace(/'/g, "\""));
 
-    if (!_state.user) return false;
+    if (!_state.account) return false;
 
-    if (!_state.user?.roles) _state.user.roles = [];
+    if (!_state.account?.roles) _state.account.roles = [];
 
-    const userInRoles = roles.filter(r => _state.user?.roles.includes(r));
-    return userInRoles.length > 0;
+    const accountInRoles = roles.filter(r => _state.account?.roles.includes(r));
+    return accountInRoles.length > 0;
   };
 
   const clearConnectedUser = (): void => {
@@ -48,7 +48,7 @@ const store = (): IAuthStore => {
     updateStateStoreWithToken(token);
   };
 
-  const getUserFromAccessToken = (accessToken: string): IUser => {
+  const getUserFromAccessToken = (accessToken: string): IAccount => {
     if (!accessToken)
       return {
         roles: [],
@@ -85,7 +85,7 @@ const store = (): IAuthStore => {
     if (!response) return;
 
     update(state => {
-      let user = getUserFromAccessToken(response.access_token ?? "");
+      let account = getUserFromAccessToken(response.access_token ?? "");
 
       let expiresAt = new Date();
       expiresAt.setSeconds(expiresAt.getSeconds() + (response.expires_in ?? 0));
@@ -99,9 +99,9 @@ const store = (): IAuthStore => {
       
       state.isAuthenticated = true;
       _state.isAuthenticated = state.isAuthenticated;
-      state.isRegistered = !!user?.id && user.profile?.status == ProfileStatus.Registered;
+      state.isRegistered = !!account?.id && account.profile?.status == ProfileStatus.Registered;
       _state.isRegistered = state.isRegistered;
-      state.user = user;
+      state.account = account;
 
       return state;
     });
@@ -143,7 +143,7 @@ const store = (): IAuthStore => {
 
   return {
     subscribe,
-    userIsInRoles,
+    userIsInRoles: accountIsInRoles,
     setConnectedUser,
     clearConnectedUser,
     startMonitorUserAccessToken: monitorUserAccessToken

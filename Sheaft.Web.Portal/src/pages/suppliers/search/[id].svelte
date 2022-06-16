@@ -8,9 +8,8 @@
   import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { GetAvailableCustomerQuery } from '$features/agreements/queries/getAvailableCustomer'
-  import ConfirmAddCustomer from './_ConfirmAddCustomer.svelte'
-  import type { IModalResult } from '$components/Modal/types'
+  import { GetAvailableSupplierQuery } from '$features/agreements/queries/getAvailableSupplier'
+  import ConfirmAddSupplier from './_ConfirmAddSupplier.svelte'
   
   export let id = ''
   
@@ -18,26 +17,26 @@
   const { open } = getContext('simple-modal');
 
   let initializing = true
-  let customer: Components.Schemas.AvailableCustomerDto = {}
+  let supplier: Components.Schemas.AvailableSupplierDto = {}
 
   onMount(async () => {
     try {
       initializing = true
-      customer = await mediator.send(new GetAvailableCustomerQuery(id))
+      supplier = await mediator.send(new GetAvailableSupplierQuery(id))
       initializing = false
     } catch (exc) {
       console.error(exc)
-      module.goToCustomers()
+      module.goToSuppliers()
     }
   })
   
-  const onClose = (result:IModalResult<string>) => {
-    module.goToAvailableCustomers();
+  const onClose = (result) => {
+    module.goToAvailableSuppliers();
   }
   
   const openModal = () => {
-    open(ConfirmAddCustomer, {
-        customer,
+    open(ConfirmAddSupplier, {
+        supplier,
         onClose
       },
       {
@@ -49,7 +48,7 @@
 
   const actions = [
     {
-      name:'Proposer mes produits',
+      name:'Acheter ses produits',
       disabled:false,
       color:'primary',
       action: () => openModal()
@@ -58,29 +57,29 @@
 </script>
 
 <!-- routify:options index=true -->
-<!-- routify:options title="Fiche du client" -->
+<!-- routify:options title="Fiche du fournisseur" -->
 <!-- routify:options roles=[] -->
 
 <PageHeader
   title={$page.title}
-  previous='{() => module.goToCustomers()}'
+  previous='{() => module.goToSuppliers()}'
   actions='{actions}'/>
 
 <Text
   label='Nom'
-  value='{customer.name}'
+  value='{supplier.name}'
   disabled={true} />
 <Text
   type='email'
   label='Adresse mail'
-  value='{customer.email}'
+  value='{supplier.email}'
   disabled={true} />
 <Text
   type='tel'
   label='Numéro de téléphone'
-  value='{customer.phone}'
+  value='{supplier.phone}'
   disabled={true} />
 <Address
-  label='Adresse de livraison'
+  label="Adresse d'expédition"
   disabled='{true}'
-  value='{customer.deliveryAddress}' />
+  value='{supplier.shippingAddress}' />

@@ -27,10 +27,10 @@
         />
         <div class="ml-4">
           <p class="overflow-hidden overflow-ellipsis font-medium">
-            {$authStore.user?.name}
+            {$authStore.account?.name}
           </p>
           <small class="overflow-hidden overflow-ellipsis"
-            ><i>{$authStore.user?.profile?.name ?? ""}</i></small
+            ><i>{$authStore.account?.profile?.name ?? ""}</i></small
           >
         </div>
       </div>

@@ -34,14 +34,14 @@
       name:'Ajouter',
       disabled:false,
       color:'primary',
-      action: () => module.goToAvailableCustomers()
+      action: () => module.goToAvailableSuppliers()
     }
   ];
   
 </script>
 
-<!-- routify:options menu="Mes clients" -->
-<!-- routify:options title="Mes clients" -->
+<!-- routify:options menu="Mes fournisseurs" -->
+<!-- routify:options title="Mes fournisseurs" -->
 <!-- routify:options index=1 -->
 <!-- routify:options default=true -->
 
@@ -62,14 +62,14 @@
       <tbody>
       {#each agreements as agreement}
         <tr on:click="{() => module.goToDetails(agreement.id)}">
-          <th>{agreement.customerName}</th>
+          <th>{agreement.supplierName}</th>
           <td use:formatInnerHtml={statusStr}>{agreement.status}</td>
           <td use:formatInnerHtml={dateDistance}>{agreement.updatedOn}</td>
         </tr>
       {/each}
       {#if agreements?.length < 1}
         <tr>
-          <td colspan='3' class='text-center'>Aucun accord commercial en cours, <a href='/customers/search'>rechercher un magasin</a></td>
+          <td colspan='3' class='text-center'>Aucun accord commercial en cours, <a href='/suppliers/search'>rechercher un fournisseur</a></td>
         </tr>
       {/if}
       </tbody>

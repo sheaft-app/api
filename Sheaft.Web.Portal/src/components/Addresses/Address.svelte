@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "./inputs.scss";
   import Text from "$components/Inputs/Text.svelte";
   import { nanoid } from "nanoid";
   import { onMount } from "svelte";

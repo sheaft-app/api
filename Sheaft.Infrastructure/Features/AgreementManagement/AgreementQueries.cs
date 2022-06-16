@@ -57,23 +57,28 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 from customer in _context.Customers.InnerJoin(c => c.Id == agreement.CustomerId)
                 where (agreement.Supplier.AccountId == accountId.Value || agreement.Customer.AccountId == accountId.Value) 
                     && (agreement.Status == (int)AgreementStatus.Active ||  agreement.Status == (int)AgreementStatus.Pending)
-                select new AgreementDto
+                select new
                 {
                     Id = agreement.Id,
-                    Status = (AgreementStatus) agreement.Status,
+                    Status = agreement.Status,
                     UpdatedOn = agreement.UpdatedOn,
                     CustomerName = customer.TradeName,
-                    SupplierName = supplier.TradeName
+                    SupplierName = supplier.TradeName,
+                    TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
-            var agreementsResults = await agreementsQuery
+            var agreementsResults = (await agreementsQuery
                 .Skip(pageInfo.Skip)
                 .Take(pageInfo.Take)
-                .GroupBy(p => new {Total = agreementsQuery.Count()})
-                .FirstOrDefaultAsync(token);
+                .ToListAsync(token))
+                .GroupBy(c => c.TotalCount)
+                .FirstOrDefault();
 
-            return Result.Success(new PagedResult<AgreementDto>(agreementsResults?.Select(p => p), pageInfo,
-                agreementsResults?.Key.Total ?? 0));
+            return Result.Success(
+                new PagedResult<AgreementDto>(
+                    agreementsResults?
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                    pageInfo, agreementsResults?.Key ?? 0));
         });
     }
 
