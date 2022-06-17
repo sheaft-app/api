@@ -30,9 +30,11 @@
     }
   }
 </script>
-<div>
+<h2 class='mb-4'>Nouvelle relation commerciale</h2>
+<hr/>
+<div class='my-6'>
   <p>Vous allez envoyer une demande de mise en relation commerciale avec le magasin :</p>
-  <div class='m-3'>
+  <div class='mx-3 my-5'>
     <p><b>{customer.name}</b></p>
     <p>{@html address(customer.deliveryAddress)}</p></div>
 
@@ -88,7 +90,7 @@
              class='w-4 h-4 m-1' />Dimanche</label>
     </li>
   </ul>
-  <div class='mt-5 mb-8'>
+  <div class='mt-4'>
     <Checkbox
       id='orderDelay'
       bind:value='{orderDelayed}'
@@ -98,7 +100,8 @@
     {/if}
   </div>
 </div>
-<div class='flex items-center'>
+<hr/>
+<div class='flex items-center justify-evenly pt-4'>
   <Button class='bg-back-600' on:click={close}>Annuler</Button>
   <Button class='bg-accent-600' on:click={validate}>Ajouter</Button>
 </div>

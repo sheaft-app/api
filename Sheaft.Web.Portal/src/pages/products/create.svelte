@@ -89,7 +89,6 @@
     disabled="{$isSubmitting}"
   />
   <Text
-    type='number'
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"

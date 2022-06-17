@@ -207,7 +207,6 @@ declare namespace Components {
             code?: string | null;
             unitPrice?: number; // double
             vat?: number; // double
-            createdOn?: string; // date-time
             updatedOn?: string; // date-time
         }
         export interface ProductDtoPaginatedResults {

@@ -1,8 +1,7 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from 'svelte'
   import Text from "$components/Inputs/Text.svelte";
-  import Price from "$components/Inputs/Price.svelte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import { createForm } from "felte";
   import Vat from "$components/Inputs/Vat.svelte";
@@ -14,10 +13,12 @@
   import { UpdateReturnableCommand } from '$features/products/commands/updateReturnable'
   import { GetReturnableQuery } from '$features/products/queries/getReturnable'
   import { calculateOnSalePrice } from '$utils/money'
+  import ConfirmRemoveReturnable from './_ConfirmRemoveReturnable.svelte'
 
   export let id = "";
   let initializing = true;
   const module = getProductModule($goto);
+  const { open } = getContext('simple-modal');
 
   const { form, data, isSubmitting, isValid, setData } =
     createForm<Components.Schemas.UpdateReturnableRequest>({
@@ -27,8 +28,7 @@
             id,
             values.name,
             values.unitPrice,
-            values.vat,
-            values.code
+            values.vat
           )
         );
       },
@@ -36,6 +36,22 @@
         module.goToReturnableList();
       }
     });
+  
+  const onClose = () => {
+    module.goToReturnableList()
+  }
+
+  const confirmModal = () => {
+    open(ConfirmRemoveReturnable, {
+        returnableId:id,
+        onClose
+      },
+      {
+        closeButton: false,
+        closeOnEsc: true,
+        closeOnOuterClick: true,
+      });
+  }
 
   onMount(async () => {
     initializing = true;
@@ -54,7 +70,7 @@
       name:'Supprimer',
       disabled:false,
       color:'danger',
-      action: () => {}
+      action: () => confirmModal()
     }
   ];
 
@@ -74,27 +90,17 @@
 
 <form use:form>
   <Text
-    id="code"
-    label="Code"
-    bind:value="{$data.code}"
-    required="{false}"
-    maxLength="{30}"
-    placeholder="Le code de votre produit (autogénéré si non renseigné)"
-    disabled="{$isLoading}"
-  />
-  <Text
     id="name"
     label="Nom"
     bind:value="{$data.name}"
-    placeholder="Le nom de votre produit"
+    placeholder="Le nom de votre consigne"
     disabled="{$isLoading}"
   />
   <Text
     id="unitPrice"
-    type='number'
     label="Prix HT"
     bind:value="{$data.unitPrice}"
-    placeholder="Prix HT de votre produit en €"
+    placeholder="Prix HT de votre consigne en €"
     disabled="{$isLoading}"
   />
   <Vat

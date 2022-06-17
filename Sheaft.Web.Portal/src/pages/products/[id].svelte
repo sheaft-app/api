@@ -6,7 +6,7 @@
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Select from "$components/Inputs/Select.svelte";
   import Checkbox from "$components/Inputs/Checkbox.svelte";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from 'svelte'
   import Button from "$components/Buttons/Button.svelte";
   import { createForm } from "felte";
   import PageHeader from '$components/Page/PageHeader.svelte'
@@ -17,9 +17,11 @@
   import { calculateOnSalePrice } from '$utils/money'
   import { GetProductQuery } from '$features/products/queries/getProduct'
   import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
+  import ConfirmRemoveProduct from '$pages/products/_ConfirmRemoveProduct.svelte'
 
   export let id = "";
   const module = getProductModule($goto);
+  const { open } = getContext('simple-modal');
 
   let isLoading = false;
   let isReturnable = false;
@@ -45,6 +47,22 @@
       }
     });
 
+  const onClose = () => {
+    module.goToProductList()
+  }
+
+  const confirmModal = () => {
+    open(ConfirmRemoveProduct, {
+        productId:id,
+        onClose
+      },
+      {
+        closeButton: false,
+        closeOnEsc: true,
+        closeOnOuterClick: true,
+      });
+  }
+
   $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
 
   onMount(async () => {
@@ -68,7 +86,7 @@
       name:'Supprimer',
       disabled:false,
       color:'danger',
-      action: () => {}
+      action: () => confirmModal()
     }
   ];
 </script>
@@ -103,7 +121,6 @@
   <Text
     id="unitPrice"
     label="Prix HT"
-    type='number'
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre produit en €"
     disabled="{$isSubmitting}"

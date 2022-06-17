@@ -46,15 +46,6 @@
 
 <form use:form>
   <Text
-    id="code"
-    label="Code"
-    bind:value="{$data.code}"
-    required="{false}"
-    maxLength="{30}"
-    placeholder="Le code de votre consigne (sera autogénéré si non renseigné)"
-    disabled="{$isSubmitting}"
-  />
-  <Text
     id="name"
     label="Nom"
     bind:value="{$data.name}"
@@ -63,7 +54,6 @@
   />
   <Text
     id="unitPrice"
-    type='number'
     label="Prix HT"
     bind:value="{$data.unitPrice}"
     placeholder="Prix HT de votre consigne en €"

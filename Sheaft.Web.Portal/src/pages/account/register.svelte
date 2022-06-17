@@ -1,7 +1,5 @@
 ﻿<script lang="ts">
   import { page, goto, params } from "@roxi/routify";
-  import Email from "$components/Inputs/Email.svelte";
-  import Password from "$components/Inputs/Password.svelte";
   import Button from "$components/Buttons/Button.svelte";
   import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import Text from "$components/Inputs/Text.svelte";

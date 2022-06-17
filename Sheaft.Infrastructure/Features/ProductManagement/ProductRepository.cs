@@ -35,4 +35,12 @@ internal class ProductRepository : Repository<Product, ProductId>, IProductRepos
                 .SingleOrDefaultAsync(v => v.Reference == reference && v.SupplierId == supplierIdentifier, token) 
                            ?? Maybe<Product>.None));
     }
+
+    public Task<Result<IEnumerable<Product>>> WithReturnable(ReturnableId returnableId, CancellationToken token)
+    {
+        return QueryAsync(async () => Result.Success(await Values
+                    .Include(p => p.Returnable)
+                    .Where(v => v.Returnable != null && v.Returnable.Id == returnableId)
+                    .ToListAsync(token) as IEnumerable<Product>));
+    }
 }

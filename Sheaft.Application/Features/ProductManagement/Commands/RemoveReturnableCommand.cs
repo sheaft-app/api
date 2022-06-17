@@ -19,7 +19,17 @@ internal class RemoveReturnableHandler : ICommandHandler<RemoveReturnableCommand
         var returnableResult = await _uow.Returnables.Get(request.Identifier, token);
         if (returnableResult.IsFailure)
             return returnableResult;
+
+        var productsResult = await _uow.Products.WithReturnable(request.Identifier, token);
+        if (productsResult.IsFailure)
+            return productsResult;
         
+        foreach (var product in productsResult.Value)
+        {
+            product.SetReturnable(Maybe<Returnable>.None);
+            _uow.Products.Update(product);
+        }
+
         _uow.Returnables.Remove(returnableResult.Value);
         return await _uow.Save(token);
     }

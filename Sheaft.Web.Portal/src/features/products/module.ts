@@ -23,6 +23,8 @@ import {
 } from '$features/products/commands/updateReturnable'
 import { GetReturnableHandler, GetReturnableQuery } from '$features/products/queries/getReturnable'
 import { ListReturnablesHandler, ListReturnablesQuery } from '$features/products/queries/listReturnables'
+import { RemoveReturnableCommand, RemoveReturnableRequestHandler } from '$features/products/commands/removeReturnable'
+import { RemoveProductCommand, RemoveProductRequestHandler } from '$features/products/commands/removeProduct'
 
 export interface IProductModule extends IAppModule {
   goToProductList(): void;
@@ -51,6 +53,10 @@ class ProductModule extends AppModule implements IProductModule {
       new UpdateProductRequestHandler(this._client).handle(request)
     );
 
+    this.registerHandler(RemoveProductCommand, request =>
+      new RemoveProductRequestHandler(this._client).handle(request)
+    );
+
     this.registerHandler(GetProductQuery, request =>
       new GetProductHandler(this._client).handle(request)
     );
@@ -69,6 +75,10 @@ class ProductModule extends AppModule implements IProductModule {
 
     this.registerHandler(UpdateReturnableCommand, request =>
       new UpdateReturnableHandler(this._client).handle(request)
+    );
+    
+    this.registerHandler(RemoveReturnableCommand, request =>
+      new RemoveReturnableRequestHandler(this._client).handle(request)
     );
 
     this.registerHandler(GetReturnableQuery, request =>

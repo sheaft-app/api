@@ -1,10 +1,12 @@
-﻿import { OpenAPIClientAxios } from "openapi-client-axios";
+﻿import { OpenAPIClientAxios } from 'openapi-client-axios'
 import { get } from "svelte/store";
 import type { Client } from '$features/api'
+import type {Document} from 'openapi-client-axios'
 import { authStore } from "$components/Auth/auth";
+import swagger from "$features/openapi/swagger.json"
 
 export const api = new OpenAPIClientAxios({
-  definition: `${import.meta.env.VITE_API_URL}/swagger/v1/swagger.json`
+  definition: <Document>swagger
 });
 
 export const configureAxios = (client: Client) => {
