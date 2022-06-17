@@ -3,16 +3,16 @@
   import { onMount } from 'svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { ListAvailableCustomersQuery } from '$features/agreements/queries/listAvailableCustomers'
   import { address } from '$utils/addresses'
+  import { getCustomerModule } from '$features/customers/module'
+  import { ListAvailableCustomersQuery } from '$features/customers/queries/listAvailableCustomers'
 
   export let pageNumber: number = 1,
     take: number = 10
 
-  const module = getAgreementModule($goto)
+  const module = getCustomerModule($goto)
 
   let isLoading = true
   let customers: Components.Schemas.AvailableCustomerDto[] = []
@@ -28,13 +28,12 @@
   })
 </script>
 
-<!-- routify:options index=1 -->
-<!-- routify:options menu="Ajouter" -->
+<!-- routify:options index=4 -->
 <!-- routify:options title="Magasins disponibles" -->
 
 <PageHeader
   title={$page.title}
-  subtitle="Ce sont les magasins avec lesquels vous n'avez pas encore d'accord commercial"
+  subtitle="Vous pouvez envoyer une demande d'accord commercial avec les magasins ci-dessous"
   previous='{() => module.goToCustomers()}' />
 
 <PageContent {isLoading}>

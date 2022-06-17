@@ -1,4 +1,4 @@
-﻿import { ProfileKind } from '$enums/profile'
+﻿import { ProfileKind } from '$components/Auth/profile'
 import { IStepDefinition, IStepsDefinition, IStepsResult } from '$components/Stepper/types'
 import type { Components } from '$features/api'
 

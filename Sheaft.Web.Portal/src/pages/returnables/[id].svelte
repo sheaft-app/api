@@ -80,6 +80,7 @@
     {
       name: 'Supprimer',
       disabled: controlsAreDisabled,
+      visible: true,
       color: 'danger',
       action: () => confirmModal()
     }

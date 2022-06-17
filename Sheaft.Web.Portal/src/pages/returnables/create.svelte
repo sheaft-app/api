@@ -51,10 +51,8 @@
   }
 </script>
 
-<!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
 <!-- routify:options title="Ajouter une nouvelle consigne" -->
-<!-- routify:options icon="fas#coffee" -->
 
 <PageHeader
   title={$page.title}

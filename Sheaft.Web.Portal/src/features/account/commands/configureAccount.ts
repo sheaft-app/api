@@ -1,6 +1,6 @@
 ﻿import type { Client, Components } from '$features/api'
 import { Request } from 'jimmy-js'
-import { ProfileKind } from '$enums/profile'
+import { ProfileKind } from '$components/Auth/profile'
 import type { IAccountAddresses, IAccountInformation } from '../types'
 
 export class ConfigureAccountCommand extends Request<Promise<boolean>> {

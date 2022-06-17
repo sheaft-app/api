@@ -3,10 +3,10 @@
   import Button from '$components/Buttons/Button.svelte'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { ProposeAgreementToSupplierCommand } from '$features/agreements/commands/proposeAgreementToSupplier'
   import { address } from '$utils/addresses'
   import type { IModalResult } from '$components/Modal/types'
   import { ModalResult } from '$components/Modal/modal'
+  import { ProposeAgreementToSupplierCommand } from '$features/suppliers/commands/proposeAgreementToSupplier'
 
   export let supplier: Components.Schemas.AvailableSupplierDto
   export let onClose: (result: IModalResult<string>) => {};

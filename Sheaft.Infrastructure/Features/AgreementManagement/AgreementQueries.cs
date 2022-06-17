@@ -2,7 +2,9 @@
 using LinqToDB;
 using Sheaft.Application;
 using Sheaft.Application.AgreementManagement;
+using Sheaft.Application.CustomerManagement;
 using Sheaft.Application.Models;
+using Sheaft.Application.SupplierManagement;
 using Sheaft.Domain;
 
 namespace Sheaft.Infrastructure.AgreementManagement;
@@ -47,7 +49,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
         });
     }
 
-    public Task<Result<PagedResult<AgreementDto>>> List(AccountId accountId, PageInfo pageInfo, CancellationToken token)
+    public Task<Result<PagedResult<AgreementDto>>> ListActiveAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? search)
     {
         return QueryAsync(async () =>
         {
@@ -55,8 +57,81 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 from agreement in _context.Agreements
                 from supplier in _context.Suppliers.InnerJoin(c => c.Id == agreement.SupplierId)
                 from customer in _context.Customers.InnerJoin(c => c.Id == agreement.CustomerId)
-                where (agreement.Supplier.AccountId == accountId.Value || agreement.Customer.AccountId == accountId.Value) 
-                    && (agreement.Status == (int)AgreementStatus.Active ||  agreement.Status == (int)AgreementStatus.Pending)
+                where agreement.Status == (int)AgreementStatus.Active
+                      && ((agreement.Supplier.AccountId == accountId.Value && (search == null || agreement.Customer.TradeName.Contains(search))) 
+                      || (agreement.Customer.AccountId == accountId.Value && (search == null || agreement.Supplier.TradeName.Contains(search)))) 
+                select new
+                {
+                    Id = agreement.Id,
+                    Status = agreement.Status,
+                    UpdatedOn = agreement.UpdatedOn,
+                    CustomerName = customer.TradeName,
+                    SupplierName = supplier.TradeName,
+                    TotalCount = Sql.Ext.Count().Over().ToValue()
+                };
+
+            var agreementsResults = (await agreementsQuery
+                .Skip(pageInfo.Skip)
+                .Take(pageInfo.Take)
+                .ToListAsync(token))
+                .GroupBy(c => c.TotalCount)
+                .FirstOrDefault();
+
+            return Result.Success(
+                new PagedResult<AgreementDto>(
+                    agreementsResults?
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                    pageInfo, agreementsResults?.Key ?? 0));
+        });
+    }
+
+    public Task<Result<PagedResult<AgreementDto>>> ListSentAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? search)
+    {
+        return QueryAsync(async () =>
+        {
+            var agreementsQuery =
+                from agreement in _context.Agreements
+                from supplier in _context.Suppliers.InnerJoin(c => c.Id == agreement.SupplierId)
+                from customer in _context.Customers.InnerJoin(c => c.Id == agreement.CustomerId)
+                where agreement.Status == (int)AgreementStatus.Pending
+                      && ((agreement.Supplier.AccountId == accountId.Value && agreement.Owner == (int)AgreementOwner.Supplier && (search == null || agreement.Customer.TradeName.Contains(search))) 
+                      || (agreement.Customer.AccountId == accountId.Value && agreement.Owner == (int)AgreementOwner.Customer && (search == null || agreement.Supplier.TradeName.Contains(search)))) 
+                select new
+                {
+                    Id = agreement.Id,
+                    Status = agreement.Status,
+                    UpdatedOn = agreement.UpdatedOn,
+                    CustomerName = customer.TradeName,
+                    SupplierName = supplier.TradeName,
+                    TotalCount = Sql.Ext.Count().Over().ToValue()
+                };
+
+            var agreementsResults = (await agreementsQuery
+                .Skip(pageInfo.Skip)
+                .Take(pageInfo.Take)
+                .ToListAsync(token))
+                .GroupBy(c => c.TotalCount)
+                .FirstOrDefault();
+
+            return Result.Success(
+                new PagedResult<AgreementDto>(
+                    agreementsResults?
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                    pageInfo, agreementsResults?.Key ?? 0));
+        });
+    }
+
+    public Task<Result<PagedResult<AgreementDto>>> ListReceivedAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? search)
+    {
+        return QueryAsync(async () =>
+        {
+            var agreementsQuery =
+                from agreement in _context.Agreements
+                from supplier in _context.Suppliers.InnerJoin(c => c.Id == agreement.SupplierId)
+                from customer in _context.Customers.InnerJoin(c => c.Id == agreement.CustomerId)
+                where agreement.Status == (int)AgreementStatus.Pending
+                      && ((agreement.Supplier.AccountId == accountId.Value && agreement.Owner == (int)AgreementOwner.Customer && (search == null || agreement.Customer.TradeName.Contains(search))) 
+                      || (agreement.Customer.AccountId == accountId.Value && agreement.Owner == (int)AgreementOwner.Supplier && (search == null || agreement.Supplier.TradeName.Contains(search)))) 
                 select new
                 {
                     Id = agreement.Id,

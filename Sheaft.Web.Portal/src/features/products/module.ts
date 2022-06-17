@@ -41,7 +41,6 @@ class ProductModule extends AppModule implements IProductModule {
 
   constructor(private _client: Client) {
     super();
-    this.registerHandlers();
   }
 
   override registerHandlers = () => {
@@ -130,5 +129,6 @@ export const registerProductModule = (client: Client): IProductModule => {
   if (module) return module;
 
   module = new ProductModule(client);
+  module.registerHandlers();
   return module;
 };

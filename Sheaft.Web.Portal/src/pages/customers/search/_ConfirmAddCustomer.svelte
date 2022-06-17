@@ -1,15 +1,15 @@
 ﻿<script lang='ts'>
   import { getContext } from 'svelte'
   import Button from '$components/Buttons/Button.svelte'
-  import { DayOfWeek } from '$enums/days'
+  import type { DayOfWeek } from '$features/agreements/enums'
   import Checkbox from '$components/Inputs/Checkbox.svelte'
   import Text from '$components/Inputs/Text.svelte'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { ProposeAgreementToCustomerCommand } from '$features/agreements/commands/proposeAgreementToCustomer'
   import { address } from '$utils/addresses'
   import type { IModalResult } from '$components/Modal/types'
   import { ModalResult } from '$components/Modal/modal'
+  import { ProposeAgreementToCustomerCommand } from '$features/customers/commands/proposeAgreementToCustomer'
 
   export let customer: Components.Schemas.AvailableCustomerDto
   export let onClose: (result: IModalResult<string>) => {};

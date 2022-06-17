@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <Folder Include="src\features\account\queries" />
+      <Folder Include="src\features\agreements\commands" />
       <Folder Include="wwwroot" />
       <Folder Include="public" />
       <Folder Include=".routify" />

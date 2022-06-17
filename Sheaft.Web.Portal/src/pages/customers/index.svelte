@@ -3,18 +3,18 @@
   import { onMount } from "svelte";
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { ListAgreementsQuery } from '$features/agreements/queries/listAgreements'
+  import { ListActiveAgreementsQuery } from '$features/agreements/queries/listActiveAgreements'
   import { statusStr } from '$features/agreements/utils'
   import {formatInnerHtml} from '$directives/format'
   import { dateDistance } from '$utils/dates'
+  import { getCustomerModule } from '$features/customers/module'
 
   export let pageNumber: number = 1,
     take: number = 10;
 
-  const module = getAgreementModule($goto);
+  const module = getCustomerModule($goto);
 
   let isLoading = true;
   let agreements: Components.Schemas.AgreementDto[] = [];
@@ -22,7 +22,7 @@
   onMount(async () => {
     try {
       isLoading = true;
-      agreements = await mediator.send(new ListAgreementsQuery(pageNumber, take));
+      agreements = await mediator.send(new ListActiveAgreementsQuery(pageNumber, take));
       isLoading = false;
     } catch (exc) {
       module.goToHome();
@@ -33,6 +33,7 @@
     {
       name:'Ajouter',
       disabled:false,
+      visible: true,
       color:'primary',
       action: () => module.goToAvailableCustomers()
     }
@@ -69,7 +70,7 @@
       {/each}
       {#if agreements?.length < 1}
         <tr>
-          <td colspan='3' class='text-center'>Aucun accord commercial en cours, <a href='/customers/search'>rechercher un magasin</a></td>
+          <td colspan='3' class='text-center'>Aucun accord commercial actif, <a href='/customers/search'>ajoutez-en un</a></td>
         </tr>
       {/if}
       </tbody>

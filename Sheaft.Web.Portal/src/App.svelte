@@ -9,6 +9,8 @@
   import { api, configureAxios } from '$features/axios'
   import type { Client } from '$features/api'
   import { authStore } from "$components/Auth/auth";
+  import { registerCustomerModule } from '$features/customers/module'
+  import { registerSupplierModule } from '$features/suppliers/module'
 
   onMount(async () => {
     const client = await api.init<Client>()
@@ -16,9 +18,11 @@
 
     await authStore.startMonitorUserAccessToken()
 
-    registerAccountModule(client, authStore)
     registerProductModule(client)
-    registerAgreementModule(client)
+    registerAccountModule(client, authStore)
+    registerAgreementModule(client, authStore)
+    registerCustomerModule(client, authStore)
+    registerSupplierModule(client, authStore)
   })
 </script>
 

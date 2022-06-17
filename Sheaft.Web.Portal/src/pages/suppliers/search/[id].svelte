@@ -5,15 +5,15 @@
   import Address from '$components/Addresses/Address.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { getContext } from 'svelte';
-  import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { GetAvailableSupplierQuery } from '$features/agreements/queries/getAvailableSupplier'
   import ConfirmAddSupplier from './_ConfirmAddSupplier.svelte'
+  import { getSupplierModule } from '$features/suppliers/module'
+  import { GetAvailableSupplierQuery } from '$features/suppliers/queries/getAvailableSupplier'
   
   export let id = ''
   
-  const module = getAgreementModule($goto)
+  const module = getSupplierModule($goto)
   const { open } = getContext('simple-modal');
 
   let initializing = true
@@ -50,6 +50,7 @@
     {
       name:'Acheter ses produits',
       disabled:false,
+      visible: true,
       color:'primary',
       action: () => openModal()
     }

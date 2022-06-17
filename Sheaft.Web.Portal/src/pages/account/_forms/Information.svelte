@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
   import Select from "$components/Inputs/Select.svelte";
   import Text from "$components/Inputs/Text.svelte";
-  import { ProfileKind } from "$enums/profile";
+  import { ProfileKind } from "$components/Auth/profile";
   import { createForm } from "felte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Button from "$components/Buttons/Button.svelte";

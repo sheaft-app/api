@@ -32,7 +32,6 @@ class AccountModule extends AppModule implements IAccountModule {
 
   constructor(private _client: Client, private _authStore: IAuthStore) {
     super();
-    this.registerHandlers();
   }
 
   override registerHandlers = () => {
@@ -88,5 +87,6 @@ export const registerAccountModule = (
   if (module) return module;
 
   module = new AccountModule(client, authStore);
+  module.registerHandlers();
   return module;
 };

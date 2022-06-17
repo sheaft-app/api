@@ -3,16 +3,16 @@
   import { onMount } from 'svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { ListAvailableSuppliersQuery } from '$features/agreements/queries/listAvailableSuppliers'
   import { address } from '$utils/addresses'
+  import { getSupplierModule } from '$features/suppliers/module'
+  import { ListAvailableSuppliersQuery } from '$features/suppliers/queries/listAvailableSuppliers'
 
   export let pageNumber: number = 1,
     take: number = 10
 
-  const module = getAgreementModule($goto)
+  const module = getSupplierModule($goto)
 
   let isLoading = true
   let suppliers: Components.Schemas.AvailableSupplierDto[] = []
@@ -28,8 +28,7 @@
   })
 </script>
 
-<!-- routify:options index=1 -->
-<!-- routify:options menu="Ajouter" -->
+<!-- routify:options index=4 -->
 <!-- routify:options title="Producteurs disponibles" -->
 
 <PageHeader

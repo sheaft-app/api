@@ -1,10 +1,10 @@
 ﻿import { writable } from "svelte-local-storage-store";
 import jwt_decode from "jwt-decode";
-import { ProfileStatus } from '$enums/profile'
 import { RefreshAccessTokenCommand } from "$features/account/commands/refreshAccessToken";
 import type { Components } from '$features/api'
 import { mediator } from '$features/mediator'
 import type { IAuthState, IAuthStore, IAccount } from '$components/Auth/types'
+import { ProfileStatus } from '$components/Auth/profile'
 
 const store = (): IAuthStore => {
   let _timer: any = null;

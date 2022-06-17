@@ -1,4 +1,4 @@
-﻿import { ProfileKind, ProfileStatus } from '$enums/profile'
+﻿import { ProfileKind, ProfileStatus } from '$components/Auth/profile'
 import type { Components } from '$features/api'
 import type { Readable } from 'svelte/store'
 

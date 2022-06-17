@@ -4,7 +4,7 @@
   import { createForm } from "felte";
   import FormFooter from "$components/Form/FormFooter.svelte";
   import Button from "$components/Buttons/Button.svelte";
-  import { ProfileKind } from "$enums/profile";
+  import { ProfileKind } from "$components/Auth/profile";
   import Address from "$components/Addresses/Address.svelte";
   import { onMount } from "svelte";
   import type { IAccountAddresses, IAccountConfigurationResults } from '$features/account/types'

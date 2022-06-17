@@ -823,7 +823,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/agreements/customers/{id}':
+  '/api/customers/{id}':
     get:
       tags:
         - GetAvailableCustomer
@@ -848,7 +848,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/agreements/suppliers/{id}':
+    put:
+      tags:
+        - UpdateCustomer
+      summary: Update current user customer profile
+      operationId: UpdateCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CustomerInfoRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/suppliers/{id}':
     get:
       tags:
         - GetAvailableSupplier
@@ -873,13 +904,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+    put:
+      tags:
+        - UpdateSupplier
+      summary: Update current user supplier profile
+      operationId: UpdateSupplier
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/SupplierInfoRequest'
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/agreements:
     get:
       tags:
-        - ListAgreements
-      summary: List available agreements for current user
-      operationId: ListAgreements
+        - ListActiveAgreements
+      summary: List active agreements for current user
+      operationId: ListActiveAgreements
       parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -905,13 +971,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/agreements/customers:
+  /api/customers:
     get:
       tags:
         - ListAvailableCustomers
       summary: List available customers for current user
       operationId: ListAvailableCustomers
       parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -937,13 +1007,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/agreements/suppliers:
+  /api/suppliers:
     get:
       tags:
         - ListAvailableSuppliers
       summary: List available suppliers for current user
       operationId: ListAvailableSuppliers
       parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -963,6 +1037,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AvailableSupplierDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/agreements/received:
+    get:
+      tags:
+        - ListReceivedAgreements
+      summary: List received agreements for current user
+      operationId: ListReceivedAgreements
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgreementDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/agreements/sent:
+    get:
+      tags:
+        - ListSentAgreements
+      summary: List sent agreements for current user
+      operationId: ListSentAgreements
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgreementDtoPaginatedResults'
         '400':
           description: Bad Request
           content:
@@ -1305,38 +1451,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/customers/{id}':
-    put:
-      tags:
-        - UpdateCustomer
-      summary: Update current user customer profile
-      operationId: UpdateCustomer
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CustomerInfoRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/CustomerInfoRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/CustomerInfoRequest'
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
   '/api/orders/{id}/draft':
     put:
       tags:
@@ -1363,38 +1477,6 @@ paths:
       responses:
         '204':
           description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-  '/api/suppliers/{id}':
-    put:
-      tags:
-        - UpdateSupplier
-      summary: Update current user supplier profile
-      operationId: UpdateSupplier
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SupplierInfoRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/SupplierInfoRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/SupplierInfoRequest'
-      responses:
-        '200':
-          description: Success
         '400':
           description: Bad Request
           content:

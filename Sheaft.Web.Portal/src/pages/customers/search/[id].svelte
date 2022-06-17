@@ -5,16 +5,16 @@
   import Address from '$components/Addresses/Address.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { getContext } from 'svelte';
-  import { getAgreementModule } from '$features/agreements/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
-  import { GetAvailableCustomerQuery } from '$features/agreements/queries/getAvailableCustomer'
   import ConfirmAddCustomer from './_ConfirmAddCustomer.svelte'
   import type { IModalResult } from '$components/Modal/types'
+  import { getCustomerModule } from '$features/customers/module'
+  import { GetAvailableCustomerQuery } from '$features/customers/queries/getAvailableCustomer'
   
   export let id = ''
   
-  const module = getAgreementModule($goto)
+  const module = getCustomerModule($goto)
   const { open } = getContext('simple-modal');
 
   let initializing = true
@@ -51,6 +51,7 @@
     {
       name:'Proposer mes produits',
       disabled:false,
+      visible: true,
       color:'primary',
       action: () => openModal()
     }

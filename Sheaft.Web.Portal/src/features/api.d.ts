@@ -582,12 +582,14 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
-    namespace ListAgreements {
+    namespace ListActiveAgreements {
         namespace Parameters {
             export type Page = number; // int32
+            export type Search = string;
             export type Take = number; // int32
         }
         export interface QueryParameters {
+            search?: Parameters.Search;
             page?: Parameters.Page /* int32 */;
             take?: Parameters.Take /* int32 */;
         }
@@ -599,9 +601,11 @@ declare namespace Paths {
     namespace ListAvailableCustomers {
         namespace Parameters {
             export type Page = number; // int32
+            export type Search = string;
             export type Take = number; // int32
         }
         export interface QueryParameters {
+            search?: Parameters.Search;
             page?: Parameters.Page /* int32 */;
             take?: Parameters.Take /* int32 */;
         }
@@ -613,9 +617,11 @@ declare namespace Paths {
     namespace ListAvailableSuppliers {
         namespace Parameters {
             export type Page = number; // int32
+            export type Search = string;
             export type Take = number; // int32
         }
         export interface QueryParameters {
+            search?: Parameters.Search;
             page?: Parameters.Page /* int32 */;
             take?: Parameters.Take /* int32 */;
         }
@@ -638,6 +644,22 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace ListReceivedAgreements {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Search = string;
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            search?: Parameters.Search;
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AgreementDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace ListReturnables {
         namespace Parameters {
             export type Page = number; // int32
@@ -649,6 +671,22 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.ReturnableDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListSentAgreements {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Search = string;
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            search?: Parameters.Search;
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AgreementDtoPaginatedResults;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -1128,6 +1166,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetAvailableCustomer.Responses.$200>
   /**
+   * UpdateCustomer - Update current user customer profile
+   */
+  'UpdateCustomer'(
+    parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
+    data?: Paths.UpdateCustomer.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UpdateCustomer.Responses.$200>
+  /**
    * GetAvailableSupplier - Retrieve supplier with id
    */
   'GetAvailableSupplier'(
@@ -1136,13 +1182,21 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetAvailableSupplier.Responses.$200>
   /**
-   * ListAgreements - List available agreements for current user
+   * UpdateSupplier - Update current user supplier profile
    */
-  'ListAgreements'(
-    parameters?: Parameters<Paths.ListAgreements.QueryParameters> | null,
+  'UpdateSupplier'(
+    parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,
+    data?: Paths.UpdateSupplier.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
+  /**
+   * ListActiveAgreements - List active agreements for current user
+   */
+  'ListActiveAgreements'(
+    parameters?: Parameters<Paths.ListActiveAgreements.QueryParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.ListAgreements.Responses.$200>
+  ): OperationResponse<Paths.ListActiveAgreements.Responses.$200>
   /**
    * ListAvailableCustomers - List available customers for current user
    */
@@ -1159,6 +1213,22 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
+  /**
+   * ListReceivedAgreements - List received agreements for current user
+   */
+  'ListReceivedAgreements'(
+    parameters?: Parameters<Paths.ListReceivedAgreements.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListReceivedAgreements.Responses.$200>
+  /**
+   * ListSentAgreements - List sent agreements for current user
+   */
+  'ListSentAgreements'(
+    parameters?: Parameters<Paths.ListSentAgreements.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListSentAgreements.Responses.$200>
   /**
    * LoginUser - Log the user in and generate access token / refresh token
    */
@@ -1256,14 +1326,6 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.SendInvoice.Responses.$204>
   /**
-   * UpdateCustomer - Update current user customer profile
-   */
-  'UpdateCustomer'(
-    parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
-    data?: Paths.UpdateCustomer.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UpdateCustomer.Responses.$200>
-  /**
    * UpdateOrderDraftProducts - Update order with id products
    */
   'UpdateOrderDraftProducts'(
@@ -1271,14 +1333,6 @@ export interface OperationMethods {
     data?: Paths.UpdateOrderDraftProducts.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateOrderDraftProducts.Responses.$204>
-  /**
-   * UpdateSupplier - Update current user supplier profile
-   */
-  'UpdateSupplier'(
-    parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,
-    data?: Paths.UpdateSupplier.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
 }
 
 export interface PathsDictionary {
@@ -1556,7 +1610,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetAgreement.Responses.$200>
   }
-  ['/api/agreements/customers/{id}']: {
+  ['/api/customers/{id}']: {
     /**
      * GetAvailableCustomer - Retrieve customer with id
      */
@@ -1565,8 +1619,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetAvailableCustomer.Responses.$200>
+    /**
+     * UpdateCustomer - Update current user customer profile
+     */
+    'put'(
+      parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
+      data?: Paths.UpdateCustomer.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UpdateCustomer.Responses.$200>
   }
-  ['/api/agreements/suppliers/{id}']: {
+  ['/api/suppliers/{id}']: {
     /**
      * GetAvailableSupplier - Retrieve supplier with id
      */
@@ -1575,18 +1637,26 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetAvailableSupplier.Responses.$200>
+    /**
+     * UpdateSupplier - Update current user supplier profile
+     */
+    'put'(
+      parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,
+      data?: Paths.UpdateSupplier.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
   }
   ['/api/agreements']: {
     /**
-     * ListAgreements - List available agreements for current user
+     * ListActiveAgreements - List active agreements for current user
      */
     'get'(
-      parameters?: Parameters<Paths.ListAgreements.QueryParameters> | null,
+      parameters?: Parameters<Paths.ListActiveAgreements.QueryParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.ListAgreements.Responses.$200>
+    ): OperationResponse<Paths.ListActiveAgreements.Responses.$200>
   }
-  ['/api/agreements/customers']: {
+  ['/api/customers']: {
     /**
      * ListAvailableCustomers - List available customers for current user
      */
@@ -1596,7 +1666,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListAvailableCustomers.Responses.$200>
   }
-  ['/api/agreements/suppliers']: {
+  ['/api/suppliers']: {
     /**
      * ListAvailableSuppliers - List available suppliers for current user
      */
@@ -1605,6 +1675,26 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
+  }
+  ['/api/agreements/received']: {
+    /**
+     * ListReceivedAgreements - List received agreements for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListReceivedAgreements.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListReceivedAgreements.Responses.$200>
+  }
+  ['/api/agreements/sent']: {
+    /**
+     * ListSentAgreements - List sent agreements for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListSentAgreements.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListSentAgreements.Responses.$200>
   }
   ['/api/token/login']: {
     /**
@@ -1726,16 +1816,6 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.SendInvoice.Responses.$204>
   }
-  ['/api/customers/{id}']: {
-    /**
-     * UpdateCustomer - Update current user customer profile
-     */
-    'put'(
-      parameters?: Parameters<Paths.UpdateCustomer.PathParameters> | null,
-      data?: Paths.UpdateCustomer.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UpdateCustomer.Responses.$200>
-  }
   ['/api/orders/{id}/draft']: {
     /**
      * UpdateOrderDraftProducts - Update order with id products
@@ -1745,16 +1825,6 @@ export interface PathsDictionary {
       data?: Paths.UpdateOrderDraftProducts.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UpdateOrderDraftProducts.Responses.$204>
-  }
-  ['/api/suppliers/{id}']: {
-    /**
-     * UpdateSupplier - Update current user supplier profile
-     */
-    'put'(
-      parameters?: Parameters<Paths.UpdateSupplier.PathParameters> | null,
-      data?: Paths.UpdateSupplier.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
   }
 }
 

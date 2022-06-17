@@ -34,6 +34,7 @@
     {
       name:'Ajouter',
       disabled:false,
+      visible: true,
       color:'primary',
       action: () => module.goToCreateProduct()
     }

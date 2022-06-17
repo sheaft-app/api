@@ -29,7 +29,7 @@
   const { form, data, isSubmitting, isValid } =
     createForm<Components.Schemas.CreateProductRequest>({
       initialValues:{
-        vat:65
+        vat:5.5
       },
       onSubmit: async values => {
         return await mediator.send(
@@ -65,7 +65,6 @@
   });
 </script>
 
-<!-- routify:options menu="Créer" -->
 <!-- routify:options index=2 -->
 <!-- routify:options title="Ajouter un nouveau produit" -->
 
