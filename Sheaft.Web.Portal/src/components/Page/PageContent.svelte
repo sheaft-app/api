@@ -5,7 +5,7 @@
   export let message: string|undefined;
 </script>
 
-<div>
+<div >
   {#if isLoading}
     <Loader {message}/>
   {:else}

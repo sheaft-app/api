@@ -21,8 +21,10 @@
       >{label} {required ? "*" : ""}</label
     >
   {/if}
-  <div class="flex"
-       aria-describedby="{id}-validation">
+  <div 
+    id='{id}'
+    class="flex"
+    aria-describedby="{id}-validation">
     {#each rates as rate}
       <div class="f-radio">
         <input

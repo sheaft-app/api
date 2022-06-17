@@ -1,21 +1,29 @@
-﻿<script lang="ts">
-  import { page, goto } from "@roxi/routify";
-  import Text from "$components/Inputs/Text.svelte";
-  import Vat from "$components/Inputs/Vat.svelte";
-  import FormFooter from "$components/Form/FormFooter.svelte";
-  import { createForm } from "felte";
-  import Button from "$components/Buttons/Button.svelte";
+﻿<script lang='ts'>
+  import { page, goto } from '@roxi/routify'
+  import Text from '$components/Inputs/Text.svelte'
+  import Vat from '$components/Inputs/Vat.svelte'
+  import FormFooter from '$components/Form/FormFooter.svelte'
+  import { createForm } from 'felte'
+  import Button from '$components/Buttons/Button.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { getProductModule } from '$features/products/module'
   import type { Components } from '$features/api'
   import { mediator } from '$features/mediator'
   import { CreateReturnableCommand } from '$features/products/commands/createReturnable'
   import { calculateOnSalePrice } from '$utils/money'
+  import { validator } from '@felte/validator-vest'
+  import { suite } from '$pages/returnables/validators'
+  import reporterDom from '@felte/reporter-dom'
+  import Checkbox from '$components/Inputs/Checkbox.svelte'
 
-  const module = getProductModule($goto);
+  const module = getProductModule($goto)
+  let hasVat = true;
 
   const { form, data, isSubmitting, isValid } =
     createForm<Components.Schemas.CreateReturnableRequest>({
+      initialValues: {
+        vat: 0
+      },
       onSubmit: async values => {
         return await mediator.send(
           new CreateReturnableCommand(
@@ -24,14 +32,23 @@
             values.vat,
             values.code
           )
-        );
+        )
       },
       onSuccess: (id: string) => {
-        module.goToReturnableDetails(id);
-      }
-    });
+        module.goToReturnableDetails(id)
+      },
+      extend: [
+        <any>validator({ suite }),
+        reporterDom({ single: true })
+      ]
+    })
 
-  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
+  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat)
+  $: if(hasVat && !$data.vat){
+    $data.vat = 5.5;
+  }else if(!hasVat && $data.vat){
+    $data.vat = undefined;
+  }
 </script>
 
 <!-- routify:options menu="Créer" -->
@@ -46,48 +63,56 @@
 
 <form use:form>
   <Text
-    id="name"
-    label="Nom"
-    bind:value="{$data.name}"
-    placeholder="Le nom de votre consigne"
-    disabled="{$isSubmitting}"
+    id='name'
+    label='Nom'
+    bind:value='{$data.name}'
+    placeholder='Le nom de votre consigne'
+    disabled='{$isSubmitting}'
   />
   <Text
-    id="unitPrice"
-    label="Prix HT"
-    bind:value="{$data.unitPrice}"
-    placeholder="Prix HT de votre consigne en €"
-    disabled="{$isSubmitting}"
+    id='unitPrice'
+    label='Prix HT'
+    bind:value='{$data.unitPrice}'
+    placeholder='Prix HT de votre consigne en €'
+    disabled='{$isSubmitting}'
   />
-  <Vat
-    id="vat"
-    label="TVA"
-    bind:value="{$data.vat}"
-    disabled="{$isSubmitting}"
-    rates="{[0, 0.055, 0.1, 0.2]}"
+  <Checkbox
+    id='hasVat'
+    label='Je facture la TVA pour cette consigne'
+    disabled='{$isSubmitting}'
+    bind:value='{hasVat}'
+    class='my-3'
   />
-  <Text
-    id="onSalePrice"
-    type='number'
-    label="Prix TTC (calculé)"
-    value="{onSalePrice}"
-    disabled="{true}"
-    required="{false}"
-  />
+  {#if hasVat}
+    <Vat
+      id='vat'
+      label='TVA'
+      bind:value='{$data.vat}'
+      disabled='{$isSubmitting}'
+    />
+    <Text
+      id='onSalePrice'
+      type='number'
+      label='Prix TTC (calculé)'
+      value='{onSalePrice}'
+      disabled='{true}'
+      required='{false}'
+    />
+  {/if}
   <FormFooter>
     <Button
-      type="button"
-      disabled="{$isSubmitting}"
-      class="back w-full mx-8"
-      on:click="{module.goToList}"
-      >Revenir à la liste
+      type='button'
+      disabled='{$isSubmitting}'
+      class='back w-full mx-8'
+      on:click='{module.goToReturnableList}'
+    >Revenir à la liste
     </Button>
     <Button
-      type="submit"
-      disabled="{!$isValid || $isSubmitting}"
-      isLoading="{$isSubmitting}"
-      class="accent w-full mx-8"
-      >Créer
+      type='submit'
+      disabled='{$isSubmitting}'
+      isLoading='{$isSubmitting}'
+      class='accent w-full mx-8'
+    >Créer
     </Button>
   </FormFooter>
 </form>

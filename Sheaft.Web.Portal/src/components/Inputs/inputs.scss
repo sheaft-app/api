@@ -65,7 +65,7 @@ select:focus-visible{
     @apply m-2;
     @apply p-2;
     @apply text-center;
-    @apply hover:bg-gray-300;
+    @apply hover:bg-primary-200;
   }
   
   label{
@@ -74,7 +74,7 @@ select:focus-visible{
 }
 
 input[aria-invalid=true], select[aria-invalid=true]{
-  @apply border-red-500
+  @apply border-danger-500
 }
 
 ul[data-felte-reporter-dom-list], ul[data-felte-reporter-dom-single]{    
@@ -84,7 +84,7 @@ ul[data-felte-reporter-dom-list], ul[data-felte-reporter-dom-single]{
 }
 
 div.validation-reporter{
-  @apply text-red-500
+  @apply text-danger-500
 }
 div.warning-reporter{
   @apply text-teal-500

@@ -8,6 +8,7 @@
   export let title: string
   export let subtitle: string
   export let previous: string | Function
+  export let disabled: boolean = false;
   export let actions: IPageAction[] = []
   
   const navigateTo = (action:string | Function) => {
@@ -46,13 +47,13 @@
     {#each actions as action}
       <div class='mx-2'>
       {#if action.color == 'accent'}
-        <Button type='button' class='bg-accent-600 hover:bg-accent-500' on:click={() => navigateTo(action.action)}>{action.name}</Button>
+        <Button type='button' class='bg-accent-600 hover:bg-accent-500' on:click={() => navigateTo(action.action)} disabled='{action.disabled}' >{action.name}</Button>
       {:else if action.color == 'primary'}
-        <Button type='button' class='bg-primary-600 hover:bg-primary-500' on:click={() => navigateTo(action.action)}>{action.name}</Button>
+        <Button type='button' class='bg-primary-600 hover:bg-primary-500' on:click={() => navigateTo(action.action)} disabled='{action.disabled}' >{action.name}</Button>
       {:else if action.color == 'danger'}
-        <Button type='button' class='bg-red-600 hover:bg-red-500' on:click={() => navigateTo(action.action)}>{action.name}</Button>
+        <Button type='button' class='bg-danger-600 hover:bg-red-500' on:click={() => navigateTo(action.action)} disabled='{action.disabled}' >{action.name}</Button>
       {:else}
-        <Button type='button' class='bg-back-600 hover:bg-back-500' on:click={() => navigateTo(action.action)}>{action.name}</Button>
+        <Button type='button' class='bg-default-600 hover:bg-back-500' on:click={() => navigateTo(action.action)}  disabled='{action.disabled}' >{action.name}</Button>
       {/if}
       </div>
     {/each}

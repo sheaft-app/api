@@ -17,7 +17,7 @@
   import { calculateOnSalePrice } from '$utils/money'
   import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
   import { validator } from '@felte/validator-vest'
-  import { createProductValidators } from '$pages/products/validators'
+  import { suite } from '$pages/products/validators'
   import reporterDom from '@felte/reporter-dom';
 
   const module = getProductModule($goto);
@@ -28,6 +28,9 @@
   
   const { form, data, isSubmitting, isValid } =
     createForm<Components.Schemas.CreateProductRequest>({
+      initialValues:{
+        vat:65
+      },
       onSubmit: async values => {
         return await mediator.send(
           new CreateProductCommand(
@@ -44,8 +47,8 @@
         module.goToProductDetails(id);
       },
       extend: [
-        <any>validator({ suite: createProductValidators }),
-        reporterDom()
+        <any>validator({ suite }),
+        reporterDom({single:true})
       ]
     });
 
@@ -132,7 +135,7 @@
       type="button"
       disabled="{$isSubmitting}"
       class="back w-full mx-8"
-      on:click="{module.goToList}"
+      on:click="{module.goToProductList}"
       >Revenir à la liste
     </Button>
     <Button

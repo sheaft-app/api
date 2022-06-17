@@ -25,6 +25,6 @@
   <p>Êtes-vous sûr de vouloir supprimer ce produit ?</p>  
 </div>
 <div class='flex items-center justify-evenly pt-4'>
-  <Button class='bg-back-600' on:click={close}>Non</Button>
-  <Button class='bg-red-600' on:click={validate}>Oui</Button>
+  <Button class='bg-default-600' on:click={close}>Non</Button>
+  <Button class='bg-danger-600' on:click={validate}>Oui</Button>
 </div>

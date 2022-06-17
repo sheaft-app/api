@@ -11,7 +11,12 @@ module.exports = {
       colors:{
         primary: colors.violet,
         accent: colors.teal,
-        back: colors.gray,
+        back: colors.stone,
+        cancel: colors.neutral,
+        danger: colors.red,
+        warning: colors.amber,
+        info: colors.sky,
+        success: colors.emerald,
       },
       spacing: {
         '128': '32rem',
@@ -19,6 +24,10 @@ module.exports = {
       },
       borderRadius: {
         '4xl': '2rem',
+      },
+      height: {
+        '96': '24rem',
+        '128': '32rem',
       }
     }
   },
