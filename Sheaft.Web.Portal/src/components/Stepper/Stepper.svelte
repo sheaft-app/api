@@ -4,17 +4,15 @@
   import NextStep from "./NextStep.svelte";
   import StepsLink from "./StepsLink.svelte";
   import type {
-    IStepDefinition,
-    IStepsDefinition,
-    IStepsResult
-  } from "$components/Stepper/types";
+    StepDefinition, StepsDefinition, StepsResult
+  } from '$components/Stepper/types'
   import { onMount } from "svelte";
 
-  export let submit = async (results: IStepsResult): Promise<void> => {};
+  export let submit = async (results: StepsResult): Promise<void> => {};
   export let cancel = async (): Promise<void> => {};
-  export let steps: IStepsDefinition = {};
-  export let results: IStepsResult = {};
-  let pages: Record<string, IStepDefinition<any>> = {};
+  export let steps: StepsDefinition = {};
+  export let results: StepsResult = {};
+  let pages: Record<string, StepDefinition<any>> = {};
 
   let pageNumber = 0;
 

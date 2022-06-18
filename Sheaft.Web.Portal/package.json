@@ -16,7 +16,7 @@
     "lint": "eslint ./src/**/*.{js,ts,svelte}",
     "lint:fix": "eslint --fix ./src/**/*.{js,ts,svelte}",
     "prelint": "npm run format",
-    "openapi": "copyfiles -f \"../Sheaft.Web.Api/wwwroot/swagger/v1/*.*\" \"./src/features/openapi\" && typegen ./src/features/openapi/swagger.yaml > ./src/features/api.d.ts"
+    "openapi": "copyfiles -f \"../Sheaft.Web.Api/wwwroot/swagger/v1/*.*\" \"./src/types/openapi\" && typegen ./src/types/openapi/swagger.yaml > ./src/types/api.d.ts"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",

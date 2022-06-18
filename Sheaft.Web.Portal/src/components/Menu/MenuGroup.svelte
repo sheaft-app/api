@@ -1,0 +1,55 @@
+<script lang="ts">
+  import { goto, isActive } from "@roxi/routify";
+  import Menu from "./Menu.svelte";
+  import Fa from "svelte-fa";
+  import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
+  import { parseSubActivePath } from '$components/Menu/menus'
+  import type { MenuEntry, MenuGroup } from '$components/Menu/types'
+
+  export let entry: MenuGroup;
+
+  let isGroupActive: boolean = false;
+  let isGroupSubActive: boolean = false;
+
+  const navigate = (path: string) => {
+    if (path) $goto(path);
+  };
+
+  $: if (entry.pages && entry.pages.length > 0) {
+    isGroupActive =
+      entry.pages.find(
+        (p: MenuEntry) => $isActive(parseSubActivePath(p.path)) && p.default
+      ) != null;
+    isGroupSubActive =
+      entry.pages.find(
+        (p: MenuEntry) => $isActive(parseSubActivePath(p.path)) && !p.default
+      ) != null;
+  }
+
+  $: isVisible = entry.visible && entry.pages.find(p => p.visible) != null;
+  $: defaultPage = entry.pages.find(p => p.default);
+</script>
+
+{#if isVisible}
+  <li class="menu-group">
+    <div
+      class="flex items-center mx-4 p-3 rounded-xl font-medium"
+      class:active="{isGroupActive}"
+      class:subactive="{isGroupSubActive}"
+      class:cursor-pointer="{defaultPage}"
+      on:click="{() => navigate(defaultPage?.path)}"
+    >
+      {#if entry.icon}
+        <div class="menu-icon">
+          <Fa icon="{getFaIconFromFullName(entry.icon)}" class="menu-icon" />
+        </div>
+      {:else}
+        <div class="menu-icon">
+          <Fa icon="{getFaIcon('fas', 'angleRight')}" class="" />
+        </div>
+      {/if}
+      <span class="ml-2 ">{entry.name}</span>
+    </div>
+    <Menu entries="{entry.pages}" expand="{isGroupActive || isGroupSubActive}" />
+  </li>
+{/if}

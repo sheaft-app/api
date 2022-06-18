@@ -3,18 +3,18 @@
   import { onMount } from 'svelte'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { getProductModule } from '$features/products/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { ListReturnablesQuery } from '$features/products/queries/listReturnables'
   import { currency } from '$utils/money'
   import { percent } from '$utils/percent'
   import { dateDistance } from '$utils/dates'
-  import {formatInnerHtml} from "$directives/format"
+  import {formatInnerHtml} from "$components/Actions/format"
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { ListReturnablesQuery } from '$components/Returnables/queries/listReturnables'
+  import { getReturnableModule } from '$components/Returnables/module'
 
   export let pageNumber: number = 1,
     take: number = 10
-  const module = getProductModule($goto)
+  const module = getReturnableModule($goto)
 
   let isLoading = true
   let returnables: Components.Schemas.ReturnableDto[] = []
@@ -35,14 +35,14 @@
       disabled:false,
       visible: true,
       color:'primary',
-      action: () => module.goToCreateReturnable()
+      action: () => module.goToCreate()
     }
   ];
 </script>
 
 <!-- routify:options menu="Mes consignes" -->
 <!-- routify:options title="Mes consignes" -->
-<!-- routify:options index=1 -->
+<!-- routify:options index=true -->
 <!-- routify:options default=true -->
 
 <PageHeader
@@ -63,7 +63,7 @@
       </thead>
       <tbody>
       {#each returnables as returnable}
-        <tr on:click='{() => module.goToReturnableDetails(returnable.id)}'>
+        <tr on:click='{() => module.goToDetails(returnable.id)}'>
           <th>{returnable.name}</th>
           <td use:formatInnerHtml='{currency}'>{returnable.unitPrice}</td>
           <td use:formatInnerHtml='{percent}'>{returnable.vat}</td>

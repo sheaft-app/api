@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
+  import Unauthorized from '$components/Unauthorized/Unauthorized.svelte'
 </script>
-<div class='flex items-center justify-center h-full w-full'>
-  <h1>Accès non autorisé</h1>
-</div>
+
+<Unauthorized/>

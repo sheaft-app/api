@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
+  import NotFound from '$components/NotFound/NotFound.svelte'
 </script>
-<div class='flex items-center justify-center h-full w-full'>
-  <h1>Page introuvable</h1>  
-</div>
+
+<NotFound/>

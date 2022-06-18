@@ -3,13 +3,13 @@
   import { onMount } from "svelte";
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { statusStr } from '$features/agreements/utils'
-  import {formatInnerHtml} from '$directives/format'
+  import type { Components } from '$types/api'
+  import {formatInnerHtml} from '$components/Actions/format'
   import { dateDistance } from '$utils/dates'
-  import { ListReceivedAgreementsQuery } from '$features/agreements/queries/listReceivedAgreements'
-  import { getSupplierModule } from '$features/suppliers/module'
+  import { getSupplierModule } from '$components/Suppliers/module'
+  import { mediator } from '$components/mediator'
+  import { ListReceivedAgreementsQuery } from '$components/Agreements/queries/listReceivedAgreements'
+  import { status } from '$components/Agreements/utils'
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -54,7 +54,7 @@
       {#each agreements as agreement}
         <tr on:click="{() => module.goToDetails(agreement.id)}">
           <th>{agreement.supplierName}</th>
-          <td use:formatInnerHtml={statusStr}>{agreement.status}</td>
+          <td use:formatInnerHtml={status}>{agreement.status}</td>
           <td use:formatInnerHtml={dateDistance}>{agreement.updatedOn}</td>
         </tr>
       {/each}

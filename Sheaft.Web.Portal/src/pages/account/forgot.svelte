@@ -1,15 +1,15 @@
 ﻿<script lang="ts">
   import { goto, page, params } from "@roxi/routify";
-  import Button from "$components/Buttons/Button.svelte";
+  import Button from "$components/Button/Button.svelte";
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
-  import HorizontalSeparator from "$components/HorizontalSeparator.svelte";
   import { createForm } from "felte";
-  import { getAccountModule } from '$features/account/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { ForgotPasswordCommand } from '$features/account/commands/forgotPassword'
-  import Text from '$components/Inputs/Text.svelte'
+  import { getAccountModule } from '$components/Account/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { ForgotPasswordCommand } from '$components/Account/commands/forgotPassword'
+  import Input from '$components/Input/Input.svelte'
+  import HorizontalSeparator from '$components/Separators/HorizontalSeparator.svelte'
 
   const module = getAccountModule($goto);
   let resetRequested = false;
@@ -39,7 +39,7 @@
     <h1>{$page.title}</h1>
     {#if !resetRequested}
       <form use:form>
-        <Text
+        <Input
           type='email'
           label="Votre adresse mail"
           bind:value="{$data.email}"

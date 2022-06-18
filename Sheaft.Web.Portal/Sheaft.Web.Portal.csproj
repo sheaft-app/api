@@ -8,8 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="src\features\account\queries" />
-      <Folder Include="src\features\agreements\commands" />
       <Folder Include="wwwroot" />
       <Folder Include="public" />
       <Folder Include=".routify" />
@@ -17,6 +15,7 @@
 
     <ItemGroup>
       <_ContentIncludedByDefault Remove="wwwroot\*" />
+      <_ContentIncludedByDefault Remove="src\features\openapi\swagger.json" />
     </ItemGroup>
 
     <ItemGroup>

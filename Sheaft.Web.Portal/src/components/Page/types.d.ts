@@ -1,6 +1,6 @@
-﻿export interface IPageAction {
+﻿export type PageAction = {
   name: string;
   disabled?:boolean;
   action: string | Function;
-  actions?: IPageAction[] | null;
+  actions?: PageAction[] | null;
 }

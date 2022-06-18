@@ -3,13 +3,13 @@
   import { onMount } from "svelte";
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { statusStr } from '$features/agreements/utils'
-  import {formatInnerHtml} from '$directives/format'
   import { dateDistance } from '$utils/dates'
-  import { ListSentAgreementsQuery } from '$features/agreements/queries/listSentAgreements'
-  import { getCustomerModule } from '$features/customers/module'
+  import { getCustomerModule } from '$components/Customers/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { formatInnerHtml } from "$components/Actions/format"
+  import { ListSentAgreementsQuery } from '$components/Agreements/queries/listSentAgreements'
+  import { status } from '$components/Agreements/utils'
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -35,7 +35,7 @@
       disabled:false,
       visible: true,
       color:'primary',
-      action: () => module.goToAvailableCustomers()
+      action: () => module.goToSearch()
     }
   ];
   
@@ -65,7 +65,7 @@
       {#each agreements as agreement}
         <tr on:click="{() => module.goToDetails(agreement.id)}">
           <th>{agreement.customerName}</th>
-          <td use:formatInnerHtml={statusStr}>{agreement.status}</td>
+          <td use:formatInnerHtml={status}>{agreement.status}</td>
           <td use:formatInnerHtml={dateDistance}>{agreement.updatedOn}</td>
         </tr>
       {/each}

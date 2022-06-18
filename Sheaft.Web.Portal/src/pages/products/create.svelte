@@ -1,24 +1,24 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
-  import Text from "$components/Inputs/Text.svelte";
-  import TextArea from "$components/Inputs/TextArea.svelte";
-  import Vat from "$components/Inputs/Vat.svelte";
-  import FormFooter from "$components/Form/FormFooter.svelte";
-  import Select from "$components/Inputs/Select.svelte";
-  import Checkbox from "$components/Inputs/Checkbox.svelte";
   import { onMount } from "svelte";
-  import Button from "$components/Buttons/Button.svelte";
+  import Button from "$components/Button/Button.svelte";
   import { createForm } from "felte";
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { getProductModule } from '$features/products/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { CreateProductCommand } from '$features/products/commands/createProduct'
   import { calculateOnSalePrice } from '$utils/money'
-  import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
   import { validator } from '@felte/validator-vest'
   import { suite } from '$pages/products/validators'
   import reporterDom from '@felte/reporter-dom';
+  import { getProductModule } from '$components/Products/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { CreateProductCommand } from '$components/Products/commands/createProduct'
+  import { ListReturnablesOptionsQuery } from '$components/Products/queries/listReturnablesOptions'
+  import Input from '$components/Input/Input.svelte'
+  import Vat from '$components/Vat/Vat.svelte'
+  import TextArea from '$components/TextArea/TextArea.svelte'
+  import Checkbox from '$components/Checkbox/Checkbox.svelte'
+  import Select from '$components/Select/Select.svelte'
+  import FormFooter from '$components/Form/FormFooter.svelte'
 
   const module = getProductModule($goto);
 
@@ -44,7 +44,7 @@
         );
       },
       onSuccess: (id: string) => {
-        module.goToProductDetails(id);
+        module.goToDetails(id);
       },
       extend: [
         <any>validator({ suite }),
@@ -60,21 +60,21 @@
       returnablesOptions = await mediator.send(new ListReturnablesOptionsQuery());
       isLoading = false;
     } catch (exc) {
-      module.goToProductList();
+      module.goToList();
     }
   });
 </script>
 
-<!-- routify:options index=2 -->
+<!-- routify:options index=true -->
 <!-- routify:options title="Ajouter un nouveau produit" -->
 
 <PageHeader
   title={$page.title}
-  previous='{() => module.goToProductList()}'
+  previous='{() => module.goToList()}'
 />
 
 <form use:form>
-  <Text
+  <Input
     id="code"
     label="Code"
     bind:value="{$data.code}"
@@ -83,14 +83,14 @@
     placeholder="Le code de votre produit (sera autogénéré si non renseigné)"
     disabled="{$isSubmitting}"
   />
-  <Text
+  <Input
     id="name"
     label="Nom"
     bind:value="{$data.name}"
     placeholder="Le nom de votre produit"
     disabled="{$isSubmitting}"
   />
-  <Text
+  <Input
     id="unitPrice"
     label="Prix HT"
     bind:value="{$data.unitPrice}"
@@ -98,7 +98,7 @@
     disabled="{$isSubmitting}"
   />
   <Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{$isSubmitting}" />
-  <Text
+  <Input
     type='number'
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
@@ -134,7 +134,7 @@
       type="button"
       disabled="{$isSubmitting}"
       class="back w-full mx-8"
-      on:click="{module.goToProductList}"
+      on:click="{module.goToList}"
       >Revenir à la liste
     </Button>
     <Button

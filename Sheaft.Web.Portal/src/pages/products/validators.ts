@@ -1,5 +1,5 @@
 ﻿import { create, enforce, test } from 'vest'
-import type { Components } from '$features/api'
+import type { Components } from '$types/api'
 
 export const suite = create('product-suite', (data: Components.Schemas.UpdateProductRequest) => {
   test('name', 'Le nom est requis', () => {

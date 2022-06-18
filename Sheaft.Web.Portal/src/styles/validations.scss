@@ -1,0 +1,17 @@
+﻿input[aria-invalid=true], select[aria-invalid=true]{
+  @apply border-danger-500
+}
+
+ul[data-felte-reporter-dom-list], ul[data-felte-reporter-dom-single]{
+  li{
+    @apply ml-0 mt-1;
+  }
+}
+
+div.validation-reporter{
+  @apply text-danger-500
+}
+div.warning-reporter{
+  @apply text-teal-500
+}
+

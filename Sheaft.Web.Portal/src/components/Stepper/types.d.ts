@@ -1,4 +1,4 @@
-﻿export interface IStepDefinition<T> {
+﻿export type StepDefinition<T> = {
   id?: string;
   name: string;
   component: any;
@@ -6,5 +6,5 @@
   initialValues?: T;
 }
 
-export interface IStepsDefinition extends Record<string, IStepDefinition> {}
-export interface IStepsResult extends Record<string, any> {}
+export type StepsDefinition = Record<string, IStepDefinition>;
+export type StepsResult = Record<string, any>;

@@ -1,0 +1,16 @@
+﻿select{
+  @apply border;
+  @apply border-gray-300;
+  @apply text-gray-900;
+  @apply text-sm;
+  @apply rounded;
+  @apply focus:ring-primary-500;
+  @apply focus:border-primary-500;
+  @apply block;
+  @apply w-full;
+  @apply p-2;
+}
+
+select:focus-visible{
+  outline: 1px solid rgb(124 58 237);
+}

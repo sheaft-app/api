@@ -1,0 +1,29 @@
+﻿input, textarea, select {
+  @apply block;
+  @apply w-full;
+  @apply px-3;
+  @apply py-1.5;
+  @apply text-base;
+  @apply font-normal;
+  @apply text-gray-700;
+  @apply bg-white bg-clip-padding;
+  @apply border border-solid border-gray-300;
+  @apply rounded;
+  @apply transition;
+  @apply ease-in-out;
+  @apply m-0;
+  @apply focus:text-gray-700;
+  @apply focus:bg-white;
+  @apply focus:border-primary-600;
+  @apply focus:outline-none;
+  @apply disabled:bg-gray-200;
+}
+
+label {
+  @apply block;
+  @apply mb-2;
+  @apply text-sm;
+  @apply font-medium;
+  @apply text-gray-700;
+  @apply cursor-pointer;
+}

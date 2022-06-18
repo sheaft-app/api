@@ -3,11 +3,11 @@
   import { onMount } from 'svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { address } from '$utils/addresses'
-  import { getCustomerModule } from '$features/customers/module'
-  import { ListAvailableCustomersQuery } from '$features/customers/queries/listAvailableCustomers'
+  import { getCustomerModule } from '$components/Customers/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { ListAvailableCustomersQuery } from '$components/Customers/queries/listAvailableCustomers'
+  import { address } from '$utils/address'
 
   export let pageNumber: number = 1,
     take: number = 10
@@ -28,7 +28,7 @@
   })
 </script>
 
-<!-- routify:options index=4 -->
+<!-- routify:options index=true -->
 <!-- routify:options title="Magasins disponibles" -->
 
 <PageHeader

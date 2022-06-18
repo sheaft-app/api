@@ -3,8 +3,8 @@
   import Fa from "svelte-fa";
   import { getFaIconFromFullName } from '$components/Icons/faIconRetriever'
 
-  export let name: string = "";
-  export let icon: string = "";
+  export let name: string;
+  export let icon: string;
   export let canClick: boolean = false;
   export let step: number = 0;
 

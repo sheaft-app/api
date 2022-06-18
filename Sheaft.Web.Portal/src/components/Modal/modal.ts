@@ -1,4 +1,8 @@
-﻿import type { IModalResult } from '$components/Modal/types'
+﻿export interface IModalResult<T> {
+  isSuccess: boolean;
+  value: T
+  error?: any
+}
 
 export class ModalResult<T> implements IModalResult<T>{
   public isSuccess:boolean = false;

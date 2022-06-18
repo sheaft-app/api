@@ -1,29 +1,30 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { getContext, onMount } from 'svelte'
-  import Text from '$components/Inputs/Text.svelte'
   import FormFooter from '$components/Form/FormFooter.svelte'
   import { createForm } from 'felte'
-  import Vat from '$components/Inputs/Vat.svelte'
-  import Button from '$components/Buttons/Button.svelte'
+  import Button from '$components/Button/Button.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { getProductModule } from '$features/products/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { UpdateReturnableCommand } from '$features/products/commands/updateReturnable'
-  import { GetReturnableQuery } from '$features/products/queries/getReturnable'
   import { calculateOnSalePrice } from '$utils/money'
-  import ConfirmRemoveReturnable from './_ConfirmRemoveReturnable.svelte'
   import { validator } from '@felte/validator-vest'
   import { suite } from '$pages/returnables/validators'
   import reporterDom from '@felte/reporter-dom'
-  import Checkbox from '$components/Inputs/Checkbox.svelte'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { UpdateReturnableCommand } from '$components/Returnables/commands/updateReturnable'
+  import ConfirmRemoveReturnable from '$components/Returnables/Modals/ConfirmRemoveReturnable.svelte'
+  import { GetReturnableQuery } from '$components/Returnables/queries/getReturnable'
+  import Input from '$components/Input/Input.svelte'
+  import Checkbox from '$components/Checkbox/Checkbox.svelte'
+  import Vat from '$components/Vat/Vat.svelte'
+  import { getReturnableModule } from '$components/Returnables/module'
 
-  export let id = ''
-  let isLoading = true
-  const module = getProductModule($goto)
+  export let id:string;
+  
+  const module = getReturnableModule($goto)
   const { open } = getContext('simple-modal')
 
+  let isLoading = true
   let hasVat = false
 
   const { form, data, isSubmitting, isValid, setData } =
@@ -39,7 +40,7 @@
         )
       },
       onSuccess: () => {
-        module.goToReturnableList()
+        module.goToList()
       },
       extend: [
         <any>validator({ suite }),
@@ -48,7 +49,7 @@
     })
 
   const onClose = () => {
-    module.goToReturnableList()
+    module.goToList()
   }
 
   const confirmModal = () => {
@@ -72,7 +73,7 @@
       isLoading = false
     } catch (exc) {
       console.error(exc)
-      module.goToReturnableList()
+      module.goToList()
     }
   })
 
@@ -98,23 +99,22 @@
 
 <!-- routify:options index=true -->
 <!-- routify:options title="Details de la consigne" -->
-<!-- routify:options roles=[] -->
 
 <PageHeader
   title={$page.title}
   actions={actions}
-  previous='{() => module.goToReturnableList()}'
+  previous='{() => module.goToList()}'
 />
 
 <form use:form>
-  <Text
+  <Input
     id='name'
     label='Nom'
     bind:value='{$data.name}'
     placeholder='Le nom de votre consigne'
     disabled='{controlsAreDisabled}'
   />
-  <Text
+  <Input
     id='unitPrice'
     label='Prix HT'
     bind:value='{$data.unitPrice}'
@@ -135,7 +135,7 @@
       bind:value='{$data.vat}'
       disabled='{controlsAreDisabled}'
     />
-    <Text
+    <Input
       id='onSalePrice'
       type='number'
       label='Prix TTC (calculé)'
@@ -149,7 +149,7 @@
       type='button'
       disabled='{controlsAreDisabled}'
       class='back w-full mx-8'
-      on:click='{module.goToReturnableList}'
+      on:click='{module.goToList}'
     >Annuler
     </Button>
     <Button

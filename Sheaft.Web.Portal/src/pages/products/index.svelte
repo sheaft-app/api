@@ -3,14 +3,14 @@
   import { onMount } from 'svelte'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { getProductModule } from '$features/products/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { ListProductsQuery } from '$features/products/queries/listProducts'
   import { dateDistance } from '$utils/dates'
   import { currency } from '$utils/money'
   import { percent } from '$utils/percent'
-  import { formatInnerHtml } from '$directives/format'
+  import { formatInnerHtml } from '$components/Actions/format'
+  import { getProductModule } from '$components/Products/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { ListProductsQuery } from '$components/Products/queries/listProducts'
 
   export let pageNumber: number = 1,
     take: number = 10
@@ -36,15 +36,14 @@
       disabled:false,
       visible: true,
       color:'primary',
-      action: () => module.goToCreateProduct()
+      action: () => module.goToCreate()
     }
   ];
 </script>
 
 <!-- routify:options menu="Mes produits" -->
 <!-- routify:options title="Mes produits" -->
-<!-- routify:options roles=[] -->
-<!-- routify:options index=1 -->
+<!-- routify:options index=true -->
 <!-- routify:options default=true -->
 
 <PageHeader
@@ -65,7 +64,7 @@
       </thead>
       <tbody>
       {#each products as product}
-        <tr on:click='{() => module.goToProductDetails(product.id)}'>
+        <tr on:click='{() => module.goToDetails(product.id)}'>
           <th>{product.name}</th>
           <td use:formatInnerHtml={currency}>{product.unitPrice}</td>
           <td use:formatInnerHtml={percent}>{product.vat}</td>

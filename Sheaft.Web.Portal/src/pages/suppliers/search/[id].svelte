@@ -1,17 +1,17 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import Text from '$components/Inputs/Text.svelte'
-  import Address from '$components/Addresses/Address.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { getContext } from 'svelte';
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import ConfirmAddSupplier from './_ConfirmAddSupplier.svelte'
-  import { getSupplierModule } from '$features/suppliers/module'
-  import { GetAvailableSupplierQuery } from '$features/suppliers/queries/getAvailableSupplier'
-  
-  export let id = ''
+  import { getSupplierModule } from '$components/Suppliers/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { GetAvailableSupplierQuery } from '$components/Suppliers/queries/getAvailableSupplier'
+  import ConfirmAddSupplier from '$components/Suppliers/Modals/ConfirmAddSupplier.svelte'
+  import Input from '$components/Input/Input.svelte'
+  import Address from '$components/Address/Address.svelte'
+
+  export let id:string;
   
   const module = getSupplierModule($goto)
   const { open } = getContext('simple-modal');
@@ -31,7 +31,7 @@
   })
   
   const onClose = (result) => {
-    module.goToAvailableSuppliers();
+    module.goToSearch();
   }
   
   const openModal = () => {
@@ -59,23 +59,22 @@
 
 <!-- routify:options index=true -->
 <!-- routify:options title="Fiche du fournisseur" -->
-<!-- routify:options roles=[] -->
 
 <PageHeader
   title={$page.title}
   previous='{() => module.goToSuppliers()}'
   actions='{actions}'/>
 
-<Text
+<Input
   label='Nom'
   value='{supplier.name}'
   disabled={true} />
-<Text
+<Input
   type='email'
   label='Adresse mail'
   value='{supplier.email}'
   disabled={true} />
-<Text
+<Input
   type='tel'
   label='Numéro de téléphone'
   value='{supplier.phone}'

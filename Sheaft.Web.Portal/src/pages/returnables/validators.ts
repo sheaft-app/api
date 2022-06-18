@@ -1,5 +1,5 @@
 ﻿import { create, enforce, test } from 'vest'
-import type { Components } from '$features/api'
+import type { Components } from '$types/api'
 
 export const suite = create('returnable-suite', (data: Components.Schemas.UpdateReturnableRequest) => {
   test('name', 'Le nom est requis', () => {

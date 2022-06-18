@@ -1,18 +1,18 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
   import { onMount } from 'svelte'
-  import Text from '$components/Inputs/Text.svelte'
-  import Address from '$components/Addresses/Address.svelte'
-  import PageHeader from '$components/Page/PageHeader.svelte'
   import { getContext } from 'svelte';
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import ConfirmAddCustomer from './_ConfirmAddCustomer.svelte'
-  import type { IModalResult } from '$components/Modal/types'
-  import { getCustomerModule } from '$features/customers/module'
-  import { GetAvailableCustomerQuery } from '$features/customers/queries/getAvailableCustomer'
-  
-  export let id = ''
+  import { getCustomerModule } from '$components/Customers/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { GetAvailableCustomerQuery } from '$components/Customers/queries/getAvailableCustomer'
+  import type { IModalResult } from '$components/Modal/modal'
+  import ConfirmAddCustomer from '$components/Customers/Modals/ConfirmAddCustomer.svelte'
+  import PageHeader from '$components/Page/PageHeader.svelte'
+  import Input from '$components/Input/Input.svelte'
+  import Address from '$components/Address/Address.svelte'
+
+  export let id:string;
   
   const module = getCustomerModule($goto)
   const { open } = getContext('simple-modal');
@@ -32,7 +32,7 @@
   })
   
   const onClose = (result:IModalResult<string>) => {
-    module.goToAvailableCustomers();
+    module.goToSearch();
   }
   
   const openModal = () => {
@@ -60,23 +60,22 @@
 
 <!-- routify:options index=true -->
 <!-- routify:options title="Fiche du client" -->
-<!-- routify:options roles=[] -->
 
 <PageHeader
   title={$page.title}
   previous='{() => module.goToCustomers()}'
   actions='{actions}'/>
 
-<Text
+<Input
   label='Nom'
   value='{customer.name}'
   disabled={true} />
-<Text
+<Input
   type='email'
   label='Adresse mail'
   value='{customer.email}'
   disabled={true} />
-<Text
+<Input
   type='tel'
   label='Numéro de téléphone'
   value='{customer.phone}'

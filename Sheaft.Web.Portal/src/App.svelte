@@ -1,16 +1,17 @@
 <script lang='ts'>
-  import { onMount } from 'svelte'
   import { Router } from '@roxi/routify'
   import { routes } from '$routify/routes'
+  import { onMount } from 'svelte'
   import Modal from 'svelte-simple-modal'
-  import { registerProductModule } from '$features/products/module'
-  import { registerAccountModule } from '$features/account/module'
-  import { registerAgreementModule } from '$features/agreements/module'
-  import { api, configureAxios } from '$features/axios'
-  import type { Client } from '$features/api'
-  import { authStore } from "$components/Auth/auth";
-  import { registerCustomerModule } from '$features/customers/module'
-  import { registerSupplierModule } from '$features/suppliers/module'
+  import type { Client } from '$types/api'
+  import { api, configureAxios } from './axios'
+  import { authStore } from '$components/Account/store'
+  import { registerProductModule } from '$components/Products/module'
+  import { registerAccountModule } from '$components/Account/module'
+  import { registerAgreementModule } from '$components/Agreements/module'
+  import { registerCustomerModule } from '$components/Customers/module'
+  import { registerSupplierModule } from '$components/Suppliers/module'
+  import { registerReturnableModule } from '$components/Returnables/module'
 
   onMount(async () => {
     const client = await api.init<Client>()
@@ -19,6 +20,7 @@
     await authStore.startMonitorUserAccessToken()
 
     registerProductModule(client)
+    registerReturnableModule(client)
     registerAccountModule(client, authStore)
     registerAgreementModule(client, authStore)
     registerCustomerModule(client, authStore)

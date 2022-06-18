@@ -3,11 +3,11 @@
   import { onMount } from 'svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { address } from '$utils/addresses'
-  import { getSupplierModule } from '$features/suppliers/module'
-  import { ListAvailableSuppliersQuery } from '$features/suppliers/queries/listAvailableSuppliers'
+  import type { Components } from '$types/api'
+  import { getSupplierModule } from '$components/Suppliers/module'
+  import { mediator } from '$components/mediator'
+  import { ListAvailableSuppliersQuery } from '$components/Suppliers/queries/listAvailableSuppliers'
+  import { address } from '$utils/address'
 
   export let pageNumber: number = 1,
     take: number = 10
@@ -28,7 +28,7 @@
   })
 </script>
 
-<!-- routify:options index=4 -->
+<!-- routify:options index=true -->
 <!-- routify:options title="Producteurs disponibles" -->
 
 <PageHeader

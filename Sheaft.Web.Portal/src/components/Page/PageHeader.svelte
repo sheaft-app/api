@@ -1,15 +1,15 @@
 <script lang='ts'>
+  import { goto } from '@roxi/routify'
   import Fa from 'svelte-fa'
   import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
-  import Button from '$components/Buttons/Button.svelte'
-  import { goto } from '@roxi/routify'
-  import type { IPageAction } from '$components/Page/types'
+  import Button from '$components/Button/Button.svelte'
+  import type { PageAction } from '$components/Page/types'
 
   export let title: string
   export let subtitle: string
   export let previous: string | Function
   export let disabled: boolean = false
-  export let actions: IPageAction[] = []
+  export let actions: PageAction[] = []
 
   const navigateTo = (action: string | Function) => {
     if (typeof (action) == 'string')
@@ -26,15 +26,9 @@
 <div class='flex w-full flex flex-row items-center my-6'>
   {#if previous}
     <div class='mr-4'>
-      {#if typeof (previous) == 'string'}
-        <a href='{previous}'>
-          <Fa icon='{faArrowAltCircleLeft}' />
-        </a>
-      {:else}
-        <a href='#' on:click={previous}>
-          <Fa icon='{faArrowAltCircleLeft}' class='text-gray-500 hover:text-gray-400' size='24' />
-        </a>
-      {/if}
+      <a href='#' on:click={() => navigateTo(previous)}>
+        <Fa icon='{faArrowAltCircleLeft}' class='text-gray-500 hover:text-gray-400' size='24' />
+      </a>
     </div>
   {/if}
   <div class='flex-grow'>

@@ -1,28 +1,28 @@
 ﻿<script lang='ts'>
   import { page, goto } from '@roxi/routify'
-  import Text from '$components/Inputs/Text.svelte'
-  import TextArea from '$components/Inputs/TextArea.svelte'
-  import Vat from '$components/Inputs/Vat.svelte'
-  import FormFooter from '$components/Form/FormFooter.svelte'
-  import Select from '$components/Inputs/Select.svelte'
-  import Checkbox from '$components/Inputs/Checkbox.svelte'
   import { getContext, onMount } from 'svelte'
-  import Button from '$components/Buttons/Button.svelte'
+  import Button from '$components/Button/Button.svelte'
   import { createForm } from 'felte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { getProductModule } from '$features/products/module'
-  import type { Components } from '$features/api'
-  import { mediator } from '$features/mediator'
-  import { UpdateProductCommand } from '$features/products/commands/updateProduct'
   import { calculateOnSalePrice } from '$utils/money'
-  import { GetProductQuery } from '$features/products/queries/getProduct'
-  import { ListReturnablesOptionsQuery } from '$features/products/queries/listReturnablesOptions'
-  import ConfirmRemoveProduct from '$pages/products/_ConfirmRemoveProduct.svelte'
   import { validator } from '@felte/validator-vest'
   import { suite } from '$pages/products/validators'
   import reporterDom from '@felte/reporter-dom'
+  import { getProductModule } from '$components/Products/module'
+  import type { Components } from '$types/api'
+  import { mediator } from '$components/mediator'
+  import { UpdateProductCommand } from '$components/Products/commands/updateProduct'
+  import ConfirmRemoveProduct from '$components/Products/Modals/ConfirmRemoveProduct.svelte'
+  import { GetProductQuery } from '$components/Products/queries/getProduct'
+  import { ListReturnablesOptionsQuery } from '$components/Products/queries/listReturnablesOptions'
+  import Input from '$components/Input/Input.svelte'
+  import TextArea from '$components/TextArea/TextArea.svelte'
+  import Vat from '$components/Vat/Vat.svelte'
+  import Checkbox from '$components/Checkbox/Checkbox.svelte'
+  import Select from '$components/Select/Select.svelte'
+  import FormFooter from '$components/Form/FormFooter.svelte'
 
-  export let id = ''
+  export let id:string;
   const module = getProductModule($goto)
   const { open } = getContext('simple-modal')
 
@@ -46,7 +46,7 @@
         )
       },
       onSuccess: () => {
-        module.goToProductList()
+        module.goToList()
       },
       extend: [
         <any>validator({ suite }),
@@ -55,7 +55,7 @@
     })
 
   const onClose = () => {
-    module.goToProductList()
+    module.goToList()
   }
 
   const confirmModal = () => {
@@ -85,7 +85,7 @@
 
       isLoading = false
     } catch (exc) {
-      module.goToProductList()
+      module.goToList()
     }
   })
 
@@ -102,16 +102,15 @@
 
 <!-- routify:options index=true -->
 <!-- routify:options title="Details du produit" -->
-<!-- routify:options roles=[] -->
 
 <PageHeader
   title={$page.title}
   actions={actions}
-  previous='{() => module.goToProductList()}'
+  previous='{() => module.goToList()}'
 />
 
 <form use:form>
-  <Text
+  <Input
     id='code'
     label='Code'
     bind:value='{$data.code}'
@@ -120,14 +119,14 @@
     placeholder='Le code de votre produit (sera autogénéré si non renseigné)'
     disabled='{controlsAreDisabled}'
   />
-  <Text
+  <Input
     id='name'
     label='Nom'
     bind:value='{$data.name}'
     placeholder='Le nom de votre produit'
     disabled='{controlsAreDisabled}'
   />
-  <Text
+  <Input
     id='unitPrice'
     label='Prix HT'
     bind:value='{$data.unitPrice}'
@@ -135,7 +134,7 @@
     disabled='{controlsAreDisabled}'
   />
   <Vat id='vat' label='TVA' bind:value='{$data.vat}' disabled='{controlsAreDisabled}' />
-  <Text
+  <Input
     type='number'
     label='Prix TTC (calculé)'
     value='{onSalePrice}'
@@ -170,7 +169,7 @@
       type='button'
       disabled='{controlsAreDisabled}'
       class='back w-full mx-8'
-      on:click='{module.goToProductList}'
+      on:click='{module.goToList}'
     >Revenir à la liste
     </Button>
     <Button
