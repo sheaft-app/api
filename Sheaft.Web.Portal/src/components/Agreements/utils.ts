@@ -1,16 +1,18 @@
-﻿import type { Components } from '$types/api'
+﻿import type { Components } from "$types/api";
 
-export const status = (status:Components.Schemas.AgreementStatus|string|undefined) => {
-  switch (status?.toString()){
+export const status = (
+  status: Components.Schemas.AgreementStatus | string | undefined
+) => {
+  switch (status?.toString()) {
     case "0":
-      return 'En attente';
+      return "En attente";
     case "1":
-      return 'Actif';
+      return "Actif";
     case "2":
-      return 'Refusé';
+      return "Refusé";
     case "3":
-      return 'Annulé';
+      return "Annulé";
     default:
       return "Inconnu";
   }
-}
+};

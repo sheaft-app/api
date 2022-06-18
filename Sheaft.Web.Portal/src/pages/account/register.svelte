@@ -2,13 +2,13 @@
   import { page, goto, params } from "@roxi/routify";
   import Button from "$components/Button/Button.svelte";
   import { createForm } from "felte";
-  import { getAccountModule } from '$components/Account/module'
-  import type { Components } from '$types/api'
-  import { mediator } from '$components/mediator'
-  import { RegisterAccountCommand } from '$components/Account/commands/registerAccount'
-  import { LoginUserCommand } from '$components/Account/commands/loginUser'
-  import Input from '$components/Input/Input.svelte'
-  import HorizontalSeparator from '$components/Separators/HorizontalSeparator.svelte'
+  import { getAccountModule } from "$components/Account/module";
+  import type { Components } from "$types/api";
+  import { mediator } from "$components/mediator";
+  import { RegisterAccountCommand } from "$components/Account/commands/registerAccount";
+  import { LoginUserCommand } from "$components/Account/commands/loginUser";
+  import Input from "$components/Input/Input.svelte";
+  import HorizontalSeparator from "$components/Separators/HorizontalSeparator.svelte";
 
   const module = getAccountModule($goto);
 
@@ -65,21 +65,21 @@
         />
       </div>
       <Input
-        type='email'
+        type="email"
         label="Adresse mail"
         bind:value="{$data.email}"
         disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Input
-        type='password'
+        type="password"
         label="Mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
         class="mb-6 w-full"
       />
       <Input
-        type='password'
+        type="password"
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         placeholder="Confirmation de mot de passe"

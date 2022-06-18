@@ -1,5 +1,5 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client, Components } from '$types/api'
+import type { Client, Components } from "$types/api";
 
 export class GetAgreementQuery extends Request<Promise<Components.Schemas.AgreementDto>> {
   constructor(public id: string) {
@@ -10,7 +10,9 @@ export class GetAgreementQuery extends Request<Promise<Components.Schemas.Agreem
 export class GetAgreementHandler {
   constructor(private _client: Client) {}
 
-  handle = async (request: GetAgreementQuery): Promise<Components.Schemas.AgreementDto> => {
+  handle = async (
+    request: GetAgreementQuery
+  ): Promise<Components.Schemas.AgreementDto> => {
     try {
       const { data } = await this._client.GetAgreement(request);
       return Promise.resolve(data);

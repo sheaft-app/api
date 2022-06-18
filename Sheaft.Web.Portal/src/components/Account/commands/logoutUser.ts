@@ -1,6 +1,6 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client } from '$types/api'
-import type { IAuthStore } from '$components/Account/store'
+import type { Client } from "$types/api";
+import type { IAuthStore } from "$components/Account/store";
 
 export class LogoutUserCommand extends Request<Promise<void>> {
   constructor() {

@@ -1,57 +1,60 @@
-﻿<script lang='ts'>
-  import { page, goto } from '@roxi/routify'
-  import { onMount } from 'svelte'
-  import { getContext } from 'svelte';
-  import { getCustomerModule } from '$components/Customers/module'
-  import type { Components } from '$types/api'
-  import { mediator } from '$components/mediator'
-  import { GetAvailableCustomerQuery } from '$components/Customers/queries/getAvailableCustomer'
-  import type { IModalResult } from '$components/Modal/modal'
-  import ConfirmAddCustomer from '$components/Customers/Modals/ConfirmAddCustomer.svelte'
-  import PageHeader from '$components/Page/PageHeader.svelte'
-  import AvailableProfile from '$components/Agreements/AvailableProfile.svelte'
+﻿<script lang="ts">
+  import { page, goto } from "@roxi/routify";
+  import { onMount } from "svelte";
+  import { getContext } from "svelte";
+  import { getCustomerModule } from "$components/Customers/module";
+  import type { Components } from "$types/api";
+  import { mediator } from "$components/mediator";
+  import { GetAvailableCustomerQuery } from "$components/Customers/queries/getAvailableCustomer";
+  import type { IModalResult } from "$components/Modal/modal";
+  import ConfirmAddCustomer from "$components/Customers/Modals/ConfirmAddCustomer.svelte";
+  import PageHeader from "$components/Page/PageHeader.svelte";
+  import AvailableProfile from "$components/Agreements/AvailableProfile.svelte";
 
-  export let id:string;
-  
-  const module = getCustomerModule($goto)
-  const { open } = getContext('simple-modal');
+  export let id: string;
 
-  let initializing = true
-  let customer: Components.Schemas.AvailableCustomerDto = {}
+  const module = getCustomerModule($goto);
+  const { open } = getContext("simple-modal");
+
+  let initializing = true;
+  let customer: Components.Schemas.AvailableCustomerDto = {};
 
   onMount(async () => {
     try {
-      initializing = true
-      customer = await mediator.send(new GetAvailableCustomerQuery(id))
-      initializing = false
+      initializing = true;
+      customer = await mediator.send(new GetAvailableCustomerQuery(id));
+      initializing = false;
     } catch (exc) {
-      console.error(exc)
-      module.goToCustomers()
+      console.error(exc);
+      module.goToCustomers();
     }
-  })
-  
-  const onClose = (result:IModalResult<string>) => {
+  });
+
+  const onClose = (result: IModalResult<string>) => {
     module.goToSearch();
-  }
-  
+  };
+
   const openModal = () => {
-    open(ConfirmAddCustomer, {
+    open(
+      ConfirmAddCustomer,
+      {
         customer,
         onClose
       },
       {
         closeButton: false,
         closeOnEsc: true,
-        closeOnOuterClick: false,
-      });
-  }
+        closeOnOuterClick: false
+      }
+    );
+  };
 
   const actions = [
     {
-      name:'Proposer mes produits',
-      disabled:false,
+      name: "Proposer mes produits",
+      disabled: false,
       visible: true,
-      color:'primary',
+      color: "primary",
       action: () => openModal()
     }
   ];
@@ -61,8 +64,9 @@
 <!-- routify:options title="Fiche du client" -->
 
 <PageHeader
-  title={$page.title}
-  previous='{() => module.goToCustomers()}'
-  actions='{actions}'/>
+  title="{$page.title}"
+  previous="{() => module.goToCustomers()}"
+  actions="{actions}"
+/>
 
-<AvailableProfile profile='{customer}'/>
+<AvailableProfile profile="{customer}" />

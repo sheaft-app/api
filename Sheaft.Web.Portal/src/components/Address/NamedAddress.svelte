@@ -1,8 +1,8 @@
 <script lang="ts">
   import { nanoid } from "nanoid";
   import { onMount } from "svelte";
-  import Input from '$components/Input/Input.svelte'
-  import type { NamedAddress } from '$types/address'
+  import Input from "$components/Input/Input.svelte";
+  import type { NamedAddress } from "$types/address";
 
   export let id: string | undefined;
   export let value: NamedAddress | undefined;
@@ -45,7 +45,7 @@
       {#if showEmail}
         <Input
           id="{id}.email"
-          type='email'
+          type="email"
           disabled="{disabled}"
           placeholder="Mail de contact"
           bind:value="{value.email}"

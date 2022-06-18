@@ -1,7 +1,7 @@
 ﻿import { Request } from "jimmy-js";
 import { get } from "svelte/store";
-import type { Client } from '$types/api'
-import type { IAuthStore } from '$components/Account/store'
+import type { Client } from "$types/api";
+import type { IAuthStore } from "$components/Account/store";
 
 export class RefreshAccessTokenCommand extends Request<Promise<void>> {
   constructor() {

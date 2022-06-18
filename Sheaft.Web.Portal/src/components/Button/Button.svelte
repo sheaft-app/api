@@ -4,7 +4,7 @@
   import Fa from "svelte-fa";
   import { faSpinner } from "@fortawesome/free-solid-svg-icons";
   import { nanoid } from "nanoid";
-  import { getFaIconFromFullName } from '$components/Icons/faIconRetriever'
+  import { getFaIconFromFullName } from "$components/Icons/faIconRetriever";
 
   export let isLoading: boolean = false;
   export let disabled: boolean = false;

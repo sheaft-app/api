@@ -1,7 +1,9 @@
 ﻿import type { Client, Components } from "$features/api";
 import { Request } from "jimmy-js";
 
-export class GetAvailableSupplierQuery extends Request<Promise<Components.Schemas.AvailableSupplierDto>> {
+export class GetAvailableSupplierQuery extends Request<
+  Promise<Components.Schemas.AvailableSupplierDto>
+> {
   constructor(public id: string) {
     super();
   }
@@ -10,7 +12,9 @@ export class GetAvailableSupplierQuery extends Request<Promise<Components.Schema
 export class GetAvailableSupplierHandler {
   constructor(private _client: Client) {}
 
-  handle = async (request: GetAvailableSupplierQuery): Promise<Components.Schemas.AvailableSupplierDto> => {
+  handle = async (
+    request: GetAvailableSupplierQuery
+  ): Promise<Components.Schemas.AvailableSupplierDto> => {
     try {
       const { data } = await this._client.GetAvailableSupplier(request);
       return Promise.resolve(data);

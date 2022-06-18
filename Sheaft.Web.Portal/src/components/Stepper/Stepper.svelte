@@ -4,8 +4,10 @@
   import NextStep from "./NextStep.svelte";
   import StepsLink from "./StepsLink.svelte";
   import type {
-    StepDefinition, StepsDefinition, StepsResult
-  } from '$components/Stepper/types'
+    StepDefinition,
+    StepsDefinition,
+    StepsResult
+  } from "$components/Stepper/types";
   import { onMount } from "svelte";
 
   export let submit = async (results: StepsResult): Promise<void> => {};

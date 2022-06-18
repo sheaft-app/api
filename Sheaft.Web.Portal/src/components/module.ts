@@ -2,7 +2,7 @@
 import type { Request } from "jimmy-js/types/request";
 import type { AnyType, Constructor, Handler } from "jimmy-js/types/types";
 import type { Notification } from "jimmy-js/types/notification";
-import { mediator } from '$components/mediator'
+import { mediator } from "$components/mediator";
 
 export interface IAppModule {
   registerHandlers(): void;

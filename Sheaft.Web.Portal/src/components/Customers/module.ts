@@ -1,20 +1,20 @@
 ﻿import type { GotoHelper } from "@roxi/routify";
-import type { IAgreementModule } from '$components/Agreements/module'
-import type { Client } from '$types/api'
-import type { IAuthStore } from '$components/Account/store'
-import { AgreementModule } from '$components/Agreements/module'
+import type { IAgreementModule } from "$components/Agreements/module";
+import type { Client } from "$types/api";
+import type { IAuthStore } from "$components/Account/store";
+import { AgreementModule } from "$components/Agreements/module";
 import {
   GetAvailableCustomerHandler,
   GetAvailableCustomerQuery
-} from '$components/Customers/queries/getAvailableCustomer'
+} from "$components/Customers/queries/getAvailableCustomer";
 import {
   ListAvailableCustomersHandler,
   ListAvailableCustomersQuery
-} from '$components/Customers/queries/listAvailableCustomers'
+} from "$components/Customers/queries/listAvailableCustomers";
 import {
   ProposeAgreementToCustomerCommand,
   ProposeAgreementToCustomerHandler
-} from '$components/Customers/commands/proposeAgreementToCustomer'
+} from "$components/Customers/commands/proposeAgreementToCustomer";
 
 export interface ICustomerModule extends IAgreementModule {
   goToCustomers(): void;
@@ -23,7 +23,7 @@ export interface ICustomerModule extends IAgreementModule {
 }
 
 class CustomerModule extends AgreementModule implements ICustomerModule {
-  constructor(client: Client, authStore:IAuthStore) {
+  constructor(client: Client, authStore: IAuthStore) {
     super(client, authStore, "/customers");
   }
 
@@ -65,7 +65,10 @@ export const getCustomerModule = (goto: GotoHelper): ICustomerModule => {
   throw "customer module was not initialized, call registerAgreementModule() in App.svelte";
 };
 
-export const registerCustomerModule = (client: Client, authStore:IAuthStore): ICustomerModule => {
+export const registerCustomerModule = (
+  client: Client,
+  authStore: IAuthStore
+): ICustomerModule => {
   if (module) return module;
 
   module = new CustomerModule(client, authStore);

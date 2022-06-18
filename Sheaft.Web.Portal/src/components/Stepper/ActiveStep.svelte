@@ -1,6 +1,6 @@
 <script lang="ts">
   import Fa from "svelte-fa";
-  import { getFaIconFromFullName } from '$components/Icons/faIconRetriever'
+  import { getFaIconFromFullName } from "$components/Icons/faIconRetriever";
 
   export let name: string;
   export let icon: string;

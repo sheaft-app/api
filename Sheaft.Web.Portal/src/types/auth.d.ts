@@ -1,4 +1,4 @@
-﻿import { ProfileKind, ProfileStatus } from '$components/Account/enums'
+﻿import { ProfileKind, ProfileStatus } from "$components/Account/enums";
 
 export type Account = {
   id?: string | null;
@@ -14,18 +14,18 @@ export type Account = {
     status: ProfileStatus;
     kind?: ProfileKind | null;
   };
-}
+};
 
 export type Tokens = {
   accessToken?: string;
   refreshToken?: string;
   expiresAt?: Date;
   tokenType?: string;
-}
+};
 
 export type AuthState = {
   tokens?: Tokens;
   isAuthenticated: boolean;
   isRegistered: boolean;
   account?: Account;
-}
+};

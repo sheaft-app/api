@@ -1,20 +1,20 @@
 ﻿import type { GotoHelper } from "@roxi/routify";
-import type { IAgreementModule } from '$components/Agreements/module'
-import type { IAuthStore } from '$components/Account/store'
-import type { Client } from '$types/api'
-import { AgreementModule } from '$components/Agreements/module'
+import type { IAgreementModule } from "$components/Agreements/module";
+import type { IAuthStore } from "$components/Account/store";
+import type { Client } from "$types/api";
+import { AgreementModule } from "$components/Agreements/module";
 import {
   GetAvailableSupplierHandler,
   GetAvailableSupplierQuery
-} from '$components/Suppliers/queries/getAvailableSupplier'
+} from "$components/Suppliers/queries/getAvailableSupplier";
 import {
   ListAvailableSuppliersHandler,
   ListAvailableSuppliersQuery
-} from '$components/Suppliers/queries/listAvailableSuppliers'
+} from "$components/Suppliers/queries/listAvailableSuppliers";
 import {
   ProposeAgreementToSupplierCommand,
   ProposeAgreementToSupplierHandler
-} from '$components/Suppliers/commands/proposeAgreementToSupplier'
+} from "$components/Suppliers/commands/proposeAgreementToSupplier";
 
 export interface ISupplierModule extends IAgreementModule {
   goToSupplier(id: string): void;
@@ -23,7 +23,7 @@ export interface ISupplierModule extends IAgreementModule {
 }
 
 class SupplierModule extends AgreementModule implements ISupplierModule {
-  constructor(client: Client, authStore:IAuthStore) {
+  constructor(client: Client, authStore: IAuthStore) {
     super(client, authStore, "/suppliers");
   }
 
@@ -40,7 +40,7 @@ class SupplierModule extends AgreementModule implements ISupplierModule {
       new ProposeAgreementToSupplierHandler(this._client).handle(request)
     );
   };
-  
+
   goToSuppliers = (): void => {
     this.navigate(this._basePath);
   };
@@ -65,7 +65,10 @@ export const getSupplierModule = (goto: GotoHelper): ISupplierModule => {
   throw "supplier module was not initialized, call registerSupplierModule() in App.svelte";
 };
 
-export const registerSupplierModule = (client: Client, authStore:IAuthStore): ISupplierModule => {
+export const registerSupplierModule = (
+  client: Client,
+  authStore: IAuthStore
+): ISupplierModule => {
   if (module) return module;
 
   module = new SupplierModule(client, authStore);

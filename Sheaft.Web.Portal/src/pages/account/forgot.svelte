@@ -4,12 +4,12 @@
   import Fa from "svelte-fa";
   import { faCheck } from "@fortawesome/free-solid-svg-icons";
   import { createForm } from "felte";
-  import { getAccountModule } from '$components/Account/module'
-  import type { Components } from '$types/api'
-  import { mediator } from '$components/mediator'
-  import { ForgotPasswordCommand } from '$components/Account/commands/forgotPassword'
-  import Input from '$components/Input/Input.svelte'
-  import HorizontalSeparator from '$components/Separators/HorizontalSeparator.svelte'
+  import { getAccountModule } from "$components/Account/module";
+  import type { Components } from "$types/api";
+  import { mediator } from "$components/mediator";
+  import { ForgotPasswordCommand } from "$components/Account/commands/forgotPassword";
+  import Input from "$components/Input/Input.svelte";
+  import HorizontalSeparator from "$components/Separators/HorizontalSeparator.svelte";
 
   const module = getAccountModule($goto);
   let resetRequested = false;
@@ -40,7 +40,7 @@
     {#if !resetRequested}
       <form use:form>
         <Input
-          type='email'
+          type="email"
           label="Votre adresse mail"
           bind:value="{$data.email}"
           disabled="{$isSubmitting}"

@@ -1,5 +1,5 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client } from '$types/api'
+import type { Client } from "$types/api";
 
 export class RegisterAccountCommand extends Request<Promise<void>> {
   constructor(

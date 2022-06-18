@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  export let showAsterisk:boolean = true;
+  export let showAsterisk: boolean = true;
 </script>
 
 <div class="{$$props.class}">

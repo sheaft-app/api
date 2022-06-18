@@ -1,9 +1,9 @@
-﻿import { OpenAPIClientAxios } from 'openapi-client-axios'
+﻿import { OpenAPIClientAxios } from "openapi-client-axios";
 import { get } from "svelte/store";
-import type {Document} from 'openapi-client-axios'
-import swagger from "$types/openapi/swagger.json"
-import type { Client } from '$types/api'
-import { authStore } from '$components/Account/store'
+import type { Document } from "openapi-client-axios";
+import swagger from "$types/openapi/swagger.json";
+import type { Client } from "$types/api";
+import { authStore } from "$components/Account/store";
 
 export const api = new OpenAPIClientAxios({
   definition: <Document>swagger

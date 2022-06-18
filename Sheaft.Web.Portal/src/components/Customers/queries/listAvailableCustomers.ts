@@ -1,7 +1,9 @@
 ﻿import type { Client, Components } from "$types/api";
 import { Request } from "jimmy-js";
 
-export class ListAvailableCustomersQuery extends Request<Promise<Components.Schemas.AvailableCustomerDto[]>> {
+export class ListAvailableCustomersQuery extends Request<
+  Promise<Components.Schemas.AvailableCustomerDto[]>
+> {
   constructor(public page: number, public take: number, public search?: string) {
     super();
   }

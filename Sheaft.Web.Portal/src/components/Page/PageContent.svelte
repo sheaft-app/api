@@ -1,13 +1,13 @@
-<script lang='ts'>
-  import Loader from '$components/Loader/Loader.svelte'
+<script lang="ts">
+  import Loader from "$components/Loader/Loader.svelte";
 
-  export let isLoading: boolean = false
-  export let message: string|undefined;
+  export let isLoading: boolean = false;
+  export let message: string | undefined;
 </script>
 
-<div >
+<div>
   {#if isLoading}
-    <Loader {message}/>
+    <Loader message="{message}" />
   {:else}
     <slot />
   {/if}

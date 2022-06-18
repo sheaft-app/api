@@ -2,11 +2,11 @@
   import { goto, params, page } from "@roxi/routify";
   import Button from "$components/Button/Button.svelte";
   import { createForm } from "felte";
-  import { getAccountModule } from '$components/Account/module'
-  import type { Components } from '$types/api'
-  import { mediator } from '$components/mediator'
-  import { ResetPasswordCommand } from '$components/Account/commands/resetPassword'
-  import Input from '$components/Input/Input.svelte'
+  import { getAccountModule } from "$components/Account/module";
+  import type { Components } from "$types/api";
+  import { mediator } from "$components/mediator";
+  import { ResetPasswordCommand } from "$components/Account/commands/resetPassword";
+  import Input from "$components/Input/Input.svelte";
 
   const module = getAccountModule($goto);
 
@@ -39,7 +39,7 @@
     <h1>{$page.title}</h1>
     <form use:form>
       <Input
-        type='password'
+        type="password"
         label="Nouveau mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
@@ -47,7 +47,7 @@
         class="mb-6 w-full"
       />
       <Input
-        type='password'
+        type="password"
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         disabled="{$isSubmitting}"

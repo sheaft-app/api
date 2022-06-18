@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import Home from '$components/Home/Home.svelte'
+  import Home from "$components/Home/Home.svelte";
 </script>
 
 <!-- routify:options public=true -->

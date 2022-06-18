@@ -9,7 +9,7 @@
   export let required: boolean = false;
 
   if (!id) id = nanoid(10);
-  else if(!name) name = id;
+  else if (!name) name = id;
 </script>
 
 <label for="{id}" class="form-check-label inline-block text-gray-800 cursor-pointer">

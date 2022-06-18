@@ -2,10 +2,10 @@
   import Fa from "svelte-fa";
   import { faRightFromBracket, faUserLock } from "@fortawesome/free-solid-svg-icons";
   import { goto } from "@roxi/routify";
-  import { mediator } from '$components/mediator'
-  import { LogoutUserCommand } from '$components/Account/commands/logoutUser'
-  import { authStore } from '$components/Account/store'
-  import Button from '$components/Button/Button.svelte'
+  import { mediator } from "$components/mediator";
+  import { LogoutUserCommand } from "$components/Account/commands/logoutUser";
+  import { authStore } from "$components/Account/store";
+  import Button from "$components/Button/Button.svelte";
 
   const logoutUser = async () => {
     await mediator.send(new LogoutUserCommand());

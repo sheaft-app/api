@@ -1,5 +1,5 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client } from '$types/api'
+import type { Client } from "$types/api";
 
 export class ForgotPasswordCommand extends Request<Promise<void>> {
   constructor(public email: string) {

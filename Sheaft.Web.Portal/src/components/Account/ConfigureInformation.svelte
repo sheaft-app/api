@@ -1,12 +1,12 @@
 ﻿<script lang="ts">
   import { createForm } from "felte";
-  import type { AccountInformation } from '$components/Account/types'
-  import type { SelectOption } from '$components/Select/types'
-  import { ProfileKind } from '$components/Account/enums'
-  import Select from '$components/Select/Select.svelte'
-  import Input from '$components/Input/Input.svelte'
-  import FormFooter from '$components/Form/FormFooter.svelte'
-  import Button from '$components/Button/Button.svelte'
+  import type { AccountInformation } from "$components/Account/types";
+  import type { SelectOption } from "$components/Select/types";
+  import { ProfileKind } from "$components/Account/enums";
+  import Select from "$components/Select/Select.svelte";
+  import Input from "$components/Input/Input.svelte";
+  import FormFooter from "$components/Form/FormFooter.svelte";
+  import Button from "$components/Button/Button.svelte";
 
   export let initialValues: AccountInformation | null;
   export let onSubmit;
@@ -55,7 +55,7 @@
   />
   <Input
     id="email"
-    type='email'
+    type="email"
     label="Mail de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.email}"
@@ -63,7 +63,7 @@
   />
   <Input
     id="phone"
-    type='tel'
+    type="tel"
     label="Téléphone de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.phone}"
@@ -78,10 +78,7 @@
     >
       Annuler
     </Button>
-    <Button 
-      class="accent w-full mx-8"             
-      isLoading="{$isSubmitting}" 
-      type="submit"
+    <Button class="accent w-full mx-8" isLoading="{$isSubmitting}" type="submit"
       >Suivant
     </Button>
   </FormFooter>

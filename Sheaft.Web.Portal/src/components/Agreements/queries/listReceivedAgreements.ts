@@ -1,15 +1,17 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client, Components } from '$types/api'
-import type { IAuthStore } from '$components/Account/store'
+import type { Client, Components } from "$types/api";
+import type { IAuthStore } from "$components/Account/store";
 
-export class ListReceivedAgreementsQuery extends Request<Promise<Components.Schemas.AgreementDto[]>> {
+export class ListReceivedAgreementsQuery extends Request<
+  Promise<Components.Schemas.AgreementDto[]>
+> {
   constructor(public page: number, public take: number, public search?: string) {
     super();
   }
 }
 
 export class ListReceivedAgreementsHandler {
-  constructor(private _client: Client, private _authStore:IAuthStore) {}
+  constructor(private _client: Client, private _authStore: IAuthStore) {}
 
   handle = async (
     request: ListReceivedAgreementsQuery

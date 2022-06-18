@@ -1,10 +1,10 @@
 <script lang="ts">
   import { layout } from "@roxi/routify";
   import logoSrc from "$assets/logos/sheaft-colorized.svg?url";
-  import Logo from '$components/Logo/Logo.svelte'
-  import Menu from '$components/Menu/Menu.svelte'
-  import UserMenu from '$components/Account/UserMenu.svelte'
-  import { parseLayoutTree } from '$components/Menu/menus'
+  import Logo from "$components/Logo/Logo.svelte";
+  import Menu from "$components/Menu/Menu.svelte";
+  import UserMenu from "$components/Account/UserMenu.svelte";
+  import { parseLayoutTree } from "$components/Menu/menus";
 
   const menus = parseLayoutTree($layout.children);
 </script>

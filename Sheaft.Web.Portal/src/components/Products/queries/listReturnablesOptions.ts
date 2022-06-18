@@ -1,7 +1,7 @@
 ﻿import type { Client } from "$types/api";
-import type { ReturnableOption } from '$components/Products/types'
+import type { ReturnableOption } from "$components/Products/types";
 import { Request } from "jimmy-js";
-import { currency } from '$utils/money'
+import { currency } from "$utils/money";
 
 export class ListReturnablesOptionsQuery extends Request<Promise<ReturnableOption[]>> {
   constructor() {

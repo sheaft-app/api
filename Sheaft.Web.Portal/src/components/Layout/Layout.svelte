@@ -1,18 +1,18 @@
 <script lang="ts">
   import { page, goto, beforeUrlChange, params } from "@roxi/routify";
-  import { checkPageAccess } from './security'
+  import { checkPageAccess } from "./security";
   import { authStore } from "$components/Account/store";
-  import SideNav from '$components/Nav/SideNav.svelte'
-  import TopNav from '$components/Nav/TopNav.svelte'
-  import Screen from '$components/Layout/Screen.svelte'
+  import SideNav from "$components/Nav/SideNav.svelte";
+  import TopNav from "$components/Nav/TopNav.svelte";
+  import Screen from "$components/Layout/Screen.svelte";
 
   $beforeUrlChange((event: any, route) => {
-    const accessToParentModuleIsRefused = route.parent?.meta?.roles && !authStore.userIsInRoles(route.parent.meta.roles)
+    const accessToParentModuleIsRefused =
+      route.parent?.meta?.roles && !authStore.userIsInRoles(route.parent.meta.roles);
     if (accessToParentModuleIsRefused) {
-      $goto('/unauthorized');
+      $goto("/unauthorized");
       return false;
-    }
-    else {
+    } else {
       const pageAccessResult = checkPageAccess(
         route?.path,
         event.url,
@@ -30,11 +30,11 @@
   });
 
   $: {
-    const accessToParentModuleIsRefused = $page.parent?.meta?.roles && !authStore.userIsInRoles($page.parent.meta.roles)
+    const accessToParentModuleIsRefused =
+      $page.parent?.meta?.roles && !authStore.userIsInRoles($page.parent.meta.roles);
     if (accessToParentModuleIsRefused) {
-      $goto('/unauthorized');
-    }
-    else {
+      $goto("/unauthorized");
+    } else {
       const pageAccessResult = checkPageAccess(
         "/",
         $page.path,

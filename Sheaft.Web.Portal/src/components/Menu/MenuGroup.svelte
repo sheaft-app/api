@@ -2,9 +2,9 @@
   import { goto, isActive } from "@roxi/routify";
   import Menu from "./Menu.svelte";
   import Fa from "svelte-fa";
-  import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
-  import { parseSubActivePath } from '$components/Menu/menus'
-  import type { MenuEntry, MenuGroup } from '$components/Menu/types'
+  import { getFaIcon, getFaIconFromFullName } from "$components/Icons/faIconRetriever";
+  import { parseSubActivePath } from "$components/Menu/menus";
+  import type { MenuEntry, MenuGroup } from "$components/Menu/types";
 
   export let entry: MenuGroup;
 

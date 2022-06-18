@@ -1,107 +1,142 @@
-﻿<script lang='ts'>
-  import { getContext } from 'svelte'
-  import Button from '$components/Button/Button.svelte'
-  import type { IModalResult } from '$components/Modal/modal'
-  import { ModalResult } from '$components/Modal/modal'
-  import type { Components } from '$types/api'
-  import { mediator } from '$components/mediator'
-  import { ProposeAgreementToCustomerCommand } from '$components/Customers/commands/proposeAgreementToCustomer'
-  import { address } from '$utils/address'
-  import { DayOfWeek } from '$enums/days'
-  import Checkbox from '$components/Checkbox/Checkbox.svelte'
-  import Input from '$components/Input/Input.svelte'
+﻿<script lang="ts">
+  import { getContext } from "svelte";
+  import Button from "$components/Button/Button.svelte";
+  import type { IModalResult } from "$components/Modal/modal";
+  import { ModalResult } from "$components/Modal/modal";
+  import type { Components } from "$types/api";
+  import { mediator } from "$components/mediator";
+  import { ProposeAgreementToCustomerCommand } from "$components/Customers/commands/proposeAgreementToCustomer";
+  import { address } from "$utils/address";
+  import { DayOfWeek } from "$enums/days";
+  import Checkbox from "$components/Checkbox/Checkbox.svelte";
+  import Input from "$components/Input/Input.svelte";
 
-  export let customer: Components.Schemas.AvailableCustomerDto
+  export let customer: Components.Schemas.AvailableCustomerDto;
   export let onClose: (result: IModalResult<string>) => {};
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext("simple-modal");
 
-  let deliveryDays = []
-  let orderDelayed = false
-  let orderDelayInHoursBeforeDeliveryDay: number | null = null
+  let deliveryDays = [];
+  let orderDelayed = false;
+  let orderDelayInHoursBeforeDeliveryDay: number | null = null;
 
   const validate = async () => {
     try {
-      const result = await mediator.send(new ProposeAgreementToCustomerCommand(customer.id, deliveryDays, orderDelayInHoursBeforeDeliveryDay))
+      const result = await mediator.send(
+        new ProposeAgreementToCustomerCommand(
+          customer.id,
+          deliveryDays,
+          orderDelayInHoursBeforeDeliveryDay
+        )
+      );
       close();
       await onClose(ModalResult.Success(result));
     } catch (exc) {
-      console.error(exc)
+      console.error(exc);
     }
-  }
+  };
 </script>
-<h2 class='mb-4'>Nouvelle relation commerciale</h2>
-<hr/>
-<div class='my-6'>
+
+<h2 class="mb-4">Nouvelle relation commerciale</h2>
+<hr />
+<div class="my-6">
   <p>Vous allez envoyer une demande de mise en relation commerciale avec le magasin :</p>
-  <div class='mx-3 my-5'>
+  <div class="mx-3 my-5">
     <p><b>{customer.name}</b></p>
-    <p>{@html address(customer.deliveryAddress)}</p></div>
+    <p>{@html address(customer.deliveryAddress)}</p>
+  </div>
 
   <p>Veuillez selectionner les jours où vous pouvez livrer ce magasin</p>
-  <ul class='m-3'>
+  <ul class="m-3">
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Monday}'
-             class='w-4 h-4 m-1' />Lundi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Monday}"
+          class="w-4 h-4 m-1"
+        />Lundi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Tuesday}'
-             class='w-4 h-4 m-1' />Mardi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Tuesday}"
+          class="w-4 h-4 m-1"
+        />Mardi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Wednesday}'
-             class='w-4 h-4 m-1' />Mercredi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Wednesday}"
+          class="w-4 h-4 m-1"
+        />Mercredi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Thursday}'
-             class='w-4 h-4 m-1' />Jeudi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Thursday}"
+          class="w-4 h-4 m-1"
+        />Jeudi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Friday}'
-             class='w-4 h-4 m-1' />Vendredi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Friday}"
+          class="w-4 h-4 m-1"
+        />Vendredi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Saturday}'
-             class='w-4 h-4 m-1' />Samedi</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Saturday}"
+          class="w-4 h-4 m-1"
+        />Samedi</label
+      >
     </li>
     <li>
-      <label class='form-check-label inline-block text-gray-800 cursor-pointer'>
-      <input bind:group={deliveryDays}
-             type='checkbox'
-             value='{DayOfWeek.Sunday}'
-             class='w-4 h-4 m-1' />Dimanche</label>
+      <label class="form-check-label inline-block text-gray-800 cursor-pointer">
+        <input
+          bind:group="{deliveryDays}"
+          type="checkbox"
+          value="{DayOfWeek.Sunday}"
+          class="w-4 h-4 m-1"
+        />Dimanche</label
+      >
     </li>
   </ul>
-  <div class='mt-4'>
+  <div class="mt-4">
     <Checkbox
-      id='orderDelay'
-      bind:value='{orderDelayed}'
-      label='Verrouiller la prise de commandes x heures avant le jour de livraison' />
+      id="orderDelay"
+      bind:value="{orderDelayed}"
+      label="Verrouiller la prise de commandes x heures avant le jour de livraison"
+    />
     {#if orderDelayed}
-      <Input type='number' label="Nombre d'heures" bind:value={orderDelayInHoursBeforeDeliveryDay} class='mt-2' />
+      <Input
+        type="number"
+        label="Nombre d'heures"
+        bind:value="{orderDelayInHoursBeforeDeliveryDay}"
+        class="mt-2"
+      />
     {/if}
   </div>
 </div>
-<hr/>
-<div class='flex items-center justify-evenly pt-4'>
-  <Button class='bg-back-600' on:click={close}>Annuler</Button>
-  <Button class='bg-accent-600' on:click={validate}>Ajouter</Button>
+<hr />
+<div class="flex items-center justify-evenly pt-4">
+  <Button class="bg-back-600" on:click="{close}">Annuler</Button>
+  <Button class="bg-accent-600" on:click="{validate}">Ajouter</Button>
 </div>

@@ -1,13 +1,13 @@
 ﻿<script lang="ts">
   import { page, goto } from "@roxi/routify";
   import { onMount } from "svelte";
-  import PageHeader from '$components/Page/PageHeader.svelte'
-  import PageContent from '$components/Page/PageContent.svelte'
-  import type { Components } from '$types/api'
-  import { getSupplierModule } from '$components/Suppliers/module'
-  import { mediator } from '$components/mediator'
-  import { ListSentAgreementsQuery } from '$components/Agreements/queries/listSentAgreements'
-  import Suppliers from '$components/Suppliers/Suppliers.svelte'
+  import PageHeader from "$components/Page/PageHeader.svelte";
+  import PageContent from "$components/Page/PageContent.svelte";
+  import type { Components } from "$types/api";
+  import { getSupplierModule } from "$components/Suppliers/module";
+  import { mediator } from "$components/mediator";
+  import { ListSentAgreementsQuery } from "$components/Agreements/queries/listSentAgreements";
+  import Suppliers from "$components/Suppliers/Suppliers.svelte";
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -26,17 +26,16 @@
       module.goToHome();
     }
   });
-  
+
   const actions = [
     {
-      name:'Ajouter',
-      disabled:false,
+      name: "Ajouter",
+      disabled: false,
       visible: true,
-      color:'primary',
+      color: "primary",
       action: () => module.goToSearch()
     }
   ];
-  
 </script>
 
 <!-- routify:options menu="Demandes envoyées" -->
@@ -44,11 +43,14 @@
 <!-- routify:options index=2 -->
 
 <PageHeader
-  title={$page.title}
+  title="{$page.title}"
   subtitle="Toutes les demandes en attente d'acceptation par les producteurs, sont listées ci-dessous"
-  actions={actions}
-  previous='{() => module.goToSuppliers()}'
+  actions="{actions}"
+  previous="{() => module.goToSuppliers()}"
 />
-<PageContent {isLoading}>
-  <Suppliers suppliers='{agreements}' noResultsMessage='Aucun accord commercial envoyé en attente'/>
+<PageContent isLoading="{isLoading}">
+  <Suppliers
+    suppliers="{agreements}"
+    noResultsMessage="Aucun accord commercial envoyé en attente"
+  />
 </PageContent>

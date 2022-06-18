@@ -1,12 +1,27 @@
 ﻿import type { GotoHelper } from "@roxi/routify";
-import type{ IAppModule } from '$components/module'
-import type { Client } from '$types/api'
-import { AppModule } from '$components/module'
-import { CreateReturnableCommand, CreateReturnableHandler } from '$components/Returnables/commands/createReturnable'
-import { UpdateReturnableCommand, UpdateReturnableHandler } from '$components/Returnables/commands/updateReturnable'
-import { RemoveReturnableCommand, RemoveReturnableHandler } from '$components/Returnables/commands/removeReturnable'
-import { GetReturnableHandler, GetReturnableQuery } from '$components/Returnables/queries/getReturnable'
-import { ListReturnablesHandler, ListReturnablesQuery } from '$components/Returnables/queries/listReturnables'
+import type { IAppModule } from "$components/module";
+import type { Client } from "$types/api";
+import { AppModule } from "$components/module";
+import {
+  CreateReturnableCommand,
+  CreateReturnableHandler
+} from "$components/Returnables/commands/createReturnable";
+import {
+  UpdateReturnableCommand,
+  UpdateReturnableHandler
+} from "$components/Returnables/commands/updateReturnable";
+import {
+  RemoveReturnableCommand,
+  RemoveReturnableHandler
+} from "$components/Returnables/commands/removeReturnable";
+import {
+  GetReturnableHandler,
+  GetReturnableQuery
+} from "$components/Returnables/queries/getReturnable";
+import {
+  ListReturnablesHandler,
+  ListReturnablesQuery
+} from "$components/Returnables/queries/listReturnables";
 
 export interface IReturnableModule extends IAppModule {
   goToList(): void;
@@ -21,7 +36,7 @@ class ReturnableModule extends AppModule implements IReturnableModule {
     super();
   }
 
-  override registerHandlers = () => {    
+  override registerHandlers = () => {
     this.registerHandler(CreateReturnableCommand, request =>
       new CreateReturnableHandler(this._client).handle(request)
     );
@@ -29,7 +44,7 @@ class ReturnableModule extends AppModule implements IReturnableModule {
     this.registerHandler(UpdateReturnableCommand, request =>
       new UpdateReturnableHandler(this._client).handle(request)
     );
-    
+
     this.registerHandler(RemoveReturnableCommand, request =>
       new RemoveReturnableHandler(this._client).handle(request)
     );

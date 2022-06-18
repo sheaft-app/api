@@ -1,9 +1,9 @@
 <script lang="ts">
   import { isActive, goto, page } from "@roxi/routify";
   import Fa from "svelte-fa";
-  import { getFaIcon, getFaIconFromFullName } from '$components/Icons/faIconRetriever'
-  import { parseActivePath } from '$components/Menu/menus'
-  import type { MenuEntry } from '$components/Menu/types'
+  import { getFaIcon, getFaIconFromFullName } from "$components/Icons/faIconRetriever";
+  import { parseActivePath } from "$components/Menu/menus";
+  import type { MenuEntry } from "$components/Menu/types";
 
   export let entry: MenuEntry;
   export let canHighlight: boolean;

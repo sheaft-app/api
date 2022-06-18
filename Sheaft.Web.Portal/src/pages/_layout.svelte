@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
-  import Layout from '$components/Layout/Layout.svelte'
+  import Layout from "$components/Layout/Layout.svelte";
 </script>
 
 <Layout>
-  <slot/>
+  <slot />
 </Layout>

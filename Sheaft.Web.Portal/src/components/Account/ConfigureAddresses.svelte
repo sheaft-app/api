@@ -1,13 +1,16 @@
 ﻿<script lang="ts">
   import { createForm } from "felte";
   import { onMount } from "svelte";
-  import type { AccountAddresses, AccountConfigurationResults } from '$components/Account/types'
-  import { ProfileKind } from '$components/Account/enums'
-  import Address from '$components/Address/Address.svelte'
-  import Checkbox from '$components/Checkbox/Checkbox.svelte'
-  import NamedAddress from '$components/Address/NamedAddress.svelte'
-  import FormFooter from '$components/Form/FormFooter.svelte'
-  import Button from '$components/Button/Button.svelte'
+  import type {
+    AccountAddresses,
+    AccountConfigurationResults
+  } from "$components/Account/types";
+  import { ProfileKind } from "$components/Account/enums";
+  import Address from "$components/Address/Address.svelte";
+  import Checkbox from "$components/Checkbox/Checkbox.svelte";
+  import NamedAddress from "$components/Address/NamedAddress.svelte";
+  import FormFooter from "$components/Form/FormFooter.svelte";
+  import Button from "$components/Button/Button.svelte";
 
   export let initialValues: AccountAddresses | null;
   export let onSubmit;
@@ -81,7 +84,7 @@
     bind:value="{hasDifferentSecondaryAddress}"
     label="{state.information.accountType === ProfileKind.Customer
       ? 'Mon adresse de livraison est différente'
-      : 'Mon adresse d\'expédition est différente'}"
+      : "Mon adresse d'expédition est différente"}"
   />
   {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Customer}
     <NamedAddress

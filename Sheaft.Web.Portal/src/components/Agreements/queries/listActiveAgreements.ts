@@ -1,7 +1,9 @@
 ﻿import { Request } from "jimmy-js";
-import type { Client, Components } from '$types/api'
+import type { Client, Components } from "$types/api";
 
-export class ListActiveAgreementsQuery extends Request<Promise<Components.Schemas.AgreementDto[]>> {
+export class ListActiveAgreementsQuery extends Request<
+  Promise<Components.Schemas.AgreementDto[]>
+> {
   constructor(public page: number, public take: number, public search?: string) {
     super();
   }

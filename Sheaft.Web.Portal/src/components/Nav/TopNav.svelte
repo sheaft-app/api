@@ -1,7 +1,7 @@
 <script lang="ts">
   import { layout, page } from "@roxi/routify";
-  import Logo from '$components/Logo/Logo.svelte'
-  import UserMenu from '$components/Account/UserMenu.svelte'
+  import Logo from "$components/Logo/Logo.svelte";
+  import UserMenu from "$components/Account/UserMenu.svelte";
 </script>
 
 <nav class="w-full flex flex-row items-center bg-primary-700">

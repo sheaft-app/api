@@ -1,6 +1,6 @@
 ﻿export type PageAction = {
   name: string;
-  disabled?:boolean;
+  disabled?: boolean;
   action: string | Function;
   actions?: PageAction[] | null;
-}
+};

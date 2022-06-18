@@ -1,8 +1,14 @@
 ﻿import type { Client, Components } from "$features/api";
 import { Request } from "jimmy-js";
 
-export class ListAvailableSuppliersQuery extends Request<Promise<Components.Schemas.AvailableSupplierDto[]>> {
-  constructor(public page: number | undefined, public take: number | undefined, public search?: string |undefined) {
+export class ListAvailableSuppliersQuery extends Request<
+  Promise<Components.Schemas.AvailableSupplierDto[]>
+> {
+  constructor(
+    public page: number | undefined,
+    public take: number | undefined,
+    public search?: string | undefined
+  ) {
     super();
   }
 }

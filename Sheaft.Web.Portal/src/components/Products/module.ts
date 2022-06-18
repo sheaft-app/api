@@ -1,31 +1,31 @@
 ﻿import type { GotoHelper } from "@roxi/routify";
-import type { IAppModule } from '$components/module'
-import type { Client } from '$types/api'
-import { AppModule } from '$components/module'
-import { 
-  CreateProductCommand, 
-  CreateProductHandler 
-} from '$components/Products/commands/createProduct'
+import type { IAppModule } from "$components/module";
+import type { Client } from "$types/api";
+import { AppModule } from "$components/module";
+import {
+  CreateProductCommand,
+  CreateProductHandler
+} from "$components/Products/commands/createProduct";
 import {
   UpdateProductCommand,
   UpdateProductHandler
-} from '$components/Products/commands/updateProduct'
+} from "$components/Products/commands/updateProduct";
 import {
   RemoveProductCommand,
   RemoveProductHandler
-} from '$components/Products/commands/removeProduct'
-import { 
-  GetProductHandler, 
-  GetProductQuery 
-} from '$components/Products/queries/getProduct'
-import { 
-  ListProductsHandler, 
-  ListProductsQuery 
-} from '$components/Products/queries/listProducts'
+} from "$components/Products/commands/removeProduct";
+import {
+  GetProductHandler,
+  GetProductQuery
+} from "$components/Products/queries/getProduct";
+import {
+  ListProductsHandler,
+  ListProductsQuery
+} from "$components/Products/queries/listProducts";
 import {
   ListReturnablesOptionsHandler,
   ListReturnablesOptionsQuery
-} from '$components/Products/queries/listReturnablesOptions'
+} from "$components/Products/queries/listReturnablesOptions";
 
 export interface IProductModule extends IAppModule {
   goToList(): void;

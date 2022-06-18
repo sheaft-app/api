@@ -1,11 +1,11 @@
 ﻿import { writable } from "svelte-local-storage-store";
 import jwt_decode from "jwt-decode";
-import type { Account, AuthState } from '$types/auth'
-import type { Components } from '$types/api'
-import type { Readable } from 'svelte/store'
-import { ProfileStatus } from '$components/Account/enums'
-import { mediator } from '$components/mediator'
-import { RefreshAccessTokenCommand } from '$components/Account/commands/refreshAccessToken'
+import type { Account, AuthState } from "$types/auth";
+import type { Components } from "$types/api";
+import type { Readable } from "svelte/store";
+import { ProfileStatus } from "$components/Account/enums";
+import { mediator } from "$components/mediator";
+import { RefreshAccessTokenCommand } from "$components/Account/commands/refreshAccessToken";
 
 export interface IAuthStore extends Readable<AuthState> {
   userIsInRoles(roles?: string[]): boolean;
@@ -25,20 +25,20 @@ const store = (): IAuthStore => {
 
   const { subscribe, set, update } = writable<AuthState>("auth", _state);
 
-  const sub = subscribe((values) => {
+  const sub = subscribe(values => {
     _state.isAuthenticated = values.isAuthenticated;
     _state.isRegistered = values.isRegistered;
     _state.account = values.account;
     _state.tokens = values.tokens;
-  })
+  });
 
   const accountIsInRoles = (roles?: Array<string>): boolean => {
     if (!_state.isAuthenticated) return false;
 
     if (!roles) return true;
-    
-    if(typeof roles == 'string' && (<string>roles).indexOf('[') > -1)
-      roles = JSON.parse((<string>roles).replace(/'/g, "\""));
+
+    if (typeof roles == "string" && (<string>roles).indexOf("[") > -1)
+      roles = JSON.parse((<string>roles).replace(/'/g, '"'));
 
     if (!_state.account) return false;
 
@@ -77,7 +77,9 @@ const store = (): IAuthStore => {
       lastname: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
       email:
         decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
-      roles: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? [decoded["http://schemas.sheaft.com/ws/identity/claims/profile/kind"]],
+      roles: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] ?? [
+        decoded["http://schemas.sheaft.com/ws/identity/claims/profile/kind"]
+      ],
       profile: {
         id: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/identifier"],
         kind: decoded["http://schemas.sheaft.com/ws/identity/claims/profile/kind"],
@@ -104,10 +106,11 @@ const store = (): IAuthStore => {
         expiresAt: expiresAt,
         tokenType: response.token_type ?? ""
       };
-      
+
       state.isAuthenticated = true;
       _state.isAuthenticated = state.isAuthenticated;
-      state.isRegistered = !!account?.id && account.profile?.status == ProfileStatus.Registered;
+      state.isRegistered =
+        !!account?.id && account.profile?.status == ProfileStatus.Registered;
       _state.isRegistered = state.isRegistered;
       state.account = account;
 

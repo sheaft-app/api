@@ -1,7 +1,7 @@
 ﻿export type PageInfo = {
-  path:string;
-  params?:any
-}
+  path: string;
+  params?: any;
+};
 
 export const checkPageAccess = (
   from: string | undefined,
