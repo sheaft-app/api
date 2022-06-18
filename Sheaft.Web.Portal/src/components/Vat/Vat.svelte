@@ -1,7 +1,7 @@
 <script lang="ts">
   import "./vat.scss";
   import { percent } from '$utils/percent'
-  import {formatInnerHtml} from '$components/Actions/format'
+  import {formatInnerHtml} from '$actions/format'
   import { nanoid } from 'nanoid'
 
   export let id: string | undefined;

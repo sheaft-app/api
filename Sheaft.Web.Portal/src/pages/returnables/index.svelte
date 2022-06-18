@@ -6,7 +6,7 @@
   import { currency } from '$utils/money'
   import { percent } from '$utils/percent'
   import { dateDistance } from '$utils/dates'
-  import {formatInnerHtml} from "$components/Actions/format"
+  import {formatInnerHtml} from "$actions/format"
   import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'
   import { ListReturnablesQuery } from '$components/Returnables/queries/listReturnables'

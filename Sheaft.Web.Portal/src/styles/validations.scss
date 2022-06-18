@@ -11,7 +11,11 @@ ul[data-felte-reporter-dom-list], ul[data-felte-reporter-dom-single]{
 div.validation-reporter{
   @apply text-danger-500
 }
+
 div.warning-reporter{
-  @apply text-teal-500
+  @apply text-warning-500
 }
 
+div.warning-reporter + input[aria-invalid=true],div.warning-reporter + select[aria-invalid=true]{
+  @apply border-warning-500
+}

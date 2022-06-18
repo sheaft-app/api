@@ -6,7 +6,7 @@
   import { dateDistance } from '$utils/dates'
   import { currency } from '$utils/money'
   import { percent } from '$utils/percent'
-  import { formatInnerHtml } from '$components/Actions/format'
+  import { formatInnerHtml } from '$actions/format'
   import { getProductModule } from '$components/Products/module'
   import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'

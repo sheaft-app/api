@@ -8,8 +8,7 @@
   import { mediator } from '$components/mediator'
   import { GetAvailableSupplierQuery } from '$components/Suppliers/queries/getAvailableSupplier'
   import ConfirmAddSupplier from '$components/Suppliers/Modals/ConfirmAddSupplier.svelte'
-  import Input from '$components/Input/Input.svelte'
-  import Address from '$components/Address/Address.svelte'
+  import AvailableProfile from '$components/Agreements/AvailableProfile.svelte'
 
   export let id:string;
   
@@ -65,21 +64,4 @@
   previous='{() => module.goToSuppliers()}'
   actions='{actions}'/>
 
-<Input
-  label='Nom'
-  value='{supplier.name}'
-  disabled={true} />
-<Input
-  type='email'
-  label='Adresse mail'
-  value='{supplier.email}'
-  disabled={true} />
-<Input
-  type='tel'
-  label='Numéro de téléphone'
-  value='{supplier.phone}'
-  disabled={true} />
-<Address
-  label="Adresse d'expédition"
-  disabled='{true}'
-  value='{supplier.shippingAddress}' />
+<AvailableProfile profile='{supplier}'/>

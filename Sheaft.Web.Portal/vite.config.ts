@@ -37,6 +37,7 @@ export default defineConfig({
       $styles: fileURLToPath(new URL("./src/styles", import.meta.url)),
       $enums: fileURLToPath(new URL("./src/enums", import.meta.url)),
       $types: fileURLToPath(new URL("./src/types", import.meta.url)),
+      $actions: fileURLToPath(new URL("./src/actions", import.meta.url)),
 
       // This Rollup aliases are extracted from @esbuild-plugins/node-modules-polyfill,
       // see https://github.com/remorses/esbuild-plugins/blob/master/node-modules-polyfill/src/polyfills.ts

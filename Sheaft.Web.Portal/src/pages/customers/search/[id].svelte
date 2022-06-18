@@ -9,8 +9,7 @@
   import type { IModalResult } from '$components/Modal/modal'
   import ConfirmAddCustomer from '$components/Customers/Modals/ConfirmAddCustomer.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import Input from '$components/Input/Input.svelte'
-  import Address from '$components/Address/Address.svelte'
+  import AvailableProfile from '$components/Agreements/AvailableProfile.svelte'
 
   export let id:string;
   
@@ -66,21 +65,4 @@
   previous='{() => module.goToCustomers()}'
   actions='{actions}'/>
 
-<Input
-  label='Nom'
-  value='{customer.name}'
-  disabled={true} />
-<Input
-  type='email'
-  label='Adresse mail'
-  value='{customer.email}'
-  disabled={true} />
-<Input
-  type='tel'
-  label='Numéro de téléphone'
-  value='{customer.phone}'
-  disabled={true} />
-<Address
-  label='Adresse de livraison'
-  disabled='{true}'
-  value='{customer.deliveryAddress}' />
+<AvailableProfile profile='{customer}'/>

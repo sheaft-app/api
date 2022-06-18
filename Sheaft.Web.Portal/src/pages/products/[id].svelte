@@ -4,54 +4,48 @@
   import Button from '$components/Button/Button.svelte'
   import { createForm } from 'felte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { calculateOnSalePrice } from '$utils/money'
-  import { validator } from '@felte/validator-vest'
-  import { suite } from '$pages/products/validators'
-  import reporterDom from '@felte/reporter-dom'
   import { getProductModule } from '$components/Products/module'
-  import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'
   import { UpdateProductCommand } from '$components/Products/commands/updateProduct'
   import ConfirmRemoveProduct from '$components/Products/Modals/ConfirmRemoveProduct.svelte'
   import { GetProductQuery } from '$components/Products/queries/getProduct'
   import { ListReturnablesOptionsQuery } from '$components/Products/queries/listReturnablesOptions'
-  import Input from '$components/Input/Input.svelte'
-  import TextArea from '$components/TextArea/TextArea.svelte'
-  import Vat from '$components/Vat/Vat.svelte'
-  import Checkbox from '$components/Checkbox/Checkbox.svelte'
-  import Select from '$components/Select/Select.svelte'
   import FormFooter from '$components/Form/FormFooter.svelte'
+  import type { UpdateProductForm } from '$components/Products/types'
+  import { getFormValidators } from '$components/validate'
+  import Product from '$components/Products/Product.svelte'
+  import { suite } from '$components/Products/validators'
 
-  export let id:string;
+  export let id: string
   const module = getProductModule($goto)
   const { open } = getContext('simple-modal')
 
   let isLoading = false
-  let isReturnable = false
   let returnablesOptions: { label: string; value: string }[] = []
 
-  const { form, data, isSubmitting, isValid, setData } =
-    createForm<Components.Schemas.UpdateProductRequest>({
-      onSubmit: async (values) => {
-        return await mediator.send(
-          new UpdateProductCommand(
-            id,
-            values.name,
-            values.unitPrice,
-            values.vat,
-            values.code,
-            values.description,
-            values.returnableId
-          )
-        )
-      },
-      onSuccess: () => {
-        module.goToList()
-      },
-      extend: [
-        <any>validator({ suite }),
-        reporterDom({ single: true })
-      ]
+  const onSubmit = async (values: UpdateProductForm): Promise<void> => {
+    return await mediator.send(
+      new UpdateProductCommand(
+        id,
+        values.name,
+        values.unitPrice,
+        values.vat,
+        values.code,
+        values.description,
+        values.returnableId
+      )
+    )
+  }
+
+  const onSuccess = (): void => {
+    module.goToList()
+  }
+
+  const { form, data, isSubmitting, setData } =
+    createForm<UpdateProductForm>({
+      onSubmit,
+      onSuccess,
+      extend: getFormValidators(suite)
     })
 
   const onClose = () => {
@@ -70,16 +64,14 @@
       })
   }
 
-  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat)
-  $: controlsAreDisabled = isLoading || $isSubmitting;
-  
   onMount(async () => {
     try {
       isLoading = true
-
-      const product = await mediator.send(new GetProductQuery(id))
-      isReturnable = !!product.returnableId
-      setData(product)
+      
+      const product = await mediator.send(new GetProductQuery(id));
+      const productForm = <UpdateProductForm>product;
+      productForm.hasReturnable = !!product.returnableId
+      setData(productForm)
 
       returnablesOptions = await mediator.send(new ListReturnablesOptionsQuery())
 
@@ -98,6 +90,8 @@
       action: () => confirmModal()
     }
   ]
+  
+  $: controlsAreDisabled = isLoading || $isSubmitting
 </script>
 
 <!-- routify:options index=true -->
@@ -110,60 +104,7 @@
 />
 
 <form use:form>
-  <Input
-    id='code'
-    label='Code'
-    bind:value='{$data.code}'
-    required='{false}'
-    maxLength='{30}'
-    placeholder='Le code de votre produit (sera autogénéré si non renseigné)'
-    disabled='{controlsAreDisabled}'
-  />
-  <Input
-    id='name'
-    label='Nom'
-    bind:value='{$data.name}'
-    placeholder='Le nom de votre produit'
-    disabled='{controlsAreDisabled}'
-  />
-  <Input
-    id='unitPrice'
-    label='Prix HT'
-    bind:value='{$data.unitPrice}'
-    placeholder='Prix HT de votre produit en €'
-    disabled='{controlsAreDisabled}'
-  />
-  <Vat id='vat' label='TVA' bind:value='{$data.vat}' disabled='{controlsAreDisabled}' />
-  <Input
-    type='number'
-    label='Prix TTC (calculé)'
-    value='{onSalePrice}'
-    disabled='{true}'
-    required='{false}'
-  />
-  <TextArea
-    id='description'
-    label='Description'
-    bind:value='{$data.description}'
-    placeholder='Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser'
-    disabled='{controlsAreDisabled}'
-  />
-  <Checkbox
-    id='hasReturnable'
-    label='Ce produit est consigné'
-    disabled='{controlsAreDisabled}'
-    bind:value='{isReturnable}'
-    class='mt-3 mb-6'
-  />
-  {#if isReturnable}
-    <Select
-      id='returnableId'
-      label='Consigne'
-      options='{returnablesOptions}'
-      disabled='{controlsAreDisabled}'
-      bind:value='{$data.returnableId}'
-    />
-  {/if}
+  <Product {data} disabled='{controlsAreDisabled}'/>
   <FormFooter>
     <Button
       type='button'

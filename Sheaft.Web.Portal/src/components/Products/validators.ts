@@ -1,7 +1,7 @@
 ﻿import { create, enforce, test } from 'vest'
-import type { Components } from '$types/api'
+import type { CreateProductForm, UpdateProductForm } from '$components/Products/types'
 
-export const suite = create('returnable-suite', (data: Components.Schemas.UpdateReturnableRequest) => {
+export const suite = create('product-suite', (data: CreateProductForm|UpdateProductForm) => {
   test('name', 'Le nom est requis', () => {
     enforce(data.name).isNotEmpty()
   })
@@ -14,15 +14,12 @@ export const suite = create('returnable-suite', (data: Components.Schemas.Update
     enforce(data.unitPrice).greaterThan(0)
   })
 
-  test('vat', 'Vous devez selectionner un taux de TVA', () => {
-    if((<any>data).hasVat)
-      enforce(data.vat).isNotNull()
+  test('returnableId', 'Vous devez selectionner une consigne', () => {
+    if(data.hasReturnable)
+      enforce(data.returnableId).isNotNull()
   })
 
   test('vat', 'Le taux de TVA doit être 5.5%, 10% ou 20%', () => {
-    if((<any>data).hasVat)
-      enforce(data.vat).inside([5.5,10,20]);
-    else
-      enforce(data.vat).equals(0);
+    enforce(data.vat).inside([5.5,10,20]);
   })
 })

@@ -1,4 +1,6 @@
-﻿input, textarea, select {
+﻿input:not([type=checkbox]),
+textarea,
+select {
   @apply block;
   @apply w-full;
   @apply px-3;
@@ -17,10 +19,10 @@
   @apply focus:border-primary-600;
   @apply focus:outline-none;
   @apply disabled:bg-gray-200;
+  @apply mb-3
 }
 
 label {
-  @apply block;
   @apply mb-2;
   @apply text-sm;
   @apply font-medium;

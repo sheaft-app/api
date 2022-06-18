@@ -24,7 +24,8 @@
       "$assets/*": ["./src/assets/*"],
       "$styles/*": ["./src/styles/*"],
       "$enums/*": ["./src/enums/*"],
-      "$types/*": ["./src/types/*"]
+      "$types/*": ["./src/types/*"],
+      "$actions/*": ["./src/actions/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

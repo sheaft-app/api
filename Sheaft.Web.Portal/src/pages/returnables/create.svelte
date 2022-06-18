@@ -4,51 +4,41 @@
   import { createForm } from 'felte'
   import Button from '$components/Button/Button.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { calculateOnSalePrice } from '$utils/money'
-  import { validator } from '@felte/validator-vest'
-  import { suite } from '$pages/returnables/validators'
-  import reporterDom from '@felte/reporter-dom'
-  import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'
   import { CreateReturnableCommand } from '$components/Returnables/commands/createReturnable'
-  import Input from '$components/Input/Input.svelte'
-  import Checkbox from '$components/Checkbox/Checkbox.svelte'
-  import Vat from '$components/Vat/Vat.svelte'
   import { getReturnableModule } from '$components/Returnables/module'
+  import type { CreateReturnableForm } from '$components/Returnables/types'
+  import { getFormValidators } from '$components/validate'
+  import Returnable from '$components/Returnables/Returnable.svelte'
+  import { suite } from '$components/Returnables/validators'
 
   const module = getReturnableModule($goto)
-  let hasVat = true;
 
-  const { form, data, isSubmitting, isValid } =
-    createForm<Components.Schemas.CreateReturnableRequest>({
+  const onSubmit = async (values:CreateReturnableForm) : Promise<string> => {
+    return await mediator.send(
+      new CreateReturnableCommand(
+        values.name,
+        values.unitPrice,
+        values.vat,
+        values.code
+      )
+    )
+  }
+  
+  const onSuccess = (id: string) : void => {
+    module.goToDetails(id)
+  }
+  
+  const { form, data, isSubmitting } =
+    createForm<CreateReturnableForm>({
       initialValues: {
         vat: 0
       },
-      onSubmit: async values => {
-        return await mediator.send(
-          new CreateReturnableCommand(
-            values.name,
-            values.unitPrice,
-            values.vat,
-            values.code
-          )
-        )
-      },
-      onSuccess: (id: string) => {
-        module.goToDetails(id)
-      },
-      extend: [
-        <any>validator({ suite }),
-        reporterDom({ single: true })
-      ]
+      onSubmit,
+      onSuccess,
+      extend: getFormValidators(suite)
     })
-
-  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat)
-  $: if(hasVat && !$data.vat){
-    $data.vat = 5.5;
-  }else if(!hasVat && $data.vat){
-    $data.vat = undefined;
-  }
+  
 </script>
 
 <!-- routify:options index=true -->
@@ -60,43 +50,7 @@
 />
 
 <form use:form>
-  <Input
-    id='name'
-    label='Nom'
-    bind:value='{$data.name}'
-    placeholder='Le nom de votre consigne'
-    disabled='{$isSubmitting}'
-  />
-  <Input
-    id='unitPrice'
-    label='Prix HT'
-    bind:value='{$data.unitPrice}'
-    placeholder='Prix HT de votre consigne en €'
-    disabled='{$isSubmitting}'
-  />
-  <Checkbox
-    id='hasVat'
-    label='Je facture la TVA pour cette consigne'
-    disabled='{$isSubmitting}'
-    bind:value='{hasVat}'
-    class='my-3'
-  />
-  {#if hasVat}
-    <Vat
-      id='vat'
-      label='TVA'
-      bind:value='{$data.vat}'
-      disabled='{$isSubmitting}'
-    />
-    <Input
-      id='onSalePrice'
-      type='number'
-      label='Prix TTC (calculé)'
-      value='{onSalePrice}'
-      disabled='{true}'
-      required='{false}'
-    />
-  {/if}
+  <Returnable {data} disabled='{$isSubmitting}'/>
   <FormFooter>
     <Button
       type='button'

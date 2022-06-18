@@ -6,10 +6,11 @@
   import { getCustomerModule } from '$components/Customers/module'
   import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'
-  import { formatInnerHtml } from "$components/Actions/format"
+  import { formatInnerHtml } from "$actions/format"
   import { ListReceivedAgreementsQuery } from '$components/Agreements/queries/listReceivedAgreements'
   import { status } from '$components/Agreements/utils'
   import { dateDistance } from '$utils/dates'
+  import Customers from '$components/Customers/Customers.svelte'
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -41,29 +42,5 @@
   previous='{() => module.goToCustomers()}'
 />
 <PageContent {isLoading}>
-  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table>
-      <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Statut</th>
-        <th>Dernière maj</th>
-      </tr>
-      </thead>
-      <tbody>
-      {#each agreements as agreement}
-        <tr on:click="{() => module.goToDetails(agreement.id)}">
-          <th>{agreement.customerName}</th>
-          <td use:formatInnerHtml={status}>{agreement.status}</td>
-          <td use:formatInnerHtml={dateDistance}>{agreement.updatedOn}</td>
-        </tr>
-      {/each}
-      {#if agreements?.length < 1}
-        <tr>
-          <td colspan='3' class='text-center'>Aucun accord commercial reçu en attente</td>
-        </tr>
-      {/if}
-      </tbody>
-    </table>
-  </div>  
+  <Customers customers='{agreements}' noResultsMessage='Aucun accord commercial reçu en attente'/>
 </PageContent>

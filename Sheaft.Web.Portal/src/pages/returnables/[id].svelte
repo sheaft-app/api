@@ -5,47 +5,43 @@
   import { createForm } from 'felte'
   import Button from '$components/Button/Button.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
-  import { calculateOnSalePrice } from '$utils/money'
-  import { validator } from '@felte/validator-vest'
-  import { suite } from '$pages/returnables/validators'
-  import reporterDom from '@felte/reporter-dom'
-  import type { Components } from '$types/api'
   import { mediator } from '$components/mediator'
   import { UpdateReturnableCommand } from '$components/Returnables/commands/updateReturnable'
   import ConfirmRemoveReturnable from '$components/Returnables/Modals/ConfirmRemoveReturnable.svelte'
   import { GetReturnableQuery } from '$components/Returnables/queries/getReturnable'
-  import Input from '$components/Input/Input.svelte'
-  import Checkbox from '$components/Checkbox/Checkbox.svelte'
-  import Vat from '$components/Vat/Vat.svelte'
   import { getReturnableModule } from '$components/Returnables/module'
+  import { getFormValidators } from '$components/validate'
+  import type { UpdateReturnableForm } from '$components/Returnables/types'
+  import Returnable from '$components/Returnables/Returnable.svelte'
+  import { suite } from '$components/Returnables/validators'
 
-  export let id:string;
-  
+  export let id: string
+
   const module = getReturnableModule($goto)
   const { open } = getContext('simple-modal')
 
   let isLoading = true
-  let hasVat = false
 
-  const { form, data, isSubmitting, isValid, setData } =
-    createForm<Components.Schemas.UpdateReturnableRequest>({
-      onSubmit: async values => {
-        await mediator.send(
-          new UpdateReturnableCommand(
-            id,
-            values.name,
-            values.unitPrice,
-            values.vat
-          )
-        )
-      },
-      onSuccess: () => {
-        module.goToList()
-      },
-      extend: [
-        <any>validator({ suite }),
-        reporterDom({ single: true })
-      ]
+  const onSubmit = async (values: UpdateReturnableForm): Promise<void> => {
+    return await mediator.send(
+      new UpdateReturnableCommand(
+        id,
+        values.name,
+        values.unitPrice,
+        values.vat
+      )
+    )
+  }
+
+  const onSuccess = (): void => {
+    module.goToList()
+  }
+
+  const { form, data, isSubmitting, setData } =
+    createForm<UpdateReturnableForm>({
+      onSubmit,
+      onSuccess,
+      extend: getFormValidators(suite)
     })
 
   const onClose = () => {
@@ -68,8 +64,9 @@
     try {
       isLoading = true
       const returnable = await mediator.send(new GetReturnableQuery(id))
-      setData(returnable)
-      hasVat = returnable.vat > 0
+      const returnableForm = <UpdateReturnableForm>returnable;
+      returnableForm.hasVat = returnable.vat > 0;
+      setData(returnableForm)
       isLoading = false
     } catch (exc) {
       console.error(exc)
@@ -87,14 +84,7 @@
     }
   ]
 
-  $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat)
   $: controlsAreDisabled = isLoading || $isSubmitting
-
-  $: if (hasVat && (!$data.vat || $data.vat == 0)){
-    $data.vat = 5.5
-  } else if (!hasVat && $data.vat && $data.vat > 0) {
-    $data.vat = 0
-  }
 </script>
 
 <!-- routify:options index=true -->
@@ -107,43 +97,7 @@
 />
 
 <form use:form>
-  <Input
-    id='name'
-    label='Nom'
-    bind:value='{$data.name}'
-    placeholder='Le nom de votre consigne'
-    disabled='{controlsAreDisabled}'
-  />
-  <Input
-    id='unitPrice'
-    label='Prix HT'
-    bind:value='{$data.unitPrice}'
-    placeholder='Prix HT de votre consigne en €'
-    disabled='{controlsAreDisabled}'
-  />
-  <Checkbox
-    id='hasVat'
-    label='Je facture la TVA pour cette consigne'
-    disabled='{controlsAreDisabled}'
-    bind:value='{hasVat}'
-    class='my-3'
-  />
-  {#if hasVat}
-    <Vat
-      id='vat'
-      label='TVA'
-      bind:value='{$data.vat}'
-      disabled='{controlsAreDisabled}'
-    />
-    <Input
-      id='onSalePrice'
-      type='number'
-      label='Prix TTC (calculé)'
-      value='{onSalePrice}'
-      disabled='{true}'
-      required='{false}'
-    />
-  {/if}
+  <Returnable {data} disabled='{controlsAreDisabled}'/>
   <FormFooter>
     <Button
       type='button'
