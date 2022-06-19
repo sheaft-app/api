@@ -52,7 +52,7 @@ public class UpdateAgreementDeliveryCommandShould
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Refuse();
+        agreement.Refuse("test");
         
         context.Add(agreement);
         context.SaveChanges();

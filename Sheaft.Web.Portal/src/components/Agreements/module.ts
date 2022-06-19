@@ -19,6 +19,16 @@ import {
   GetAgreementHandler,
   GetAgreementQuery
 } from "$components/Agreements/queries/getAgreement";
+import { RefuseAgreementCommand, RefuseAgreementHandler } from '$components/Agreements/commands/refuseAgreement'
+import { CancelAgreementCommand, CancelAgreementHandler } from '$components/Agreements/commands/cancelAgreement'
+import {
+  AcceptCustomerAgreementCommand,
+  AcceptCustomerAgreementHandler
+} from '$components/Agreements/commands/acceptCustomerAgreement'
+import {
+  AcceptSupplierAgreementCommand,
+  AcceptSupplierAgreementHandler
+} from '$components/Agreements/commands/acceptSupplierAgreement'
 
 export interface IAgreementModule extends IAppModule {
   goToDetails(id: string): void;
@@ -37,15 +47,33 @@ export class AgreementModule extends AppModule implements IAgreementModule {
     this.registerHandler(ListActiveAgreementsQuery, request =>
       new ListActiveAgreementsHandler(this._client).handle(request)
     );
+    
     this.registerHandler(ListSentAgreementsQuery, request =>
       new ListSentAgreementsHandler(this._client, this._authStore).handle(request)
     );
+    
     this.registerHandler(ListReceivedAgreementsQuery, request =>
       new ListReceivedAgreementsHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(GetAgreementQuery, request =>
       new GetAgreementHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(AcceptCustomerAgreementCommand, request =>
+      new AcceptCustomerAgreementHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(AcceptSupplierAgreementCommand, request =>
+      new AcceptSupplierAgreementHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(RefuseAgreementCommand, request =>
+      new RefuseAgreementHandler(this._client).handle(request)
+    );
+
+    this.registerHandler(CancelAgreementCommand, request =>
+      new CancelAgreementHandler(this._client).handle(request)
     );
   };
 

@@ -29,7 +29,7 @@
     }
   });
 
-  const onClose = result => {
+  const onClose = () => {
     module.goToSearch();
   };
 

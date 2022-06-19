@@ -108,7 +108,7 @@ internal static class DataHelpers
                     catalog.Id,
                     new List<DeliveryDay> {agreementInfo.Value}, 2);
 
-                agreement.Accept();
+                agreement.AcceptAgreement();
                 context.Add(agreement);
             }
 

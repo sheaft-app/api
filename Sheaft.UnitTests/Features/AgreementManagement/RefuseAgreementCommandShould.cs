@@ -32,7 +32,7 @@ public class RefuseAgreementCommandShould
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Id), CancellationToken.None);
+        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Refused, agreement.Status);
@@ -63,16 +63,34 @@ public class RefuseAgreementCommandShould
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Accept();
+        agreement.AcceptAgreement();
         
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Id), CancellationToken.None);
+        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("agreement.refuse.requires.pending", result.Error.Code);
+    }
+    
+    [Test]
+    public async Task Fail_To_Refuse_Agreement_If_No_Reason_Provided()
+    {
+        var (supplier, customer, catalog, context, handler) = InitHandler();
+        
+        var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
+            catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
+
+        context.Add(agreement); 
+        context.SaveChanges();
+        
+        var result = await handler.Handle(new RefuseAgreementCommand(agreement.Id, string.Empty), CancellationToken.None);
+
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("agreement.refuse.requires.reason", result.Error.Code);
     }
 
     private (Supplier, Customer, Catalog, AppDbContext, RefuseAgreementHandler) InitHandler()

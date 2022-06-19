@@ -61,7 +61,7 @@ public class Agreement : AggregateRoot
         return Result.Success();
     }
 
-    public Result Accept(IEnumerable<DeliveryDay>? deliveryDays = null, int? orderDelayInHoursBeforeDeliveryDay = null)
+    public Result AcceptAgreement(IEnumerable<DeliveryDay>? deliveryDays = null, int? orderDelayInHoursBeforeDeliveryDay = null)
     {
         if (Status != AgreementStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "agreement.accept.requires.pending");
@@ -91,13 +91,16 @@ public class Agreement : AggregateRoot
         return Result.Success();
     }
 
-    public Result Refuse(string? refusalReason = null)
+    public Result Refuse(string reason)
     {
         if (Status != AgreementStatus.Pending)
             return Result.Failure(ErrorKind.BadRequest, "agreement.refuse.requires.pending");
+        
+        if (string.IsNullOrWhiteSpace(reason))
+            return Result.Failure(ErrorKind.BadRequest, "agreement.refuse.requires.reason");
 
         Status = AgreementStatus.Refused;
-        FailureReason = refusalReason;
+        FailureReason = reason;
         UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }

@@ -10,13 +10,13 @@
     }
   ],
   "paths": {
-    "/api/agreements/{id}/accept": {
+    "/api/agreements/{id}/accept/customer": {
       "put": {
         "tags": [
-          "AcceptAgreement"
+          "AcceptCustomerAgreement"
         ],
-        "summary": "Accept agreeement",
-        "operationId": "AcceptAgreement",
+        "summary": "Accept customer agreement",
+        "operationId": "AcceptCustomerAgreement",
         "parameters": [
           {
             "name": "id",
@@ -31,17 +31,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AcceptAgreementRequest"
+                "$ref": "#/components/schemas/AcceptCustomerAgreementRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AcceptAgreementRequest"
+                "$ref": "#/components/schemas/AcceptCustomerAgreementRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AcceptAgreementRequest"
+                "$ref": "#/components/schemas/AcceptCustomerAgreementRequest"
               }
             }
           }
@@ -95,6 +95,93 @@
             "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/AcceptOrderRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agreements/{id}/accept/supplier": {
+      "put": {
+        "tags": [
+          "AcceptSupplierAgreement"
+        ],
+        "summary": "Accept supplier agreement",
+        "operationId": "AcceptSupplierAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agreements/{id}/cancel": {
+      "put": {
+        "tags": [
+          "CancelAgreement"
+        ],
+        "summary": "Cancel agreement",
+        "operationId": "CancelAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelAgreementRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelAgreementRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelAgreementRequest"
               }
             }
           }
@@ -2170,6 +2257,59 @@
         }
       }
     },
+    "/api/agreements/{id}/refuse": {
+      "put": {
+        "tags": [
+          "RefuseAgreement"
+        ],
+        "summary": "Refuse agreement",
+        "operationId": "RefuseAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefuseAgreementRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefuseAgreementRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefuseAgreementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/orders/{id}/refuse": {
       "post": {
         "tags": [
@@ -2440,7 +2580,7 @@
   },
   "components": {
     "schemas": {
-      "AcceptAgreementRequest": {
+      "AcceptCustomerAgreementRequest": {
         "type": "object",
         "properties": {
           "deliveryDays": {
@@ -2452,8 +2592,7 @@
           },
           "orderDelayInHoursBeforeDeliveryDay": {
             "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2515,6 +2654,9 @@
           "status": {
             "$ref": "#/components/schemas/AgreementStatus"
           },
+          "owner": {
+            "$ref": "#/components/schemas/AgreementOwner"
+          },
           "createdOn": {
             "type": "string",
             "format": "date-time"
@@ -2566,6 +2708,9 @@
           "customerName": {
             "type": "string",
             "nullable": true
+          },
+          "owner": {
+            "$ref": "#/components/schemas/AgreementOwner"
           }
         },
         "additionalProperties": false
@@ -2606,6 +2751,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "AgreementOwner": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
       },
       "AgreementProfileDto": {
         "type": "object",
@@ -2771,6 +2924,16 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "CancelAgreementRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "CancelInvoiceRequest": {
         "type": "object",
@@ -3310,6 +3473,16 @@
         "type": "object",
         "properties": {
           "token": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RefuseAgreementRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
             "type": "string",
             "nullable": true
           }

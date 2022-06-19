@@ -44,6 +44,6 @@
 </div>
 <hr />
 <div class="flex items-center justify-evenly pt-4">
-  <Button class="bg-back-600 mx-2" on:click="{close}">Annuler</Button>
+  <Button class="bg-default-600 mx-2" on:click="{close}">Fermer</Button>
   <Button class="bg-accent-600 mx-2" on:click="{validate}">Ajouter</Button>
 </div>

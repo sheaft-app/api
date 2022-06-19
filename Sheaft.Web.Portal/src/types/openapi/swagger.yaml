@@ -5,12 +5,12 @@ info:
 servers:
   - url: https://localhost:5003
 paths:
-  '/api/agreements/{id}/accept':
+  '/api/agreements/{id}/accept/customer':
     put:
       tags:
-        - AcceptAgreement
-      summary: Accept agreeement
-      operationId: AcceptAgreement
+        - AcceptCustomerAgreement
+      summary: Accept customer agreement
+      operationId: AcceptCustomerAgreement
       parameters:
         - name: id
           in: path
@@ -21,13 +21,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AcceptAgreementRequest'
+              $ref: '#/components/schemas/AcceptCustomerAgreementRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/AcceptAgreementRequest'
+              $ref: '#/components/schemas/AcceptCustomerAgreementRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/AcceptAgreementRequest'
+              $ref: '#/components/schemas/AcceptCustomerAgreementRequest'
       responses:
         '204':
           description: No Content
@@ -60,6 +60,59 @@ paths:
           application/*+json:
             schema:
               $ref: '#/components/schemas/AcceptOrderRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/{id}/accept/supplier':
+    put:
+      tags:
+        - AcceptSupplierAgreement
+      summary: Accept supplier agreement
+      operationId: AcceptSupplierAgreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/{id}/cancel':
+    put:
+      tags:
+        - CancelAgreement
+      summary: Cancel agreement
+      operationId: CancelAgreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelAgreementRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/CancelAgreementRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/CancelAgreementRequest'
       responses:
         '204':
           description: No Content
@@ -1321,6 +1374,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/{id}/refuse':
+    put:
+      tags:
+        - RefuseAgreement
+      summary: Refuse agreement
+      operationId: RefuseAgreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefuseAgreementRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RefuseAgreementRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RefuseAgreementRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   '/api/orders/{id}/refuse':
     post:
       tags:
@@ -1485,7 +1570,7 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
-    AcceptAgreementRequest:
+    AcceptCustomerAgreementRequest:
       type: object
       properties:
         deliveryDays:
@@ -1496,7 +1581,6 @@ components:
         orderDelayInHoursBeforeDeliveryDay:
           type: integer
           format: int32
-          nullable: true
       additionalProperties: false
     AcceptOrderRequest:
       type: object
@@ -1540,6 +1624,8 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/AgreementStatus'
+        owner:
+          $ref: '#/components/schemas/AgreementOwner'
         createdOn:
           type: string
           format: date-time
@@ -1577,6 +1663,8 @@ components:
         customerName:
           type: string
           nullable: true
+        owner:
+          $ref: '#/components/schemas/AgreementOwner'
       additionalProperties: false
     AgreementDtoPaginatedResults:
       type: object
@@ -1605,6 +1693,12 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    AgreementOwner:
+      enum:
+        - 0
+        - 1
+      type: integer
+      format: int32
     AgreementProfileDto:
       type: object
       properties:
@@ -1726,6 +1820,13 @@ components:
         - 2
       type: integer
       format: int32
+    CancelAgreementRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          nullable: true
+      additionalProperties: false
     CancelInvoiceRequest:
       type: object
       properties:
@@ -2117,6 +2218,13 @@ components:
       type: object
       properties:
         token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RefuseAgreementRequest:
+      type: object
+      properties:
+        reason:
           type: string
           nullable: true
       additionalProperties: false

@@ -13,6 +13,7 @@ module.exports = {
         accent: colors.teal,
         back: colors.stone,
         cancel: colors.neutral,
+        default: colors.neutral,
         danger: colors.red,
         warning: colors.amber,
         info: colors.sky,

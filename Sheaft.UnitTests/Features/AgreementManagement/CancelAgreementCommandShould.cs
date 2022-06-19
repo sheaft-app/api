@@ -19,7 +19,7 @@ namespace Sheaft.UnitTests.AgreementManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class RevokeAgreementCommandShould
+public class CancelAgreementCommandShould
 {
     [Test]
     public async Task Revoke_Agreement_Between_Customer_And_Supplier()
@@ -29,11 +29,11 @@ public class RevokeAgreementCommandShould
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Accept();
+        agreement.AcceptAgreement();
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, "raison valable"), CancellationToken.None);
+        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, "raison valable"), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Revoked, agreement.Status);
@@ -48,12 +48,12 @@ public class RevokeAgreementCommandShould
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Refuse();
+        agreement.Refuse("reason");
         
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
+        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
@@ -68,21 +68,21 @@ public class RevokeAgreementCommandShould
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Accept();
+        agreement.AcceptAgreement();
         
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, null), CancellationToken.None);
+        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, null), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("agreement.revoke.requires.reason", result.Error.Code);
     }
 
-    private (Supplier, Customer, Catalog, AppDbContext, RevokeAgreementHandler) InitHandler()
+    private (Supplier, Customer, Catalog, AppDbContext, CancelAgreementHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<RevokeAgreementHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<CancelAgreementHandler>();
 
         var supplierAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
         var customerAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
@@ -100,7 +100,7 @@ public class RevokeAgreementCommandShould
         
         context.SaveChanges();
         
-        var handler = new RevokeAgreementHandler(uow);
+        var handler = new CancelAgreementHandler(uow);
         
         return (supplier, customer, catalog, context, handler);
     }

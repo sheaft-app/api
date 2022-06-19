@@ -24,15 +24,14 @@ public class AcceptAgreementCommandShould
     [Test]
     public async Task Set_As_Active_Agreement_Sent_By_Supplier()
     {
-        var (supplier, customer, catalog, context, handler) = InitHandler();
-        
+        var (supplier, customer, catalog, context, handler) = InitSupplierHandler();
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Id), CancellationToken.None);
+        var result = await handler.Handle(new AcceptSupplierAgreementCommand(agreement.Id), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Active, agreement.Status);
@@ -41,13 +40,13 @@ public class AcceptAgreementCommandShould
     [Test]
     public async Task Set_As_Active_Agreement_Sent_By_Customer()
     {
-        var (supplier, customer, catalog, context, handler) = InitHandler();
+        var (supplier, customer, catalog, context, handler) = InitCustomerHandler();
         
         var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Id, customer.Id, catalog.Id);
         context.Add(agreement);
         context.SaveChanges();
         
-        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Id, new List<DayOfWeek>
+        var result = await handler.Handle(new AcceptCustomerAgreementCommand(agreement.Id, new List<DayOfWeek>
             {
                 DayOfWeek.Monday
             }, 24), CancellationToken.None);
@@ -60,13 +59,13 @@ public class AcceptAgreementCommandShould
     [Test]
     public async Task Assign_DeliveryDay_Agreement_Sent_By_Customer()
     {
-        var (supplier, customer, catalog, context, handler) = InitHandler();
+        var (supplier, customer, catalog, context, handler) = InitCustomerHandler();
         
         var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Id, customer.Id, catalog.Id);
         context.Add(agreement);
         context.SaveChanges();
         
-        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Id, new List<DayOfWeek>
+        var result = await handler.Handle(new AcceptCustomerAgreementCommand(agreement.Id, new List<DayOfWeek>
         {
             DayOfWeek.Monday
         }, 24), CancellationToken.None);
@@ -76,15 +75,15 @@ public class AcceptAgreementCommandShould
     }
     
     [Test]
-    public async Task Fail_If_Supplier_Accept_Agreement_From_Customer_Without_DeliveryDays_Or_Delay()
+    public async Task Fail_If_Supplier_Accept_Agreement_From_Customer_Without_DeliveryDays()
     {
-        var (supplier, customer, catalog, context, handler) = InitHandler();
+        var (supplier, customer, catalog, context, handler) = InitCustomerHandler();
         
         var agreement = Agreement.CreateAndSendAgreementToSupplier(supplier.Id, customer.Id, catalog.Id);
         context.Add(agreement);
         context.SaveChanges();
         
-        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Id), CancellationToken.None);
+        var result = await handler.Handle(new AcceptCustomerAgreementCommand(agreement.Id, new List<DayOfWeek>(), 0), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
@@ -93,33 +92,53 @@ public class AcceptAgreementCommandShould
     [Test]
     public async Task Fail_To_Accept_Agreement_If_Not_In_Pending_Status()
     {
-        var (supplier, customer, catalog, context, handler) = InitHandler();
+        var (supplier, customer, catalog, context, handler) = InitSupplierHandler();
         
         var agreement = Agreement.CreateAndSendAgreementToCustomer(supplier.Id, customer.Id,
             catalog.Id, new List<DeliveryDay>{new(DayOfWeek.Friday)}, 24);
 
-        agreement.Accept();
+        agreement.AcceptAgreement();
         
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new AcceptAgreementCommand(agreement.Id), CancellationToken.None);
+        var result = await handler.Handle(new AcceptSupplierAgreementCommand(agreement.Id), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("agreement.accept.requires.pending", result.Error.Code);
     }
 
-    private (Supplier, Customer, Catalog, AppDbContext, AcceptAgreementHandler) InitHandler()
+    private (Supplier, Customer, Catalog, AppDbContext, AcceptCustomerAgreementHandler) InitCustomerHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<AcceptAgreementHandler>();
-
-        var supplierAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
-        var customerAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<AcceptCustomerAgreementHandler>();
+        var (supplier, customer, catalog) = InitContext(context);
         
+        var handler = new AcceptCustomerAgreementHandler(uow);
+        
+        return (supplier, customer, catalog, context, handler);
+    }
+
+    private (Supplier, Customer, Catalog, AppDbContext, AcceptSupplierAgreementHandler) InitSupplierHandler()
+    {
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<AcceptSupplierAgreementHandler>();
+        var (supplier, customer, catalog) = InitContext(context);
+        
+        var handler = new AcceptSupplierAgreementHandler(uow);
+        
+        return (supplier, customer, catalog, context, handler);
+    }
+
+    private static (Supplier, Customer, Catalog) InitContext(AppDbContext context)
+    {
+        var supplierAcct =
+            DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+        var customerAcct =
+            DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
+
         var supplier = DataHelpers.GetDefaultSupplier(supplierAcct.Id);
         var customer = DataHelpers.GetDefaultCustomer(customerAcct.Id);
-        
+
         var catalog = Catalog.CreateDefaultCatalog(supplier.Id);
 
         context.Add(customerAcct);
@@ -130,9 +149,7 @@ public class AcceptAgreementCommandShould
         
         context.SaveChanges();
         
-        var handler = new AcceptAgreementHandler(uow);
-        
-        return (supplier, customer, catalog, context, handler);
+        return (supplier, customer, catalog);
     }
 }
 #pragma warning restore CS8767

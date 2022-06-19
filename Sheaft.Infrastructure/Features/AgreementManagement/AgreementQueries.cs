@@ -32,6 +32,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 {
                     Id = agreement.Id,
                     Status = (AgreementStatus) agreement.Status,
+                    Owner = (AgreementOwner) agreement.Owner,
                     CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     DeliveryDays = agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek)d.DayOfWeek),
@@ -67,6 +68,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     UpdatedOn = agreement.UpdatedOn,
                     CustomerName = customer.TradeName,
                     SupplierName = supplier.TradeName,
+                    Owner = agreement.Owner,
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -80,7 +82,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName, (AgreementOwner)p.Owner)), 
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
@@ -103,6 +105,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     UpdatedOn = agreement.UpdatedOn,
                     CustomerName = customer.TradeName,
                     SupplierName = supplier.TradeName,
+                    Owner = agreement.Owner,
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -116,7 +119,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName, (AgreementOwner)p.Owner)), 
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
@@ -139,6 +142,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     UpdatedOn = agreement.UpdatedOn,
                     CustomerName = customer.TradeName,
                     SupplierName = supplier.TradeName,
+                    Owner = agreement.Owner,
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -152,7 +156,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName)), 
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus)p.Status, p.UpdatedOn, p.SupplierName, p.CustomerName, (AgreementOwner)p.Owner)), 
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
