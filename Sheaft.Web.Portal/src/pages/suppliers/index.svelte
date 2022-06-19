@@ -7,7 +7,7 @@
   import { mediator } from "$components/mediator";
   import { getSupplierModule } from "$components/Suppliers/module";
   import { ListActiveAgreementsQuery } from "$components/Agreements/queries/listActiveAgreements";
-  import Suppliers from "$components/Suppliers/Suppliers.svelte";
+  import Agreements from "$components/Agreements/Agreements.svelte";
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -45,5 +45,9 @@
 
 <PageHeader title="{$page.title}" actions="{actions}" />
 <PageContent isLoading="{isLoading}">
-  <Suppliers suppliers="{agreements}" noResultsMessage="Aucun accord commercial actif" />
+  <Agreements
+    agreements="{agreements}"
+    module="{module}"
+    noResultsMessage="Aucun accord commercial actif"
+  />
 </PageContent>

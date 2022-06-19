@@ -10,11 +10,9 @@ export class AcceptSupplierAgreementCommand extends Request<Promise<void>> {
 export class AcceptSupplierAgreementHandler {
   constructor(private _client: Client) {}
 
-  handle = async (
-    request: AcceptSupplierAgreementCommand
-  ): Promise<void> => {
+  handle = async (request: AcceptSupplierAgreementCommand): Promise<void> => {
     try {
-      await this._client.AcceptSupplierAgreement(request);
+      await this._client.AcceptSupplierAgreement(request.id, request);
       return Promise.resolve();
     } catch (exc) {
       console.error(exc);

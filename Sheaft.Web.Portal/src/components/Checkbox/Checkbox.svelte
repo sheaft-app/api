@@ -12,7 +12,7 @@
   else if (!name) name = id;
 </script>
 
-<label for="{id}" class="form-check-label inline-block text-gray-800 cursor-pointer">
+<label for="{id}" class="form-check-label  block text-gray-800 cursor-pointer">
   <input
     id="{id}"
     name="{name}"

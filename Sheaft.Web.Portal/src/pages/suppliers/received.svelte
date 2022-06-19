@@ -7,7 +7,7 @@
   import { getSupplierModule } from "$components/Suppliers/module";
   import { mediator } from "$components/mediator";
   import { ListReceivedAgreementsQuery } from "$components/Agreements/queries/listReceivedAgreements";
-  import Suppliers from "$components/Suppliers/Suppliers.svelte";
+  import Agreements from "$components/Agreements/Agreements.svelte";
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -38,8 +38,9 @@
   previous="{() => module.goToSuppliers()}"
 />
 <PageContent isLoading="{isLoading}">
-  <Suppliers
-    suppliers="{agreements}"
+  <Agreements
+    agreements="{agreements}"
+    module="{module}"
     noResultsMessage="Aucun accord commercial reçu en attente"
   />
 </PageContent>

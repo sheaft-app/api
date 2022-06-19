@@ -6,11 +6,8 @@
   import { getCustomerModule } from "$components/Customers/module";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
-  import { formatInnerHtml } from "$actions/format";
   import { ListReceivedAgreementsQuery } from "$components/Agreements/queries/listReceivedAgreements";
-  import { status } from "$components/Agreements/utils";
-  import { dateDistance } from "$utils/dates";
-  import Customers from "$components/Customers/Customers.svelte";
+  import Agreements from "$components/Agreements/Agreements.svelte";
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -41,8 +38,9 @@
   previous="{() => module.goToCustomers()}"
 />
 <PageContent isLoading="{isLoading}">
-  <Customers
-    customers="{agreements}"
+  <Agreements
+    agreements="{agreements}"
+    module="{module}"
     noResultsMessage="Aucun accord commercial reçu en attente"
   />
 </PageContent>

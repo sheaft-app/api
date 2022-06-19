@@ -19,7 +19,7 @@ namespace Sheaft.UnitTests.AgreementManagement;
 #pragma warning disable CS8767
 #pragma warning disable CS8618
 
-public class CancelAgreementCommandShould
+public class RevokeAgreementCommandShould
 {
     [Test]
     public async Task Revoke_Agreement_Between_Customer_And_Supplier()
@@ -33,7 +33,7 @@ public class CancelAgreementCommandShould
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, "raison valable"), CancellationToken.None);
+        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, "raison valable"), CancellationToken.None);
 
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(AgreementStatus.Revoked, agreement.Status);
@@ -53,7 +53,7 @@ public class CancelAgreementCommandShould
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
+        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, "reason"), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
@@ -73,16 +73,16 @@ public class CancelAgreementCommandShould
         context.Add(agreement); 
         context.SaveChanges();
         
-        var result = await handler.Handle(new CancelAgreementCommand(agreement.Id, null), CancellationToken.None);
+        var result = await handler.Handle(new RevokeAgreementCommand(agreement.Id, null), CancellationToken.None);
 
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("agreement.revoke.requires.reason", result.Error.Code);
     }
 
-    private (Supplier, Customer, Catalog, AppDbContext, CancelAgreementHandler) InitHandler()
+    private (Supplier, Customer, Catalog, AppDbContext, RevokeAgreementHandler) InitHandler()
     {
-        var (context, uow, logger) = DependencyHelpers.InitDependencies<CancelAgreementHandler>();
+        var (context, uow, logger) = DependencyHelpers.InitDependencies<RevokeAgreementHandler>();
 
         var supplierAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
         var customerAcct  = DataHelpers.GetDefaultAccount(new PasswordHasher("super_password"), $"{Guid.NewGuid():N}@test.com");
@@ -100,7 +100,7 @@ public class CancelAgreementCommandShould
         
         context.SaveChanges();
         
-        var handler = new CancelAgreementHandler(uow);
+        var handler = new RevokeAgreementHandler(uow);
         
         return (supplier, customer, catalog, context, handler);
     }

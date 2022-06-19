@@ -7,10 +7,26 @@
   import type { CreateProductForm, UpdateProductForm } from "$components/Products/types";
   import Select from "$components/Select/Select.svelte";
   import TextArea from "$components/TextArea/TextArea.svelte";
+  import { onMount } from "svelte";
+  import { mediator } from "$components/mediator";
+  import { ListReturnablesOptionsQuery } from "$components/Products/queries/listReturnablesOptions";
+  import type { ReturnableOption } from "$components/Products/types";
 
   export let data: KeyedWritable<CreateProductForm | UpdateProductForm>;
   export let disabled: boolean;
 
+  let isLoading = true;
+  let returnablesOptions: ReturnableOption[] = [];
+
+  onMount(async () => {
+    try {
+      isLoading = true;
+      returnablesOptions = await mediator.send(new ListReturnablesOptionsQuery());
+      isLoading = false;
+    } catch (ex) {}
+  });
+
+  $: isDisabled = disabled || isLoading;
   $: onSalePrice = calculateOnSalePrice($data.unitPrice, $data.vat);
 </script>
 
@@ -21,23 +37,23 @@
   required="{false}"
   maxLength="{30}"
   placeholder="Le code de votre produit (sera autogénéré si non renseigné)"
-  disabled="{disabled}"
+  disabled="{isDisabled}"
 />
 <Input
   id="name"
   label="Nom"
   bind:value="{$data.name}"
   placeholder="Le nom de votre produit"
-  disabled="{disabled}"
+  disabled="{isDisabled}"
 />
 <Input
   id="unitPrice"
   label="Prix HT"
   bind:value="{$data.unitPrice}"
   placeholder="Prix HT de votre produit en €"
-  disabled="{disabled}"
+  disabled="{isDisabled}"
 />
-<Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{disabled}" />
+<Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{isDisabled}" />
 <Input
   type="number"
   label="Prix TTC (calculé)"
@@ -50,12 +66,12 @@
   label="Description"
   bind:value="{$data.description}"
   placeholder="Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser"
-  disabled="{disabled}"
+  disabled="{isDisabled}"
 />
 <Checkbox
   id="hasReturnable"
   label="Ce produit est consigné"
-  disabled="{disabled}"
+  disabled="{isDisabled}"
   bind:value="{$data.hasReturnable}"
   class="mt-3 mb-6"
 />
@@ -64,7 +80,7 @@
     id="returnableId"
     label="Consigne"
     options="{returnablesOptions}"
-    disabled="{disabled}"
+    disabled="{isDisabled}"
     bind:value="{$data.returnableId}"
   />
 {/if}

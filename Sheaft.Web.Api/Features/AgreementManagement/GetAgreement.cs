@@ -23,7 +23,7 @@ public class GetAgreement : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<AgreementDetailsDto>> Get(string id, CancellationToken token)
     {
-        var result = await Mediator.Query(new GetAgreementQuery(new AgreementId(id)), token);
+        var result = await Mediator.Query(new GetAgreementQuery(new AgreementId(id), CurrentAccountId), token);
         return HandleCommandResult(result);
     }
 }

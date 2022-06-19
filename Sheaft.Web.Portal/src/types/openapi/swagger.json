@@ -167,25 +167,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelAgreementRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelAgreementRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelAgreementRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "204": {
             "description": "No Content"
@@ -2490,6 +2471,59 @@
         }
       }
     },
+    "/api/agreements/{id}/revoke": {
+      "put": {
+        "tags": [
+          "RevokeAgreement"
+        ],
+        "summary": "Revoke agreement",
+        "operationId": "RevokeAgreement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeAgreementRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeAgreementRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeAgreementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/invoices/{id}/send": {
       "post": {
         "tags": [
@@ -2654,9 +2688,6 @@
           "status": {
             "$ref": "#/components/schemas/AgreementStatus"
           },
-          "owner": {
-            "$ref": "#/components/schemas/AgreementOwner"
-          },
           "createdOn": {
             "type": "string",
             "format": "date-time"
@@ -2665,10 +2696,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "supplier": {
-            "$ref": "#/components/schemas/AgreementProfileDto"
-          },
-          "customer": {
+          "target": {
             "$ref": "#/components/schemas/AgreementProfileDto"
           },
           "catalog": {
@@ -2683,6 +2711,22 @@
           },
           "deliveryAddress": {
             "$ref": "#/components/schemas/AddressDto"
+          },
+          "ownerId": {
+            "type": "string",
+            "nullable": true
+          },
+          "owner": {
+            "$ref": "#/components/schemas/AgreementOwner"
+          },
+          "canBeAcceptedOrRefused": {
+            "type": "boolean"
+          },
+          "canBeCancelled": {
+            "type": "boolean"
+          },
+          "canBeRevoked": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -2701,11 +2745,11 @@
             "type": "string",
             "format": "date-time"
           },
-          "supplierName": {
+          "targetName": {
             "type": "string",
             "nullable": true
           },
-          "customerName": {
+          "ownerId": {
             "type": "string",
             "nullable": true
           },
@@ -2787,7 +2831,8 @@
           0,
           1,
           2,
-          3
+          3,
+          4
         ],
         "type": "integer",
         "format": "int32"
@@ -2924,16 +2969,6 @@
         ],
         "type": "integer",
         "format": "int32"
-      },
-      "CancelAgreementRequest": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "CancelInvoiceRequest": {
         "type": "object",
@@ -3610,6 +3645,16 @@
           "totalPages": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RevokeAgreementRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

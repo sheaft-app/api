@@ -2,25 +2,25 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record CancelAgreementCommand(AgreementId AgreementIdentifier) : ICommand<Result>;
+public record RevokeAgreementCommand(AgreementId AgreementIdentifier, string Reason) : ICommand<Result>;
 
-public class CancelAgreementHandler : ICommandHandler<CancelAgreementCommand, Result>
+public class RevokeAgreementHandler : ICommandHandler<RevokeAgreementCommand, Result>
 {
     private readonly IUnitOfWork _uow;
 
-    public CancelAgreementHandler(IUnitOfWork uow)
+    public RevokeAgreementHandler(IUnitOfWork uow)
     {
         _uow = uow;
     }
 
-    public async Task<Result> Handle(CancelAgreementCommand request, CancellationToken token)
+    public async Task<Result> Handle(RevokeAgreementCommand request, CancellationToken token)
     {
         var agreementResult = await _uow.Agreements.Get(request.AgreementIdentifier, token);
         if (agreementResult.IsFailure)
             return Result.Failure(agreementResult);
 
         var agreement = agreementResult.Value;
-        var result = agreement.Cancel();
+        var result = agreement.Revoke(request.Reason);
         if (result.IsFailure)
             return result;
         

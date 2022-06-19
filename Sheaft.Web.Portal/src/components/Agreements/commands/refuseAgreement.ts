@@ -2,7 +2,7 @@
 import type { Client, Components } from "$types/api";
 
 export class RefuseAgreementCommand extends Request<Promise<void>> {
-  constructor(public id: string, public reason?:string) {
+  constructor(public id: string, public reason: string) {
     super();
   }
 }
@@ -10,11 +10,9 @@ export class RefuseAgreementCommand extends Request<Promise<void>> {
 export class RefuseAgreementHandler {
   constructor(private _client: Client) {}
 
-  handle = async (
-    request: RefuseAgreementCommand
-  ): Promise<void> => {
+  handle = async (request: RefuseAgreementCommand): Promise<void> => {
     try {
-      await this._client.RefuseAgreement(request);
+      await this._client.RefuseAgreement(request.id, request);
       return Promise.resolve();
     } catch (exc) {
       console.error(exc);

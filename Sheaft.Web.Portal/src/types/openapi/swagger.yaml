@@ -102,17 +102,6 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CancelAgreementRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/CancelAgreementRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/CancelAgreementRequest'
       responses:
         '204':
           description: No Content
@@ -1515,6 +1504,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/agreements/{id}/revoke':
+    put:
+      tags:
+        - RevokeAgreement
+      summary: Revoke agreement
+      operationId: RevokeAgreement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeAgreementRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RevokeAgreementRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RevokeAgreementRequest'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   '/api/invoices/{id}/send':
     post:
       tags:
@@ -1624,17 +1645,13 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/AgreementStatus'
-        owner:
-          $ref: '#/components/schemas/AgreementOwner'
         createdOn:
           type: string
           format: date-time
         updatedOn:
           type: string
           format: date-time
-        supplier:
-          $ref: '#/components/schemas/AgreementProfileDto'
-        customer:
+        target:
           $ref: '#/components/schemas/AgreementProfileDto'
         catalog:
           $ref: '#/components/schemas/AgreementCatalogDto'
@@ -1645,6 +1662,17 @@ components:
           nullable: true
         deliveryAddress:
           $ref: '#/components/schemas/AddressDto'
+        ownerId:
+          type: string
+          nullable: true
+        owner:
+          $ref: '#/components/schemas/AgreementOwner'
+        canBeAcceptedOrRefused:
+          type: boolean
+        canBeCancelled:
+          type: boolean
+        canBeRevoked:
+          type: boolean
       additionalProperties: false
     AgreementDto:
       type: object
@@ -1657,10 +1685,10 @@ components:
         updatedOn:
           type: string
           format: date-time
-        supplierName:
+        targetName:
           type: string
           nullable: true
-        customerName:
+        ownerId:
           type: string
           nullable: true
         owner:
@@ -1721,6 +1749,7 @@ components:
         - 1
         - 2
         - 3
+        - 4
       type: integer
       format: int32
     AvailableCustomerDto:
@@ -1820,13 +1849,6 @@ components:
         - 2
       type: integer
       format: int32
-    CancelAgreementRequest:
-      type: object
-      properties:
-        reason:
-          type: string
-          nullable: true
-      additionalProperties: false
     CancelInvoiceRequest:
       type: object
       properties:
@@ -2318,6 +2340,13 @@ components:
         totalPages:
           type: integer
           format: int32
+      additionalProperties: false
+    RevokeAgreementRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          nullable: true
       additionalProperties: false
     SupplierInfoRequest:
       type: object

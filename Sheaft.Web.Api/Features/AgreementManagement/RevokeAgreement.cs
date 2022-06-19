@@ -6,23 +6,25 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.AgreementManagement;
 
 [Route(Routes.AGREEMENTS)]
-public class CancelAgreement : Feature
+public class RevokeAgreement : Feature
 {
-    public CancelAgreement(ISheaftMediator mediator)
+    public RevokeAgreement(ISheaftMediator mediator)
         : base(mediator)
     {
     }
 
     /// <summary>
-    /// Cancel agreement
+    /// Revoke agreement
     /// </summary>
-    [HttpPut("{id}/cancel", Name = nameof(CancelAgreement))]
+    [HttpPut("{id}/revoke", Name = nameof(RevokeAgreement))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
+    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] RevokeAgreementRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CancelAgreementCommand(new AgreementId(id)), token);
+        var result = await Mediator.Execute(new RevokeAgreementCommand(new AgreementId(id), data.Reason), token);
         return HandleCommandResult(result);
     }
 }
+
+public record RevokeAgreementRequest(string Reason);

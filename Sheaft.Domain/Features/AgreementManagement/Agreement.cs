@@ -91,6 +91,16 @@ public class Agreement : AggregateRoot
         return Result.Success();
     }
 
+    public Result Cancel()
+    {
+        if (Status != AgreementStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "agreement.cancel.requires.pending");
+        
+        Status = AgreementStatus.Cancelled;
+        UpdatedOn = DateTimeOffset.UtcNow;
+        return Result.Success();
+    }
+
     public Result Refuse(string reason)
     {
         if (Status != AgreementStatus.Pending)

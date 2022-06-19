@@ -3,14 +3,11 @@
   import { onMount } from "svelte";
   import PageHeader from "$components/Page/PageHeader.svelte";
   import PageContent from "$components/Page/PageContent.svelte";
-  import { dateDistance } from "$utils/dates";
   import { getCustomerModule } from "$components/Customers/module";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
-  import { formatInnerHtml } from "$actions/format";
   import { ListSentAgreementsQuery } from "$components/Agreements/queries/listSentAgreements";
-  import { status } from "$components/Agreements/utils";
-  import Customers from "$components/Customers/Customers.svelte";
+  import Agreements from "$components/Agreements/Agreements.svelte";
 
   export let pageNumber: number = 1,
     take: number = 10;
@@ -52,8 +49,9 @@
   previous="{() => module.goToCustomers()}"
 />
 <PageContent isLoading="{isLoading}">
-  <Customers
-    customers="{agreements}"
+  <Agreements
+    agreements="{agreements}"
+    module="{module}"
     noResultsMessage="Aucun accord commercial envoyé en attente"
   />
 </PageContent>

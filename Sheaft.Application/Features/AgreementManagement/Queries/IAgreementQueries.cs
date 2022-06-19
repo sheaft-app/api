@@ -6,7 +6,7 @@ namespace Sheaft.Application.AgreementManagement;
 
 public interface IAgreementQueries
 {
-    Task<Result<AgreementDetailsDto>> Get(AgreementId identifier, CancellationToken token);
+    Task<Result<AgreementDetailsDto>> Get(AgreementId identifier, AccountId accountId, CancellationToken token);
     Task<Result<PagedResult<AgreementDto>>> ListActiveAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? requestSearch = null);
     Task<Result<PagedResult<AgreementDto>>> ListSentAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? requestSearch = null);
     Task<Result<PagedResult<AgreementDto>>> ListReceivedAgreements(AccountId accountId, PageInfo pageInfo, CancellationToken token, string? requestSearch = null);
