@@ -40,7 +40,7 @@
   </p>
   <TextArea bind:value="{reason}" />
   <p class="my-4">
-    Si plus tard, vous souhaiterez commercer avec {agreement.target.name} à nouveau, vous pourrez
+    Si plus tard, vous souhaiterez commercer à nouveau avec {agreement.target.name}, vous pourrez
     renvoyer une demande d'accord commercial.
   </p>
 </div>

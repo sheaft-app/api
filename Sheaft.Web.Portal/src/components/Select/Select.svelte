@@ -15,9 +15,22 @@
   else if (!name) name = id;
 </script>
 
-{#if label && label.length > 0}
-  <label for="{id}">{label} {required ? "*" : ""}</label>
-{/if}
+<div class='flex justify-between'>
+  {#if label}
+    <label class='flex-grow' for='{id}'>{label} {required ? "*" : ""}</label>
+  {/if}
+  <div
+    id='{id}-validation'
+    class='validation-reporter'
+    data-felte-reporter-dom-for='{id}'>
+  </div>
+  <div
+    id='{id}-warning'
+    class='warning-reporter'
+    data-felte-reporter-dom-for='{id}'
+    data-felte-reporter-dom-level='warning'>
+  </div>
+</div>
 <select
   id="{id}"
   name="{name}"
@@ -29,11 +42,3 @@
     <option value="{option.value}">{option.label}</option>
   {/each}
 </select>
-<div id="{id}-validation" class="validation-reporter" data-felte-reporter-dom-for="{id}">
-</div>
-<div
-  id="{id}-warning"
-  class="warning-reporter"
-  data-felte-reporter-dom-for="{id}"
-  data-felte-reporter-dom-level="warning">
-</div>

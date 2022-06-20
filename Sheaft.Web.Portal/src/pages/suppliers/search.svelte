@@ -33,7 +33,7 @@
 
 <PageHeader
   title="{$page.title}"
-  subtitle="Ce sont les producteurs avec lesquels vous n'avez pas encore d'accord commercial"
+  subtitle="Vous pouvez envoyer une demande d'accord commercial aux producteurs ci-dessous"
   previous="{() => module.goToList()}" />
 
 <PageContent isLoading="{isLoading}">
@@ -41,7 +41,7 @@
     <table>
       <thead>
         <tr>
-          <th>Nom</th>
+          <th>Producteur</th>
           <th>Adresse d'expedition</th>
         </tr>
       </thead>

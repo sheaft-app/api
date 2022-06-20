@@ -33,7 +33,7 @@
 
 <PageHeader
   title="{$page.title}"
-  subtitle="Vous pouvez envoyer une demande d'accord commercial avec les magasins ci-dessous"
+  subtitle="Vous pouvez envoyer une demande d'accord commercial aux magasins ci-dessous"
   previous="{() => module.goToList()}" />
 
 <PageContent isLoading="{isLoading}">
@@ -41,7 +41,7 @@
     <table>
       <thead>
         <tr>
-          <th>Nom</th>
+          <th>Magasin</th>
           <th>Adresse de livraison</th>
         </tr>
       </thead>

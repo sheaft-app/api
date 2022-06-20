@@ -37,7 +37,10 @@
 <!-- routify:options index=true -->
 <!-- routify:options title="Ajouter une nouvelle consigne" -->
 
-<PageHeader title="{$page.title}" previous="{() => module.goToList()}" />
+<PageHeader 
+  title="{$page.title}" 
+  previous="{() => module.goToList()}"
+  class='max-w-xl'/>
 
 <form use:form>
   <Returnable data="{data}" disabled="{$isSubmitting}" />

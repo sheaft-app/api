@@ -90,7 +90,8 @@
 <PageHeader
   title="{$page.title}"
   actions="{actions}"
-  previous="{() => module.goToList()}" />
+  previous="{() => module.goToList()}"
+  class='max-w-xl'/>
 
 <form use:form>
   <Returnable data="{data}" disabled="{controlsAreDisabled}" />

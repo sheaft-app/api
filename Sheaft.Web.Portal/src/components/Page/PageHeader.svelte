@@ -21,7 +21,7 @@
   <title>{title}</title>
 </svelte:head>
 
-<div class="flex w-full flex flex-row items-center my-6">
+<div class="flex w-full flex flex-row items-center my-6 {$$props.class}">
   {#if previous}
     <div class="mr-4">
       <a href="#" on:click="{() => navigateTo(previous)}">

@@ -39,6 +39,10 @@ import {
   RevokeAgreementCommand,
   RevokeAgreementHandler
 } from '$components/Agreements/commands/revokeAgreement'
+import {
+  UpdateAgreementDeliveryCommand,
+  UpdateAgreementDeliveryHandler
+} from '$components/Agreements/commands/updateAgreement'
 
 export interface IAgreementModule extends IAppModule {
   goToSearch(): void;
@@ -91,6 +95,10 @@ export class AgreementModule extends AppModule implements IAgreementModule {
 
     this.registerHandler(RevokeAgreementCommand, request =>
       new RevokeAgreementHandler(this._client).handle(request)
+    )
+
+    this.registerHandler(UpdateAgreementDeliveryCommand, request =>
+      new UpdateAgreementDeliveryHandler(this._client).handle(request)
     )
   }
 

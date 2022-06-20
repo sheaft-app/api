@@ -59,7 +59,10 @@
 <!-- routify:options index=true -->
 <!-- routify:options title="Ajouter un nouveau produit" -->
 
-<PageHeader title="{$page.title}" previous="{() => module.goToList()}" />
+<PageHeader 
+  title="{$page.title}" 
+  previous="{() => module.goToList()}"
+  class='max-w-xl'/>
 
 <form use:form>
   <Product data="{data}" disabled="{$isSubmitting}" />

@@ -6,7 +6,7 @@ export class AcceptCustomerAgreementCommand extends Request<Promise<void>> {
   constructor(
     public id: string,
     public deliveryDays: DayOfWeek[],
-    public orderDelayInHoursBeforeDeliveryDay: number
+    public limitOrderHourOffset: number
   ) {
     super();
   }

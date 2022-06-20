@@ -12,6 +12,7 @@ public record AgreementDetailsDto
     public AgreementProfileDto Target { get; set; }
     public AgreementCatalogDto? Catalog { get; set; }
     public IEnumerable<DayOfWeek>? DeliveryDays { get; set; }
+    public int? LimitOrderHourOffset { get; set; }
     public AddressDto DeliveryAddress { get; set; }
     public string OwnerId { get; set; }
     public AgreementOwner Owner { get; set; }

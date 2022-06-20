@@ -10,7 +10,7 @@ declare namespace Components {
     namespace Schemas {
         export interface AcceptCustomerAgreementRequest {
             deliveryDays?: DayOfWeek /* int32 */[] | null;
-            orderDelayInHoursBeforeDeliveryDay?: number; // int32
+            limitOrderHourOffset?: number; // int32
         }
         export interface AcceptOrderRequest {
             newDeliveryDate?: string | null; // date-time
@@ -33,6 +33,7 @@ declare namespace Components {
             target?: AgreementProfileDto;
             catalog?: AgreementCatalogDto;
             deliveryDays?: DayOfWeek /* int32 */[] | null;
+            limitOrderHourOffset?: null | number; // int32
             deliveryAddress?: AddressDto;
             ownerId?: string | null;
             owner?: AgreementOwner /* int32 */;
@@ -48,6 +49,8 @@ declare namespace Components {
             targetName?: string | null;
             ownerId?: string | null;
             owner?: AgreementOwner /* int32 */;
+            deliveryDays?: DayOfWeek /* int32 */[] | null;
+            limitOrderHourOffset?: null | number; // int32
         }
         export interface AgreementDtoPaginatedResults {
             items?: AgreementDto[] | null;
@@ -294,6 +297,10 @@ declare namespace Components {
             refresh_token?: string | null;
             token_type?: string | null;
             expires_in?: number; // int32
+        }
+        export interface UpdateAgreementDeliveryRequest {
+            deliveryDays?: DayOfWeek /* int32 */[] | null;
+            limitOrderHourOffset?: number; // int32
         }
         export interface UpdateBatchRequest {
             number?: string | null;
@@ -905,6 +912,20 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace UpdateAgreementDelivery {
+        namespace Parameters {
+            export type Id = string;
+        }
+        export interface PathParameters {
+            id: Parameters.Id;
+        }
+        export type RequestBody = Components.Schemas.UpdateAgreementDeliveryRequest;
+        namespace Responses {
+            export interface $204 {
+            }
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace UpdateBatch {
         namespace Parameters {
             export type Id = string;
@@ -1240,6 +1261,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetAgreement.Responses.$200>
+  /**
+   * UpdateAgreementDelivery - update agreement delivery
+   */
+  'UpdateAgreementDelivery'(
+    parameters?: Parameters<Paths.UpdateAgreementDelivery.PathParameters> | null,
+    data?: Paths.UpdateAgreementDelivery.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UpdateAgreementDelivery.Responses.$204>
   /**
    * GetAvailableCustomer - Retrieve customer with id
    */
@@ -1728,6 +1757,14 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetAgreement.Responses.$200>
+    /**
+     * UpdateAgreementDelivery - update agreement delivery
+     */
+    'put'(
+      parameters?: Parameters<Paths.UpdateAgreementDelivery.PathParameters> | null,
+      data?: Paths.UpdateAgreementDelivery.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UpdateAgreementDelivery.Responses.$204>
   }
   ['/api/customers/{id}']: {
     /**

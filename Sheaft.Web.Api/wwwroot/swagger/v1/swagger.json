@@ -1421,6 +1421,57 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "UpdateAgreementDelivery"
+        ],
+        "summary": "update agreement delivery",
+        "operationId": "UpdateAgreementDelivery",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgreementDeliveryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgreementDeliveryRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAgreementDeliveryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/customers/{id}": {
@@ -2624,7 +2675,7 @@
             },
             "nullable": true
           },
-          "orderDelayInHoursBeforeDeliveryDay": {
+          "limitOrderHourOffset": {
             "type": "integer",
             "format": "int32"
           }
@@ -2709,6 +2760,11 @@
             },
             "nullable": true
           },
+          "limitOrderHourOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "deliveryAddress": {
             "$ref": "#/components/schemas/AddressDto"
           },
@@ -2759,6 +2815,18 @@
           },
           "owner": {
             "$ref": "#/components/schemas/AgreementOwner"
+          },
+          "deliveryDays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayOfWeek"
+            },
+            "nullable": true
+          },
+          "limitOrderHourOffset": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3714,6 +3782,23 @@
             "nullable": true
           },
           "expires_in": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateAgreementDeliveryRequest": {
+        "type": "object",
+        "properties": {
+          "deliveryDays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DayOfWeek"
+            },
+            "nullable": true
+          },
+          "limitOrderHourOffset": {
             "type": "integer",
             "format": "int32"
           }

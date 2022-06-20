@@ -22,9 +22,9 @@ public class AcceptCustomerAgreement : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] AcceptCustomerAgreementRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new AcceptCustomerAgreementCommand(new AgreementId(id), data.DeliveryDays, data.OrderDelayInHoursBeforeDeliveryDay), token);
+        var result = await Mediator.Execute(new AcceptCustomerAgreementCommand(new AgreementId(id), data.DeliveryDays, data.LimitOrderHourOffset), token);
         return HandleCommandResult(result);
     }
 }
 
-public record AcceptCustomerAgreementRequest(List<DayOfWeek> DeliveryDays, int OrderDelayInHoursBeforeDeliveryDay);
+public record AcceptCustomerAgreementRequest(List<DayOfWeek> DeliveryDays, int LimitOrderHourOffset);

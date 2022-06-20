@@ -34,6 +34,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     Status = (AgreementStatus) agreement.Status,
                     CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
+                    LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
                     DeliveryDays = agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek) d.DayOfWeek),
                     DeliveryAddress = new AddressDto(customer.DeliveryAddressStreet, customer.DeliveryAddressComplement,
                         customer.DeliveryAddressPostcode, customer.DeliveryAddressCity),
@@ -88,6 +89,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
+                    LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
+                    DeliveryDays = agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek) d.DayOfWeek),
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -102,7 +105,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 new PagedResult<AgreementDto>(
                     agreementsResults?
                         .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
-                            p.OwnerId, p.Owner)),
+                            p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
@@ -132,6 +135,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
+                    LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
+                    DeliveryDays = agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek) d.DayOfWeek),
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -146,7 +151,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 new PagedResult<AgreementDto>(
                     agreementsResults?
                         .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
-                            p.OwnerId, p.Owner)),
+                            p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
@@ -176,6 +181,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
+                    LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
+                    DeliveryDays = agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek) d.DayOfWeek),
                     TotalCount = Sql.Ext.Count().Over().ToValue()
                 };
 
@@ -190,7 +197,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 new PagedResult<AgreementDto>(
                     agreementsResults?
                         .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
-                            p.OwnerId, p.Owner)),
+                            p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
     }
