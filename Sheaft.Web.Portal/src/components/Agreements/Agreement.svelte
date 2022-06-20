@@ -180,7 +180,7 @@
         <Button class='bg-accent-600' type='submit' isLoading='{$isSubmitting}' disabled='{$isSubmitting || isLoading}'>Sauvegarder</Button>
       </div>
     </form>
-  {:else}
+  {:else if agreement?.status == AgreementStatus.Active}
     <DeliveryDays
       days={agreement?.deliveryDays}
       disabled='{true}'
