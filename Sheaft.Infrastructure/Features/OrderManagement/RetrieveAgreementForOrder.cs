@@ -22,7 +22,7 @@ public class RetrieveAgreementForOrder : IRetrieveAgreementForOrder
         {
             var agreement = await _context.Set<Agreement>()
                 .SingleOrDefaultAsync(
-                    c => c.SupplierId == supplierIdentifier && c.CustomerId == customerIdentifier,
+                    c => c.SupplierId == supplierIdentifier && c.CustomerId == customerIdentifier && (c.Status == AgreementStatus.Active || c.Status == AgreementStatus.Pending),
                     token);
 
             return agreement?.Status switch

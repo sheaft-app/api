@@ -8,7 +8,7 @@
   import { CreateProductCommand } from "$components/Products/commands/createProduct";
   import { ListReturnablesOptionsQuery } from "$components/Products/queries/listReturnablesOptions";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import type { CreateProductForm } from "$components/Products/types";
+  import type { ProductForm } from "$components/Products/types";
   import { createForm } from "felte";
   import { getFormValidators } from "$components/validate";
   import Product from "$components/Products/Product.svelte";
@@ -19,7 +19,7 @@
   let isLoading = false;
   let returnablesOptions: { label: string; value: string }[] = [];
 
-  const onSubmit = async (values: CreateProductForm): Promise<string> => {
+  const onSubmit = async (values: ProductForm): Promise<string> => {
     return await mediator.send(
       new CreateProductCommand(
         values.name,
@@ -36,7 +36,7 @@
     module.goToDetails(id);
   };
 
-  const { form, data, isSubmitting } = createForm<CreateProductForm>({
+  const { form, data, isSubmitting } = createForm<ProductForm>({
     initialValues: {
       vat: 5.5
     },

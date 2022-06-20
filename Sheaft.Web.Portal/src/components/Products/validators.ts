@@ -1,9 +1,9 @@
 ﻿import { create, enforce, test } from "vest";
-import type { CreateProductForm, UpdateProductForm } from "$components/Products/types";
+import type { ProductForm } from "$components/Products/types";
 
 export const suite = create(
   "product-suite",
-  (data: CreateProductForm | UpdateProductForm) => {
+  (data: ProductForm) => {
     test("name", "Le nom est requis", () => {
       enforce(data.name).isNotEmpty();
     });

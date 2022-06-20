@@ -1077,6 +1077,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/{orderId}':
+    get:
+      tags:
+        - GetOrder
+      summary: Retrieve order with id
+      operationId: GetOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailsDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/agreements:
     get:
       tags:
@@ -1216,6 +1241,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderableProductDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /api/orders:
+    get:
+      tags:
+        - ListOrders
+      summary: List available orders for current user
+      operationId: ListOrders
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDtoPaginatedResults'
         '400':
           description: Bad Request
           content:
@@ -2165,6 +2222,13 @@ components:
             type: string
           nullable: true
       additionalProperties: false
+    DeliveryStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+      type: integer
+      format: int32
     ForgotPasswordRequest:
       type: object
       properties:
@@ -2236,6 +2300,219 @@ components:
           type: string
           nullable: true
         city:
+          type: string
+          nullable: true
+      additionalProperties: false
+    OrderDeliveryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        scheduledAt:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/DeliveryStatus'
+        address:
+          $ref: '#/components/schemas/NamedAddressDto'
+      additionalProperties: false
+    OrderDetailsDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalWholeSalePrice:
+          type: number
+          format: double
+        totalOnSalePrice:
+          type: number
+          format: double
+        totalVatPrice:
+          type: number
+          format: double
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        publishedOn:
+          type: string
+          format: date-time
+          nullable: true
+        acceptedOn:
+          type: string
+          format: date-time
+          nullable: true
+        completedOn:
+          type: string
+          format: date-time
+          nullable: true
+        fulfilledOn:
+          type: string
+          format: date-time
+          nullable: true
+        supplier:
+          $ref: '#/components/schemas/OrderUserDto'
+        customer:
+          $ref: '#/components/schemas/OrderUserDto'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineDto'
+          nullable: true
+        delivery:
+          $ref: '#/components/schemas/OrderDeliveryDto'
+      additionalProperties: false
+    OrderDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        totalWholeSalePrice:
+          type: number
+          format: double
+        totalOnSalePrice:
+          type: number
+          format: double
+        totalVatPrice:
+          type: number
+          format: double
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        publishedOn:
+          type: string
+          format: date-time
+          nullable: true
+        acceptedOn:
+          type: string
+          format: date-time
+          nullable: true
+        completedOn:
+          type: string
+          format: date-time
+          nullable: true
+        fulfilledOn:
+          type: string
+          format: date-time
+          nullable: true
+        deliveryStatus:
+          $ref: '#/components/schemas/DeliveryStatus'
+        deliveryScheduledAt:
+          type: string
+          format: date-time
+          nullable: true
+        targetName:
+          type: string
+          nullable: true
+      additionalProperties: false
+    OrderDtoPaginatedResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDto'
+          nullable: true
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        pageNumber:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+      additionalProperties: false
+    OrderLineDto:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/OrderLineKind'
+        identifier:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+        vat:
+          type: number
+          format: double
+        unitPrice:
+          type: number
+          format: double
+        totalWholeSalePrice:
+          type: number
+          format: double
+        totalVatPrice:
+          type: number
+          format: double
+        totalOnSalePrice:
+          type: number
+          format: double
+      additionalProperties: false
+    OrderLineKind:
+      enum:
+        - 0
+        - 1
+      type: integer
+      format: int32
+    OrderStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      format: int32
+    OrderUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phone:
           type: string
           nullable: true
       additionalProperties: false

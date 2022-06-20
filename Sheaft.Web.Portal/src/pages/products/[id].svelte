@@ -11,7 +11,7 @@
   import { GetProductQuery } from "$components/Products/queries/getProduct";
   import { ListReturnablesOptionsQuery } from "$components/Products/queries/listReturnablesOptions";
   import FormFooter from "$components/Form/FormFooter.svelte";
-  import type { UpdateProductForm } from "$components/Products/types";
+  import type { ProductForm } from '$components/Products/types'
   import { getFormValidators } from "$components/validate";
   import Product from "$components/Products/Product.svelte";
   import { suite } from "$components/Products/validators";
@@ -23,7 +23,7 @@
   let isLoading = false;
   let returnablesOptions: { label: string; value: string }[] = [];
 
-  const onSubmit = async (values: UpdateProductForm): Promise<void> => {
+  const onSubmit = async (values: ProductForm): Promise<void> => {
     return await mediator.send(
       new UpdateProductCommand(
         id,
@@ -41,7 +41,7 @@
     module.goToList();
   };
 
-  const { form, data, isSubmitting, setData } = createForm<UpdateProductForm>({
+  const { form, data, isSubmitting, setData } = createForm<ProductForm>({
     onSubmit,
     onSuccess,
     extend: getFormValidators(suite)
@@ -71,7 +71,7 @@
       isLoading = true;
 
       const product = await mediator.send(new GetProductQuery(id));
-      const productForm = <UpdateProductForm>product;
+      const productForm = <ProductForm>product;
       productForm.hasReturnable = !!product.returnableId;
       setData(productForm);
 

@@ -159,6 +159,7 @@ declare namespace Components {
             quantity?: number; // int32
             batchIdentifiers?: string[] | null;
         }
+        export type DeliveryStatus = 0 | 1 | 2; // int32
         export interface ForgotPasswordRequest {
             email?: string | null;
         }
@@ -186,6 +187,76 @@ declare namespace Components {
             complement?: string | null;
             postcode?: string | null;
             city?: string | null;
+        }
+        export interface OrderDeliveryDto {
+            id?: string | null;
+            scheduledAt?: string; // date-time
+            status?: DeliveryStatus /* int32 */;
+            address?: NamedAddressDto;
+        }
+        export interface OrderDetailsDto {
+            id?: string | null;
+            code?: string | null;
+            status?: OrderStatus /* int32 */;
+            totalWholeSalePrice?: number; // double
+            totalOnSalePrice?: number; // double
+            totalVatPrice?: number; // double
+            createdOn?: string; // date-time
+            updatedOn?: string; // date-time
+            publishedOn?: string | null; // date-time
+            acceptedOn?: string | null; // date-time
+            completedOn?: string | null; // date-time
+            fulfilledOn?: string | null; // date-time
+            supplier?: OrderUserDto;
+            customer?: OrderUserDto;
+            lines?: OrderLineDto[] | null;
+            delivery?: OrderDeliveryDto;
+        }
+        export interface OrderDto {
+            id?: string | null;
+            code?: string | null;
+            status?: OrderStatus /* int32 */;
+            totalWholeSalePrice?: number; // double
+            totalOnSalePrice?: number; // double
+            totalVatPrice?: number; // double
+            createdOn?: string; // date-time
+            updatedOn?: string; // date-time
+            publishedOn?: string | null; // date-time
+            acceptedOn?: string | null; // date-time
+            completedOn?: string | null; // date-time
+            fulfilledOn?: string | null; // date-time
+            deliveryStatus?: DeliveryStatus /* int32 */;
+            deliveryScheduledAt?: string | null; // date-time
+            targetName?: string | null;
+        }
+        export interface OrderDtoPaginatedResults {
+            items?: OrderDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
+        }
+        export interface OrderLineDto {
+            kind?: OrderLineKind /* int32 */;
+            identifier?: string | null;
+            name?: string | null;
+            code?: string | null;
+            quantity?: number; // int32
+            vat?: number; // double
+            unitPrice?: number; // double
+            totalWholeSalePrice?: number; // double
+            totalVatPrice?: number; // double
+            totalOnSalePrice?: number; // double
+        }
+        export type OrderLineKind = 0 | 1; // int32
+        export type OrderStatus = 0 | 1 | 2 | 3 | 4 | 5 | 6; // int32
+        export interface OrderUserDto {
+            id?: string | null;
+            name?: string | null;
+            email?: string | null;
+            phone?: string | null;
         }
         export interface OrderableProductDto {
             id?: string | null;
@@ -655,6 +726,18 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace GetOrder {
+        namespace Parameters {
+            export type OrderId = string;
+        }
+        export interface PathParameters {
+            orderId: Parameters.OrderId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.OrderDetailsDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace GetProduct {
         namespace Parameters {
             export type ProductId = string;
@@ -746,6 +829,20 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.OrderableProductDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListOrders {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type Take = number; // int32
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.OrderDtoPaginatedResults;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -1389,6 +1486,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
   /**
+   * GetOrder - Retrieve order with id
+   */
+  'GetOrder'(
+    parameters?: Parameters<Paths.GetOrder.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetOrder.Responses.$200>
+  /**
    * ListActiveAgreements - List active agreements for current user
    */
   'ListActiveAgreements'(
@@ -1420,6 +1525,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListOrderableProducts.Responses.$200>
+  /**
+   * ListOrders - List available orders for current user
+   */
+  'ListOrders'(
+    parameters?: Parameters<Paths.ListOrders.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListOrders.Responses.$200>
   /**
    * ListReceivedAgreements - List received agreements for current user
    */
@@ -1897,6 +2010,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
   }
+  ['/api/orders/{orderId}']: {
+    /**
+     * GetOrder - Retrieve order with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetOrder.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetOrder.Responses.$200>
+  }
   ['/api/agreements']: {
     /**
      * ListActiveAgreements - List active agreements for current user
@@ -1936,6 +2059,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListOrderableProducts.Responses.$200>
+  }
+  ['/api/orders']: {
+    /**
+     * ListOrders - List available orders for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListOrders.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListOrders.Responses.$200>
   }
   ['/api/agreements/received']: {
     /**

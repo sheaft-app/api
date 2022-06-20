@@ -3,7 +3,8 @@
   value: string;
 };
 
-export type CreateProductForm = {
+export type ProductForm = {
+  id?: string;
   name: string;
   unitPrice: number;
   vat: number;
@@ -11,8 +12,4 @@ export type CreateProductForm = {
   code?: string | null | undefined;
   description?: string | null | undefined;
   returnableId?: string | null | undefined;
-};
-
-export type UpdateProductForm = CreateProductForm & {
-  id: string;
 };

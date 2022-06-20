@@ -12,6 +12,7 @@
   import { registerCustomerModule } from "$components/Customers/module";
   import { registerSupplierModule } from "$components/Suppliers/module";
   import { registerReturnableModule } from "$components/Returnables/module";
+  import { registerOrderModule } from '$components/Orders/module'
 
   onMount(async () => {
     const client = await api.init<Client>();
@@ -25,6 +26,7 @@
     registerAgreementModule(client, authStore);
     registerCustomerModule(client, authStore);
     registerSupplierModule(client, authStore);
+    registerOrderModule(client, authStore);
   });
 </script>
 

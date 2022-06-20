@@ -4,7 +4,7 @@
   import Vat from "$components/Vat/Vat.svelte";
   import { calculateOnSalePrice } from "$utils/money";
   import type { KeyedWritable } from "@felte/common";
-  import type { CreateProductForm, UpdateProductForm } from "$components/Products/types";
+  import type { ProductForm } from "$components/Products/types";
   import Select from "$components/Select/Select.svelte";
   import TextArea from "$components/TextArea/TextArea.svelte";
   import { onMount } from "svelte";
@@ -12,7 +12,7 @@
   import { ListReturnablesOptionsQuery } from "$components/Products/queries/listReturnablesOptions";
   import type { ReturnableOption } from "$components/Products/types";
 
-  export let data: KeyedWritable<CreateProductForm | UpdateProductForm>;
+  export let data: KeyedWritable<ProductForm>;
   export let disabled: boolean;
 
   let isLoading = true;

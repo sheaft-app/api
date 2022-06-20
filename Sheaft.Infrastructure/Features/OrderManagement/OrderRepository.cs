@@ -71,7 +71,7 @@ internal class OrderRepository : Repository<Order, OrderId>, IOrderRepository
         {
             return Result.Success(await Values
                 .SingleOrDefaultAsync(
-                    e => e.CustomerId == customerIdentifier && e.SupplierId == supplierIdentifier,
+                    e => e.CustomerId == customerIdentifier && e.SupplierId == supplierIdentifier && e.Status == OrderStatus.Draft,
                     token) ?? Maybe<Order>.None);
         });
     }
