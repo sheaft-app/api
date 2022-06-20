@@ -5,7 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Web.Api.ProductManagement;
 
-[Route(Routes.PRODUCTS)]
+[Route(Routes.SUPPLIER_PRODUCTS)]
 public class DeleteProduct : Feature
 {
     public DeleteProduct(ISheaftMediator mediator)
@@ -16,13 +16,13 @@ public class DeleteProduct : Feature
     /// <summary>
     /// Remove product with id
     /// </summary>
-    [HttpDelete("{id}", Name = nameof(DeleteProduct))]
+    [HttpDelete("{productId}", Name = nameof(DeleteProduct))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
+    public async Task<ActionResult> Post(string supplierId, string productId, CancellationToken token)
     {
-        var result = await Mediator.Execute(new RemoveProductCommand(new ProductId(id)), token);
+        var result = await Mediator.Execute(new RemoveProductCommand(new ProductId(productId), new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

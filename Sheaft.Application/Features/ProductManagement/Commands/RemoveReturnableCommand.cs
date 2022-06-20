@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record RemoveReturnableCommand(ReturnableId Identifier) : ICommand<Result>;
+public record RemoveReturnableCommand(ReturnableId Identifier, SupplierId SupplierId) : ICommand<Result>;
 
 internal class RemoveReturnableHandler : ICommandHandler<RemoveReturnableCommand, Result>
 {

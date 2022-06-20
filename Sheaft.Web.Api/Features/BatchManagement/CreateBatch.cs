@@ -7,7 +7,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.BatchManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.BATCHES)]
+[Route(Routes.SUPPLIER_BATCHES)]
 public class CreateBatch : Feature
 {
     public CreateBatch(ISheaftMediator mediator)
@@ -22,9 +22,9 @@ public class CreateBatch : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Post([FromBody] CreateBatchRequest data, CancellationToken token)
+    public async Task<ActionResult<string>> Post(string supplierId, CreateBatchRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateBatchCommand(data.Number, data.DateKind,  data.Date, CurrentSupplierId), token);
+        var result = await Mediator.Execute(new CreateBatchCommand(data.Number, data.DateKind,  data.Date, new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

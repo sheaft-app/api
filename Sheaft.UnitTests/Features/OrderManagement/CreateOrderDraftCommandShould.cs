@@ -27,7 +27,7 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.AccountId), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
         var order = context.Orders.Single(c => c.Id == new OrderId(result.Value));
@@ -43,7 +43,7 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.AccountId), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
         var order = context.Orders.Single(c => c.Id == new OrderId(result.Value));
@@ -64,7 +64,7 @@ public class CreateOrderDraftCommandShould
         context.Orders.Add(order);
         context.SaveChanges();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.AccountId), CancellationToken.None);
     
         Assert.IsTrue(result.IsSuccess);
         Assert.AreEqual(order.Id.Value, result.Value);
@@ -78,7 +78,7 @@ public class CreateOrderDraftCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.Id), CancellationToken.None);
+        var result = await handler.Handle(new CreateOrderDraftCommand(supplier.Id, customer.AccountId), CancellationToken.None);
     
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);

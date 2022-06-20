@@ -6,7 +6,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Web.Api.BatchManagement;
 
-[Route(Routes.BATCHES)]
+[Route(Routes.SUPPLIER_BATCHES)]
 public class DeleteBatch : Feature
 {
     public DeleteBatch(ISheaftMediator mediator)
@@ -17,13 +17,13 @@ public class DeleteBatch : Feature
     /// <summary>
     /// Remove a batch
     /// </summary>
-    [HttpDelete("{id}", Name = nameof(DeleteBatch))]
+    [HttpDelete("{batchId}", Name = nameof(DeleteBatch))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
+    public async Task<ActionResult> Post(string supplierId, string batchId, CancellationToken token)
     {
-        var result = await Mediator.Execute(new RemoveBatchCommand(new BatchId(id)), token);
+        var result = await Mediator.Execute(new RemoveBatchCommand(new BatchId(batchId), new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

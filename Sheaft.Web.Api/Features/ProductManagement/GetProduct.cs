@@ -6,7 +6,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.ProductManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.PRODUCTS)]
+[Route(Routes.SUPPLIER_PRODUCTS)]
 public class GetProduct : Feature
 {
     public GetProduct(ISheaftMediator mediator)
@@ -17,13 +17,13 @@ public class GetProduct : Feature
     /// <summary>
     /// Retrieve product with id
     /// </summary>
-    [HttpGet("{id}", Name = nameof(GetProduct))]
+    [HttpGet("{productId}", Name = nameof(GetProduct))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ProductDetailsDto>> Get(string id, CancellationToken token)
+    public async Task<ActionResult<ProductDetailsDto>> Get(string supplierId, string productId, CancellationToken token)
     {
-        var result = await Mediator.Query(new GetProductQuery(new ProductId(id)), token);
+        var result = await Mediator.Query(new GetProductQuery(new ProductId(productId), new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

@@ -80,4 +80,45 @@ internal class ProductQueries : Queries, IProductQueries
                 pageInfo, products?.Key ?? 0));
         });
     }
+
+    public Task<Result<PagedResult<OrderableProductDto>>> ListOrderable(AccountId customerAccountId, SupplierId supplierId, PageInfo pageInfo, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var productsQuery =
+                from agreement in _context.Agreements
+                from supplier in _context.Suppliers.Where(s => s.Id == agreement.SupplierId)
+                from catalog in _context.Catalogs.Where(c => c.Id == agreement.CatalogId)
+                from catalogProduct in _context.CatalogProducts.Where(cp => cp.CatalogId == catalog.Id)
+                from product in _context.Products.Where(p => p.Id == catalogProduct.ProductId)
+                where agreement.Customer.AccountId == customerAccountId.Value 
+                      && (AgreementStatus)agreement.Status == AgreementStatus.Active 
+                      && agreement.SupplierId == supplierId.Value
+                orderby product.Name
+                select new 
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Code = product.Reference,
+                    Vat = product.Vat,
+                    UnitPrice = catalogProduct.UnitPrice,
+                    UpdatedOn = product.UpdatedOn,
+                    SupplierName = supplier.TradeName,
+                    SupplierId = supplier.Id,
+                    TotalCount = Sql.Ext.Count().Over().ToValue()
+                };
+
+            var products = (await productsQuery
+                    .Skip(pageInfo.Skip)
+                    .Take(pageInfo.Take)
+                    .ToListAsync(token))
+                .GroupBy(p => p.TotalCount)
+                .FirstOrDefault();
+            
+            return Result.Success(new PagedResult<OrderableProductDto>(
+                products?.Select(p => 
+                    new OrderableProductDto(p.Id, p.Name, p.Code, p.UnitPrice, p.Vat, p.UpdatedOn, p.SupplierName, p.SupplierId)), 
+                pageInfo, products?.Key ?? 0));
+        });
+    }
 }

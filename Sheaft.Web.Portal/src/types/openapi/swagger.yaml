@@ -239,12 +239,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/batches:
+  '/api/suppliers/{supplierId}/batches':
     post:
       tags:
         - CreateBatch
       summary: Create a batch with specified info
       operationId: CreateBatch
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -319,23 +325,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/orders/drafts:
+  '/api/suppliers/{supplierId}/orders':
     post:
       tags:
         - CreateOrderDraft
       summary: Create a new order draft
       operationId: CreateOrderDraft
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderDraftRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderDraftRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/CreateOrderDraftRequest'
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '201':
           description: Created
@@ -349,12 +350,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/documents/preparation:
+  '/api/documents/{supplierId}/preparation':
     post:
       tags:
         - CreatePreparationDocument
-      summary: Create a preparation document for specfified orders
+      summary: Create a preparation document for specified orders
       operationId: CreatePreparationDocument
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -379,12 +386,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/products:
+  '/api/suppliers/{supplierId}/products':
     post:
       tags:
         - CreateProduct
       summary: Create a product
       operationId: CreateProduct
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -415,6 +428,11 @@ paths:
       summary: List available products for supplier
       operationId: ListProducts
       parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -440,12 +458,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /api/returnables:
+  '/api/suppliers/{supplierId}/returnables':
     post:
       tags:
         - CreateReturnable
       summary: Create a returnable to be used with products
       operationId: CreateReturnable
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -476,6 +500,11 @@ paths:
       summary: List available returnables for supplier
       operationId: ListReturnables
       parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -501,14 +530,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/batches/{id}':
+  '/api/suppliers/{supplierId}/batches/{batchId}':
     delete:
       tags:
         - DeleteBatch
       summary: Remove a batch
       operationId: DeleteBatch
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: batchId
           in: path
           required: true
           schema:
@@ -528,7 +562,12 @@ paths:
       summary: Update a batch
       operationId: UpdateBatch
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: batchId
           in: path
           required: true
           schema:
@@ -553,14 +592,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/products/{id}':
+  '/api/suppliers/{supplierId}/products/{productId}':
     delete:
       tags:
         - DeleteProduct
       summary: Remove product with id
       operationId: DeleteProduct
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
           in: path
           required: true
           schema:
@@ -580,7 +624,12 @@ paths:
       summary: Retrieve product with id
       operationId: GetProduct
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
           in: path
           required: true
           schema:
@@ -604,7 +653,12 @@ paths:
       summary: Update product with id info
       operationId: UpdateProduct
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: productId
           in: path
           required: true
           schema:
@@ -629,14 +683,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/returnables/{id}':
+  '/api/suppliers/{supplierId}/returnables/{returnableId}':
     delete:
       tags:
         - DeleteReturnable
       summary: Remove returnable with id
       operationId: DeleteReturnable
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: returnableId
           in: path
           required: true
           schema:
@@ -656,7 +715,12 @@ paths:
       summary: Retrieve returnable with id
       operationId: GetReturnable
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: returnableId
           in: path
           required: true
           schema:
@@ -680,7 +744,12 @@ paths:
       summary: Remove returnable with id info
       operationId: UpdateReturnable
       parameters:
-        - name: id
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: returnableId
           in: path
           required: true
           schema:
@@ -1116,6 +1185,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/suppliers/{supplierId}/products/orderable':
+    get:
+      tags:
+        - ListOrderableProducts
+      summary: List supplier orderable products for current user
+      operationId: ListOrderableProducts
+      parameters:
+        - name: supplierId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 1
+        - name: take
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderableProductDtoPaginatedResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/agreements/received:
     get:
       tags:
@@ -1286,14 +1392,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  '/api/suppliers/{id}/agreement':
+  '/api/suppliers/{supplierId}/agreement':
     post:
       tags:
         - ProposeAgreementToSupplier
       summary: Send an agreement to supplier
       operationId: ProposeAgreementToSupplier
       parameters:
-        - name: id
+        - name: supplierId
           in: path
           required: true
           schema:
@@ -1921,13 +2027,6 @@ components:
         date:
           $ref: '#/components/schemas/DateOnly'
       additionalProperties: false
-    CreateOrderDraftRequest:
-      type: object
-      properties:
-        supplierIdentifier:
-          type: string
-          nullable: true
-      additionalProperties: false
     CreatePreparationDocumentRequest:
       type: object
       properties:
@@ -2139,6 +2238,61 @@ components:
         city:
           type: string
           nullable: true
+      additionalProperties: false
+    OrderableProductDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
+        updatedOn:
+          type: string
+          format: date-time
+        supplierName:
+          type: string
+          nullable: true
+        supplierId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    OrderableProductDtoPaginatedResults:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderableProductDto'
+          nullable: true
+        next:
+          type: string
+          nullable: true
+        previous:
+          type: string
+          nullable: true
+        pageNumber:
+          type: integer
+          format: int32
+        itemsPerPage:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
       additionalProperties: false
     PaymentKind:
       enum:

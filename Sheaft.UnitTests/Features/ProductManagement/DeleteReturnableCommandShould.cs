@@ -24,7 +24,7 @@ public class DeleteReturnableCommandShould
     {
         var (returnableId, context, handler) = InitHandler();
 
-        var result = await handler.Handle(new RemoveReturnableCommand(returnableId), CancellationToken.None);
+        var result = await handler.Handle(new RemoveReturnableCommand(returnableId, SupplierId.New()), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
         
@@ -37,7 +37,7 @@ public class DeleteReturnableCommandShould
     {
         var (productId, context, handler) = InitHandler();
 
-        var result = await handler.Handle(new RemoveReturnableCommand(ReturnableId.New()), CancellationToken.None);
+        var result = await handler.Handle(new RemoveReturnableCommand(ReturnableId.New(), SupplierId.New()), CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);

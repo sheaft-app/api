@@ -6,4 +6,5 @@ public interface IProductQueries
 {
     Task<Result<ProductDetailsDto>> Get(ProductId identifier, CancellationToken token);
     Task<Result<PagedResult<ProductDto>>> List(SupplierId supplierId, PageInfo pageInfo, CancellationToken token);
+    Task<Result<PagedResult<OrderableProductDto>>> ListOrderable(AccountId customerAccountId, SupplierId supplierId, PageInfo pageInfo, CancellationToken token);
 }

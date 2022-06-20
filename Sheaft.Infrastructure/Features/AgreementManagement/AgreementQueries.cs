@@ -256,7 +256,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
         });
     }
 
-    public Task<Result<PagedResult<AvailableCustomerDto>>> ListAvailableCustomersForSupplier(SupplierId supplierId,
+    public Task<Result<PagedResult<AvailableCustomerDto>>> ListAvailableCustomersForSupplier(AccountId accountId,
         PageInfo pageInfo, CancellationToken token)
     {
         return QueryAsync(async () =>
@@ -264,7 +264,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             var customersQuery =
                 from customer in _context.Customers
                 from agreement in _context.Agreements.LeftJoin(a =>
-                    a.CustomerId == customer.Id && a.SupplierId == supplierId.Value &&
+                    a.CustomerId == customer.Id && a.Supplier.AccountId == accountId.Value &&
                     (a.Status == (int) AgreementStatus.Active || a.Status == (int) AgreementStatus.Pending))
                 where agreement == null
                 group customer by customer.Id
@@ -293,7 +293,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
         });
     }
 
-    public Task<Result<PagedResult<AvailableSupplierDto>>> ListAvailableSuppliersForCustomer(CustomerId customerId,
+    public Task<Result<PagedResult<AvailableSupplierDto>>> ListAvailableSuppliersForCustomer(AccountId accountId,
         PageInfo pageInfo, CancellationToken token)
     {
         return QueryAsync(async () =>
@@ -301,7 +301,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             var suppliersQuery =
                 from supplier in _context.Suppliers
                 from agreement in _context.Agreements.LeftJoin(a =>
-                    a.SupplierId == supplier.Id && a.CustomerId == customerId.Value &&
+                    a.SupplierId == supplier.Id && a.Customer.AccountId == accountId.Value &&
                     (a.Status == (int) AgreementStatus.Active || a.Status == (int) AgreementStatus.Pending))
                 where agreement == null
                 group supplier by supplier.Id

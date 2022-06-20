@@ -6,7 +6,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.ProductManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.RETURNABLES)]
+[Route(Routes.SUPPLIER_RETURNABLES)]
 public class GetReturnable : Feature
 {
     public GetReturnable(ISheaftMediator mediator)
@@ -17,13 +17,13 @@ public class GetReturnable : Feature
     /// <summary>
     /// Retrieve returnable with id
     /// </summary>
-    [HttpGet("{id}", Name = nameof(GetReturnable))]
+    [HttpGet("{returnableId}", Name = nameof(GetReturnable))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ReturnableDto>> Get(string id, CancellationToken token)
+    public async Task<ActionResult<ReturnableDto>> Get(string supplierId, string returnableId, CancellationToken token)
     {
-        var result = await Mediator.Query(new GetReturnableQuery(new ReturnableId(id)), token);
+        var result = await Mediator.Query(new GetReturnableQuery(new ReturnableId(returnableId), new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

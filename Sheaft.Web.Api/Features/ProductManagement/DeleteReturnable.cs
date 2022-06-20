@@ -5,7 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Web.Api.ProductManagement;
 
-[Route(Routes.RETURNABLES)]
+[Route(Routes.SUPPLIER_RETURNABLES)]
 public class DeleteReturnable : Feature
 {
     public DeleteReturnable(ISheaftMediator mediator)
@@ -16,13 +16,13 @@ public class DeleteReturnable : Feature
     /// <summary>
     /// Remove returnable with id
     /// </summary>
-    [HttpDelete("{id}", Name = nameof(DeleteReturnable))]
+    [HttpDelete("{returnableId}", Name = nameof(DeleteReturnable))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, CancellationToken token)
+    public async Task<ActionResult> Post(string supplierId, string returnableId, CancellationToken token)
     {
-        var result = await Mediator.Execute(new RemoveReturnableCommand(new ReturnableId(id)), token);
+        var result = await Mediator.Execute(new RemoveReturnableCommand(new ReturnableId(returnableId), new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

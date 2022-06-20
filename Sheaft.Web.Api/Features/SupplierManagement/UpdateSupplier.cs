@@ -1,9 +1,6 @@
 using Mapster;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
-using Sheaft.Application.AccountManagement;
 using Sheaft.Application.SupplierManagement;
 
 namespace Sheaft.Web.Api.SupplierManagement;
@@ -23,7 +20,7 @@ public class UpdateSupplier : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] SupplierInfoRequest data, CancellationToken token)
+    public async Task<ActionResult> Post(string id, SupplierInfoRequest data, CancellationToken token)
     {
         var result = await Mediator.Execute(data.Adapt<UpdateSupplierCommand>(), token);
         return HandleCommandResult(result);

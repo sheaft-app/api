@@ -26,6 +26,7 @@ import {
   ListReturnablesOptionsHandler,
   ListReturnablesOptionsQuery
 } from "$components/Products/queries/listReturnablesOptions";
+import type { IAuthStore } from '$components/Account/store'
 
 export interface IProductModule extends IAppModule {
   goToList(): void;
@@ -36,33 +37,33 @@ export interface IProductModule extends IAppModule {
 class ProductModule extends AppModule implements IProductModule {
   private _basePath: string = "/products";
 
-  constructor(private _client: Client) {
+  constructor(private _client: Client, private _authStore: IAuthStore) {
     super();
   }
 
   override registerHandlers = () => {
     this.registerHandler(CreateProductCommand, request =>
-      new CreateProductHandler(this._client).handle(request)
+      new CreateProductHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(UpdateProductCommand, request =>
-      new UpdateProductHandler(this._client).handle(request)
+      new UpdateProductHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(RemoveProductCommand, request =>
-      new RemoveProductHandler(this._client).handle(request)
+      new RemoveProductHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(GetProductQuery, request =>
-      new GetProductHandler(this._client).handle(request)
+      new GetProductHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(ListProductsQuery, request =>
-      new ListProductsHandler(this._client).handle(request)
+      new ListProductsHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(ListReturnablesOptionsQuery, request =>
-      new ListReturnablesOptionsHandler(this._client).handle(request)
+      new ListReturnablesOptionsHandler(this._client, this._authStore).handle(request)
     );
   };
 
@@ -90,10 +91,10 @@ export const getProductModule = (goto: GotoHelper): IProductModule => {
   throw "product module was not initialized, call registerProductModule() in App.svelte";
 };
 
-export const registerProductModule = (client: Client): IProductModule => {
+export const registerProductModule = (client: Client, authStore:IAuthStore): IProductModule => {
   if (module) return module;
 
-  module = new ProductModule(client);
+  module = new ProductModule(client, authStore);
   module.registerHandlers();
   return module;
 };

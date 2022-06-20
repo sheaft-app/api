@@ -118,7 +118,7 @@ public class UpdateBatchCommandShould
 
     private UpdateBatchCommand GetCommand(BatchId batchIdentifier, string number, BatchDateKind batchDateKind, DateTime dateTimeOffset)
     {
-        var command = new UpdateBatchCommand(batchIdentifier, number, batchDateKind, DateOnly.FromDateTime(dateTimeOffset));
+        var command = new UpdateBatchCommand(SupplierId.New(), batchIdentifier, number, batchDateKind, DateOnly.FromDateTime(dateTimeOffset));
         return command;
     }
 }

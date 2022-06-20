@@ -124,7 +124,7 @@ public class UpdateProductCommandShould
     private static UpdateProductCommand GetCommand(ProductId identifier, int price = 1200, string? code = null,
         ReturnableId? returnableId = null)
     {
-        var command = new UpdateProductCommand(identifier, "Test", 0, code, "desc", price, returnableId);
+        var command = new UpdateProductCommand(SupplierId.New(), identifier, "Test", 0, code, "desc", price, returnableId);
         return command;
     }
 }

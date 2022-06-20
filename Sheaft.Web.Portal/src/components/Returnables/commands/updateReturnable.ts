@@ -1,5 +1,7 @@
 ﻿import type { Client, Components } from "$types/api";
 import { Request } from "jimmy-js";
+import { get } from 'svelte/store'
+import type { IAuthStore } from '$components/Account/store'
 
 export class UpdateReturnableCommand extends Request<Promise<void>> {
   constructor(
@@ -14,11 +16,12 @@ export class UpdateReturnableCommand extends Request<Promise<void>> {
 }
 
 export class UpdateReturnableHandler {
-  constructor(private _client: Client) {}
+  constructor(private _client: Client, private _authStore:IAuthStore) {}
 
   handle = async (request: UpdateReturnableCommand): Promise<void> => {
     try {
-      await this._client.UpdateReturnable(request.id, request);
+      const profileId = get(this._authStore).account.profile.id;
+      await this._client.UpdateReturnable({ returnableId: request.id, supplierId: profileId}, request);
       return Promise.resolve();
     } catch (exc) {
       console.error(exc);

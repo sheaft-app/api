@@ -3,7 +3,7 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record RemoveProductCommand(ProductId Identifier) : ICommand<Result>;
+public record RemoveProductCommand(ProductId Identifier, SupplierId SupplierId) : ICommand<Result>;
 
 internal class RemoveProductHandler : ICommandHandler<RemoveProductCommand, Result>
 {

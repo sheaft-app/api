@@ -1,5 +1,7 @@
 ﻿import type { Client } from "$types/api";
 import { Request } from "jimmy-js";
+import { get } from 'svelte/store'
+import type { IAuthStore } from '$components/Account/store'
 
 export class UpdateProductCommand extends Request<Promise<void>> {
   constructor(
@@ -16,11 +18,12 @@ export class UpdateProductCommand extends Request<Promise<void>> {
 }
 
 export class UpdateProductHandler {
-  constructor(private _client: Client) {}
+  constructor(private _client: Client, private _authStore:IAuthStore) {}
 
   handle = async (request: UpdateProductCommand): Promise<void> => {
     try {
-      await this._client.UpdateProduct(request.id, request);
+      const profileId = get(this._authStore).account.profile.id;
+      await this._client.UpdateProduct({ productId: request.id, supplierId: profileId}, request);
       return Promise.resolve();
     } catch (exc) {
       console.error(exc);

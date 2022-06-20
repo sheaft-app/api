@@ -113,9 +113,6 @@ declare namespace Components {
             dateKind?: BatchDateKind /* int32 */;
             date?: DateOnly;
         }
-        export interface CreateOrderDraftRequest {
-            supplierIdentifier?: string | null;
-        }
         export interface CreatePreparationDocumentRequest {
             orderIdentifiers?: string[] | null;
             autoAcceptPendingOrders?: boolean | null;
@@ -189,6 +186,25 @@ declare namespace Components {
             complement?: string | null;
             postcode?: string | null;
             city?: string | null;
+        }
+        export interface OrderableProductDto {
+            id?: string | null;
+            name?: string | null;
+            code?: string | null;
+            unitPrice?: number; // double
+            vat?: number; // double
+            updatedOn?: string; // date-time
+            supplierName?: string | null;
+            supplierId?: string | null;
+        }
+        export interface OrderableProductDtoPaginatedResults {
+            items?: OrderableProductDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
         }
         export type PaymentKind = 0 | 1; // int32
         export interface ProblemDetails {
@@ -423,6 +439,12 @@ declare namespace Paths {
         }
     }
     namespace CreateBatch {
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
         export type RequestBody = Components.Schemas.CreateBatchRequest;
         namespace Responses {
             export type $201 = string;
@@ -454,13 +476,24 @@ declare namespace Paths {
         }
     }
     namespace CreateOrderDraft {
-        export type RequestBody = Components.Schemas.CreateOrderDraftRequest;
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
         namespace Responses {
             export type $201 = string;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
     namespace CreatePreparationDocument {
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
         export type RequestBody = Components.Schemas.CreatePreparationDocumentRequest;
         namespace Responses {
             export type $201 = string;
@@ -468,6 +501,12 @@ declare namespace Paths {
         }
     }
     namespace CreateProduct {
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
         export type RequestBody = Components.Schemas.CreateProductRequest;
         namespace Responses {
             export type $201 = string;
@@ -475,6 +514,12 @@ declare namespace Paths {
         }
     }
     namespace CreateReturnable {
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
         export type RequestBody = Components.Schemas.CreateReturnableRequest;
         namespace Responses {
             export type $201 = string;
@@ -483,10 +528,12 @@ declare namespace Paths {
     }
     namespace DeleteBatch {
         namespace Parameters {
-            export type Id = string;
+            export type BatchId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            batchId: Parameters.BatchId;
         }
         namespace Responses {
             export interface $204 {
@@ -496,10 +543,12 @@ declare namespace Paths {
     }
     namespace DeleteProduct {
         namespace Parameters {
-            export type Id = string;
+            export type ProductId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            productId: Parameters.ProductId;
         }
         namespace Responses {
             export interface $204 {
@@ -509,10 +558,12 @@ declare namespace Paths {
     }
     namespace DeleteReturnable {
         namespace Parameters {
-            export type Id = string;
+            export type ReturnableId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            returnableId: Parameters.ReturnableId;
         }
         namespace Responses {
             export interface $204 {
@@ -606,10 +657,12 @@ declare namespace Paths {
     }
     namespace GetProduct {
         namespace Parameters {
-            export type Id = string;
+            export type ProductId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            productId: Parameters.ProductId;
         }
         namespace Responses {
             export type $200 = Components.Schemas.ProductDetailsDto;
@@ -618,10 +671,12 @@ declare namespace Paths {
     }
     namespace GetReturnable {
         namespace Parameters {
-            export type Id = string;
+            export type ReturnableId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            returnableId: Parameters.ReturnableId;
         }
         namespace Responses {
             export type $200 = Components.Schemas.ReturnableDto;
@@ -676,10 +731,32 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace ListOrderableProducts {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type SupplierId = string;
+            export type Take = number; // int32
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.OrderableProductDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace ListProducts {
         namespace Parameters {
             export type Page = number; // int32
+            export type SupplierId = string;
             export type Take = number; // int32
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
         }
         export interface QueryParameters {
             page?: Parameters.Page /* int32 */;
@@ -709,7 +786,11 @@ declare namespace Paths {
     namespace ListReturnables {
         namespace Parameters {
             export type Page = number; // int32
+            export type SupplierId = string;
             export type Take = number; // int32
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
         }
         export interface QueryParameters {
             page?: Parameters.Page /* int32 */;
@@ -772,10 +853,10 @@ declare namespace Paths {
     }
     namespace ProposeAgreementToSupplier {
         namespace Parameters {
-            export type Id = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
         }
         namespace Responses {
             export type $201 = string;
@@ -928,10 +1009,12 @@ declare namespace Paths {
     }
     namespace UpdateBatch {
         namespace Parameters {
-            export type Id = string;
+            export type BatchId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            batchId: Parameters.BatchId;
         }
         export type RequestBody = Components.Schemas.UpdateBatchRequest;
         namespace Responses {
@@ -970,10 +1053,12 @@ declare namespace Paths {
     }
     namespace UpdateProduct {
         namespace Parameters {
-            export type Id = string;
+            export type ProductId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            productId: Parameters.ProductId;
         }
         export type RequestBody = Components.Schemas.UpdateProductRequest;
         namespace Responses {
@@ -984,10 +1069,12 @@ declare namespace Paths {
     }
     namespace UpdateReturnable {
         namespace Parameters {
-            export type Id = string;
+            export type ReturnableId = string;
+            export type SupplierId = string;
         }
         export interface PathParameters {
-            id: Parameters.Id;
+            supplierId: Parameters.SupplierId;
+            returnableId: Parameters.ReturnableId;
         }
         export type RequestBody = Components.Schemas.UpdateReturnableRequest;
         namespace Responses {
@@ -1081,7 +1168,7 @@ export interface OperationMethods {
    * CreateBatch - Create a batch with specified info
    */
   'CreateBatch'(
-    parameters?: Parameters<UnknownParamsObject> | null,
+    parameters?: Parameters<Paths.CreateBatch.PathParameters> | null,
     data?: Paths.CreateBatch.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateBatch.Responses.$201>
@@ -1105,15 +1192,15 @@ export interface OperationMethods {
    * CreateOrderDraft - Create a new order draft
    */
   'CreateOrderDraft'(
-    parameters?: Parameters<UnknownParamsObject> | null,
-    data?: Paths.CreateOrderDraft.RequestBody,
+    parameters?: Parameters<Paths.CreateOrderDraft.PathParameters> | null,
+    data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateOrderDraft.Responses.$201>
   /**
-   * CreatePreparationDocument - Create a preparation document for specfified orders
+   * CreatePreparationDocument - Create a preparation document for specified orders
    */
   'CreatePreparationDocument'(
-    parameters?: Parameters<UnknownParamsObject> | null,
+    parameters?: Parameters<Paths.CreatePreparationDocument.PathParameters> | null,
     data?: Paths.CreatePreparationDocument.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreatePreparationDocument.Responses.$201>
@@ -1121,7 +1208,7 @@ export interface OperationMethods {
    * ListProducts - List available products for supplier
    */
   'ListProducts'(
-    parameters?: Parameters<Paths.ListProducts.QueryParameters> | null,
+    parameters?: Parameters<Paths.ListProducts.PathParameters & Paths.ListProducts.QueryParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListProducts.Responses.$200>
@@ -1129,7 +1216,7 @@ export interface OperationMethods {
    * CreateProduct - Create a product
    */
   'CreateProduct'(
-    parameters?: Parameters<UnknownParamsObject> | null,
+    parameters?: Parameters<Paths.CreateProduct.PathParameters> | null,
     data?: Paths.CreateProduct.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateProduct.Responses.$201>
@@ -1137,7 +1224,7 @@ export interface OperationMethods {
    * ListReturnables - List available returnables for supplier
    */
   'ListReturnables'(
-    parameters?: Parameters<Paths.ListReturnables.QueryParameters> | null,
+    parameters?: Parameters<Paths.ListReturnables.PathParameters & Paths.ListReturnables.QueryParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListReturnables.Responses.$200>
@@ -1145,7 +1232,7 @@ export interface OperationMethods {
    * CreateReturnable - Create a returnable to be used with products
    */
   'CreateReturnable'(
-    parameters?: Parameters<UnknownParamsObject> | null,
+    parameters?: Parameters<Paths.CreateReturnable.PathParameters> | null,
     data?: Paths.CreateReturnable.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateReturnable.Responses.$201>
@@ -1325,6 +1412,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
+  /**
+   * ListOrderableProducts - List supplier orderable products for current user
+   */
+  'ListOrderableProducts'(
+    parameters?: Parameters<Paths.ListOrderableProducts.PathParameters & Paths.ListOrderableProducts.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListOrderableProducts.Responses.$200>
   /**
    * ListReceivedAgreements - List received agreements for current user
    */
@@ -1544,12 +1639,12 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ConfigureAccountAsSupplier.Responses.$200>
   }
-  ['/api/batches']: {
+  ['/api/suppliers/{supplierId}/batches']: {
     /**
      * CreateBatch - Create a batch with specified info
      */
     'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
+      parameters?: Parameters<Paths.CreateBatch.PathParameters> | null,
       data?: Paths.CreateBatch.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateBatch.Responses.$201>
@@ -1574,32 +1669,32 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateInvoiceForDelivery.Responses.$201>
   }
-  ['/api/orders/drafts']: {
+  ['/api/suppliers/{supplierId}/orders']: {
     /**
      * CreateOrderDraft - Create a new order draft
      */
     'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: Paths.CreateOrderDraft.RequestBody,
+      parameters?: Parameters<Paths.CreateOrderDraft.PathParameters> | null,
+      data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateOrderDraft.Responses.$201>
   }
-  ['/api/documents/preparation']: {
+  ['/api/documents/{supplierId}/preparation']: {
     /**
-     * CreatePreparationDocument - Create a preparation document for specfified orders
+     * CreatePreparationDocument - Create a preparation document for specified orders
      */
     'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
+      parameters?: Parameters<Paths.CreatePreparationDocument.PathParameters> | null,
       data?: Paths.CreatePreparationDocument.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreatePreparationDocument.Responses.$201>
   }
-  ['/api/products']: {
+  ['/api/suppliers/{supplierId}/products']: {
     /**
      * CreateProduct - Create a product
      */
     'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
+      parameters?: Parameters<Paths.CreateProduct.PathParameters> | null,
       data?: Paths.CreateProduct.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateProduct.Responses.$201>
@@ -1607,17 +1702,17 @@ export interface PathsDictionary {
      * ListProducts - List available products for supplier
      */
     'get'(
-      parameters?: Parameters<Paths.ListProducts.QueryParameters> | null,
+      parameters?: Parameters<Paths.ListProducts.PathParameters & Paths.ListProducts.QueryParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListProducts.Responses.$200>
   }
-  ['/api/returnables']: {
+  ['/api/suppliers/{supplierId}/returnables']: {
     /**
      * CreateReturnable - Create a returnable to be used with products
      */
     'post'(
-      parameters?: Parameters<UnknownParamsObject> | null,
+      parameters?: Parameters<Paths.CreateReturnable.PathParameters> | null,
       data?: Paths.CreateReturnable.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateReturnable.Responses.$201>
@@ -1625,12 +1720,12 @@ export interface PathsDictionary {
      * ListReturnables - List available returnables for supplier
      */
     'get'(
-      parameters?: Parameters<Paths.ListReturnables.QueryParameters> | null,
+      parameters?: Parameters<Paths.ListReturnables.PathParameters & Paths.ListReturnables.QueryParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListReturnables.Responses.$200>
   }
-  ['/api/batches/{id}']: {
+  ['/api/suppliers/{supplierId}/batches/{batchId}']: {
     /**
      * DeleteBatch - Remove a batch
      */
@@ -1648,7 +1743,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UpdateBatch.Responses.$200>
   }
-  ['/api/products/{id}']: {
+  ['/api/suppliers/{supplierId}/products/{productId}']: {
     /**
      * DeleteProduct - Remove product with id
      */
@@ -1674,7 +1769,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UpdateProduct.Responses.$204>
   }
-  ['/api/returnables/{id}']: {
+  ['/api/suppliers/{supplierId}/returnables/{returnableId}']: {
     /**
      * DeleteReturnable - Remove returnable with id
      */
@@ -1832,6 +1927,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ListAvailableSuppliers.Responses.$200>
   }
+  ['/api/suppliers/{supplierId}/products/orderable']: {
+    /**
+     * ListOrderableProducts - List supplier orderable products for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListOrderableProducts.PathParameters & Paths.ListOrderableProducts.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListOrderableProducts.Responses.$200>
+  }
   ['/api/agreements/received']: {
     /**
      * ListReceivedAgreements - List received agreements for current user
@@ -1882,7 +1987,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.ProposeAgreementToCustomer.Responses.$201>
   }
-  ['/api/suppliers/{id}/agreement']: {
+  ['/api/suppliers/{supplierId}/agreement']: {
     /**
      * ProposeAgreementToSupplier - Send an agreement to supplier
      */

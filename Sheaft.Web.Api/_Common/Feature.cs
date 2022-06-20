@@ -17,14 +17,6 @@ public class Feature : ControllerBase
     protected AccountId? CurrentAccountId => HttpContext.User.Identity?.IsAuthenticated == true 
         ? new AccountId(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)) 
         : null;
-    
-    protected SupplierId? CurrentSupplierId => HttpContext.User.Identity?.IsAuthenticated == true 
-        ? new SupplierId(HttpContext.User.FindFirstValue(CustomClaims.ProfileIdentifier)) 
-        : null;
-    
-    protected CustomerId? CurrentCustomerId => HttpContext.User.Identity?.IsAuthenticated == true 
-        ? new CustomerId(HttpContext.User.FindFirstValue(CustomClaims.ProfileIdentifier)) 
-        : null;
 
     public Feature(ISheaftMediator mediator)
     {

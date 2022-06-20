@@ -3,7 +3,7 @@ using Sheaft.Domain.BatchManagement;
 
 namespace Sheaft.Application.BatchManagement;
 
-public record RemoveBatchCommand(BatchId BatchIdentifier) : ICommand<Result>;
+public record RemoveBatchCommand(BatchId BatchIdentifier, SupplierId SupplierId) : ICommand<Result>;
 
 internal class RemoveBatchHandler : ICommandHandler<RemoveBatchCommand, Result>
 {

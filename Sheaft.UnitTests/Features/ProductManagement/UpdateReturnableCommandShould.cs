@@ -69,7 +69,7 @@ public class UpdateReturnableCommandShould
 
     private UpdateReturnableCommand GetCommand(ReturnableId returnableId, int price = 1200, string? code = "Code")
     {
-        var command = new UpdateReturnableCommand(returnableId, "Test", code, price, 0);
+        var command = new UpdateReturnableCommand(SupplierId.New(), returnableId, "Test", code, price, 0);
         return command;
     }
 }

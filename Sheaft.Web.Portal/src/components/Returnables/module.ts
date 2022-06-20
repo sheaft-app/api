@@ -22,6 +22,7 @@ import {
   ListReturnablesHandler,
   ListReturnablesQuery
 } from "$components/Returnables/queries/listReturnables";
+import type { IAuthStore } from '$components/Account/store'
 
 export interface IReturnableModule extends IAppModule {
   goToList(): void;
@@ -32,29 +33,29 @@ export interface IReturnableModule extends IAppModule {
 class ReturnableModule extends AppModule implements IReturnableModule {
   private _basePath: string = "/returnables";
 
-  constructor(private _client: Client) {
+  constructor(private _client: Client, private _authStore: IAuthStore) {
     super();
   }
 
   override registerHandlers = () => {
     this.registerHandler(CreateReturnableCommand, request =>
-      new CreateReturnableHandler(this._client).handle(request)
+      new CreateReturnableHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(UpdateReturnableCommand, request =>
-      new UpdateReturnableHandler(this._client).handle(request)
+      new UpdateReturnableHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(RemoveReturnableCommand, request =>
-      new RemoveReturnableHandler(this._client).handle(request)
+      new RemoveReturnableHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(GetReturnableQuery, request =>
-      new GetReturnableHandler(this._client).handle(request)
+      new GetReturnableHandler(this._client, this._authStore).handle(request)
     );
 
     this.registerHandler(ListReturnablesQuery, request =>
-      new ListReturnablesHandler(this._client).handle(request)
+      new ListReturnablesHandler(this._client, this._authStore).handle(request)
     );
   };
 
@@ -82,10 +83,10 @@ export const getReturnableModule = (goto: GotoHelper): IReturnableModule => {
   throw "returnable module was not initialized, call registerReturnableModule() in App.svelte";
 };
 
-export const registerReturnableModule = (client: Client): IReturnableModule => {
+export const registerReturnableModule = (client: Client, authStore:IAuthStore): IReturnableModule => {
   if (module) return module;
 
-  module = new ReturnableModule(client);
+  module = new ReturnableModule(client, authStore);
   module.registerHandlers();
   return module;
 };

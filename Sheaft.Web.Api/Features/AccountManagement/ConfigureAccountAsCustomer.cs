@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Sheaft.Application;
-using Sheaft.Application.Models;
 using Sheaft.Application.CustomerManagement;
 
-namespace Sheaft.Web.Api.CustomerManagement;
+namespace Sheaft.Web.Api.AccountManagement;
 
 #pragma warning disable CS8604
 [Route(Routes.ACCOUNT)]
@@ -31,6 +30,3 @@ public class ConfigureAccountAsCustomer : Feature
         return HandleCommandResult(result);
     }
 }
-
-public record CustomerInfoRequest(string TradeName, string CorporateName, string Siret, string Email, string Phone,
-    AddressDto LegalAddress, NamedAddressDto? DeliveryAddress, NamedAddressDto? BillingAddress);

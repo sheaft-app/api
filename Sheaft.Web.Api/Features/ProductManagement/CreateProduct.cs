@@ -6,7 +6,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.ProductManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.PRODUCTS)]
+[Route(Routes.SUPPLIER_PRODUCTS)]
 public class CreateProduct : Feature
 {
     public CreateProduct(ISheaftMediator mediator)
@@ -21,13 +21,13 @@ public class CreateProduct : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Post([FromBody] CreateProductRequest data, CancellationToken token)
+    public async Task<ActionResult<string>> Post(string supplierId, CreateProductRequest data, CancellationToken token)
     {
         var result =
             await Mediator.Execute(
                 new CreateProductCommand(data.Name, data.Code, data.Description, data.UnitPrice, data.Vat,
                     data.ReturnableId != null ? new ReturnableId(data.ReturnableId) : null,
-                    CurrentSupplierId), token);
+                    new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

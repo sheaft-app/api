@@ -102,7 +102,7 @@ public class DeleteBatchCommandShould
 
     private RemoveBatchCommand GetCommand(BatchId batchIdentifier)
     {
-        var command = new RemoveBatchCommand(batchIdentifier);
+        var command = new RemoveBatchCommand(batchIdentifier, SupplierId.New());
         return command;
     }
 }

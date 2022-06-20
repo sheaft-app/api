@@ -3,7 +3,8 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record UpdateReturnableCommand(ReturnableId Identifier, string Name, string Code, decimal Price, decimal Vat) : ICommand<Result>;
+public record UpdateReturnableCommand(SupplierId SupplierId, ReturnableId Identifier, string Name, string Code,
+    decimal Price, decimal Vat) : ICommand<Result>;
 
 internal class UpdateReturnableHandler : ICommandHandler<UpdateReturnableCommand, Result>
 {

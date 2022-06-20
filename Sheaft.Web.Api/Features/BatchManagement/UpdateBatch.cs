@@ -6,7 +6,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Web.Api.BatchManagement;
 
-[Route(Routes.BATCHES)]
+[Route(Routes.SUPPLIER_BATCHES)]
 public class UpdateBatch : Feature
 {
     public UpdateBatch(ISheaftMediator mediator)
@@ -17,13 +17,13 @@ public class UpdateBatch : Feature
     /// <summary>
     /// Update a batch
     /// </summary>
-    [HttpPut("{id}", Name = nameof(UpdateBatch))]
+    [HttpPut("{batchId}", Name = nameof(UpdateBatch))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Post([FromRoute] string id, [FromBody] UpdateBatchRequest data, CancellationToken token)
+    public async Task<ActionResult> Post(string supplierId, string batchId, UpdateBatchRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new UpdateBatchCommand(new BatchId(id), data.Number, data.DateKind,  data.Date), token);
+        var result = await Mediator.Execute(new UpdateBatchCommand(new SupplierId(supplierId), new BatchId(batchId), data.Number, data.DateKind,  data.Date), token);
         return HandleCommandResult(result);
     }
 }

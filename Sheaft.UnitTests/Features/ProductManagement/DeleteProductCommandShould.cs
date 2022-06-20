@@ -24,7 +24,7 @@ public class DeleteProductCommandShould
     {
         var (productId, context, handler) = InitHandler();
 
-        var result = await handler.Handle(new RemoveProductCommand(productId), CancellationToken.None);
+        var result = await handler.Handle(new RemoveProductCommand(productId, SupplierId.New()), CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
         var product = context.Products.SingleOrDefault(s => s.Id == productId);
@@ -41,7 +41,7 @@ public class DeleteProductCommandShould
     {
         var (productId, context, handler) = InitHandler();
 
-        var result = await handler.Handle(new RemoveProductCommand(ProductId.New()), CancellationToken.None);
+        var result = await handler.Handle(new RemoveProductCommand(ProductId.New(), SupplierId.New()), CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.NotFound, result.Error.Kind);

@@ -3,7 +3,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.CustomerManagement;
 
-public record ListAvailableCustomersQuery(SupplierId SupplierId, PageInfo PageInfo) : IQuery<Result<PagedResult<AvailableCustomerDto>>>;
+public record ListAvailableCustomersQuery(AccountId AccountId, PageInfo PageInfo) : IQuery<Result<PagedResult<AvailableCustomerDto>>>;
 
 internal class ListAvailableCustomersHandler : IQueryHandler<ListAvailableCustomersQuery, Result<PagedResult<AvailableCustomerDto>>>
 {
@@ -16,6 +16,6 @@ internal class ListAvailableCustomersHandler : IQueryHandler<ListAvailableCustom
     
     public async Task<Result<PagedResult<AvailableCustomerDto>>> Handle(ListAvailableCustomersQuery request, CancellationToken token)
     {
-        return await _agreementQueries.ListAvailableCustomersForSupplier(request.SupplierId, request.PageInfo, token);
+        return await _agreementQueries.ListAvailableCustomersForSupplier(request.AccountId, request.PageInfo, token);
     }
 }

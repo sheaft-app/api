@@ -17,13 +17,13 @@ public class ProposeAgreementToSupplier : Feature
     /// <summary>
     /// Send an agreement to supplier
     /// </summary>
-    [HttpPost("{id}/agreement", Name = nameof(ProposeAgreementToSupplier))]
+    [HttpPost("{supplierId}/agreement", Name = nameof(ProposeAgreementToSupplier))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Post([FromRoute] string id, CancellationToken token)
+    public async Task<ActionResult<string>> Post(string supplierId, CancellationToken token)
     {
-        var result = await Mediator.Execute(new ProposeAgreementToSupplierCommand(new SupplierId(id), CurrentAccountId), token);
+        var result = await Mediator.Execute(new ProposeAgreementToSupplierCommand(new SupplierId(supplierId), CurrentAccountId), token);
         return HandleCommandResult(result);
     }
 }

@@ -6,7 +6,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.OrderManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.ORDERS)]
+[Route(Routes.SUPPLIERS)]
 public class CreateOrderDraft : Feature
 {
     public CreateOrderDraft(ISheaftMediator mediator)
@@ -17,17 +17,15 @@ public class CreateOrderDraft : Feature
     /// <summary>
     /// Create a new order draft
     /// </summary>
-    [HttpPost("drafts", Name = nameof(CreateOrderDraft))]
+    [HttpPost("{supplierId}/orders", Name = nameof(CreateOrderDraft))]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<string>> Post([FromBody] CreateOrderDraftRequest data, CancellationToken token)
+    public async Task<ActionResult<string>> Post(string supplierId, CancellationToken token)
     {
         var result =
             await Mediator.Execute(
-                new CreateOrderDraftCommand(new SupplierId(data.SupplierIdentifier), CurrentCustomerId), token);
+                new CreateOrderDraftCommand(new SupplierId(supplierId), CurrentAccountId), token);
         return HandleCommandResult(result);
     }
 }
-
-public record CreateOrderDraftRequest(string SupplierIdentifier);

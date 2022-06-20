@@ -19,8 +19,8 @@
 
     await authStore.startMonitorUserAccessToken();
 
-    registerProductModule(client);
-    registerReturnableModule(client);
+    registerProductModule(client, authStore);
+    registerReturnableModule(client, authStore);
     registerAccountModule(client, authStore);
     registerAgreementModule(client, authStore);
     registerCustomerModule(client, authStore);

@@ -6,7 +6,7 @@ using Sheaft.Domain;
 namespace Sheaft.Web.Api.ProductManagement;
 
 #pragma warning disable CS8604
-[Route(Routes.PRODUCTS)]
+[Route(Routes.SUPPLIER_PRODUCTS)]
 public class ListProducts : Feature
 {
     public ListProducts(ISheaftMediator mediator)
@@ -21,9 +21,9 @@ public class ListProducts : Feature
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<PaginatedResults<ProductDto>>> List(CancellationToken token, int? page = 1, int? take = 10)
+    public async Task<ActionResult<PaginatedResults<ProductDto>>> List(string supplierId, CancellationToken token, int? page = 1, int? take = 10)
     {
-        var result = await Mediator.Query(new ListProductsQuery(CurrentSupplierId, PageInfo.From(page, take)), token);
+        var result = await Mediator.Query(new ListProductsQuery(new SupplierId(supplierId), PageInfo.From(page, take)), token);
         return HandleQueryResult(result);
     }
 }
