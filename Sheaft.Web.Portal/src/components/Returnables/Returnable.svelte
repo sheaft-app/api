@@ -26,22 +26,19 @@
   label="Nom"
   bind:value="{$data.name}"
   placeholder="Le nom de votre consigne"
-  disabled="{disabled}"
-/>
+  disabled="{disabled}" />
 <Input
   id="unitPrice"
   label="Prix HT"
   bind:value="{$data.unitPrice}"
   placeholder="Prix HT de votre consigne en €"
-  disabled="{disabled}"
-/>
+  disabled="{disabled}" />
 <Checkbox
   id="hasVat"
   label="Je facture la TVA pour cette consigne"
   disabled="{disabled}"
   bind:value="{$data.hasVat}"
-  class="my-3"
-/>
+  class="my-3" />
 {#if $data.hasVat}
   <Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{disabled}" />
   <Input
@@ -50,6 +47,5 @@
     label="Prix TTC (calculé)"
     value="{onSalePrice}"
     disabled="{true}"
-    required="{false}"
-  />
+    required="{false}" />
 {/if}

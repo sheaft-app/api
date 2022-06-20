@@ -20,8 +20,7 @@
     bind:checked="{value}"
     disabled="{disabled}"
     required="{required}"
-    class="{$$props.class} w-4 h-4 m-1"
-  />
+    class="{$$props.class} w-4 h-4 m-1" />
   {#if label}
     {label}
     {required ? "*" : ""}

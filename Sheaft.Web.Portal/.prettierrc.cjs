@@ -8,7 +8,8 @@
   semi: true,
   svelteSortOrder: "options-scripts-markup-styles",
   svelteStrictMode: true,
-  svelteBracketNewLine: true,
+  bracketSameLine: true,
   svelteIndentScriptAndStyle: true,
-  trailingComma: "none"
+  trailingComma: "none",
+  singleAttributePerLine:true
 }

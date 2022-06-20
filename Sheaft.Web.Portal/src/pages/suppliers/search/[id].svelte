@@ -65,7 +65,6 @@
 <PageHeader
   title="{$page.title}"
   previous="{() => module.goToSuppliers()}"
-  actions="{actions}"
-/>
+  actions="{actions}" />
 
 <AvailableProfile profile="{supplier}" />

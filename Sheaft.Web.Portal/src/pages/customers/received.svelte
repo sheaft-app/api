@@ -35,12 +35,10 @@
 <PageHeader
   title="{$page.title}"
   subtitle="Toutes les demandes en attente de votre acceptation, sont listées ci-dessous"
-  previous="{() => module.goToCustomers()}"
-/>
+  previous="{() => module.goToCustomers()}" />
 <PageContent isLoading="{isLoading}">
   <Agreements
     agreements="{agreements}"
     module="{module}"
-    noResultsMessage="Aucun accord commercial reçu en attente"
-  />
+    noResultsMessage="Aucun accord commercial reçu en attente" />
 </PageContent>

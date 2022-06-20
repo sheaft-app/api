@@ -2,8 +2,7 @@
   import { getContext } from "svelte";
   import Button from "$components/Button/Button.svelte";
   import { address } from "$utils/address";
-  import type { IModalResult } from "$components/Modal/modal";
-  import { ModalResult } from "$components/Modal/modal";
+  import { type IModalResult, ModalResult } from "$components/Modal/modal";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
   import { ProposeAgreementToSupplierCommand } from "$components/Suppliers/commands/proposeAgreementToSupplier";

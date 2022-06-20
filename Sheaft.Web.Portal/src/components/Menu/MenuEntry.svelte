@@ -22,8 +22,7 @@
   class="menu-entry cursor-pointer mx-4 p-3 rounded-xl"
   class:active="{isEntryActive}"
   class:has-parent="{entry.parent}"
-  on:click="{() => navigate(entry.path)}"
->
+  on:click="{() => navigate(entry.path)}">
   <span class:flex="{!entry.parent}" class:items-center="{!entry.parent}">
     {#if !entry.parent}
       {#if entry.icon}

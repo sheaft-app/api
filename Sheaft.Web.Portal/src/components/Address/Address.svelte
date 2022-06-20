@@ -27,8 +27,7 @@
   <fieldset class="my-4">
     {#if label}
       <label class="block mb-2 text-sm font-medium text-gray-700 "
-        >{label} {required ? "*" : ""}</label
-      >
+        >{label} {required ? "*" : ""}</label>
     {/if}
 
     <Input
@@ -36,31 +35,27 @@
       disabled="{disabled}"
       placeholder="Adresse"
       bind:value="{value.street}"
-      required="{required}"
-    />
+      required="{required}" />
     <Input
       id="{id}.complement"
       type="text"
       disabled="{disabled}"
       required="{false}"
       placeholder="Complément d'adresse"
-      bind:value="{value.complement}"
-    />
+      bind:value="{value.complement}" />
     <Input
       id="{id}.postcode"
       type="text"
       disabled="{disabled}"
       placeholder="Code postal"
       bind:value="{value.postcode}"
-      required="{required}"
-    />
+      required="{required}" />
     <Input
       id="{id}.city"
       type="text"
       disabled="{disabled}"
       placeholder="Ville"
       bind:value="{value.city}"
-      required="{required}"
-    />
+      required="{required}" />
   </fieldset>
 {/if}

@@ -30,52 +30,45 @@
     options="{accountTypeOptions}"
     disabled="{$isSubmitting}"
     bind:value="{$data.accountType}"
-    class="mb-6"
-  />
+    class="mb-6" />
   <Input
     id="tradeName"
     label="Nom commercial"
     disabled="{$isSubmitting}"
     bind:value="{$data.tradeName}"
-    placeholder="ex: Dupont & Fils"
-  />
+    placeholder="ex: Dupont & Fils" />
   <Input
     id="corporateName"
     label="Dénomination légale"
     disabled="{$isSubmitting}"
     bind:value="{$data.corporateName}"
-    placeholder="ex: SARL Dupont"
-  />
+    placeholder="ex: SARL Dupont" />
   <Input
     id="siret"
     label="SIRET"
     disabled="{$isSubmitting}"
     bind:value="{$data.siret}"
-    placeholder="Votre numéro de SIRET (14 chiffres)"
-  />
+    placeholder="Votre numéro de SIRET (14 chiffres)" />
   <Input
     id="email"
     type="email"
     label="Mail de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.email}"
-    placeholder="Votre adresse mail"
-  />
+    placeholder="Votre adresse mail" />
   <Input
     id="phone"
     type="tel"
     label="Téléphone de contact"
     disabled="{$isSubmitting}"
     bind:value="{$data.phone}"
-    placeholder="Votre numéro de téléphone"
-  />
+    placeholder="Votre numéro de téléphone" />
   <FormFooter>
     <Button
       class="back w-full mx-8"
       disabled="{$isSubmitting}"
       type="button"
-      on:click="{() => onBack($data)}"
-    >
+      on:click="{() => onBack($data)}">
       Annuler
     </Button>
     <Button class="accent w-full mx-8" isLoading="{$isSubmitting}" type="submit"

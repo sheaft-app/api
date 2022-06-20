@@ -37,8 +37,7 @@
       class:active="{isGroupActive}"
       class:subactive="{isGroupSubActive}"
       class:cursor-pointer="{defaultPage}"
-      on:click="{() => navigate(defaultPage?.path)}"
-    >
+      on:click="{() => navigate(defaultPage?.path)}">
       {#if entry.icon}
         <div class="menu-icon">
           <Fa icon="{getFaIconFromFullName(entry.icon)}" class="menu-icon" />

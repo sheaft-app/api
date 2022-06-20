@@ -1,13 +1,9 @@
 ﻿<script lang="ts">
-  import { getContext, onMount } from "svelte";
+  import { getContext } from "svelte";
   import Button from "$components/Button/Button.svelte";
-  import type { IModalResult } from "$components/Modal/modal";
-  import { ModalResult } from "$components/Modal/modal";
+  import { type IModalResult, ModalResult } from "$components/Modal/modal";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
-  import { RefuseAgreementCommand } from "$components/Agreements/commands/refuseAgreement";
-  import TextArea from "$components/TextArea/TextArea.svelte";
-  import { AgreementOwner, AgreementStatus } from "$components/Agreements/enums";
   import { CancelAgreementCommand } from "$components/Agreements/commands/cancelAgreement";
 
   export let agreement: Components.Schemas.AgreementDetailsDto;

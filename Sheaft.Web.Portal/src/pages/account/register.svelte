@@ -54,45 +54,39 @@
           bind:value="{$data.firstname}"
           disabled="{$isSubmitting}"
           class="w-full"
-          placeholder="Votre prénom"
-        />
+          placeholder="Votre prénom" />
         <Input
           label="Nom"
           bind:value="{$data.lastname}"
           disabled="{$isSubmitting}"
           class="w-full"
-          placeholder="Votre nom"
-        />
+          placeholder="Votre nom" />
       </div>
       <Input
         type="email"
         label="Adresse mail"
         bind:value="{$data.email}"
         disabled="{$isSubmitting}"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Input
         type="password"
         label="Mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Input
         type="password"
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         placeholder="Confirmation de mot de passe"
         disabled="{$isSubmitting}"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-8"
         >Créer
       </Button>
       <HorizontalSeparator>
         <a href="/account/login?&username={$data.email}&returnUrl={$params.returnUrl}"
-          >J'ai déjà un compte</a
-        >
+          >J'ai déjà un compte</a>
       </HorizontalSeparator>
     </form>
   </div>

@@ -48,6 +48,5 @@
   <Agreements
     agreements="{agreements}"
     module="{module}"
-    noResultsMessage="Aucun accord commercial actif"
-  />
+    noResultsMessage="Aucun accord commercial actif" />
 </PageContent>

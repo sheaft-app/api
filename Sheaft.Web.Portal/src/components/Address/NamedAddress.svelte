@@ -29,8 +29,7 @@
   <fieldset class="my-4">
     {#if label}
       <label class="block mb-2 text-sm font-medium text-gray-700 "
-        >{label} {required ? "*" : ""}</label
-      >
+        >{label} {required ? "*" : ""}</label>
     {/if}
     <fieldset class:mb-3="{showName || showEmail}">
       {#if showName}
@@ -39,8 +38,7 @@
           disabled="{disabled}"
           placeholder="Destinataire/Emetteur"
           bind:value="{value.name}"
-          required="{required}"
-        />
+          required="{required}" />
       {/if}
       {#if showEmail}
         <Input
@@ -48,8 +46,7 @@
           type="email"
           disabled="{disabled}"
           placeholder="Mail de contact"
-          bind:value="{value.email}"
-        />
+          bind:value="{value.email}" />
       {/if}
     </fieldset>
     <fieldset>
@@ -58,29 +55,25 @@
         disabled="{disabled}"
         placeholder="Adresse"
         bind:value="{value.street}"
-        required="{required}"
-      />
+        required="{required}" />
       <Input
         id="{id}.complement"
         disabled="{disabled}"
         placeholder="Complément d'adresse"
         bind:value="{value.complement}"
-        required="{false}"
-      />
+        required="{false}" />
       <Input
         id="{id}.postcode"
         disabled="{disabled}"
         placeholder="Code postal"
         bind:value="{value.postcode}"
-        required="{required}"
-      />
+        required="{required}" />
       <Input
         id="{id}.city"
         disabled="{disabled}"
         placeholder="Ville"
         bind:value="{value.city}"
-        required="{required}"
-      />
+        required="{required}" />
     </fieldset>
   </fieldset>
 {/if}

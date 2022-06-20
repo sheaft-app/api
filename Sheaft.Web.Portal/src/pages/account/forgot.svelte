@@ -45,8 +45,7 @@
           bind:value="{$data.email}"
           disabled="{$isSubmitting}"
           placeholder="Adresse mail de votre compte"
-          class="mb-6 w-full"
-        />
+          class="mb-6 w-full" />
         <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-8"
           >Reinitialiser
         </Button>

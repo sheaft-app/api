@@ -52,8 +52,7 @@
 <main
   class="flex bg-back-100"
   class:flex-col="{!$authStore.isAuthenticated}"
-  class:flex-row="{$authStore.isAuthenticated}"
->
+  class:flex-row="{$authStore.isAuthenticated}">
   {#if $authStore.isAuthenticated}
     <SideNav />
   {:else}

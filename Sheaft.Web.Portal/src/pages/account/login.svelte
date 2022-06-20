@@ -41,25 +41,21 @@
         label="Nom d'utilisateur"
         bind:value="{$data.username}"
         disabled="{$isSubmitting}"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Input
         id="password"
         type="password"
         label="Votre mot de passe"
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <a href="/account/forgot?&email={$data.username}">Mot de passe oublié?</a>
       <Button type="submit" class="primary w-full mt-8" isLoading="{$isSubmitting}"
-        >Se connecter</Button
-      >
+        >Se connecter</Button>
       <HorizontalSeparator>
         <a
           href="/account/register?&username={$data.username}&returnUrl={$params.returnUrl}"
-          >Je n'ai pas de compte</a
-        >
+          >Je n'ai pas de compte</a>
       </HorizontalSeparator>
     </form>
   </div>

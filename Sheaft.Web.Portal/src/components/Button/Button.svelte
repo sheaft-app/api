@@ -24,8 +24,7 @@
   type="{$$props.type}"
   disabled="{disabled || isLoading}"
   class="{$$props.class}"
-  on:click="{dispatchClick}"
->
+  on:click="{dispatchClick}">
   {#if isLoading}
     <Fa icon="{faSpinner}" spin class="mx-5" scale="1.5" />
   {:else}

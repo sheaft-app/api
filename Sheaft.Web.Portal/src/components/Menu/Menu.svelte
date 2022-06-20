@@ -30,8 +30,7 @@
       {:else if isPage(entries[key])}
         <MenuEntry
           entry="{entries[key]}"
-          canHighlight="{canHighlightMenuItem(entries[key], $page.path)}"
-        />
+          canHighlight="{canHighlightMenuItem(entries[key], $page.path)}" />
       {/if}
     {/if}
   {/each}

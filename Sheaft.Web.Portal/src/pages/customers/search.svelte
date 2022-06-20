@@ -34,8 +34,7 @@
 <PageHeader
   title="{$page.title}"
   subtitle="Vous pouvez envoyer une demande d'accord commercial avec les magasins ci-dessous"
-  previous="{() => module.goToCustomers()}"
-/>
+  previous="{() => module.goToCustomers()}" />
 
 <PageContent isLoading="{isLoading}">
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">

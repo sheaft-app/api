@@ -24,20 +24,16 @@
   disabled="{disabled}"
   bind:value
   class="{$$props.class}"
-  aria-describedby="{id}-validation"
->
+  aria-describedby="{id}-validation">
   {#each options as option}
     <option value="{option.value}">{option.label}</option>
   {/each}
 </select>
-<div
-  id="{id}-validation"
-  class="validation-reporter"
-  data-felte-reporter-dom-for="{id}"
-></div>
+<div id="{id}-validation" class="validation-reporter" data-felte-reporter-dom-for="{id}">
+</div>
 <div
   id="{id}-warning"
   class="warning-reporter"
   data-felte-reporter-dom-for="{id}"
-  data-felte-reporter-dom-level="warning"
-></div>
+  data-felte-reporter-dom-level="warning">
+</div>

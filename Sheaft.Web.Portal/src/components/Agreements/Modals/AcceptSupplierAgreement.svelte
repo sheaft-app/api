@@ -1,8 +1,7 @@
 ﻿<script lang="ts">
   import { getContext } from "svelte";
   import Button from "$components/Button/Button.svelte";
-  import type { IModalResult } from "$components/Modal/modal";
-  import { ModalResult } from "$components/Modal/modal";
+  import { type IModalResult, ModalResult } from "$components/Modal/modal";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
   import { AcceptSupplierAgreementCommand } from "$components/Agreements/commands/acceptSupplierAgreement";

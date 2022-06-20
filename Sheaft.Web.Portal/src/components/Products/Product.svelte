@@ -37,50 +37,43 @@
   required="{false}"
   maxLength="{30}"
   placeholder="Le code de votre produit (sera autogénéré si non renseigné)"
-  disabled="{isDisabled}"
-/>
+  disabled="{isDisabled}" />
 <Input
   id="name"
   label="Nom"
   bind:value="{$data.name}"
   placeholder="Le nom de votre produit"
-  disabled="{isDisabled}"
-/>
+  disabled="{isDisabled}" />
 <Input
   id="unitPrice"
   label="Prix HT"
   bind:value="{$data.unitPrice}"
   placeholder="Prix HT de votre produit en €"
-  disabled="{isDisabled}"
-/>
+  disabled="{isDisabled}" />
 <Vat id="vat" label="TVA" bind:value="{$data.vat}" disabled="{isDisabled}" />
 <Input
   type="number"
   label="Prix TTC (calculé)"
   value="{onSalePrice}"
   disabled="{true}"
-  required="{false}"
-/>
+  required="{false}" />
 <TextArea
   id="description"
   label="Description"
   bind:value="{$data.description}"
   placeholder="Les ingrédients, la méthode de préparation, tout ce que vous pouvez juger utile de préciser"
-  disabled="{isDisabled}"
-/>
+  disabled="{isDisabled}" />
 <Checkbox
   id="hasReturnable"
   label="Ce produit est consigné"
   disabled="{isDisabled}"
   bind:value="{$data.hasReturnable}"
-  class="mt-3 mb-6"
-/>
+  class="mt-3 mb-6" />
 {#if $data.hasReturnable}
   <Select
     id="returnableId"
     label="Consigne"
     options="{returnablesOptions}"
     disabled="{isDisabled}"
-    bind:value="{$data.returnableId}"
-  />
+    bind:value="{$data.returnableId}" />
 {/if}

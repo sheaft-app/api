@@ -26,14 +26,11 @@
   class="{$$props.class}"
   required="{required}"
   aria-describedby="{id}-validation"></textarea>
-<div
-  id="{id}-validation"
-  class="validation-reporter"
-  data-felte-reporter-dom-for="{id}"
-></div>
+<div id="{id}-validation" class="validation-reporter" data-felte-reporter-dom-for="{id}">
+</div>
 <div
   id="{id}-warning"
   class="warning-reporter"
   data-felte-reporter-dom-for="{id}"
-  data-felte-reporter-dom-level="warning"
-></div>
+  data-felte-reporter-dom-level="warning">
+</div>

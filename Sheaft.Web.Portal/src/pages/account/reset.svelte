@@ -44,16 +44,14 @@
         bind:value="{$data.password}"
         disabled="{$isSubmitting}"
         placeholder="Votre nouveau mot de passe"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Input
         type="password"
         label="Confirmer le mot de passe"
         bind:value="{$data.confirm}"
         disabled="{$isSubmitting}"
         placeholder="Confirmer le nouveau mot de passe"
-        class="mb-6 w-full"
-      />
+        class="mb-6 w-full" />
       <Button type="submit" isLoading="{$isSubmitting}" class="primary w-full mt-6"
         >Enregistrer
       </Button>

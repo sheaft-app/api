@@ -61,22 +61,19 @@
     id="legalAddress"
     label="Siège social"
     disabled="{$isSubmitting}"
-    bind:value="{$data.legalAddress}"
-  />
+    bind:value="{$data.legalAddress}" />
   <Checkbox
     id="hasDifferentBillingAddress"
     disabled="{$isSubmitting}"
     bind:value="{hasDifferentBillingAddress}"
-    label="Mon adresse de facturation est différente"
-  />
+    label="Mon adresse de facturation est différente" />
   {#if hasDifferentBillingAddress}
     <NamedAddress
       id="billingAddress"
       label="Adresse de facturation"
       disabled="{$isSubmitting}"
       bind:value="{$data.billingAddress}"
-      required="{hasDifferentBillingAddress}"
-    />
+      required="{hasDifferentBillingAddress}" />
   {/if}
   <Checkbox
     id="hasDifferentSecondaryAddress"
@@ -84,16 +81,14 @@
     bind:value="{hasDifferentSecondaryAddress}"
     label="{state.information.accountType === ProfileKind.Customer
       ? 'Mon adresse de livraison est différente'
-      : "Mon adresse d'expédition est différente"}"
-  />
+      : 'Mon adresse d\'expédition est différente'}" />
   {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Customer}
     <NamedAddress
       id="deliveryAddress"
       label="Adresse de livraison"
       disabled="{$isSubmitting}"
       bind:value="{$data.deliveryAddress}"
-      required="{hasDifferentSecondaryAddress}"
-    />
+      required="{hasDifferentSecondaryAddress}" />
   {/if}
   {#if hasDifferentSecondaryAddress && state.information.accountType === ProfileKind.Supplier}
     <NamedAddress
@@ -101,16 +96,14 @@
       label="Adresse d'expédition"
       disabled="{$isSubmitting}"
       bind:value="{$data.shippingAddress}"
-      required="{hasDifferentSecondaryAddress}"
-    />
+      required="{hasDifferentSecondaryAddress}" />
   {/if}
   <FormFooter class="mt-2">
     <Button
       class="back w-full mx-8"
       disabled="{$isSubmitting}"
       type="button"
-      on:click="{() => onBack($data)}"
-    >
+      on:click="{() => onBack($data)}">
       Précédent
     </Button>
     <Button

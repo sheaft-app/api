@@ -66,7 +66,6 @@
 <PageHeader
   title="{$page.title}"
   previous="{() => module.goToCustomers()}"
-  actions="{actions}"
-/>
+  actions="{actions}" />
 
 <AvailableProfile profile="{customer}" />

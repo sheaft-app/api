@@ -90,8 +90,7 @@
 <PageHeader
   title="{$page.title}"
   actions="{actions}"
-  previous="{() => module.goToList()}"
-/>
+  previous="{() => module.goToList()}" />
 
 <form use:form>
   <Returnable data="{data}" disabled="{controlsAreDisabled}" />

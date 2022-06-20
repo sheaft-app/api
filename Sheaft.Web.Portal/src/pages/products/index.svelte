@@ -73,8 +73,7 @@
             <td colspan="4" class="text-center"
               >Aucun produit disponible, <a href="/products/create"
                 >créez-en en cliquant ici</a
-              ></td
-            >
+              ></td>
           </tr>
         {/if}
       </tbody>

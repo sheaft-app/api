@@ -21,8 +21,7 @@
 <fieldset class="my-4">
   {#if label}
     <label class="block mb-2 text-sm font-medium text-gray-700 "
-      >{label} {required ? "*" : ""}</label
-    >
+      >{label} {required ? "*" : ""}</label>
   {/if}
   <div id="{id}" class="flex" aria-describedby="{id}-validation">
     {#each rates as rate}
@@ -33,25 +32,23 @@
           bind:group="{value}"
           id="{id}-{rate}"
           value="{getValue(rate)}"
-          disabled="{disabled}"
-        />
+          disabled="{disabled}" />
         <label
           class="peer-checked:bg-primary-500 peer-checked:font-bold peer-checked:text-white hover:peer-checked:bg-primary-600"
           for="{id}-{rate}"
-          use:formatInnerHtml="{percent}">{rate}</label
-        >
+          use:formatInnerHtml="{percent}">{rate}</label>
       </div>
     {/each}
   </div>
   <div
     id="{id}-validation"
     class="validation-reporter"
-    data-felte-reporter-dom-for="{id}"
-  ></div>
+    data-felte-reporter-dom-for="{id}">
+  </div>
   <div
     id="{id}-warning"
     class="warning-reporter"
     data-felte-reporter-dom-for="{id}"
-    data-felte-reporter-dom-level="warning"
-  ></div>
+    data-felte-reporter-dom-level="warning">
+  </div>
 </fieldset>

@@ -72,8 +72,7 @@
             <td colspan="4" class="text-center"
               >Aucune consigne disponible, <a href="/returnables/create"
                 >créez-en une en cliquant ici</a
-              ></td
-            >
+              ></td>
           </tr>
         {/if}
       </tbody>

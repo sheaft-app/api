@@ -46,12 +46,10 @@
   title="{$page.title}"
   subtitle="Toutes les demandes en attente d'acceptation par les producteurs, sont listées ci-dessous"
   actions="{actions}"
-  previous="{() => module.goToSuppliers()}"
-/>
+  previous="{() => module.goToSuppliers()}" />
 <PageContent isLoading="{isLoading}">
   <Agreements
     agreements="{agreements}"
     module="{module}"
-    noResultsMessage="Aucun accord commercial envoyé en attente"
-  />
+    noResultsMessage="Aucun accord commercial envoyé en attente" />
 </PageContent>

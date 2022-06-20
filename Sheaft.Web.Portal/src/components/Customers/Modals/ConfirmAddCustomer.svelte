@@ -1,8 +1,7 @@
 ﻿<script lang="ts">
   import { getContext } from "svelte";
   import Button from "$components/Button/Button.svelte";
-  import type { IModalResult } from "$components/Modal/modal";
-  import { ModalResult } from "$components/Modal/modal";
+  import { type IModalResult, ModalResult } from "$components/Modal/modal";
   import type { Components } from "$types/api";
   import { mediator } from "$components/mediator";
   import { ProposeAgreementToCustomerCommand } from "$components/Customers/commands/proposeAgreementToCustomer";
@@ -54,9 +53,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Monday}"
-          class="w-4 h-4 m-1"
-        />Lundi</label
-      >
+          class="w-4 h-4 m-1" />Lundi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -64,9 +61,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Tuesday}"
-          class="w-4 h-4 m-1"
-        />Mardi</label
-      >
+          class="w-4 h-4 m-1" />Mardi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -74,9 +69,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Wednesday}"
-          class="w-4 h-4 m-1"
-        />Mercredi</label
-      >
+          class="w-4 h-4 m-1" />Mercredi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -84,9 +77,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Thursday}"
-          class="w-4 h-4 m-1"
-        />Jeudi</label
-      >
+          class="w-4 h-4 m-1" />Jeudi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -94,9 +85,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Friday}"
-          class="w-4 h-4 m-1"
-        />Vendredi</label
-      >
+          class="w-4 h-4 m-1" />Vendredi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -104,9 +93,7 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Saturday}"
-          class="w-4 h-4 m-1"
-        />Samedi</label
-      >
+          class="w-4 h-4 m-1" />Samedi</label>
     </li>
     <li>
       <label class="form-check-label inline-block text-gray-800 cursor-pointer">
@@ -114,24 +101,20 @@
           bind:group="{deliveryDays}"
           type="checkbox"
           value="{DayOfWeek.Sunday}"
-          class="w-4 h-4 m-1"
-        />Dimanche</label
-      >
+          class="w-4 h-4 m-1" />Dimanche</label>
     </li>
   </ul>
   <div class="mt-4">
     <Checkbox
       id="orderDelay"
       bind:value="{orderDelayed}"
-      label="Verrouiller la prise de commandes x heures avant le jour de livraison"
-    />
+      label="Verrouiller la prise de commandes x heures avant le jour de livraison" />
     {#if orderDelayed}
       <Input
         type="number"
         label="Nombre d'heures"
         bind:value="{orderDelayInHoursBeforeDeliveryDay}"
-        class="mt-2"
-      />
+        class="mt-2" />
     {/if}
   </div>
 </div>

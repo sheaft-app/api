@@ -28,8 +28,7 @@
         <Fa
           icon="{faArrowAltCircleLeft}"
           class="text-gray-500 hover:text-gray-400"
-          size="24"
-        />
+          size="24" />
       </a>
     </div>
   {/if}
@@ -48,50 +47,43 @@
               type="button"
               class="bg-accent-600 hover:bg-accent-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else if action.color == "primary"}
             <Button
               type="button"
               class="bg-primary-600 hover:bg-primary-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else if action.color == "danger"}
             <Button
               type="button"
               class="bg-danger-600 hover:bg-danger-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else if action.color == "warning"}
             <Button
               type="button"
               class="bg-warning-600 hover:bg-warning-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else if action.color == "success"}
             <Button
               type="button"
               class="bg-success-600 hover:bg-success-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else if action.color == "info"}
             <Button
               type="button"
               class="bg-info-600 hover:bg-info-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {:else}
             <Button
               type="button"
               class="bg-default-600 hover:bg-default-500"
               on:click="{() => navigateTo(action.action)}"
-              disabled="{action.disabled}">{action.name}</Button
-            >
+              disabled="{action.disabled}">{action.name}</Button>
           {/if}
         </div>
       {/if}

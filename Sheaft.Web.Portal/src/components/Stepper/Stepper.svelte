@@ -72,6 +72,5 @@
     onSubmit="{onSubmit}"
     onBack="{onBack}"
     initialValues="{results[pages[pageNumber].id]}"
-    state="{results}"
-  />
+    state="{results}" />
 </div>

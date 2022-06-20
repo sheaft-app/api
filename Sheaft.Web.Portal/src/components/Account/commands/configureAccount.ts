@@ -1,8 +1,7 @@
 ﻿import { Request } from "jimmy-js";
 import { ProfileKind } from "$components/Account/enums";
 import type { AccountAddresses, AccountInformation } from "$components/Account/types";
-import type { Client } from "$types/api";
-import type { Components } from "$types/api";
+import type { Client, Components } from "$types/api";
 
 export class ConfigureAccountCommand extends Request<Promise<boolean>> {
   constructor(
