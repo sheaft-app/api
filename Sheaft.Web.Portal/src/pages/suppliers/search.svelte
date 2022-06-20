@@ -34,7 +34,7 @@
 <PageHeader
   title="{$page.title}"
   subtitle="Ce sont les producteurs avec lesquels vous n'avez pas encore d'accord commercial"
-  previous="{() => module.goToSuppliers()}" />
+  previous="{() => module.goToList()}" />
 
 <PageContent isLoading="{isLoading}">
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -47,7 +47,7 @@
       </thead>
       <tbody>
         {#each suppliers as supplier}
-          <tr on:click="{() => module.goToSupplier(supplier.id)}">
+          <tr on:click="{() => module.goToSearchProfile(supplier.id)}">
             <th>{supplier.name}</th>
             <th>{@html address(supplier.deliveryAddress)}</th>
           </tr>

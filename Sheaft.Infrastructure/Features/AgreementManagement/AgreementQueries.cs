@@ -83,6 +83,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 {
                     Id = agreement.Id,
                     Status = agreement.Status,
+                    CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
@@ -100,7 +101,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
                             p.OwnerId, p.Owner)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -126,6 +127,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 {
                     Id = agreement.Id,
                     Status = agreement.Status,
+                    CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
@@ -143,7 +145,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
                             p.OwnerId, p.Owner)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -169,6 +171,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 {
                     Id = agreement.Id,
                     Status = agreement.Status,
+                    CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
@@ -186,7 +189,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
                             p.OwnerId, p.Owner)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });

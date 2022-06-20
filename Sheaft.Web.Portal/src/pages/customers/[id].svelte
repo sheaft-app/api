@@ -10,4 +10,4 @@
 <!-- routify:options index=true -->
 <!-- routify:options title="Details de l'accord commercial" -->
 
-<Agreement id="{id}" goHome="{() => module.goToCustomers()}" />
+<Agreement id="{id}" goHome="{() => module.goToList()}" />

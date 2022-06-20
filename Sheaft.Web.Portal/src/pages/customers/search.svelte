@@ -34,7 +34,7 @@
 <PageHeader
   title="{$page.title}"
   subtitle="Vous pouvez envoyer une demande d'accord commercial avec les magasins ci-dessous"
-  previous="{() => module.goToCustomers()}" />
+  previous="{() => module.goToList()}" />
 
 <PageContent isLoading="{isLoading}">
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -47,7 +47,7 @@
       </thead>
       <tbody>
         {#each customers as customer}
-          <tr on:click="{() => module.goToCustomer(customer.id)}">
+          <tr on:click="{() => module.goToSearchProfile(customer.id)}">
             <th>{customer.name}</th>
             <th>{@html address(customer.deliveryAddress)}</th>
           </tr>

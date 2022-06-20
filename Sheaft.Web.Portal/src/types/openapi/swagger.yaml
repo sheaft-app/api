@@ -1682,6 +1682,9 @@ components:
           nullable: true
         status:
           $ref: '#/components/schemas/AgreementStatus'
+        createdOn:
+          type: string
+          format: date-time
         updatedOn:
           type: string
           format: date-time

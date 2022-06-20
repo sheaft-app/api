@@ -17,9 +17,6 @@ import {
 } from "$components/Customers/commands/proposeAgreementToCustomer";
 
 export interface ICustomerModule extends IAgreementModule {
-  goToCustomers(): void;
-  goToSearch(): void;
-  goToCustomer(id: string): void;
 }
 
 class CustomerModule extends AgreementModule implements ICustomerModule {
@@ -40,18 +37,6 @@ class CustomerModule extends AgreementModule implements ICustomerModule {
       new ProposeAgreementToCustomerHandler(this._client).handle(request)
     );
   };
-
-  goToCustomers = (): void => {
-    this.navigate(this._basePath);
-  };
-
-  goToCustomer(id: string): void {
-    this.navigate(`${this._basePath}/search/${id}`);
-  }
-
-  goToSearch(): void {
-    this.navigate(`${this._basePath}/search`);
-  }
 }
 
 let module: ICustomerModule | undefined;

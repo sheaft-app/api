@@ -26,7 +26,7 @@
       initializing = false;
     } catch (exc) {
       console.error(exc);
-      module.goToCustomers();
+      module.goToSearch();
     }
   });
 
@@ -65,7 +65,7 @@
 
 <PageHeader
   title="{$page.title}"
-  previous="{() => module.goToCustomers()}"
+  previous="{() => module.goToSearch()}"
   actions="{actions}" />
 
 <AvailableProfile profile="{customer}" />

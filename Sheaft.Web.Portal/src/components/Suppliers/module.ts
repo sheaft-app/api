@@ -17,9 +17,6 @@ import {
 } from "$components/Suppliers/commands/proposeAgreementToSupplier";
 
 export interface ISupplierModule extends IAgreementModule {
-  goToSupplier(id: string): void;
-  goToSuppliers(): void;
-  goToSearch(): void;
 }
 
 class SupplierModule extends AgreementModule implements ISupplierModule {
@@ -40,18 +37,6 @@ class SupplierModule extends AgreementModule implements ISupplierModule {
       new ProposeAgreementToSupplierHandler(this._client).handle(request)
     );
   };
-
-  goToSuppliers = (): void => {
-    this.navigate(this._basePath);
-  };
-
-  goToSupplier(id: string): void {
-    this.navigate(`${this._basePath}/search/${id}`);
-  }
-
-  goToSearch(): void {
-    this.navigate(`${this._basePath}/search`);
-  }
 }
 
 let module: ISupplierModule | undefined;

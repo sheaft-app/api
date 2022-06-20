@@ -25,7 +25,7 @@
       initializing = false;
     } catch (exc) {
       console.error(exc);
-      module.goToSuppliers();
+      module.goToSearch();
     }
   });
 
@@ -64,7 +64,7 @@
 
 <PageHeader
   title="{$page.title}"
-  previous="{() => module.goToSuppliers()}"
+  previous="{() => module.goToSearch()}"
   actions="{actions}" />
 
 <AvailableProfile profile="{supplier}" />
