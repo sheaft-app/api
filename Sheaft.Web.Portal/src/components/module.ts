@@ -31,8 +31,8 @@ export abstract class AppModule implements IAppModule {
     mediator.handle(constructor, handler);
   };
 
-  protected navigate = (url: string): void => {
-    if (this._goto) this._goto(url);
+  protected navigate = (url: string, params?: any): void => {
+    if (this._goto) this._goto(url, params);
     else throw "$goto was not provided when called getXXXModule($goto)";
   };
 }

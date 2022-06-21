@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record ListOrdersQuery(AccountId AccountId, PageInfo PageInfo) : IQuery<Result<PagedResult<OrderDto>>>;
+public record ListOrdersQuery(AccountId AccountId, IEnumerable<OrderStatus>? Statuses, PageInfo PageInfo) : IQuery<Result<PagedResult<OrderDto>>>;
 
 internal class ListOrdersHandler : IQueryHandler<ListOrdersQuery, Result<PagedResult<OrderDto>>>
 {
@@ -12,9 +12,17 @@ internal class ListOrdersHandler : IQueryHandler<ListOrdersQuery, Result<PagedRe
     {
         _orderQueries = orderQueries;
     }
-    
+
     public async Task<Result<PagedResult<OrderDto>>> Handle(ListOrdersQuery request, CancellationToken token)
     {
-        return await _orderQueries.List(request.AccountId, request.PageInfo, token);
+        //TODO remove order status draft filter if user is Supplier
+        
+        return await _orderQueries.List(request.AccountId, request.Statuses ?? new List<OrderStatus>
+        {
+            OrderStatus.Pending,
+            OrderStatus.Accepted,
+            OrderStatus.Fulfilled,
+            OrderStatus.Completed
+        }, request.PageInfo, token);
     }
 }

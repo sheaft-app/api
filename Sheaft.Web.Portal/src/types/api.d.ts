@@ -47,6 +47,7 @@ declare namespace Components {
             createdOn?: string; // date-time
             updatedOn?: string; // date-time
             targetName?: string | null;
+            targetId?: string | null;
             ownerId?: string | null;
             owner?: AgreementOwner /* int32 */;
             deliveryDays?: DayOfWeek /* int32 */[] | null;
@@ -212,6 +213,23 @@ declare namespace Components {
             lines?: OrderLineDto[] | null;
             delivery?: OrderDeliveryDto;
         }
+        export interface OrderDraftDto {
+            id?: string | null;
+            createdOn?: string; // date-time
+            updatedOn?: string; // date-time
+            supplier?: OrderUserDto;
+            customer?: OrderUserDto;
+            lines?: OrderDraftLineDto[] | null;
+        }
+        export interface OrderDraftLineDto {
+            kind?: OrderLineKind /* int32 */;
+            identifier?: string | null;
+            name?: string | null;
+            code?: string | null;
+            quantity?: number; // int32
+            vat?: number; // double
+            unitPrice?: number; // double
+        }
         export interface OrderDto {
             id?: string | null;
             code?: string | null;
@@ -227,7 +245,8 @@ declare namespace Components {
             fulfilledOn?: string | null; // date-time
             deliveryStatus?: DeliveryStatus /* int32 */;
             deliveryScheduledAt?: string | null; // date-time
-            targetName?: string | null;
+            customerName?: string | null;
+            supplierName?: string | null;
         }
         export interface OrderDtoPaginatedResults {
             items?: OrderDto[] | null;
@@ -265,8 +284,8 @@ declare namespace Components {
             unitPrice?: number; // double
             vat?: number; // double
             updatedOn?: string; // date-time
-            supplierName?: string | null;
-            supplierId?: string | null;
+            supplier?: OrderableProductSupplierDto;
+            returnable?: OrderableReturnableDto;
         }
         export interface OrderableProductDtoPaginatedResults {
             items?: OrderableProductDto[] | null;
@@ -276,6 +295,16 @@ declare namespace Components {
             itemsPerPage?: number; // int32
             totalItems?: number; // int32
             totalPages?: number; // int32
+        }
+        export interface OrderableProductSupplierDto {
+            id?: string | null;
+            name?: string | null;
+        }
+        export interface OrderableReturnableDto {
+            id?: string | null;
+            name?: string | null;
+            unitPrice?: number; // double
+            vat?: number; // double
         }
         export type PaymentKind = 0 | 1; // int32
         export interface ProblemDetails {
@@ -738,6 +767,18 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace GetOrderDraft {
+        namespace Parameters {
+            export type OrderId = string;
+        }
+        export interface PathParameters {
+            orderId: Parameters.OrderId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.OrderDraftDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace GetProduct {
         namespace Parameters {
             export type ProductId = string;
@@ -835,9 +876,11 @@ declare namespace Paths {
     namespace ListOrders {
         namespace Parameters {
             export type Page = number; // int32
+            export type Statuses = Components.Schemas.OrderStatus /* int32 */[];
             export type Take = number; // int32
         }
         export interface QueryParameters {
+            statuses?: Parameters.Statuses;
             page?: Parameters.Page /* int32 */;
             take?: Parameters.Take /* int32 */;
         }
@@ -1494,6 +1537,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.GetOrder.Responses.$200>
   /**
+   * GetOrderDraft - Retrieve order draft with id
+   */
+  'GetOrderDraft'(
+    parameters?: Parameters<Paths.GetOrderDraft.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetOrderDraft.Responses.$200>
+  /**
    * ListActiveAgreements - List active agreements for current user
    */
   'ListActiveAgreements'(
@@ -2019,6 +2070,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.GetOrder.Responses.$200>
+  }
+  ['/api/orders/draft/{orderId}']: {
+    /**
+     * GetOrderDraft - Retrieve order draft with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetOrderDraft.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetOrderDraft.Responses.$200>
   }
   ['/api/agreements']: {
     /**

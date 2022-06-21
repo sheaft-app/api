@@ -5,8 +5,8 @@ import type { ProductQuantity } from '$components/Orders/types'
 
 export class PublishOrderDraftCommand extends Request<Promise<void>> {
   constructor(public id: string,
-              public products: ProductQuantity[],
-              public deliveryDate: string) {
+              public deliveryDate: string,
+              public products?: ProductQuantity[]) {
     super()
   }
 }

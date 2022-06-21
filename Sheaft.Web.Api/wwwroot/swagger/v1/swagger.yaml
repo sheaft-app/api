@@ -1102,6 +1102,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  '/api/orders/draft/{orderId}':
+    get:
+      tags:
+        - GetOrderDraft
+      summary: Retrieve order draft with id
+      operationId: GetOrderDraft
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDraftDto'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/agreements:
     get:
       tags:
@@ -1254,6 +1279,12 @@ paths:
       summary: List available orders for current user
       operationId: ListOrders
       parameters:
+        - name: statuses
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/OrderStatus'
         - name: page
           in: query
           schema:
@@ -1889,6 +1920,9 @@ components:
         targetName:
           type: string
           nullable: true
+        targetId:
+          type: string
+          nullable: true
         ownerId:
           type: string
           nullable: true
@@ -2371,6 +2405,52 @@ components:
         delivery:
           $ref: '#/components/schemas/OrderDeliveryDto'
       additionalProperties: false
+    OrderDraftDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        createdOn:
+          type: string
+          format: date-time
+        updatedOn:
+          type: string
+          format: date-time
+        supplier:
+          $ref: '#/components/schemas/OrderUserDto'
+        customer:
+          $ref: '#/components/schemas/OrderUserDto'
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDraftLineDto'
+          nullable: true
+      additionalProperties: false
+    OrderDraftLineDto:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/OrderLineKind'
+        identifier:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+        vat:
+          type: number
+          format: double
+        unitPrice:
+          type: number
+          format: double
+      additionalProperties: false
     OrderDto:
       type: object
       properties:
@@ -2419,7 +2499,10 @@ components:
           type: string
           format: date-time
           nullable: true
-        targetName:
+        customerName:
+          type: string
+          nullable: true
+        supplierName:
           type: string
           nullable: true
       additionalProperties: false
@@ -2537,12 +2620,10 @@ components:
         updatedOn:
           type: string
           format: date-time
-        supplierName:
-          type: string
-          nullable: true
-        supplierId:
-          type: string
-          nullable: true
+        supplier:
+          $ref: '#/components/schemas/OrderableProductSupplierDto'
+        returnable:
+          $ref: '#/components/schemas/OrderableReturnableDto'
       additionalProperties: false
     OrderableProductDtoPaginatedResults:
       type: object
@@ -2570,6 +2651,32 @@ components:
         totalPages:
           type: integer
           format: int32
+      additionalProperties: false
+    OrderableProductSupplierDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
+    OrderableReturnableDto:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          format: double
+        vat:
+          type: number
+          format: double
       additionalProperties: false
     PaymentKind:
       enum:

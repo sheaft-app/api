@@ -1,7 +1,6 @@
 ﻿import type { GotoHelper } from "@roxi/routify";
-import type { IAppModule } from "$components/module";
 import type { Client } from "$types/api";
-import { AppModule } from "$components/module";
+import { type IAppModule, AppModule } from '$components/module'
 import {
   CreateReturnableCommand,
   CreateReturnableHandler

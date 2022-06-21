@@ -1,6 +1,7 @@
 ﻿table{
+  @apply border-collapse rounded-xl overflow-hidden;
   @apply w-full text-sm text-left text-gray-500;
-
+    
   thead{
     @apply text-xs text-gray-700 uppercase bg-gray-200;
 
@@ -9,8 +10,8 @@
     }
   }
 
-  tbody{
-    @apply bg-white border-b hover:bg-gray-50;
+  tbody, tfoot{
+    @apply bg-white border-b;
 
     tr{
       @apply cursor-pointer hover:bg-gray-100;

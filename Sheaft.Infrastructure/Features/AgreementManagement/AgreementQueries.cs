@@ -87,6 +87,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
+                    TargetId = customer.AccountId == accountId.Value ? supplier.Id : customer.Id,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
                     LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
@@ -104,7 +105,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -133,6 +134,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
+                    TargetId = customer.AccountId == accountId.Value ? supplier.Id : customer.Id,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
                     LimitOrderHourOffset = agreement.OrderDelayInHoursBeforeDeliveryDay,
@@ -150,7 +152,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -178,6 +180,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
                     Status = agreement.Status,
                     CreatedOn = agreement.CreatedOn,
                     UpdatedOn = agreement.UpdatedOn,
+                    TargetId = customer.AccountId == accountId.Value ? supplier.Id : customer.Id,
                     TargetName = customer.AccountId == accountId.Value ? supplier.TradeName : customer.TradeName,
                     OwnerId = supplier.AccountId == accountId.Value ? supplier.AccountId : customer.AccountId,
                     Owner = (AgreementOwner) agreement.Owner,
@@ -196,7 +199,7 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });

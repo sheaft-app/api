@@ -15,8 +15,7 @@ import {
   ConfigureAccountCommand,
   ConfigureAccountHandler
 } from "./commands/configureAccount";
-import type { IAppModule } from "$components/module";
-import { AppModule } from "$components/module";
+import { type IAppModule, AppModule } from '$components/module'
 import type { Client } from "$types/api";
 import type { IAuthStore } from "$components/Account/store";
 
