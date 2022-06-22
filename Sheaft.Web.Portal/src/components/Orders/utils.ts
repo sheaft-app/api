@@ -7,7 +7,7 @@ export const orderStatus = (order: Components.Schemas.OrderDto | Components.Sche
     case "1":
       return "En attente";
     case "2":
-      return "En cours";
+      return "En préparation";
     case "3":
       return "Prête";
     case "4":

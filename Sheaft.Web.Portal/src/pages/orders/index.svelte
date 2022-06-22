@@ -31,7 +31,7 @@
   const profileKind = $authStore.account?.profile?.kind
 
   let isLoading = true
-  let selectedTab: OrderTab = <OrderTab>$params.tab ?? OrderTab.Active
+  let selectedTab: OrderTab = <OrderTab>$params.tab ?? OrderTab.InProgress
   let orders: Components.Schemas.OrderDto[] = []
 
   const getOrderTargetName = (order: Components.Schemas.OrderDto): string => {
@@ -46,16 +46,17 @@
         case OrderTab.Draft:
           query = new ListDraftOrdersQuery(pageNumber, take)
           break
+        case OrderTab.Sent:
         case OrderTab.Pending:
           query = new ListPendingOrdersQuery(pageNumber, take)
           break
-        case OrderTab.Completed:
+        case OrderTab.Delivered:
           query = new ListCompletedOrdersQuery(pageNumber, take)
           break
         case OrderTab.Aborted:
           query = new ListAbortedOrdersQuery(pageNumber, take)
           break
-        case OrderTab.Active:
+        case OrderTab.InProgress:
         default:
           query = new ListActiveOrdersQuery(pageNumber, take)
           break
@@ -108,8 +109,8 @@
   ]
 
   $: availableTabs = profileKind == ProfileKind.Customer
-    ? [OrderTab.Draft, OrderTab.Pending, OrderTab.Active, OrderTab.Completed, OrderTab.Aborted]
-    : [OrderTab.Pending, OrderTab.Active, OrderTab.Completed, OrderTab.Aborted]
+    ? [OrderTab.Draft, OrderTab.Sent, OrderTab.InProgress, OrderTab.Delivered, OrderTab.Aborted]
+    : [OrderTab.Pending, OrderTab.InProgress, OrderTab.Delivered, OrderTab.Aborted]
 
   $:listOrders(selectedTab)
 </script>
@@ -131,26 +132,28 @@
         {#if selectedTab !== OrderTab.Draft}
           <th>Total HT</th>
         {/if}
-        {#if selectedTab === OrderTab.Pending}
-          <th>{profileKind === ProfileKind.Customer ? "Envoyée" : "Reçue"}</th>
+        {#if selectedTab === OrderTab.Sent}
+          <th>Envoyée</th>
         {/if}
-        {#if selectedTab === OrderTab.Pending || selectedTab === OrderTab.Active}
+        {#if selectedTab === OrderTab.Pending}
+          <th>Reçue</th>
+        {/if}
+        {#if selectedTab === OrderTab.Pending || selectedTab === OrderTab.Sent || selectedTab === OrderTab.InProgress}
           <th>Livraison le</th>
         {/if}
         {#if selectedTab === OrderTab.Draft}
           <th>Créé le</th>
         {/if}
-        {#if selectedTab === OrderTab.Completed}
+        {#if selectedTab === OrderTab.Delivered}
           <th>Livrée le</th>
         {/if}
         {#if selectedTab === OrderTab.Aborted}
           <th>Avortée le</th>
+        {/if}
+        {#if selectedTab === OrderTab.Aborted || selectedTab === OrderTab.InProgress}
           <th>Statut</th>
         {/if}
-        {#if selectedTab === OrderTab.Active}
-          <th>Statut</th>
-        {/if}
-        {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.Active}
+        {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.InProgress}
           <th>Mise à jour</th>
         {/if}
       </tr>
@@ -162,26 +165,25 @@
           {#if selectedTab !== OrderTab.Draft}
             <td use:formatInnerHtml='{currency}'>{order.totalWholeSalePrice}</td>
           {/if}
-          {#if selectedTab === OrderTab.Pending}
+          {#if selectedTab === OrderTab.Pending || selectedTab === OrderTab.Sent}
             <td use:formatInnerHtml='{dateDistance}'>{order.publishedOn}</td>
           {/if}
-          {#if selectedTab === OrderTab.Pending || selectedTab === OrderTab.Active}
+          {#if selectedTab === OrderTab.Pending || selectedTab === OrderTab.Sent || selectedTab === OrderTab.InProgress}
             <td>{dateStr(order.deliveryScheduledAt, "dd/MM/yyyy")}</td>
           {/if}
           {#if selectedTab === OrderTab.Draft}
             <td>{dateStr(order.createdOn, "dd/MM/yyyy")}</td>
           {/if}
-          {#if selectedTab === OrderTab.Completed}
+          {#if selectedTab === OrderTab.Delivered}
             <td>{dateStr(order.completedOn, "dd/MM/yyyy")}</td>
           {/if}
           {#if selectedTab === OrderTab.Aborted}
             <td>{dateStr(order.abortedOn, "dd/MM/yyyy")}</td>
+          {/if}
+          {#if selectedTab === OrderTab.Aborted || selectedTab === OrderTab.InProgress}
             <td>{orderStatus(order)}</td>
           {/if}
-          {#if selectedTab === OrderTab.Active}
-            <td>{orderStatus(order)}</td>
-          {/if}
-          {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.Active}
+          {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.InProgress}
             <td use:formatInnerHtml='{dateDistance}'>{order.updatedOn}</td>
           {/if}
         </tr>

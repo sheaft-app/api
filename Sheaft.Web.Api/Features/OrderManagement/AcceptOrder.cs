@@ -22,7 +22,7 @@ public class AcceptOrder : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromRoute] string id, [FromBody] AcceptOrderRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new AcceptOrderCommand(new OrderId(id), data.NewDeliveryDate.HasValue ? Maybe.From(new DeliveryDate(data.NewDeliveryDate.Value)) : Maybe<DeliveryDate>.None), token);
+        var result = await Mediator.Execute(new AcceptOrderCommand(new OrderId(id), data.NewDeliveryDate.HasValue ? new DeliveryDate(data.NewDeliveryDate.Value) : null), token);
         return HandleCommandResult(result);
     }
 }

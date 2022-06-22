@@ -29,9 +29,13 @@ import {
   GetNextSupplierDeliveryDatesHandler,
   GetNextSupplierDeliveryDatesQuery
 } from '$components/Orders/queries/getNextSupplierDeliveryDates'
+import { AcceptOrderCommand, AcceptOrderHandler } from '$components/Orders/commands/acceptOrder'
+import { RefuseOrderCommand, RefuseOrderHandler } from '$components/Orders/commands/refuseOrder'
+import { CancelOrderCommand, CancelOrderHandler } from '$components/Orders/commands/cancelOrder'
+import { FulfillOrderCommand, FulfillOrderHandler } from '$components/Orders/commands/fulfillOrder'
 
 export interface IOrderModule extends IAppModule {
-  goToList(params:{}): void;
+  goToList(params?:{}): void;
   goToDetails(id: string): void;
   goToDraft(id: string): void;
   goToCreate(): void;
@@ -91,6 +95,22 @@ class OrderModule extends AppModule implements IOrderModule {
 
     this.registerHandler(GetNextSupplierDeliveryDatesQuery, request =>
       new GetNextSupplierDeliveryDatesHandler(this._client, this._authStore).handle(request)
+    )
+
+    this.registerHandler(AcceptOrderCommand, request =>
+      new AcceptOrderHandler(this._client, this._authStore).handle(request)
+    )
+
+    this.registerHandler(RefuseOrderCommand, request =>
+      new RefuseOrderHandler(this._client, this._authStore).handle(request)
+    )
+
+    this.registerHandler(CancelOrderCommand, request =>
+      new CancelOrderHandler(this._client, this._authStore).handle(request)
+    )
+
+    this.registerHandler(FulfillOrderCommand, request =>
+      new FulfillOrderHandler(this._client, this._authStore).handle(request)
     )
   }
 

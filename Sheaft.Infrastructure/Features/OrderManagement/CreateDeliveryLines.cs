@@ -30,15 +30,19 @@ public class CreateDeliveryLines : ICreateDeliveryLines
             var orderedProducts = orders
                 .SelectMany(o => o.Lines.Where(l => l.LineKind == OrderLineKind.Product));
 
+            var orderedReturnables = orders
+                .SelectMany(o => o.Lines.Where(l => l.LineKind == OrderLineKind.Returnable));
+
             var productIdentifiers = productLines
                 .Select(p => p.ProductIdentifier)
                 .ToList();
-            
+
             var products = await _context
                 .Set<Product>()
-                .Where(r => 
-                    r.SupplierId == delivery.SupplierId 
+                .Where(r =>
+                    r.SupplierId == delivery.SupplierId
                     && productIdentifiers.Contains(r.Id))
+                .Include(p => p.Returnable)
                 .ToListAsync(token);
 
             if (products.Count != productIdentifiers.Count)
@@ -49,7 +53,7 @@ public class CreateDeliveryLines : ICreateDeliveryLines
                 .SelectMany(op => op.BatchIdentifiers)
                 .Distinct()
                 .ToList();
-            
+
             if (batchIdentifiers.Any())
             {
                 var batches = await _context
@@ -64,23 +68,29 @@ public class CreateDeliveryLines : ICreateDeliveryLines
 
             var deliveryProductLines = products
                 .Select(p =>
-                    DeliveryLine.CreateProductLine(p.Id, p.Reference, p.Name,
-                        GetProductQuantity(p.Id, productLines), GetProductPrice(p.Id, orderedProducts),
-                        p.Vat, GetProductOrder(p.Id, productLines),
+                    DeliveryLine.CreateProductLine(
+                        p.Id, 
+                        p.Reference, 
+                        p.Name,
+                        GetProductQuantity(p.Id, productLines),
+                        GetEntityPrice(p.Id.Value, orderedProducts),
+                        p.Vat,
+                        GetProductOrder(p.Id, productLines),
                         GetProductBatches(p.Id, productLines)))
                 .ToList();
 
             var deliveryReturnableLines = products
                 .Where(p => p.Returnable != null)
                 .Select(p =>
-                {
-                    Debug.Assert(p.Returnable != null, "p.Returnable != null");
-
-                    return DeliveryLine.CreateReturnableLine(p.Returnable.Id, p.Returnable.Reference,
+                    DeliveryLine.CreateReturnableLine(
+                        p.Returnable.Id, 
+                        p.Returnable.Reference,
                         p.Returnable.Name,
-                        GetProductQuantity(p.Id, productLines), GetProductPrice(p.Id, orderedProducts),
-                        p.Vat, GetProductOrder(p.Id, productLines));
-                }).ToList();
+                        GetProductQuantity(p.Id, productLines),
+                        GetEntityPrice(p.Returnable.Id.Value, orderedReturnables),
+                        p.Vat,
+                        GetProductOrder(p.Id, productLines)))
+                .ToList();
 
             var deliveryLines = new List<DeliveryLine>();
             deliveryLines.AddRange(deliveryProductLines.Where(dp => dp.Quantity.Value > 0));
@@ -116,9 +126,9 @@ public class CreateDeliveryLines : ICreateDeliveryLines
         return new DeliveryOrder(order.Reference, order.PublishedOn);
     }
 
-    private ProductUnitPrice GetProductPrice(ProductId productIdentifier, IEnumerable<OrderLine> orderedProducts)
+    private ProductUnitPrice GetEntityPrice(string identifier, IEnumerable<OrderLine> orderLines)
     {
-        var productPrice = orderedProducts.Single(p => p.Identifier == productIdentifier.Value).PriceInfo.UnitPrice;
+        var productPrice = orderLines.Single(p => p.Identifier == identifier).PriceInfo.UnitPrice;
         return new ProductUnitPrice(productPrice.Value);
     }
 }

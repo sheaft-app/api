@@ -14,3 +14,7 @@ export type DraftLine = {
   quantity:number;
   returnable?:any; 
 }
+
+export type DeliveryLine = ProductQuantity & { 
+  batchIdentifiers?: string[];
+}

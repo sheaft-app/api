@@ -92,7 +92,7 @@
       })
       isLoading = false
     } catch (exc) {
-      module.goToList()
+      module.goToList({tab:OrderTab.Draft})
     }
   })
 
@@ -150,8 +150,8 @@
       <th colspan='5' class='font-bold text-gray-600'>Produits</th>
     </tr>
     {#each lines ?? [] as line}
-      <tr>
-        <td><p class='font-medium'>{line.name}</p>
+      <tr class='cursor-default'>
+        <td><p class='font-semibold'>{line.name}</p>
           <small>#{line.code}</small></td>
         <td use:formatInnerHtml={currency}>{line.unitPrice}</td>
         <td use:formatInnerHtml={percent}>{line.vat}</td>
@@ -163,8 +163,8 @@
       <th colspan='5' class='font-bold text-gray-600'>Consignes</th>
     </tr>
     {#each returnables ?? [] as returnable}
-      <tr>
-        <td class='font-medium'>{returnable.name}</td>
+      <tr class='cursor-default'>
+        <td class='font-semibold'>{returnable.name}</td>
         <td use:formatInnerHtml={currency}>{returnable.unitPrice}</td>
         <td use:formatInnerHtml={percent}>{returnable.vat}</td>
         <td>{returnable.quantity}</td>
@@ -174,15 +174,15 @@
     </tbody>
     <tfoot>
       <tr class='hover:bg-white cursor-default'>
-        <td colspan='4' class='text-right font-medium'>Total HT</td>
+        <td colspan='4' class='text-right font-semibold'>Total HT</td>
         <td class='font-medium'>{currency(totalWholeSalePrice)}</td>
       </tr>
       <tr class='hover:bg-white cursor-default'>
-        <td colspan='4' class='text-right font-medium'>Total TVA</td>
+        <td colspan='4' class='text-right font-semibold'>Total TVA</td>
         <td class='font-medium'>{currency(totalVatPrice)}</td>
       </tr>
       <tr class='hover:bg-white cursor-default'>
-        <td colspan='4' class='text-right font-medium'>Total TTC</td>
+        <td colspan='4' class='text-right font-semibold'>Total TTC</td>
         <td class='font-medium'>{currency(totalOnSalePrice)}</td>
       </tr>
     </tfoot>

@@ -3,7 +3,7 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record AcceptOrderCommand(OrderId OrderIdentifier, Maybe<DeliveryDate> NewDeliveryDate) : Command<Result>;
+public record AcceptOrderCommand(OrderId OrderIdentifier, DeliveryDate? NewDeliveryDate = null) : Command<Result>;
     
 public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
 {
@@ -20,7 +20,7 @@ public class AcceptOrderHandler : ICommandHandler<AcceptOrderCommand, Result>
 
     public async Task<Result> Handle(AcceptOrderCommand request, CancellationToken token)
     {
-        var result = await _acceptOrders.Accept(request.OrderIdentifier, request.NewDeliveryDate, request.CreatedAt, token);
+        var result = await _acceptOrders.Accept(request.OrderIdentifier, request.NewDeliveryDate != null ? Maybe<DeliveryDate>.From(request.NewDeliveryDate) : Maybe<DeliveryDate>.None, request.CreatedAt, token);
         if (result.IsFailure)
             return result;
         

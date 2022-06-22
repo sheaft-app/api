@@ -8,10 +8,16 @@
   Cancelled
 }
 
+export enum OrderLineKind{
+  Product, 
+  Returnable
+}
+
 export enum OrderTab {
   Draft = "Brouillon",
+  Sent = "Envoyées",
   Pending = "En attente",
-  Active = "Acceptées",
-  Completed = "Terminées",
+  InProgress = "En cours",
+  Delivered = "Livrées",
   Aborted = "Avortées"
 }

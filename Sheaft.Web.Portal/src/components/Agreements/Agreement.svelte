@@ -185,7 +185,7 @@
   <Address
     label="{$authStore.account?.profile?.kind === ProfileKind.Customer ? 'Vous livrera à cette adresse' : 'Adresse de livraison'}"
     disabled='{true}' value='{agreement?.deliveryAddress}' />
-  {#if $authStore.account?.profile?.kind == ProfileKind.Supplier}
+  {#if $authStore.account?.profile?.kind === ProfileKind.Supplier}
     <form use:form>
       <DeliveryDays
         id='deliveryDays'
@@ -201,7 +201,7 @@
         <Button class='bg-accent-600' type='submit' isLoading='{$isSubmitting}' disabled='{$isSubmitting || isLoading}'>Sauvegarder</Button>
       </div>
     </form>
-  {:else if agreement?.status == AgreementStatus.Active}
+  {:else if agreement?.status === AgreementStatus.Active}
     <DeliveryDays
       days={agreement?.deliveryDays}
       disabled='{true}'

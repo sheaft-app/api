@@ -213,6 +213,10 @@ declare namespace Components {
             customer?: OrderUserDto;
             lines?: OrderLineDto[] | null;
             delivery?: OrderDeliveryDto;
+            canAcceptOrRefuse?: boolean;
+            canCancel?: boolean;
+            canFulfill?: boolean;
+            canComplete?: boolean;
         }
         export interface OrderDraftDto {
             id?: string | null;
@@ -264,7 +268,8 @@ declare namespace Components {
             identifier?: string | null;
             name?: string | null;
             code?: string | null;
-            quantity?: number; // int32
+            orderedQuantity?: number; // int32
+            preparedQuantity?: null | number; // int32
             vat?: number; // double
             unitPrice?: number; // double
             totalWholeSalePrice?: number; // double

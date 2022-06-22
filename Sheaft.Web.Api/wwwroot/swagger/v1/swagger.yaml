@@ -2436,6 +2436,14 @@ components:
           nullable: true
         delivery:
           $ref: '#/components/schemas/OrderDeliveryDto'
+        canAcceptOrRefuse:
+          type: boolean
+        canCancel:
+          type: boolean
+        canFulfill:
+          type: boolean
+        canComplete:
+          type: boolean
       additionalProperties: false
     OrderDraftDto:
       type: object
@@ -2583,9 +2591,13 @@ components:
         code:
           type: string
           nullable: true
-        quantity:
+        orderedQuantity:
           type: integer
           format: int32
+        preparedQuantity:
+          type: integer
+          format: int32
+          nullable: true
         vat:
           type: number
           format: double
