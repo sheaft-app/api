@@ -105,7 +105,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn,
+                            p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -152,7 +153,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn,
+                            p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -199,7 +201,8 @@ internal class AgreementQueries : Queries, IAgreementQueries
             return Result.Success(
                 new PagedResult<AgreementDto>(
                     agreementsResults?
-                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn, p.TargetName, p.TargetId,
+                        .Select(p => new AgreementDto(p.Id, (AgreementStatus) p.Status, p.CreatedOn, p.UpdatedOn,
+                            p.TargetName, p.TargetId,
                             p.OwnerId, p.Owner, p.DeliveryDays, p.LimitOrderHourOffset)),
                     pageInfo, agreementsResults?.Key ?? 0));
         });
@@ -332,4 +335,34 @@ internal class AgreementQueries : Queries, IAgreementQueries
                 suppliersResults?.Key.Total ?? 0));
         });
     }
+
+    public Task<Result<AgreementDto>> GetAgreementFromSupplierAndCustomerAccountInfo(SupplierId supplierId,
+        AccountId customerAccountId, CancellationToken token)
+    {
+        return QueryAsync(async () =>
+        {
+            var agreementQuery =
+                from agreement in _context.Agreements
+                where (agreement.Status == (int) AgreementStatus.Active && agreement.Customer.AccountId == customerAccountId.Value && agreement.SupplierId == supplierId.Value)
+                select new AgreementDto(agreement.Id, (AgreementStatus) agreement.Status, agreement.CreatedOn,
+                    agreement.UpdatedOn,
+                    agreement.Customer.AccountId == customerAccountId.Value
+                        ? agreement.SupplierId
+                        : agreement.CustomerId,
+                    agreement.Customer.AccountId == customerAccountId.Value
+                        ? agreement.Supplier.TradeName
+                        : agreement.Customer.TradeName,
+                    agreement.Customer.AccountId == customerAccountId.Value
+                        ? agreement.Supplier.AccountId
+                        : agreement.Customer.AccountId,
+                    (AgreementOwner) agreement.Owner,
+                    agreement.DeliveryDaysAgreementIds.Select(d => (DayOfWeek) d.DayOfWeek),
+                    agreement.OrderDelayInHoursBeforeDeliveryDay);
+        
+
+        var agreementDeliveryDays = await agreementQuery.SingleAsync(token);
+        return Result.Success(agreementDeliveryDays);
+    });
+}
+
 }

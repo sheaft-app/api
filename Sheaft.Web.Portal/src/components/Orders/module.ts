@@ -25,9 +25,13 @@ import {
   ListSupplierOrderableProductsQuery
 } from '$components/Orders/queries/listOrderableProducts'
 import { GetOrderDraftHandler, GetOrderDraftQuery } from '$components/Orders/queries/getOrderDraft'
+import {
+  GetNextSupplierDeliveryDatesHandler,
+  GetNextSupplierDeliveryDatesQuery
+} from '$components/Orders/queries/getNextSupplierDeliveryDates'
 
 export interface IOrderModule extends IAppModule {
-  goToList(): void;
+  goToList(params:{}): void;
   goToDetails(id: string): void;
   goToDraft(id: string): void;
   goToCreate(): void;
@@ -84,6 +88,10 @@ class OrderModule extends AppModule implements IOrderModule {
     this.registerHandler(ListSupplierOrderableProductsQuery, request =>
       new ListSupplierOrderableProductsHandler(this._client, this._authStore).handle(request)
     )
+
+    this.registerHandler(GetNextSupplierDeliveryDatesQuery, request =>
+      new GetNextSupplierDeliveryDatesHandler(this._client, this._authStore).handle(request)
+    )
   }
 
   goToDetails = (id: string): void => {
@@ -94,8 +102,8 @@ class OrderModule extends AppModule implements IOrderModule {
     this.navigate(`${this._basePath}/drafts/${id}`)
   }
 
-  goToList = (): void => {
-    this.navigate(this._basePath)
+  goToList = (params:{}): void => {
+    this.navigate(this._basePath, params)
   }
 
   goToCreate = (): void => {

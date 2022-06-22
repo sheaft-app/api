@@ -25,6 +25,7 @@ public static class ServiceCollectionInitializers
         services.AddScoped<IFulfillOrders, FulfillOrders>();
         services.AddScoped<IDeliverOrders, DeliverOrders>();
         services.AddScoped<IValidateOrderDeliveryDate, ValidateOrderDeliveryDate>();
+        services.AddScoped<IDetermineNextDeliveryDays, DetermineNextDeliveryDays>();
         
         services.AddScoped<ICancelInvoices, CancelInvoices>();
         services.AddScoped<ICreateInvoices, CreateInvoices>();

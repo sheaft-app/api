@@ -1,5 +1,5 @@
 ﻿<script lang='ts'>
-  import { goto, page } from '@roxi/routify'
+  import { goto, page, params } from '@roxi/routify'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { dateDistance, dateStr } from '$utils/dates'
@@ -14,12 +14,13 @@
   import { OrderStatus, OrderTab } from '$components/Orders/enums'
   import { ListPendingOrdersQuery } from '$components/Orders/queries/listPendingOrders'
   import { ListCompletedOrdersQuery } from '$components/Orders/queries/listCompletedOrders'
-  import { ListAbortedOrdersQuery } from '$components/Orders/queries/listAbortedOrders'
   import { ListActiveOrdersQuery } from '$components/Orders/queries/listActiveOrders'
   import { ListDraftOrdersQuery } from '$components/Orders/queries/listDraftOrders'
   import { getContext } from 'svelte'
   import CreateDraft from '$components/Orders/Modals/CreateDraft.svelte'
   import type { IModalResult } from '$components/Modal/modal'
+  import { ListAbortedOrdersQuery } from '$components/Orders/queries/listAbortedOrders'
+  import { orderStatus } from '$components/Orders/utils'
 
   export let pageNumber: number = 1,
     take: number = 10
@@ -30,7 +31,7 @@
   const profileKind = $authStore.account?.profile?.kind
 
   let isLoading = true
-  let selectedTab: OrderTab = OrderTab.Active
+  let selectedTab: OrderTab = <OrderTab>$params.tab ?? OrderTab.Active
   let orders: Components.Schemas.OrderDto[] = []
 
   const getOrderTargetName = (order: Components.Schemas.OrderDto): string => {
@@ -76,10 +77,10 @@
   }
 
   const onClose = (result: IModalResult<string>): void => {
-    if(!result.isSuccess)
-      return;
-    
-    module.goToDraft(result.value);
+    if (!result.isSuccess)
+      return
+
+    module.goToDraft(result.value)
   }
 
   const openCreateModal = () => {
@@ -127,7 +128,9 @@
       <thead>
       <tr>
         <th>{profileKind === ProfileKind.Customer ? 'Fournisseur' : 'Client'}</th>
-        <th>Total HT</th>
+        {#if selectedTab !== OrderTab.Draft}
+          <th>Total HT</th>
+        {/if}
         {#if selectedTab === OrderTab.Pending}
           <th>{profileKind === ProfileKind.Customer ? "Envoyée" : "Reçue"}</th>
         {/if}
@@ -138,16 +141,27 @@
           <th>Créé le</th>
         {/if}
         {#if selectedTab === OrderTab.Completed}
-          <th>Terminée le</th>
+          <th>Livrée le</th>
         {/if}
-        <th>Mise à jour</th>
+        {#if selectedTab === OrderTab.Aborted}
+          <th>Avortée le</th>
+          <th>Statut</th>
+        {/if}
+        {#if selectedTab === OrderTab.Active}
+          <th>Statut</th>
+        {/if}
+        {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.Active}
+          <th>Mise à jour</th>
+        {/if}
       </tr>
       </thead>
       <tbody>
       {#each orders as order}
         <tr on:click='{() => goTo(order)}'>
           <th>{getOrderTargetName(order)}</th>
-          <td use:formatInnerHtml='{currency}'>{order.totalWholeSalePrice}</td>
+          {#if selectedTab !== OrderTab.Draft}
+            <td use:formatInnerHtml='{currency}'>{order.totalWholeSalePrice}</td>
+          {/if}
           {#if selectedTab === OrderTab.Pending}
             <td use:formatInnerHtml='{dateDistance}'>{order.publishedOn}</td>
           {/if}
@@ -160,12 +174,21 @@
           {#if selectedTab === OrderTab.Completed}
             <td>{dateStr(order.completedOn, "dd/MM/yyyy")}</td>
           {/if}
-          <td use:formatInnerHtml='{dateDistance}'>{order.updatedOn}</td>
+          {#if selectedTab === OrderTab.Aborted}
+            <td>{dateStr(order.abortedOn, "dd/MM/yyyy")}</td>
+            <td>{orderStatus(order)}</td>
+          {/if}
+          {#if selectedTab === OrderTab.Active}
+            <td>{orderStatus(order)}</td>
+          {/if}
+          {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.Active}
+            <td use:formatInnerHtml='{dateDistance}'>{order.updatedOn}</td>
+          {/if}
         </tr>
       {/each}
       {#if orders?.length < 1}
         <tr>
-          <td colspan='4' class='text-center'>Aucune commande</td>
+          <td colspan='5' class='text-center'>Aucune commande</td>
         </tr>
       {/if}
       </tbody>

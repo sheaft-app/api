@@ -22,7 +22,7 @@ internal class OrderQueries : Queries, IOrderQueries
         {
             var ordersQuery =
                 from order in _context.Orders
-                from line in _context.OrderLines.InnerJoin(ol => ol.OrderId == order.Id)
+                from line in _context.OrderLines.LeftJoin(ol => ol.OrderId == order.Id)
                 from delivery in _context.Deliveries.LeftJoin(d => d.Id == order.DeliveryId)
                 where order.Id == identifier.Value
                 group line by new
@@ -69,7 +69,8 @@ internal class OrderQueries : Queries, IOrderQueries
                     g.Key.UpdatedOn,
                     g.Key.PublishedOn,
                     g.Key.AcceptedOn,
-                    g.Key.CompletedOn,
+                    (OrderStatus)g.Key.Status == OrderStatus.Completed ? g.Key.CompletedOn : null,
+                    (OrderStatus)g.Key.Status == OrderStatus.Refused || (OrderStatus)g.Key.Status == OrderStatus.Cancelled ? g.Key.CompletedOn : null,
                     g.Key.FulfilledOn,
                     new OrderUserDto(g.Key.SupplierId, g.Key.SupplierName, g.Key.SupplierEmail, g.Key.SupplierPhone),
                     new OrderUserDto(g.Key.CustomerId, g.Key.CustomerName, g.Key.CustomerEmail, g.Key.CustomerPhone),
@@ -97,7 +98,7 @@ internal class OrderQueries : Queries, IOrderQueries
         {
             var ordersQuery =
                 from order in _context.Orders
-                from line in _context.OrderLines.InnerJoin(ol => ol.OrderId == order.Id)
+                from line in _context.OrderLines.LeftJoin(ol => ol.OrderId == order.Id)
                 from product in _context.Products.LeftJoin(p => p.Id == line.Identifier)
                 from catalogProduct in _context.CatalogProducts.LeftJoin(cp => cp.ProductId == product.Id)
                 from returnable in _context.Returnables.LeftJoin(r => r.Id == line.Identifier)
@@ -111,17 +112,8 @@ internal class OrderQueries : Queries, IOrderQueries
                 } by new
                 {
                     order.Id,
-                    order.Reference,
-                    order.Status,
-                    order.TotalWholeSalePrice,
-                    order.TotalVatPrice,
-                    order.TotalOnSalePrice,
                     order.CreatedOn,
                     order.UpdatedOn,
-                    order.PublishedOn,
-                    order.AcceptedOn,
-                    order.CompletedOn,
-                    order.FulfilledOn,
                     SupplierId = order.Supplier.Id,
                     SupplierName = order.Supplier.TradeName,
                     SupplierEmail = order.Supplier.Email,
@@ -172,7 +164,8 @@ internal class OrderQueries : Queries, IOrderQueries
                     order.UpdatedOn,
                     order.PublishedOn,
                     order.AcceptedOn,
-                    order.CompletedOn,
+                    CompletedOn = (OrderStatus)order.Status == OrderStatus.Completed ? order.CompletedOn : null,
+                    AbortedOn = (OrderStatus)order.Status == OrderStatus.Refused || (OrderStatus)order.Status == OrderStatus.Cancelled ? order.CompletedOn : null,
                     order.FulfilledOn,
                     DeliveryScheduledAt = delivery != null ? delivery.ScheduledAt : (DateTimeOffset?) null,
                     DeliveryStatus = delivery != null ? delivery.Status : (int?) null,
@@ -191,7 +184,7 @@ internal class OrderQueries : Queries, IOrderQueries
             return Result.Success(new PagedResult<OrderDto>(
                 orders?.Select(o =>
                     new OrderDto(o.Id, o.Reference, (OrderStatus) o.Status, o.TotalWholeSalePrice, o.TotalOnSalePrice,
-                        o.TotalVatPrice, o.CreatedOn, o.UpdatedOn, o.PublishedOn, o.AcceptedOn, o.CompletedOn,
+                        o.TotalVatPrice, o.CreatedOn, o.UpdatedOn, o.PublishedOn, o.AcceptedOn, o.CompletedOn, o.AbortedOn,
                         o.FulfilledOn, o.DeliveryStatus.HasValue ? (DeliveryStatus) o.DeliveryStatus.Value : null,
                         o.DeliveryScheduledAt, o.CustomerName, o.SupplierName)),
                 pageInfo, orders?.Key ?? 0));

@@ -14,7 +14,7 @@ public record DeliveryDate
         if (value.Date < currentDateTime.Date)
             throw new InvalidOperationException("Delivery date must be in future");
         
-        Value = value.ToUniversalTime();
+        Value = value;
     }
 
     public DateTimeOffset Value { get; }

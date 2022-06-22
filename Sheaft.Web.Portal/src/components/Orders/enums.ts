@@ -11,7 +11,7 @@
 export enum OrderTab {
   Draft = "Brouillon",
   Pending = "En attente",
-  Active = "En cours",
+  Active = "Acceptées",
   Completed = "Terminées",
   Aborted = "Avortées"
 }

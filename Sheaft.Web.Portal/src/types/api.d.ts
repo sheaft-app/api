@@ -207,6 +207,7 @@ declare namespace Components {
             publishedOn?: string | null; // date-time
             acceptedOn?: string | null; // date-time
             completedOn?: string | null; // date-time
+            abortedOn?: string | null; // date-time
             fulfilledOn?: string | null; // date-time
             supplier?: OrderUserDto;
             customer?: OrderUserDto;
@@ -242,6 +243,7 @@ declare namespace Components {
             publishedOn?: string | null; // date-time
             acceptedOn?: string | null; // date-time
             completedOn?: string | null; // date-time
+            abortedOn?: string | null; // date-time
             fulfilledOn?: string | null; // date-time
             deliveryStatus?: DeliveryStatus /* int32 */;
             deliveryScheduledAt?: string | null; // date-time
@@ -752,6 +754,18 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.AvailableSupplierDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace GetNextSupplierDeliveryDates {
+        namespace Parameters {
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
+        namespace Responses {
+            export type $200 = string /* date-time */[];
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -1529,6 +1543,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
   /**
+   * GetNextSupplierDeliveryDates - Get supplier next delivery dates for current user
+   */
+  'GetNextSupplierDeliveryDates'(
+    parameters?: Parameters<Paths.GetNextSupplierDeliveryDates.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetNextSupplierDeliveryDates.Responses.$200>
+  /**
    * GetOrder - Retrieve order with id
    */
   'GetOrder'(
@@ -2060,6 +2082,16 @@ export interface PathsDictionary {
       data?: Paths.UpdateSupplier.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UpdateSupplier.Responses.$200>
+  }
+  ['/api/suppliers/{supplierId}/next-delivery-dates']: {
+    /**
+     * GetNextSupplierDeliveryDates - Get supplier next delivery dates for current user
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetNextSupplierDeliveryDates.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetNextSupplierDeliveryDates.Responses.$200>
   }
   ['/api/orders/{orderId}']: {
     /**

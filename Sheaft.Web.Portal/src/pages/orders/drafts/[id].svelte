@@ -1,6 +1,6 @@
 ﻿<script lang='ts'>
   import { goto, page } from '@roxi/routify'
-  import { onMount } from 'svelte'
+  import { getContext, onMount } from 'svelte'
   import { getOrderModule } from '$components/Orders/module'
   import { GetOrderDraftQuery } from '$components/Orders/queries/getOrderDraft'
   import { mediator } from '$components/mediator'
@@ -11,20 +11,22 @@
   import type { DraftLine } from '$components/Orders/types'
   import type { PageAction } from '$components/Page/types'
   import { PublishOrderDraftCommand } from '$components/Orders/commands/publishOrderDraft'
-  import { dateStr } from '$utils/dates'
   import { calculateOnSalePrice, calculateVatPrice, calculateWholeSalePrice, currency } from '$utils/money'
   import {formatInnerHtml} from "$actions/format"
   import { percent } from '$utils/percent'
   import { UpdateOrderDraftProductsCommand } from '$components/Orders/commands/updateOrderDraftProducts'
+  import SelectDeliveryDate from '$components/Orders/Modals/SelectDeliveryDate.svelte'
+  import type { IModalResult } from '$components/Modal/modal'
+  import { OrderTab } from '$components/Orders/enums'
 
   export let id: string
   const module = getOrderModule($goto)
+  const { open } = getContext('simple-modal')
 
   let title = $page.title
   let order: Components.Schemas.OrderDraftDto = null
   let products: Components.Schemas.OrderableProductDto[] = []
   let lines: DraftLine[] = []
-  let deliveryDate: Date
 
   const updateOrderDraftProducts = async () => {
     try {
@@ -38,12 +40,32 @@
     }
   }
   
-  const publishOrderDraft = async () => {
+  const openSelectDeliveryDate = () => {
+    open(
+      SelectDeliveryDate,
+      {
+        supplierId: order.supplier.id,
+        onClose:publishOrderDraft
+      },
+      {
+        closeButton: false,
+        closeOnEsc: true,
+        closeOnOuterClick: true
+      }
+    )
+  }
+  
+  const publishOrderDraft = async (result:IModalResult<string>) => {    
+    if(!result.isSuccess)
+      return;
+    
     try {
       isLoading = true
-      await mediator.send(new PublishOrderDraftCommand(id, dateStr(deliveryDate, 'yyyy-MM-dd'), lines.filter(l => l.quantity > 0).map(l => {
+      await mediator.send(new PublishOrderDraftCommand(id, result.value, lines.filter(l => l.quantity > 0).map(l => {
         return { productIdentifier: l.id, quantity: l.quantity }
       })))
+      
+      module.goToList({tab:OrderTab.Pending});
       isLoading = false
     } catch (exc) {
       console.error(exc)
@@ -87,7 +109,7 @@
       disabled: isLoading,
       visible: true,
       color: 'primary',
-      action: () => publishOrderDraft()
+      action: () => openSelectDeliveryDate()
     }
   ]
 
@@ -99,8 +121,10 @@
   
   $: totalWholeSalePrice = lines.reduce((acc:number, line:DraftLine) => 
     acc + calculateWholeSalePrice(line.unitPrice, line.quantity) + calculateWholeSalePrice(line.returnable?.unitPrice, line.quantity), 0);
+  
   $: totalVatPrice = lines.reduce((acc:number, line:DraftLine) =>
     acc + calculateVatPrice(line.unitPrice, line.vat, line.quantity) + calculateVatPrice(line.returnable?.unitPrice, line.returnable?.vat, line.quantity), 0);
+  
   $: totalOnSalePrice = lines.reduce((acc:number, line:DraftLine) =>
     acc + calculateOnSalePrice(line.unitPrice, line.vat, line.quantity) + calculateOnSalePrice(line.returnable?.unitPrice, line.returnable?.vat, line.quantity), 0);
 </script>

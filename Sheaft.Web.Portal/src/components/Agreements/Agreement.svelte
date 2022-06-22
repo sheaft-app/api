@@ -23,15 +23,29 @@
   import { suite } from '$components/Agreements/validators'
   import type { AgreementDeliveryForm } from '$components/Agreements/types'
   import type { IAgreementModule } from '$components/Agreements/module'
+  import { CreateOrderDraftCommand } from '$components/Orders/commands/createOrderDraft'
+  import { getOrderModule } from '$components/Orders/module'
+  import { goto } from '@roxi/routify'
 
   export let id: string
   export let title: string = "Détails de l'accord commercial"  
   export let module: IAgreementModule; 
-
+  
+  const orderModule = getOrderModule($goto);
   const { open } = getContext('simple-modal')
 
   let agreement: Components.Schemas.AgreementDetailsDto = null
 
+  const createOrderDraft = async () =>{
+    try{
+      const result = await mediator.send(new CreateOrderDraftCommand(agreement?.target.id));
+      orderModule.goToDraft(result);
+    }
+    catch(exc){
+      console.error(exc);
+    }
+  }
+  
   const openAcceptModal = () => {
     openModal(
       agreement.owner == AgreementOwner.Supplier
@@ -119,6 +133,13 @@
 
   $: actions = [
     {
+      name: 'Commander',
+      disabled: isLoading,
+      visible: agreement?.canBeRevoked && $authStore.account?.profile?.kind == ProfileKind.Customer,
+      color: 'accent',
+      action: () => createOrderDraft()
+    },
+    {
       name: 'Accepter',
       disabled: isLoading,
       visible: agreement?.canBeAcceptedOrRefused,
@@ -153,7 +174,7 @@
   title='{title}'
   actions='{actions}'
   previous='{() => module.goToList()}'
-  class='max-w-xl' />
+  class='max-w-4xl' />
 
 <div class='max-w-xl'>
   <h2 class='my-6'>Information</h2>

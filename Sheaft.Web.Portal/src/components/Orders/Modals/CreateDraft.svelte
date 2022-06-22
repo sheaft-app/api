@@ -47,7 +47,7 @@
 <hr />
 <div class='my-6'>
   <Select
-    label='Selectionner le client dont vous souhaitez commander les produits'
+    label='Selectionner le fournisseur'
     bind:value={supplierId}
     disabled='{isLoading}'
     options='{agreements.map(a => { return {label: a.targetName, value: a.targetId}})}' />

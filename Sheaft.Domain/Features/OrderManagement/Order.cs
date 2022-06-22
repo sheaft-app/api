@@ -55,6 +55,7 @@ public class Order : AggregateRoot
         Reference = reference;
         Status = OrderStatus.Pending;
         PublishedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
@@ -79,6 +80,7 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.update.lines.requires.draft");
         
         SetLines(lines);
+        UpdatedOn = DateTimeOffset.UtcNow;
         return Result.Success();
     }
 
@@ -88,6 +90,7 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.accept.requires.pending.status");
         
         AcceptedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Accepted;
         return Result.Success();
     }
@@ -98,6 +101,7 @@ public class Order : AggregateRoot
             return Result.Failure(ErrorKind.BadRequest, "order.fulfill.requires.accepted.status");
         
         FulfilledOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         Status = OrderStatus.Fulfilled;
         return Result.Success();
     }
@@ -109,6 +113,7 @@ public class Order : AggregateRoot
         
         Status = OrderStatus.Refused;
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = refusalReason;
         return Result.Success();
     }
@@ -120,6 +125,7 @@ public class Order : AggregateRoot
         
         Status = OrderStatus.Cancelled;
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         FailureReason = cancelReason;
         return Result.Success();
     }
@@ -131,6 +137,7 @@ public class Order : AggregateRoot
         
         Status = OrderStatus.Completed;
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;
+        UpdatedOn = currentDateTime ?? DateTimeOffset.UtcNow;
         return Result.Success();
     }
 

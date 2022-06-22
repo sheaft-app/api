@@ -1769,6 +1769,51 @@
         }
       }
     },
+    "/api/suppliers/{supplierId}/next-delivery-dates": {
+      "get": {
+        "tags": [
+          "GetNextSupplierDeliveryDates"
+        ],
+        "summary": "Get supplier next delivery dates for current user",
+        "operationId": "GetNextSupplierDeliveryDates",
+        "parameters": [
+          {
+            "name": "supplierId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/orders/{orderId}": {
       "get": {
         "tags": [
@@ -3765,6 +3810,11 @@
             "format": "date-time",
             "nullable": true
           },
+          "abortedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "fulfilledOn": {
             "type": "string",
             "format": "date-time",
@@ -3898,6 +3948,11 @@
             "nullable": true
           },
           "completedOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "abortedOn": {
             "type": "string",
             "format": "date-time",
             "nullable": true

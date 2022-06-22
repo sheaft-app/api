@@ -14,4 +14,5 @@ public interface IAgreementQueries
     Task<Result<AvailableSupplierDto>> GetSupplier(SupplierId identifier, CancellationToken token);
     Task<Result<PagedResult<AvailableCustomerDto>>> ListAvailableCustomersForSupplier(AccountId accountId, PageInfo pageInfo, CancellationToken token);
     Task<Result<PagedResult<AvailableSupplierDto>>> ListAvailableSuppliersForCustomer(AccountId accountId, PageInfo pageInfo, CancellationToken token);
+    Task<Result<AgreementDto>> GetAgreementFromSupplierAndCustomerAccountInfo(SupplierId supplierId, AccountId customerAccountId, CancellationToken token);
 }
