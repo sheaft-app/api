@@ -217,6 +217,7 @@ declare namespace Components {
             canCancel?: boolean;
             canFulfill?: boolean;
             canComplete?: boolean;
+            reason?: string | null;
         }
         export interface OrderDraftDto {
             id?: string | null;
@@ -380,6 +381,7 @@ declare namespace Components {
             lastname?: string | null;
         }
         export interface ResetPasswordRequest {
+            identifier?: string | null;
             resetToken?: string | null;
             password?: string | null;
             confirm?: string | null;
