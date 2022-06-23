@@ -6,5 +6,8 @@ export const dateDistance = (date): string => {
 };
 
 export const dateStr = (date, pattern?: string | undefined): string => {
-  return format(new Date(date), pattern ?? "dd/MM/yyyy", { locale: fr });
+  if(!date)
+    return '';
+  
+  return format(new Date(date), pattern ?? "dd MMMM yyyy", { locale: fr });
 };

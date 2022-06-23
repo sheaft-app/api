@@ -9,13 +9,17 @@
   import { currency } from '$utils/money'
   import { formatInnerHtml } from '$actions/format'
   import { percent } from '$utils/percent'
-  import { OrderLineKind } from '$components/Orders/enums'
+  import { DeliveryStatus, OrderLineKind, OrderStatus } from '$components/Orders/enums'
   import { GetOrderQuery } from '$components/Orders/queries/getOrder'
   import type { IModalResult } from '$components/Modal/modal'
   import AcceptOrder from '$components/Orders/Modals/AcceptOrder.svelte'
   import RefuseOrder from '$components/Orders/Modals/RefuseOrder.svelte'
   import CancelOrder from '$components/Orders/Modals/CancelOrder.svelte'
   import FulfillOrder from '$components/Orders/Modals/FulfillOrder.svelte'
+  import { dateStr } from '$utils/dates'
+  import { orderStatus } from '$components/Orders/utils'
+  import { ProfileKind } from '$components/Account/enums'
+  import { authStore } from '$components/Account/store'
 
   export let id: string
   const module = getOrderModule($goto)
@@ -38,7 +42,8 @@
   }
 
   const onClose = async (result: IModalResult<any>) => {
-    await loadOrder(id)
+    if (result.isSuccess)
+      await loadOrder(id)
   }
 
   const openModal = Modal => {
@@ -60,7 +65,7 @@
     try {
       isLoading = true
       order = await mediator.send(new GetOrderQuery(orderId))
-      title = `Commande pour ${order.supplier.name}`
+      title = `Commande n°${order.code}`
       isLoading = false
     } catch (exc) {
       module.goToList()
@@ -114,14 +119,55 @@
 <PageHeader {title} {actions} />
 
 <PageContent>
+  <div class='flex'>
+    {#if $authStore.account.profile.kind === ProfileKind.Customer}
+      <div class='bg-white rounded py-4 px-6 mb-3 mr-2 flex-grow border-r'>
+        <h3 class='mb-2'>Fournisseur</h3>
+        <p class='font-medium'>{order?.supplier.name}</p>
+        <p><a href='mailto:{order?.supplier.email}'>{order?.supplier.email}</a></p>
+        <p><a href='tel:{order?.supplier.phone}'>{order?.supplier.phone}</a></p>
+      </div>
+    {:else}
+      <div class='bg-white rounded py-4 px-6 mb-3 mr-2 flex-grow border-r'>
+        <h3 class='mb-2'>Client</h3>
+        <p class='font-medium'>{order?.customer.name}</p>
+        <p><a href='mailto:{order?.customer.email}'>{order?.customer.email}</a></p>
+        <p><a href='tel:{order?.customer.phone}'>{order?.customer.phone}</a></p>
+      </div>
+    {/if}
+    <div class='bg-white rounded py-4 px-6 mb-3 mr-2 flex-grow border-r'>
+      <h3 class='mb-2'>Statut</h3>
+      <p><b>{orderStatus(order)}</b></p>
+      <p>{$authStore.account.profile.kind === ProfileKind.Customer ? 'Créée' : 'Reçue'}
+        le {dateStr(order?.publishedOn)}</p>
+      {#if order?.status === OrderStatus.Fulfilled}
+        <p>Préparée le {dateStr(order?.fulfilledOn)}</p>
+      {/if}
+    </div>
+    <div class='bg-white rounded py-4 px-6 mb-3 flex-grow'>
+      <h3 class='mb-2'>Livraison {order?.delivery.status !== DeliveryStatus.Delivered ? 'prévue' : ''}</h3>
+      <p class='font-medium'>le {dateStr(order?.delivery.scheduledAt)}</p>
+      <p>{order?.delivery.address.street}</p>
+      {#if order?.delivery.address.complement}
+        <p>{order?.delivery.address.complement}</p>
+      {/if}
+      <p>{order?.delivery.address.postcode} {order?.delivery.address.city}</p>
+    </div>
+  </div>
+  {#if order?.status === OrderStatus.Cancelled || order?.status === OrderStatus.Refused}
+    <div class='bg-white rounded py-4 px-6 mb-3 w-full'>
+      <p class='font-medium'>Cette commande à été {orderStatus(order).toLowerCase()} pour la raison suivante: </p>
+      <p>{order?.reason}</p>
+    </div>
+  {/if}
   <table>
     <thead>
     <tr>
       <th>Nom</th>
-      <th>Prix unitaire (HT)</th>
-      <th>TVA</th>
-      <th>Quantité</th>
-      <th>Prix total (TTC)</th>
+      <th class='text-right'>Prix unitaire (HT)</th>
+      <th class='text-right'>TVA</th>
+      <th class='text-right'>Quantité</th>
+      <th class='text-right'>Prix total (TTC)</th>
     </tr>
     </thead>
     <tbody>
@@ -134,9 +180,9 @@
       <tr class='cursor-default'>
         <td><p class='font-semibold'>{product.name}</p>
           <small>#{product.code}</small></td>
-        <td use:formatInnerHtml={currency}>{product.unitPrice}</td>
-        <td use:formatInnerHtml={percent}>{product.vat}</td>
-        <td>
+        <td use:formatInnerHtml={currency} class='text-right'>{product.unitPrice}</td>
+        <td use:formatInnerHtml={percent} class='text-right'>{product.vat}</td>
+        <td class='text-right'>
           {#if product.preparedQuantity > 0 && product.preparedQuantity !== product.orderedQuantity}
             <p>{product.orderedQuantity} commandé(s)</p>
             <p>{product.preparedQuantity} préparé(s)</p>
@@ -144,7 +190,7 @@
             {product.orderedQuantity}
           {/if}
         </td>
-        <td use:formatInnerHtml={currency}>{product.totalOnSalePrice}</td>
+        <td use:formatInnerHtml={currency} class='text-right'>{product.totalOnSalePrice}</td>
       </tr>
     {/each}
     {#if returnables?.length > 0}
@@ -154,10 +200,11 @@
       {#each returnables ?? [] as returnable}
         <tr class='cursor-default'>
           <td class='font-semibold'>{returnable.name}</td>
-          <td use:formatInnerHtml={currency}>{returnable.unitPrice}</td>
-          <td use:formatInnerHtml={percent}>{returnable.vat}</td>
-          <td>{returnable.preparedQuantity > 0 ? returnable.preparedQuantity : returnable.orderedQuantity}</td>
-          <td use:formatInnerHtml={currency}>{returnable.totalOnSalePrice}</td>
+          <td use:formatInnerHtml={currency} class='text-right'>{returnable.unitPrice}</td>
+          <td use:formatInnerHtml={percent} class='text-right'>{returnable.vat}</td>
+          <td
+            class='text-right'>{returnable.preparedQuantity > 0 ? returnable.preparedQuantity : returnable.orderedQuantity}</td>
+          <td use:formatInnerHtml={currency} class='text-right'>{returnable.totalOnSalePrice}</td>
         </tr>
       {/each}
     {/if}
@@ -165,15 +212,15 @@
     <tfoot>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total HT</td>
-      <td class='font-medium'>{currency(order?.totalWholeSalePrice)}</td>
+      <td class='font-medium text-right'>{currency(order?.totalWholeSalePrice)}</td>
     </tr>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total TVA</td>
-      <td class='font-medium'>{currency(order?.totalVatPrice)}</td>
+      <td class='font-medium text-right'>{currency(order?.totalVatPrice)}</td>
     </tr>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total TTC</td>
-      <td class='font-medium'>{currency(order?.totalOnSalePrice)}</td>
+      <td class='font-medium text-right'>{currency(order?.totalOnSalePrice)}</td>
     </tr>
     </tfoot>
   </table>

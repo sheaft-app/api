@@ -25,7 +25,7 @@ public class ConfigureAccountAsCustomer : Feature
         var result =
             await Mediator.Execute(
                 new ConfigureAccountAsCustomerCommand(data.TradeName, data.CorporateName, data.Siret, data.Email,
-                    data.Phone, data.LegalAddress, data.DeliveryAddress, data.BillingAddress, CurrentAccountId), token);
+                    data.Phone, data.LegalAddress, data.DeliveryAddress, data.BillingAddress), token);
         
         return HandleCommandResult(result);
     }

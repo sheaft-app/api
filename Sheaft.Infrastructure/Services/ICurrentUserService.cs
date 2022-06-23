@@ -1,6 +1,6 @@
 ﻿using Sheaft.Domain;
 
-namespace Sheaft.Web.Api
+namespace Sheaft.Infrastructure
 {
     public interface ICurrentUserService
     {

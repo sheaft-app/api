@@ -3,7 +3,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.SupplierManagement;
 
-public record GetAvailableSupplierQuery(SupplierId Identifier) : IQuery<Result<AvailableSupplierDto>>;
+public record GetAvailableSupplierQuery(SupplierId Identifier) : Query<Result<AvailableSupplierDto>>;
 
 internal class GetAvailableSupplierHandler : IQueryHandler<GetAvailableSupplierQuery, Result<AvailableSupplierDto>>
 {

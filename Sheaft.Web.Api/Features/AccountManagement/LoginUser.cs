@@ -25,7 +25,7 @@ public class LoginUser : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TokenResponse>> Post([FromBody] LoginRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(data.Adapt<LoginUserCommand>(), token);
+        var result = await Mediator.Execute(new LoginUserCommand(data.Username, data.Password), token);
         return HandleCommandResult<AuthenticationTokenDto, TokenResponse>(result);
     }
 }

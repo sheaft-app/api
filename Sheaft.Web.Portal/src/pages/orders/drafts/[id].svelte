@@ -65,7 +65,7 @@
         return { productIdentifier: l.id, quantity: l.quantity }
       })))
       
-      module.goToList({tab:OrderTab.Pending});
+      module.goToDetails(id);
       isLoading = false
     } catch (exc) {
       console.error(exc)

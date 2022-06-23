@@ -3,7 +3,9 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.SupplierManagement;
 
-public record UpdateSupplierCommand(SupplierId Identifier, string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? ShippingAddress, NamedAddressDto? BillingAddress) : ICommand<Result>;
+public record UpdateSupplierCommand(SupplierId Identifier, string TradeName, string CorporateName, string Siret,
+    string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? ShippingAddress,
+    NamedAddressDto? BillingAddress) : Command<Result>;
 
 public class UpdateSupplierHandler : ICommandHandler<UpdateSupplierCommand, Result>
 {
@@ -24,9 +26,10 @@ public class UpdateSupplierHandler : ICommandHandler<UpdateSupplierCommand, Resu
             return Result.Failure(supplierResult);
 
         var supplier = supplierResult.Value;
-        supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email), new PhoneNumber(request.Phone));
+        supplier.SetInfo(new TradeName(request.TradeName), new EmailAddress(request.Email),
+            new PhoneNumber(request.Phone));
         supplier.SetLegal(new CorporateName(request.CorporateName), new Siret(request.Siret), legalAddress);
-        
+
         if (request.BillingAddress != null)
             supplier.SetBillingAddress(new BillingAddress(
                 request.BillingAddress.Name,

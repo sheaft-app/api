@@ -20,6 +20,12 @@ public class CancelOrderHandler : ICommandHandler<CancelOrderCommand, Result>
             return Result.Failure(orderResult);
 
         var order = orderResult.Value;
+        if(request.RequestUser.Kind == ProfileKind.Supplier && (order.Status != OrderStatus.Accepted && order.Status != OrderStatus.Fulfilled))
+            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.fulfilled.status");
+        
+        if(request.RequestUser.Kind == ProfileKind.Customer && order.Status != OrderStatus.Pending)
+            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.pending.status");
+        
         var refuseResult = order.Cancel(request.CancelReason, request.CreatedAt);
         if (refuseResult.IsFailure)
             return Result.Failure(refuseResult);

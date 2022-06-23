@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record ListReturnablesQuery(SupplierId SupplierId, PageInfo PageInfo) : IQuery<Result<PagedResult<ReturnableDto>>>;
+public record ListReturnablesQuery(SupplierId SupplierId, PageInfo PageInfo) : Query<Result<PagedResult<ReturnableDto>>>;
 
 internal class ListReturnablesHandler : IQueryHandler<ListReturnablesQuery, Result<PagedResult<ReturnableDto>>>
 {

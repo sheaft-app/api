@@ -3,7 +3,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.CustomerManagement;
 
-public record UpdateCustomerCommand(CustomerId Identifier, string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? DeliveryAddress, NamedAddressDto? BillingAddress) : ICommand<Result>;
+public record UpdateCustomerCommand(CustomerId Identifier, string TradeName, string CorporateName, string Siret, string Email, string Phone, AddressDto LegalAddress, NamedAddressDto? DeliveryAddress, NamedAddressDto? BillingAddress) : Command<Result>;
 
 public class UpdateCustomerHandler : ICommandHandler<UpdateCustomerCommand, Result>
 {

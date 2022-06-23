@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.OrderManagement;
 
-public record GetOrderQuery(OrderId Identifier, AccountId AccountId) : IQuery<Result<OrderDetailsDto>>;
+public record GetOrderQuery(OrderId Identifier) : Query<Result<OrderDetailsDto>>;
 
 internal class GetOrderHandler : IQueryHandler<GetOrderQuery, Result<OrderDetailsDto>>
 {
@@ -15,6 +15,6 @@ internal class GetOrderHandler : IQueryHandler<GetOrderQuery, Result<OrderDetail
     
     public async Task<Result<OrderDetailsDto>> Handle(GetOrderQuery request, CancellationToken token)
     {
-        return await _orderQueries.Get(request.Identifier, request.AccountId, token);
+        return await _orderQueries.Get(request.Identifier, request.RequestUser.AccountId, token);
     }
 }

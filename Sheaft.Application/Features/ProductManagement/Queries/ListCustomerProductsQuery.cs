@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record ListOrderableProductsQuery(AccountId CustomerAccountId, SupplierId SupplierId, PageInfo PageInfo) : IQuery<Result<PagedResult<OrderableProductDto>>>;
+public record ListOrderableProductsQuery(SupplierId SupplierId, PageInfo PageInfo) : Query<Result<PagedResult<OrderableProductDto>>>;
 
 internal class ListOrderableProductsHandler : IQueryHandler<ListOrderableProductsQuery, Result<PagedResult<OrderableProductDto>>>
 {
@@ -15,6 +15,6 @@ internal class ListOrderableProductsHandler : IQueryHandler<ListOrderableProduct
     
     public async Task<Result<PagedResult<OrderableProductDto>>> Handle(ListOrderableProductsQuery request, CancellationToken token)
     {
-        return await _productQueries.ListOrderable(request.CustomerAccountId, request.SupplierId, request.PageInfo, token);
+        return await _productQueries.ListOrderable(request.RequestUser.AccountId, request.SupplierId, request.PageInfo, token);
     }
 }

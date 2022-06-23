@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record ListSentAgreementsQuery(AccountId AccountId, PageInfo PageInfo, string? Search = null) : IQuery<Result<PagedResult<AgreementDto>>>;
+public record ListSentAgreementsQuery(PageInfo PageInfo, string? Search = null) : Query<Result<PagedResult<AgreementDto>>>;
 
 internal class ListSentAgreementsHandler : IQueryHandler<ListSentAgreementsQuery, Result<PagedResult<AgreementDto>>>
 {
@@ -15,6 +15,6 @@ internal class ListSentAgreementsHandler : IQueryHandler<ListSentAgreementsQuery
     
     public async Task<Result<PagedResult<AgreementDto>>> Handle(ListSentAgreementsQuery request, CancellationToken token)
     {
-        return await _agreementQueries.ListSentAgreements(request.AccountId, request.PageInfo, token, request.Search);
+        return await _agreementQueries.ListSentAgreements(request.RequestUser.AccountId, request.PageInfo, token, request.Search);
     }
 }

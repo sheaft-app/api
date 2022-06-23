@@ -4,7 +4,7 @@ using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Application.AccountManagement;
 
-public record LoginUserCommand(string Username, string Password) : ICommand<Result<AuthenticationTokenDto>>;
+public record LoginUserCommand(string Username, string Password) : Command<Result<AuthenticationTokenDto>>;
 
 internal class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {

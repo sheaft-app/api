@@ -79,7 +79,8 @@ public class ProposeAgreementToSupplierCommandShould
 
     private static ProposeAgreementToSupplierCommand GetCommand(SupplierId supplierIdentifier, AccountId customerAccountIdentifier)
     {
-        var command = new ProposeAgreementToSupplierCommand(supplierIdentifier, customerAccountIdentifier);
+        var command = new ProposeAgreementToSupplierCommand(supplierIdentifier);
+        command.SetRequestUser(new RequestUser(true, ProfileKind.Customer, customerAccountIdentifier));
         return command;
     }
 }

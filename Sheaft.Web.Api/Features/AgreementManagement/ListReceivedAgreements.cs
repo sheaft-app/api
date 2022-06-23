@@ -24,7 +24,7 @@ public class ListReceivedAgreements : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaginatedResults<AgreementDto>>> List(CancellationToken token, string? search = null, int? page = 1, int? take = 10)
     {
-        var result = await Mediator.Query(new ListReceivedAgreementsQuery(CurrentAccountId, PageInfo.From(page, take), search), token);
+        var result = await Mediator.Query(new ListReceivedAgreementsQuery(PageInfo.From(page, take), search), token);
         return HandleQueryResult(result);
     }
 }

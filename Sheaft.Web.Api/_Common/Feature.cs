@@ -14,9 +14,6 @@ namespace Sheaft.Web.Api;
 public class Feature : ControllerBase
 {
     protected readonly ISheaftMediator Mediator;
-    protected AccountId? CurrentAccountId => HttpContext.User.Identity?.IsAuthenticated == true 
-        ? new AccountId(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)) 
-        : null;
 
     public Feature(ISheaftMediator mediator)
     {

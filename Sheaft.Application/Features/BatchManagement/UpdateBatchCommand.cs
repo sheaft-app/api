@@ -4,7 +4,7 @@ using Sheaft.Domain.BatchManagement;
 namespace Sheaft.Application.BatchManagement;
 
 public record UpdateBatchCommand(SupplierId SupplierId, BatchId BatchIdentifier, string Number,
-    BatchDateKind DateKind, DateOnly Date) : ICommand<Result>;
+    BatchDateKind DateKind, DateOnly Date) : Command<Result>;
 
 internal class UpdateBatchHandler : ICommandHandler<UpdateBatchCommand, Result>
 {

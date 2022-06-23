@@ -5,7 +5,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.AccountManagement;
 
-public record ForgotPasswordCommand(string Email) : ICommand<Result>;
+public record ForgotPasswordCommand(string Email) : Command<Result>;
 
 internal class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCommand>
 {

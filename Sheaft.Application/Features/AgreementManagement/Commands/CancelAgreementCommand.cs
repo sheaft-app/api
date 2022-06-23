@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record CancelAgreementCommand(AgreementId AgreementIdentifier) : ICommand<Result>;
+public record CancelAgreementCommand(AgreementId AgreementIdentifier) : Command<Result>;
 
 public class CancelAgreementHandler : ICommandHandler<CancelAgreementCommand, Result>
 {

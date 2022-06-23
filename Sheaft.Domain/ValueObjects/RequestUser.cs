@@ -1,3 +1,3 @@
 ﻿namespace Sheaft.Domain;
 
-public record RequestUser(bool IsAuthenticated, string? Identifier = null);
+public record RequestUser(bool IsAuthenticated, ProfileKind? Kind = null, AccountId AccountId = null, string ProfileId = null);

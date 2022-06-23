@@ -4,7 +4,7 @@ using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Application.AccountManagement;
 
-public record RefreshAccessTokenCommand(string RefreshToken) : ICommand<Result<AuthenticationTokenDto>>;
+public record RefreshAccessTokenCommand(string RefreshToken) : Command<Result<AuthenticationTokenDto>>;
 
 internal class RefreshAccessTokenCommandValidator : AbstractValidator<RefreshAccessTokenCommand>
 {

@@ -24,9 +24,9 @@ public class ResetPassword : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post([FromBody] ResetPasswordRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(data.Adapt<ResetPasswordCommand>(), token);
+        var result = await Mediator.Execute(new ResetPasswordCommand(data.Identifier, data.ResetToken, data.Password, data.Confirm), token);
         return HandleCommandResult(result);
     }
 }
 
-public record ResetPasswordRequest(string ResetToken, string Password, string Confirm);
+public record ResetPasswordRequest(string Identifier, string ResetToken, string Password, string Confirm);

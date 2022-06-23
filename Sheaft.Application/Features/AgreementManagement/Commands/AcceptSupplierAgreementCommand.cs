@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record AcceptSupplierAgreementCommand(AgreementId AgreementIdentifier) : ICommand<Result>;
+public record AcceptSupplierAgreementCommand(AgreementId AgreementIdentifier) : Command<Result>;
 
 public class AcceptSupplierAgreementHandler : ICommandHandler<AcceptSupplierAgreementCommand, Result>
 {

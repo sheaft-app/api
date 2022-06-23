@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record GetProductQuery(ProductId Identifier, SupplierId SupplierId) : IQuery<Result<ProductDetailsDto>>;
+public record GetProductQuery(ProductId Identifier, SupplierId SupplierId) : Query<Result<ProductDetailsDto>>;
 
 internal class GetProductHandler : IQueryHandler<GetProductQuery, Result<ProductDetailsDto>>
 {

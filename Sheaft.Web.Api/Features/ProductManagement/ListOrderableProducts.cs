@@ -23,7 +23,7 @@ public class ListOrderableProducts : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaginatedResults<OrderableProductDto>>> List(string supplierId, CancellationToken token, int? page = 1, int? take = 10)
     {
-        var result = await Mediator.Query(new ListOrderableProductsQuery(CurrentAccountId, new SupplierId(supplierId), PageInfo.From(page, take)), token);
+        var result = await Mediator.Query(new ListOrderableProductsQuery(new SupplierId(supplierId), PageInfo.From(page, take)), token);
         return HandleQueryResult(result);
     }
 }

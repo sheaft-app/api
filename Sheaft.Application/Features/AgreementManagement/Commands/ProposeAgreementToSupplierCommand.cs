@@ -3,7 +3,7 @@ using Sheaft.Domain.AgreementManagement;
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record ProposeAgreementToSupplierCommand(SupplierId SupplierIdentifier, AccountId CustomerAccountIdentifier) : ICommand<Result<string>>;
+public record ProposeAgreementToSupplierCommand(SupplierId SupplierIdentifier) : Command<Result<string>>;
 
 public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreementToSupplierCommand, Result<string>>
 {
@@ -20,7 +20,7 @@ public class ProposeAgreementToSupplierHandler : ICommandHandler<ProposeAgreemen
 
     public async Task<Result<string>> Handle(ProposeAgreementToSupplierCommand request, CancellationToken token)
     {
-        var customerResult = await _uow.Customers.Get(request.CustomerAccountIdentifier, token);
+        var customerResult = await _uow.Customers.Get(request.RequestUser.AccountId, token);
         if (customerResult.IsFailure)
             return Result.Failure<string>(customerResult);
         

@@ -1,4 +1,5 @@
 ﻿using Sheaft.Domain;
+using Sheaft.Infrastructure;
 
 namespace Sheaft.Web.Api
 {

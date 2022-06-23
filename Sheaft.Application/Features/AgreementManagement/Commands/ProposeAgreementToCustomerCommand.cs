@@ -4,7 +4,7 @@ using Sheaft.Domain.AgreementManagement;
 namespace Sheaft.Application.AgreementManagement;
 
 public record ProposeAgreementToCustomerCommand(CustomerId CustomerIdentifier, 
-    List<DayOfWeek> DeliveryDays, int? OrderDelayInHoursBeforeDeliveryDay, AccountId SupplierAccountIdentifier) : ICommand<Result<string>>;
+    List<DayOfWeek> DeliveryDays, int? OrderDelayInHoursBeforeDeliveryDay) : Command<Result<string>>;
 
 public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreementToCustomerCommand, Result<string>>
 {
@@ -21,7 +21,7 @@ public class ProposeAgreementToCustomerHandler : ICommandHandler<ProposeAgreemen
 
     public async Task<Result<string>> Handle(ProposeAgreementToCustomerCommand request, CancellationToken token)
     {
-        var supplierResult = await _uow.Suppliers.Get(request.SupplierAccountIdentifier, token);
+        var supplierResult = await _uow.Suppliers.Get(request.RequestUser.AccountId, token);
         if (supplierResult.IsFailure)
             return Result.Failure<string>(supplierResult);
 

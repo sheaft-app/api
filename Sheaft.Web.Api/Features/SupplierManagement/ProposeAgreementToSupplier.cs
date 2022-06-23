@@ -23,7 +23,7 @@ public class ProposeAgreementToSupplier : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post(string supplierId, CancellationToken token)
     {
-        var result = await Mediator.Execute(new ProposeAgreementToSupplierCommand(new SupplierId(supplierId), CurrentAccountId), token);
+        var result = await Mediator.Execute(new ProposeAgreementToSupplierCommand(new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

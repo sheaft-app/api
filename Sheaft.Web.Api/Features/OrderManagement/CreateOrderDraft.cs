@@ -25,7 +25,7 @@ public class CreateOrderDraft : Feature
     {
         var result =
             await Mediator.Execute(
-                new CreateOrderDraftCommand(new SupplierId(supplierId), CurrentAccountId), token);
+                new CreateOrderDraftCommand(new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

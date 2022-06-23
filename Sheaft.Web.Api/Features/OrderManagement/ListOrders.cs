@@ -24,7 +24,7 @@ public class ListOrders : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaginatedResults<OrderDto>>> List(CancellationToken token, [FromQuery]IEnumerable<OrderStatus>? statuses = null, int? page = 1, int? take = 10)
     {
-        var result = await Mediator.Query(new ListOrdersQuery(CurrentAccountId, statuses, PageInfo.From(page, take)), token);
+        var result = await Mediator.Query(new ListOrdersQuery(statuses, PageInfo.From(page, take)), token);
         return HandleQueryResult(result);
     }
 }

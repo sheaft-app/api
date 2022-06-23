@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Domain;
+using Sheaft.Domain.AccountManagement;
 using Sheaft.Domain.OrderManagement;
+using Sheaft.Domain.SupplierManagement;
 using Sheaft.Infrastructure.AccountManagement;
 using Sheaft.Infrastructure.Persistence;
 using Sheaft.UnitTests.Helpers;
@@ -21,10 +23,11 @@ public class CancelOrderCommandShould
     [Test]
     public async Task Set_Status_As_Cancelled_And_CompletedOn()
     {
-        var (context, handler) = InitHandler();
+        var (account, context, handler) = InitHandler();
         var order = InitOrder(context);
 
         var cancelOrderCommand = new CancelOrderCommand(order.Id);
+        cancelOrderCommand.SetRequestUser(new RequestUser(true, ProfileKind.Supplier, account.Id, order.SupplierId.Value));
         var result =
             await handler.Handle(
                 cancelOrderCommand,
@@ -38,10 +41,11 @@ public class CancelOrderCommandShould
     [Test]
     public async Task Set_FailureReason()
     {
-        var (context, handler) = InitHandler();
+        var (account, context, handler) = InitHandler();
         var order = InitOrder(context);
 
         var cancelOrderCommand = new CancelOrderCommand(order.Id, "reason");
+        cancelOrderCommand.SetRequestUser(new RequestUser(true, ProfileKind.Supplier, account.Id, order.SupplierId.Value));
         var result = await handler.Handle(cancelOrderCommand, CancellationToken.None);
         
         Assert.IsTrue(result.IsSuccess);
@@ -49,19 +53,36 @@ public class CancelOrderCommandShould
     }
     
     [Test]
-    public async Task Fail_If_Not_In_Accepted_Status()
+    public async Task Fail_If_Supplier_Cancel_Not_In_Accepted_Status()
     {
-        var (context, handler) = InitHandler();
+        var (account, context, handler) = InitHandler();
         var order = InitOrder(context, false);
 
-        var result = await handler.Handle(new CancelOrderCommand(order.Id), CancellationToken.None);
+        var cancelOrderCommand = new CancelOrderCommand(order.Id);
+        cancelOrderCommand.SetRequestUser(new RequestUser(true, ProfileKind.Supplier, account.Id, order.SupplierId.Value));
+        var result = await handler.Handle(cancelOrderCommand, CancellationToken.None);
         
         Assert.IsTrue(result.IsFailure);
         Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
         Assert.AreEqual("order.cancel.requires.accepted.or.fulfilled.status", result.Error.Code);
     }
+    
+    [Test]
+    public async Task Fail_If_Customer_Cancel_Not_In_Pending_Status()
+    {
+        var (account, context, handler) = InitHandler();
+        var order = InitOrder(context);
 
-    private (AppDbContext, CancelOrderHandler) InitHandler()
+        var cancelOrderCommand = new CancelOrderCommand(order.Id);
+        cancelOrderCommand.SetRequestUser(new RequestUser(true, ProfileKind.Customer, AccountId.New(), ""));
+        var result = await handler.Handle(cancelOrderCommand, CancellationToken.None);
+        
+        Assert.IsTrue(result.IsFailure);
+        Assert.AreEqual(ErrorKind.BadRequest, result.Error.Kind);
+        Assert.AreEqual("order.cancel.requires.pending.status", result.Error.Code);
+    }
+
+    private (Account, AppDbContext, CancelOrderHandler) InitHandler()
     {
         var (context, uow, logger) = DependencyHelpers.InitDependencies<CancelOrderHandler>();
 
@@ -81,7 +102,7 @@ public class CancelOrderCommandShould
 
         var handler = new CancelOrderHandler(uow);
 
-        return (context, handler);
+        return (supplierAccount, context, handler);
     }
 
     private static Order InitOrder(AppDbContext context, bool accept = true, bool fulfill = false)

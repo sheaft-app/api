@@ -23,7 +23,7 @@ public class GetOrder : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<OrderDetailsDto>> Get(string orderId, CancellationToken token)
     {
-        var result = await Mediator.Query(new GetOrderQuery(new OrderId(orderId), CurrentAccountId), token);
+        var result = await Mediator.Query(new GetOrderQuery(new OrderId(orderId)), token);
         return HandleCommandResult(result);
     }
 }

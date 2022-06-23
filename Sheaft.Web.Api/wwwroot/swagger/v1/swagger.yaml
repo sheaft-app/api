@@ -2444,6 +2444,9 @@ components:
           type: boolean
         canComplete:
           type: boolean
+        reason:
+          type: string
+          nullable: true
       additionalProperties: false
     OrderDraftDto:
       type: object
@@ -2912,6 +2915,9 @@ components:
     ResetPasswordRequest:
       type: object
       properties:
+        identifier:
+          type: string
+          nullable: true
         resetToken:
           type: string
           nullable: true

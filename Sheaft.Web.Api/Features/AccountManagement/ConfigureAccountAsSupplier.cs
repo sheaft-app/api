@@ -26,7 +26,7 @@ public class ConfigureAccountAsSupplier : Feature
         var result =
             await Mediator.Execute(
                 new ConfigureAccountAsSupplierCommand(data.TradeName, data.CorporateName, data.Siret, data.Email,
-                    data.Phone, data.LegalAddress, data.ShippingAddress, data.BillingAddress, CurrentAccountId), token);
+                    data.Phone, data.LegalAddress, data.ShippingAddress, data.BillingAddress), token);
         
         return HandleCommandResult(result);
     }

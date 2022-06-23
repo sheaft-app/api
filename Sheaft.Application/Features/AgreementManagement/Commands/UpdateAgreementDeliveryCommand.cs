@@ -3,7 +3,7 @@ using Sheaft.Domain.AgreementManagement;
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record UpdateAgreementDeliveryCommand(AgreementId AgreementIdentifier, List<DayOfWeek> DeliveryDays, int? OrderDelayInHoursBeforeDeliveryDay = null) : ICommand<Result>;
+public record UpdateAgreementDeliveryCommand(AgreementId AgreementIdentifier, List<DayOfWeek> DeliveryDays, int? OrderDelayInHoursBeforeDeliveryDay = null) : Command<Result>;
 
 public class UpdateAgreementDeliveryHandler : ICommandHandler<UpdateAgreementDeliveryCommand, Result>
 {

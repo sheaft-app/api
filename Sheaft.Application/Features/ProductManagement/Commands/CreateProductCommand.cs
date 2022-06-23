@@ -3,7 +3,8 @@ using Sheaft.Domain.ProductManagement;
 
 namespace Sheaft.Application.ProductManagement;
 
-public record CreateProductCommand(string Name, string? Code, string? Description, decimal Price, decimal Vat, ReturnableId? ReturnableId, SupplierId SupplierId) : ICommand<Result<string>>;
+public record CreateProductCommand(string Name, string? Code, string? Description, decimal Price, decimal Vat,
+    ReturnableId? ReturnableId, SupplierId SupplierId) : Command<Result<string>>;
 
 internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Result<string>>
 {
@@ -12,7 +13,7 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
     private readonly IHandleProductCode _handleProductCode;
 
     public CreateProductHandler(
-        IUnitOfWork uow, 
+        IUnitOfWork uow,
         IRetrieveDefaultCatalog retrieveDefaultCatalog,
         IHandleProductCode handleProductCode)
     {
@@ -20,7 +21,7 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
         _retrieveDefaultCatalog = retrieveDefaultCatalog;
         _handleProductCode = handleProductCode;
     }
-    
+
     public async Task<Result<string>> Handle(CreateProductCommand request, CancellationToken token)
     {
         var codeResult = await _handleProductCode.ValidateOrGenerateNextCode(request.Code, request.SupplierId, token);
@@ -30,11 +31,11 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
         var returnableResult = await _uow.Returnables.Find(request.ReturnableId, token);
         if (returnableResult.IsFailure)
             return Result.Failure<string>(returnableResult);
-        
-        if(returnableResult.Value.HasNoValue && request.ReturnableId != null)
+
+        if (returnableResult.Value.HasNoValue && request.ReturnableId != null)
             return Result.Failure<string>(ErrorKind.NotFound, ReturnableCodes.NotFound);
-        
-        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat), 
+
+        var product = new Product(new ProductName(request.Name), codeResult.Value, new VatRate(request.Vat),
             request.Description, request.SupplierId, returnableResult.Value);
         _uow.Products.Add(product);
 
@@ -44,11 +45,11 @@ internal class CreateProductHandler : ICommandHandler<CreateProductCommand, Resu
 
         catalogResult.Value.AddOrUpdateProductPrice(product, new ProductUnitPrice(request.Price));
         _uow.Catalogs.Update(catalogResult.Value);
-        
+
         var result = await _uow.Save(token);
-        
-        return result.IsSuccess 
-            ? Result.Success(product.Id.Value) 
+
+        return result.IsSuccess
+            ? Result.Success(product.Id.Value)
             : Result.Failure<string>(result);
     }
 }

@@ -5,7 +5,7 @@ using Sheaft.Domain.AccountManagement;
 
 namespace Sheaft.Application.AccountManagement;
 
-public record ResetPasswordCommand(string Identifier, string ResetToken, string Password, string Confirm) : ICommand<Result>;
+public record ResetPasswordCommand(string Identifier, string ResetToken, string Password, string Confirm) : Command<Result>;
 
 internal class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
 {

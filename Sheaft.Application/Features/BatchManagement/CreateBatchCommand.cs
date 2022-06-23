@@ -3,7 +3,7 @@ using Sheaft.Domain.BatchManagement;
 
 namespace Sheaft.Application.BatchManagement;
 
-public record CreateBatchCommand(string Number, BatchDateKind DateKind, DateOnly Date, SupplierId SupplierIdentifier) : ICommand<Result<string>>;
+public record CreateBatchCommand(string Number, BatchDateKind DateKind, DateOnly Date, SupplierId SupplierIdentifier) : Command<Result<string>>;
 
 internal class CreateBatchHandler : ICommandHandler<CreateBatchCommand, Result<string>>
 {

@@ -25,7 +25,7 @@ public class ListAvailableCustomers : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PaginatedResults<AvailableCustomerDto>>> List(CancellationToken token, string? search = null, int? page = 1, int? take = 10)
     {
-        var result = await Mediator.Query(new ListAvailableCustomersQuery(CurrentAccountId, PageInfo.From(page, take)), token);
+        var result = await Mediator.Query(new ListAvailableCustomersQuery(PageInfo.From(page, take)), token);
         return HandleQueryResult(result);
     }
 }

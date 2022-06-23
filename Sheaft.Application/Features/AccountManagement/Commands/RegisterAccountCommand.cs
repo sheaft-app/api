@@ -5,7 +5,7 @@ using Sheaft.Domain.AccountManagement;
 namespace Sheaft.Application.AccountManagement;
 
 public record RegisterAccountCommand
-    (string Email, string Password, string Confirm, string Firstname, string Lastname) : ICommand<Result<string>>;
+    (string Email, string Password, string Confirm, string Firstname, string Lastname) : Command<Result<string>>;
 
 internal class RegisterAccountCommandValidator : AbstractValidator<RegisterAccountCommand>
 {

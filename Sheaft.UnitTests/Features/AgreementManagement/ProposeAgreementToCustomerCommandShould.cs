@@ -82,7 +82,8 @@ public class ProposeAgreementToCustomerCommandShould
 
     private static ProposeAgreementToCustomerCommand GetCommand(CustomerId customerIdentifier, AccountId supplierAccountIdentifier, List<DayOfWeek> deliveryDays, int orderDelayInHoursBeforeDeliveryDay)
     {
-        var command = new ProposeAgreementToCustomerCommand(customerIdentifier, deliveryDays, orderDelayInHoursBeforeDeliveryDay, supplierAccountIdentifier);
+        var command = new ProposeAgreementToCustomerCommand(customerIdentifier, deliveryDays, orderDelayInHoursBeforeDeliveryDay);
+        command.SetRequestUser(new RequestUser(true, ProfileKind.Supplier, supplierAccountIdentifier));
         return command;
     }
 }

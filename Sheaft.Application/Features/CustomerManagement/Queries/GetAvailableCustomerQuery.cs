@@ -3,7 +3,7 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.CustomerManagement;
 
-public record GetAvailableCustomerQuery(CustomerId Identifier) : IQuery<Result<AvailableCustomerDto>>;
+public record GetAvailableCustomerQuery(CustomerId Identifier) : Query<Result<AvailableCustomerDto>>;
 
 internal class GetAvailableCustomerHandler : IQueryHandler<GetAvailableCustomerQuery, Result<AvailableCustomerDto>>
 {

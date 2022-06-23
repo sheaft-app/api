@@ -23,7 +23,7 @@ public class ProposeAgreementToCustomer : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromRoute] string id, [FromBody] ProposeAgreementToCustomerRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new ProposeAgreementToCustomerCommand(new CustomerId(id), data.DeliveryDays, data.OrderDelayInHoursBeforeDeliveryDay, CurrentAccountId), token);
+        var result = await Mediator.Execute(new ProposeAgreementToCustomerCommand(new CustomerId(id), data.DeliveryDays, data.OrderDelayInHoursBeforeDeliveryDay), token);
         return HandleCommandResult(result);
     }
 }

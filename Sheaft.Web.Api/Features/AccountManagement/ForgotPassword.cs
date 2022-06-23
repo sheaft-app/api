@@ -25,7 +25,7 @@ public class ForgotPassword : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post([FromBody] ForgotPasswordRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(data.Adapt<ForgotPasswordCommand>(), token);
+        var result = await Mediator.Execute(new ForgotPasswordCommand(data.Email), token);
         return HandleCommandResult(result);
     }
 }

@@ -23,7 +23,7 @@ public class GetNextSupplierDeliveryDates : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<DateTime>>> Get(string supplierId, CancellationToken token)
     {
-        var result = await Mediator.Query(new GetNextSupplierDeliveryDatesQuery(new SupplierId(supplierId), CurrentAccountId), token);
+        var result = await Mediator.Query(new GetNextSupplierDeliveryDatesQuery(new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }

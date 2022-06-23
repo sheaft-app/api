@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record RevokeAgreementCommand(AgreementId AgreementIdentifier, string Reason) : ICommand<Result>;
+public record RevokeAgreementCommand(AgreementId AgreementIdentifier, string Reason) : Command<Result>;
 
 public class RevokeAgreementHandler : ICommandHandler<RevokeAgreementCommand, Result>
 {

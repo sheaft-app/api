@@ -60,6 +60,7 @@ internal class OrderQueries : Queries, IOrderQueries
                     CustomerPhone = order.Customer.Phone,
                     SupplierAccountId = order.Supplier.AccountId,
                     CustomerAccountId = order.Customer.AccountId,
+                    Reason = order.FailureReason
                 }
                 into g
                 select new OrderDetailsDto(
@@ -107,9 +108,10 @@ internal class OrderQueries : Queries, IOrderQueries
                         : null,
                     accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Pending,
                     (accountId.Value == g.Key.CustomerAccountId && (OrderStatus) g.Key.Status == OrderStatus.Pending) ||
-                    (accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Accepted),
+                    (accountId.Value == g.Key.SupplierAccountId && ((OrderStatus) g.Key.Status == OrderStatus.Accepted || (OrderStatus) g.Key.Status == OrderStatus.Fulfilled)),
                     accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Accepted,
-                    accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Fulfilled);
+                    accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Fulfilled,
+                    g.Key.Reason);
 
             var orderResult = await ordersQuery.FirstOrDefaultAsync(token);
             return orderResult == null

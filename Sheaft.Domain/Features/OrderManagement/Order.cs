@@ -120,8 +120,8 @@ public class Order : AggregateRoot
 
     public Result Cancel(string? cancelReason, DateTimeOffset? currentDateTime)
     {
-        if (Status != OrderStatus.Accepted && Status != OrderStatus.Fulfilled)
-            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.accepted.or.fulfilled.status");
+        if (Status != OrderStatus.Pending && Status != OrderStatus.Accepted && Status != OrderStatus.Fulfilled)
+            return Result.Failure(ErrorKind.BadRequest, "order.cancel.requires.pending.accepted.or.fulfilled.status");
         
         Status = OrderStatus.Cancelled;
         CompletedOn = currentDateTime ?? DateTimeOffset.UtcNow;

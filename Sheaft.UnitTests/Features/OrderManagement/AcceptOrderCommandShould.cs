@@ -25,7 +25,7 @@ public class AcceptOrderCommandShould
     {
         var (context, handler) = InitHandler();
         var order = InitOrder(context);
-        var acceptOrderCommand = new AcceptOrderCommand(order.Id, Maybe<DeliveryDate>.None);
+        var acceptOrderCommand = new AcceptOrderCommand(order.Id);
 
         var result = await handler.Handle(acceptOrderCommand, CancellationToken.None);
 
@@ -46,7 +46,7 @@ public class AcceptOrderCommandShould
         Assert.IsTrue(result.IsSuccess);
         var delivery = context.Deliveries.Single(d => d.Id == order.DeliveryId);
         Assert.IsNotNull(delivery);
-        Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value.Value, delivery.ScheduledAt.Value);
+        Assert.AreEqual(acceptOrderCommand.NewDeliveryDate.Value, delivery.ScheduledAt.Value);
         Assert.AreEqual(acceptOrderCommand.CreatedAt, order.AcceptedOn);
     }
     

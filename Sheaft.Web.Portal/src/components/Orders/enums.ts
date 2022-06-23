@@ -8,6 +8,12 @@
   Cancelled
 }
 
+export enum DeliveryStatus{
+  Pending,
+  Scheduled,
+  Delivered,
+}
+
 export enum OrderLineKind{
   Product, 
   Returnable

@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.AgreementManagement;
 
-public record AcceptCustomerAgreementCommand(AgreementId AgreementIdentifier, List<DayOfWeek> DeliveryDays, int OrderDelayInHoursBeforeDeliveryDay) : ICommand<Result>;
+public record AcceptCustomerAgreementCommand(AgreementId AgreementIdentifier, List<DayOfWeek> DeliveryDays, int OrderDelayInHoursBeforeDeliveryDay) : Command<Result>;
 
 public class AcceptCustomerAgreementHandler : ICommandHandler<AcceptCustomerAgreementCommand, Result>
 {

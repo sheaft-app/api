@@ -3,7 +3,7 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record CreateOrderDraftCommand(SupplierId SupplierIdentifier, AccountId CustomerAccountId) : ICommand<Result<string>>;
+public record CreateOrderDraftCommand(SupplierId SupplierIdentifier) : Command<Result<string>>;
     
 public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, Result<string>>
 {
@@ -20,7 +20,7 @@ public class CreateOrderDraftHandler : ICommandHandler<CreateOrderDraftCommand, 
 
     public async Task<Result<string>> Handle(CreateOrderDraftCommand request, CancellationToken token)
     {
-        var customerResult = await _uow.Customers.Get(request.CustomerAccountId, token);
+        var customerResult = await _uow.Customers.Get(request.RequestUser.AccountId, token);
         if(customerResult.IsFailure)
             return Result.Failure<string>(customerResult);
         

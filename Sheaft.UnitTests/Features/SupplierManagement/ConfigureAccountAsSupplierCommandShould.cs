@@ -64,7 +64,8 @@ public class ConfigureAccountAsSupplierCommandShould
         var address = new AddressDto("street", null, "74540", "city");
         var namedAddress = new NamedAddressDto("ee", "tys@tese.com", "street", null, "74540", "city");
         var command = new ConfigureAccountAsSupplierCommand("TradeName", "CorporateName", "15932477173006", "test@test.com",
-            "0654653221", address, namedAddress, namedAddress, accountIdentifier);
+            "0654653221", address, namedAddress, namedAddress);
+        command.SetRequestUser(new RequestUser(true, null, accountIdentifier));
         return command;
     }
 }

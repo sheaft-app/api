@@ -2,7 +2,7 @@
 
 namespace Sheaft.Application.ProductManagement;
 
-public record ListProductsQuery(SupplierId SupplierId, PageInfo PageInfo) : IQuery<Result<PagedResult<ProductDto>>>;
+public record ListProductsQuery(SupplierId SupplierId, PageInfo PageInfo) : Query<Result<PagedResult<ProductDto>>>;
 
 internal class ListProductsHandler : IQueryHandler<ListProductsQuery, Result<PagedResult<ProductDto>>>
 {

@@ -3,7 +3,7 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record UpdateOrderDraftProductsCommand(OrderId OrderIdentifier, IEnumerable<ProductQuantityDto> Products) : ICommand<Result>;
+public record UpdateOrderDraftProductsCommand(OrderId OrderIdentifier, IEnumerable<ProductQuantityDto> Products) : Command<Result>;
     
 public class UpdateOrderDraftProductsHandler : ICommandHandler<UpdateOrderDraftProductsCommand, Result>
 {
