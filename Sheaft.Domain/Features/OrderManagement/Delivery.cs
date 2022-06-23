@@ -33,6 +33,7 @@ public class Delivery : AggregateRoot
     public TotalVatPrice TotalVatPrice { get; private set; }
     public TotalOnSalePrice TotalOnSalePrice { get; private set; }
     public DeliveryAddress Address { get; }
+    public string? Comments { get; private set; }
     public SupplierId SupplierId { get; }
     public CustomerId CustomerId { get; }
     public DateTimeOffset CreatedOn { get; private set; }
@@ -114,7 +115,7 @@ public class Delivery : AggregateRoot
         return Result.Success();
     }
 
-    internal Result Deliver(IEnumerable<DeliveryLine> adjustments, DateTimeOffset? currentDateTime = null)
+    internal Result Deliver(IEnumerable<DeliveryLine> adjustments, string? comments = null, DateTimeOffset? currentDateTime = null)
     {
         if (Status != DeliveryStatus.Scheduled)
             return Result.Failure(ErrorKind.BadRequest, "delivery.deliver.requires.scheduled.delivery");
@@ -123,6 +124,7 @@ public class Delivery : AggregateRoot
         DeliveredOn = currentDateTime ?? DateTimeOffset.UtcNow;
         UpdatedOn = DateTimeOffset.UtcNow;
         Status = DeliveryStatus.Delivered;
+        Comments = comments;
         
         CalculatePrices();
 

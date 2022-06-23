@@ -6,14 +6,14 @@
   import { mediator } from '$components/mediator'
   import { FulfillOrderCommand } from '$components/Orders/commands/fulfillOrder'
   import type { DeliveryLine } from '$components/Orders/types'
-  import { OrderLineKind } from '$components/Orders/enums'
+  import { LineKind } from '$components/Orders/enums'
 
   export let order: Components.Schemas.OrderDetailsDto
   export let onClose: (result: IModalResult<string>) => {}
 
   const { close } = getContext('simple-modal')
 
-  const lines: DeliveryLine[] = order?.lines.filter(l => l.kind == OrderLineKind.Product).map(l => {
+  const lines: DeliveryLine[] = order?.lines.filter(l => l.kind == LineKind.Product).map(l => {
     return {
       productIdentifier: l.identifier,
       orderedQuantity: l.orderedQuantity,

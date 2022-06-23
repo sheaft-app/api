@@ -25,6 +25,7 @@ namespace DataModel
 		[Column("TotalWholeSalePrice"                                        )] public decimal         TotalWholeSalePrice { get; set; } // decimal(18, 2)
 		[Column("TotalVatPrice"                                              )] public decimal         TotalVatPrice       { get; set; } // decimal(18, 2)
 		[Column("TotalOnSalePrice"                                           )] public decimal         TotalOnSalePrice    { get; set; } // decimal(18, 2)
+		[Column("Comments"       , CanBeNull = true                     )] public string          Comments         { get; set; } = null!; // nvarchar(250)
 		[Column("Address_Name"       , CanBeNull = false                     )] public string          AddressName         { get; set; } = null!; // nvarchar(100)
 		[Column("Address_Email"      , CanBeNull = false                     )] public string          AddressEmail        { get; set; } = null!; // nvarchar(254)
 		[Column("Address_Street"     , CanBeNull = false                     )] public string          AddressStreet       { get; set; } = null!; // nvarchar(200)

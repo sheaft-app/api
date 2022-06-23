@@ -34,7 +34,7 @@ public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnab
                     GetProductQuantity(p.Id, returnedReturnables), p.UnitPrice,
                     p.Vat));
 
-            if (adjustedReturnables.Any(r => r.Quantity.Value >= 0))
+            if (adjustedReturnables.Any(r => r.Quantity.Value > 0))
                 return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.BadRequest,
                     "delivery.returnables.quantity.must.be.lower.than.zero");
 

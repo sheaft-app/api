@@ -154,6 +154,7 @@ declare namespace Components {
         export interface DeliverOrdersRequest {
             productsAdjustments?: LineAdjustmentRequest[] | null;
             returnedReturnables?: LineAdjustmentRequest[] | null;
+            comments?: string | null;
         }
         export interface DeliveryLineRequest {
             productIdentifier?: string | null;
@@ -194,6 +195,7 @@ declare namespace Components {
             scheduledAt?: string; // date-time
             status?: DeliveryStatus /* int32 */;
             address?: NamedAddressDto;
+            comments?: string | null;
         }
         export interface OrderDetailsDto {
             id?: string | null;

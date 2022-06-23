@@ -3,4 +3,4 @@ using Sheaft.Domain;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record OrderDeliveryDto(string Id, DateTimeOffset ScheduledAt, DeliveryStatus Status, NamedAddressDto Address);
+public record OrderDeliveryDto(string Id, DateTimeOffset ScheduledAt, DeliveryStatus Status, NamedAddressDto Address, string Comments);

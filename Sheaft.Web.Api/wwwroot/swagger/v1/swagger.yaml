@@ -2268,6 +2268,9 @@ components:
           items:
             $ref: '#/components/schemas/LineAdjustmentRequest'
           nullable: true
+        comments:
+          type: string
+          nullable: true
       additionalProperties: false
     DeliveryLineRequest:
       type: object
@@ -2378,6 +2381,9 @@ components:
           $ref: '#/components/schemas/DeliveryStatus'
         address:
           $ref: '#/components/schemas/NamedAddressDto'
+        comments:
+          type: string
+          nullable: true
       additionalProperties: false
     OrderDetailsDto:
       type: object

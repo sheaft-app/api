@@ -6,6 +6,11 @@ export type ProductQuantity = {
   quantity:number;
 }
 
+export type LineQuantity = {
+  identifier:string;
+  quantity:number;
+}
+
 export type DraftLine = {
   id: string; 
   name: string; 

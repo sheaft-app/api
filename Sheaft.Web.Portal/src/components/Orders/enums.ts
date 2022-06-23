@@ -14,9 +14,10 @@ export enum DeliveryStatus{
   Delivered,
 }
 
-export enum OrderLineKind{
+export enum LineKind{
   Product, 
-  Returnable
+  Returnable,
+  ReturnedReturnable
 }
 
 export enum OrderTab {

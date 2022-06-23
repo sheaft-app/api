@@ -2,7 +2,8 @@
 
 public interface IDeliverOrders
 {
-    Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, IEnumerable<ReturnedReturnable>? returnedReturnables, DateTimeOffset currentDateTime,
+    Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments,
+        IEnumerable<ReturnedReturnable>? returnedReturnables, string? comments, DateTimeOffset currentDateTime,
         CancellationToken token);
 }
 
@@ -25,8 +26,9 @@ public class DeliverOrders : IDeliverOrders
         _createDeliveryReturnedReturnables = createDeliveryReturnedReturnables;
     }
 
-    public async Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments, 
-        IEnumerable<ReturnedReturnable>? returnedReturnables, DateTimeOffset currentDateTime, CancellationToken token)
+    public async Task<Result> Deliver(DeliveryId deliveryIdentifier, IEnumerable<ProductAdjustment>? productAdjustments,
+        IEnumerable<ReturnedReturnable>? returnedReturnables, string? comments, DateTimeOffset currentDateTime,
+        CancellationToken token)
     {
         var deliveryResult = await _deliveryRepository.Get(deliveryIdentifier, token);
         if (deliveryResult.IsFailure)
@@ -52,7 +54,7 @@ public class DeliverOrders : IDeliverOrders
             adjustmentLines.AddRange(returnedReturnablesResult.Value);
         }
 
-        var deliverResult = delivery.Deliver(adjustmentLines, currentDateTime);
+        var deliverResult = delivery.Deliver(adjustmentLines, comments, currentDateTime);
         if (deliverResult.IsFailure)
             return Result.Failure(deliverResult);
         

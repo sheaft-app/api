@@ -9,7 +9,7 @@
   import { currency } from '$utils/money'
   import { formatInnerHtml } from '$actions/format'
   import { percent } from '$utils/percent'
-  import { DeliveryStatus, OrderLineKind, OrderStatus } from '$components/Orders/enums'
+  import { LineKind, OrderStatus } from '$components/Orders/enums'
   import { GetOrderQuery } from '$components/Orders/queries/getOrder'
   import type { IModalResult } from '$components/Modal/modal'
   import AcceptOrder from '$components/Orders/Modals/AcceptOrder.svelte'
@@ -20,6 +20,7 @@
   import { orderStatus } from '$components/Orders/utils'
   import { ProfileKind } from '$components/Account/enums'
   import { authStore } from '$components/Account/store'
+  import DeliverOrder from '$components/Orders/Modals/DeliverOrder.svelte'
 
   export let id: string
   const module = getOrderModule($goto)
@@ -39,6 +40,9 @@
   }
   const fulfillOrder = () => {
     openModal(FulfillOrder)
+  }
+  const deliverOrder = () => {
+    openModal(DeliverOrder)
   }
 
   const onClose = async (result: IModalResult<any>) => {
@@ -104,13 +108,20 @@
       visible: order?.canFulfill,
       color: 'accent',
       action: () => fulfillOrder()
+    },
+    {
+      name: 'Livrer',
+      disabled: isLoading,
+      visible: order?.canComplete,
+      color: 'accent',
+      action: () => deliverOrder()
     }
   ]
 
   $: isLoading = true
 
-  $:returnables = order?.lines.filter(l => l.kind == OrderLineKind.Returnable)
-  $:products = order?.lines.filter(l => l.kind == OrderLineKind.Product)
+  $:returnables = order?.lines.filter(l => l.kind == LineKind.Returnable)
+  $:products = order?.lines.filter(l => l.kind == LineKind.Product)
 </script>
 
 <!-- routify:options title="Détails de la commande" -->
@@ -137,15 +148,37 @@
     {/if}
     <div class='bg-white rounded py-4 px-6 mb-3 mr-2 flex-grow border-r'>
       <h3 class='mb-2'>Statut</h3>
-      <p><b>{orderStatus(order)}</b></p>
-      <p>{$authStore.account.profile.kind === ProfileKind.Customer ? 'Créée' : 'Reçue'}
-        le {dateStr(order?.publishedOn)}</p>
-      {#if order?.status === OrderStatus.Fulfilled}
-        <p>Préparée le {dateStr(order?.fulfilledOn)}</p>
-      {/if}
+      <p>Commande {$authStore.account.profile.kind === ProfileKind.Customer ? 'créée' : 'reçue'}
+        le {dateStr(order?.publishedOn, "dd/MM/yyyy")}</p>
+      <p>
+        {#if order?.status === OrderStatus.Pending && $authStore.account.profile.kind === ProfileKind.Supplier}
+          Elle est en attente de votre acceptation
+        {/if}
+        {#if order?.status === OrderStatus.Pending && $authStore.account.profile.kind === ProfileKind.Customer}
+          Elle est en attente d'acceptation du fournisseur
+        {/if}
+        {#if order?.status === OrderStatus.Accepted && $authStore.account.profile.kind === ProfileKind.Customer}
+          Elle a été acceptée par le fournisseur, sa préparation est en cours
+        {/if}
+        {#if order?.status === OrderStatus.Accepted && $authStore.account.profile.kind === ProfileKind.Supplier}
+          Elle est en attente de préparation de votre part
+        {/if}
+        {#if order?.status === OrderStatus.Fulfilled}
+          Elle est prête à être livrée depuis le {dateStr(order?.fulfilledOn, "dd/MM/yyyy")}
+        {/if}
+        {#if order?.status === OrderStatus.Completed}
+          Elle a été livrée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
+        {/if}
+        {#if order?.status === OrderStatus.Cancelled}
+          Elle a été annulée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
+        {/if}
+        {#if order?.status === OrderStatus.Refused}
+          Elle a été refusée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
+        {/if}
+      </p>
     </div>
     <div class='bg-white rounded py-4 px-6 mb-3 flex-grow'>
-      <h3 class='mb-2'>Livraison {order?.delivery.status !== DeliveryStatus.Delivered ? 'prévue' : ''}</h3>
+      <h3 class='mb-2'>Livraison prévue</h3>
       <p class='font-medium'>le {dateStr(order?.delivery.scheduledAt)}</p>
       <p>{order?.delivery.address.street}</p>
       {#if order?.delivery.address.complement}
@@ -158,6 +191,12 @@
     <div class='bg-white rounded py-4 px-6 mb-3 w-full'>
       <p class='font-medium'>Cette commande à été {orderStatus(order).toLowerCase()} pour la raison suivante: </p>
       <p>{order?.reason}</p>
+    </div>
+  {/if}
+  {#if order?.status === OrderStatus.Completed}
+    <div class='bg-white rounded py-4 px-6 mb-3 w-full'>
+      <p class='font-medium'>Un commentaire a été laissé pour la livraison correspondante: </p>
+      <p>{order?.delivery.comments}</p>
     </div>
   {/if}
   <table>

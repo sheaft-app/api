@@ -3604,6 +3604,10 @@
               "$ref": "#/components/schemas/LineAdjustmentRequest"
             },
             "nullable": true
+          },
+          "comments": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3757,6 +3761,10 @@
           },
           "address": {
             "$ref": "#/components/schemas/NamedAddressDto"
+          },
+          "comments": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
