@@ -128,6 +128,9 @@
     <table>
       <thead>
       <tr>
+        {#if selectedTab !== OrderTab.Draft}
+          <th>N°commande</th>
+        {/if}
         <th>{profileKind === ProfileKind.Customer ? 'Fournisseur' : 'Client'}</th>
         {#if selectedTab !== OrderTab.Draft}
           <th>Total HT</th>
@@ -161,6 +164,9 @@
       <tbody>
       {#each orders as order}
         <tr on:click='{() => goTo(order)}'>
+          {#if selectedTab !== OrderTab.Draft}
+            <th>{order.code}</th>
+          {/if}
           <th>{getOrderTargetName(order)}</th>
           {#if selectedTab !== OrderTab.Draft}
             <td use:formatInnerHtml='{currency}'>{order.totalWholeSalePrice}</td>
@@ -182,7 +188,7 @@
           {/if}
           {#if selectedTab === OrderTab.Aborted || selectedTab === OrderTab.InProgress}
             <td>
-              <span 
+              <span
                 class='rounded-full py-2 px-4 text-white'
                 class:bg-danger-400={order.status === OrderStatus.Refused}
                 class:bg-warning-400={order.status === OrderStatus.Accepted || order.status === OrderStatus.Cancelled}

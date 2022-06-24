@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Sheaft.Application;
 using Sheaft.Application.AgreementManagement;
+using Sheaft.Application.BatchManagement;
 using Sheaft.Application.OrderManagement;
 using Sheaft.Application.ProductManagement;
 using Sheaft.Domain;
@@ -70,6 +71,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IReturnableQueries, ReturnableQueries>();
         services.AddScoped<IAgreementQueries, AgreementQueries>();
         services.AddScoped<IOrderQueries, OrderQueries>();
+        services.AddScoped<IBatchQueries, BatchQueries>();
     }
 
     private static void RegisterRepositories(IServiceCollection services, IConfiguration configuration)

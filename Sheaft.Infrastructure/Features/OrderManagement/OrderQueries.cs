@@ -174,7 +174,7 @@ internal class OrderQueries : Queries, IOrderQueries
                 from delivery in _context.Deliveries.LeftJoin(d => d.Id == order.DeliveryId)
                 where (order.Customer.AccountId == accountId.Value || order.Supplier.AccountId == accountId.Value)
                       && statuses.Contains((OrderStatus) order.Status)
-                orderby order.PublishedOn descending, order.CreatedOn descending
+                orderby order.Reference
                 select new
                 {
                     order.Id,

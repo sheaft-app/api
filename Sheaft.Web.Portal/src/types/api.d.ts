@@ -103,6 +103,23 @@ declare namespace Components {
             totalPages?: number; // int32
         }
         export type BatchDateKind = 0 | 1 | 2; // int32
+        export interface BatchDto {
+            id?: string | null;
+            number?: string | null;
+            kind?: DateTimeKind /* int32 */;
+            date?: DateOnly;
+            createdOn?: string; // date-time
+            updatedOn?: string; // date-time
+        }
+        export interface BatchDtoPaginatedResults {
+            items?: BatchDto[] | null;
+            next?: string | null;
+            previous?: string | null;
+            pageNumber?: number; // int32
+            itemsPerPage?: number; // int32
+            totalItems?: number; // int32
+            totalPages?: number; // int32
+        }
         export interface CancelInvoiceRequest {
             reason?: string | null;
         }
@@ -150,6 +167,7 @@ declare namespace Components {
             dayOfYear?: number; // int32
             dayNumber?: number; // int32
         }
+        export type DateTimeKind = 0 | 1 | 2; // int32
         export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // int32
         export interface DeliverOrdersRequest {
             productsAdjustments?: LineAdjustmentRequest[] | null;
@@ -783,6 +801,20 @@ declare namespace Paths {
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
+    namespace GetBatch {
+        namespace Parameters {
+            export type BatchId = string;
+            export type SupplierId = string;
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+            batchId: Parameters.BatchId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.BatchDto;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
     namespace GetNextSupplierDeliveryDates {
         namespace Parameters {
             export type SupplierId = string;
@@ -892,6 +924,24 @@ declare namespace Paths {
         }
         namespace Responses {
             export type $200 = Components.Schemas.AvailableSupplierDtoPaginatedResults;
+            export type $400 = Components.Schemas.ProblemDetails;
+        }
+    }
+    namespace ListBatches {
+        namespace Parameters {
+            export type Page = number; // int32
+            export type SupplierId = string;
+            export type Take = number; // int32
+        }
+        export interface PathParameters {
+            supplierId: Parameters.SupplierId;
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page /* int32 */;
+            take?: Parameters.Take /* int32 */;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.BatchDtoPaginatedResults;
             export type $400 = Components.Schemas.ProblemDetails;
         }
     }
@@ -1345,6 +1395,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.ConfigureAccountAsSupplier.Responses.$200>
   /**
+   * ListBatches - List available batches for supplier
+   */
+  'ListBatches'(
+    parameters?: Parameters<Paths.ListBatches.PathParameters & Paths.ListBatches.QueryParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.ListBatches.Responses.$200>
+  /**
    * CreateBatch - Create a batch with specified info
    */
   'CreateBatch'(
@@ -1416,6 +1474,14 @@ export interface OperationMethods {
     data?: Paths.CreateReturnable.RequestBody,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.CreateReturnable.Responses.$201>
+  /**
+   * GetBatch - Retrieve batch with id
+   */
+  'GetBatch'(
+    parameters?: Parameters<Paths.GetBatch.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.GetBatch.Responses.$200>
   /**
    * UpdateBatch - Update a batch
    */
@@ -1860,6 +1926,14 @@ export interface PathsDictionary {
       data?: Paths.CreateBatch.RequestBody,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.CreateBatch.Responses.$201>
+    /**
+     * ListBatches - List available batches for supplier
+     */
+    'get'(
+      parameters?: Parameters<Paths.ListBatches.PathParameters & Paths.ListBatches.QueryParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.ListBatches.Responses.$200>
   }
   ['/api/invoices/{id}/credit']: {
     /**
@@ -1946,6 +2020,14 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.DeleteBatch.Responses.$204>
+    /**
+     * GetBatch - Retrieve batch with id
+     */
+    'get'(
+      parameters?: Parameters<Paths.GetBatch.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.GetBatch.Responses.$200>
     /**
      * UpdateBatch - Update a batch
      */
