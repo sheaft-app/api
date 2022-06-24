@@ -23,9 +23,9 @@ public class UpdateBatch : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Post(string supplierId, string batchId, UpdateBatchRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new UpdateBatchCommand(new SupplierId(supplierId), new BatchId(batchId), data.Number, data.DateKind,  data.Date), token);
+        var result = await Mediator.Execute(new UpdateBatchCommand(new SupplierId(supplierId), new BatchId(batchId), data.Number, data.DateKind, data.ExpirationDate, data.ProductionDate), token);
         return HandleCommandResult(result);
     }
 }
 
-public record UpdateBatchRequest(string Number, BatchDateKind DateKind, DateOnly Date);
+public record UpdateBatchRequest(string Number, BatchDateKind DateKind, DateTime ExpirationDate, DateTime? ProductionDate);

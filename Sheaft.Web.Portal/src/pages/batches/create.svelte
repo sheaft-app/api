@@ -5,18 +5,17 @@
   import Button from "$components/Button/Button.svelte";
   import PageHeader from "$components/Page/PageHeader.svelte";
   import { mediator } from "$components/mediator";
-  import { CreateReturnableCommand } from "$components/Returnables/commands/createReturnable";
-  import { getReturnableModule } from "$components/Returnables/module";
-  import type { ReturnableForm } from "$components/Returnables/types";
+  import { CreateBatchCommand } from "$components/Batches/commands/createBatch";
+  import { getBatchModule } from "$components/Batches/module";
+  import type { BatchForm } from "$components/Batches/types";
   import { getFormValidators } from "$components/validate";
-  import Returnable from "$components/Returnables/Returnable.svelte";
-  import { suite } from "$components/Returnables/validators";
+  import Batch from "$components/Batches/Batch.svelte";
+  import { suite } from "$components/Batches/validators";
 
-  const module = getReturnableModule($goto);
+  const module = getBatchModule($goto);
 
-  const onSubmit = async (values: ReturnableForm): Promise<string> => {
-    return await mediator.send(
-      new CreateReturnableCommand(values.name, values.unitPrice, values.vat, values.code)
+  const onSubmit = async (values: BatchForm): Promise<string> => {
+    return await mediator.send(new CreateBatchCommand(values.number, values.kind, values.expirationDate, values.productionDate)
     );
   };
 
@@ -24,10 +23,7 @@
     module.goToDetails(id);
   };
 
-  const { form, data, isSubmitting } = createForm<ReturnableForm>({
-    initialValues: {
-      vat: 0
-    },
+  const { form, data, isSubmitting } = createForm<BatchForm>({
     onSubmit,
     onSuccess,
     extend: getFormValidators(suite)
@@ -35,7 +31,7 @@
 </script>
 
 <!-- routify:options index=true -->
-<!-- routify:options title="Ajouter une nouvelle consigne" -->
+<!-- routify:options title="Ajouter un nouveau lot" -->
 
 <PageHeader 
   title="{$page.title}" 
@@ -43,7 +39,7 @@
   class='max-w-xl'/>
 
 <form use:form>
-  <Returnable data="{data}" disabled="{$isSubmitting}" />
+  <Batch data="{data}" disabled="{$isSubmitting}" />
   <FormFooter>
     <Button
       type="button"

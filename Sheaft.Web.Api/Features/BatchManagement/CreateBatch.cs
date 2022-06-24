@@ -24,9 +24,9 @@ public class CreateBatch : Feature
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<string>> Post(string supplierId, CreateBatchRequest data, CancellationToken token)
     {
-        var result = await Mediator.Execute(new CreateBatchCommand(data.Number, data.DateKind,  data.Date, new SupplierId(supplierId)), token);
+        var result = await Mediator.Execute(new CreateBatchCommand(data.Number, data.DateKind,  data.ExpirationDate, data.ProductionDate, new SupplierId(supplierId)), token);
         return HandleCommandResult(result);
     }
 }
 
-public record CreateBatchRequest(string Number, BatchDateKind DateKind, DateOnly Date);
+public record CreateBatchRequest(string Number, BatchDateKind DateKind, DateTime ExpirationDate, DateTime? ProductionDate);

@@ -13,6 +13,7 @@
   import { registerSupplierModule } from "$components/Suppliers/module";
   import { registerReturnableModule } from "$components/Returnables/module";
   import { registerOrderModule } from '$components/Orders/module'
+  import { registerBatchModule } from '$components/Batches/module'
 
   onMount(async () => {
     const client = await api.init<Client>();
@@ -27,6 +28,7 @@
     registerCustomerModule(client, authStore);
     registerSupplierModule(client, authStore);
     registerOrderModule(client, authStore);
+    registerBatchModule(client, authStore);
   });
 </script>
 

@@ -3,7 +3,7 @@ using Sheaft.Domain.BatchManagement;
 
 namespace Sheaft.Application.BatchManagement;
 
-public record CreateBatchCommand(string Number, BatchDateKind DateKind, DateOnly Date, SupplierId SupplierIdentifier) : Command<Result<string>>;
+public record CreateBatchCommand(string Number, BatchDateKind DateKind, DateTime ExpirationDate, DateTime? ProductionDate, SupplierId SupplierIdentifier) : Command<Result<string>>;
 
 internal class CreateBatchHandler : ICommandHandler<CreateBatchCommand, Result<string>>
 {
@@ -23,7 +23,7 @@ internal class CreateBatchHandler : ICommandHandler<CreateBatchCommand, Result<s
         if (existingBatchResult.Value.HasValue)
             return Result.Failure<string>(ErrorKind.Conflict, "batch.number.already.exists");
         
-        var batch = new Batch(new BatchNumber(request.Number), request.DateKind, request.Date, request.SupplierIdentifier);
+        var batch = new Batch(new BatchNumber(request.Number), request.DateKind, request.ExpirationDate, request.ProductionDate, request.SupplierIdentifier);
         _uow.Batches.Add(batch);
         var result = await _uow.Save(token);
         

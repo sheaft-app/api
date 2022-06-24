@@ -17,8 +17,12 @@ internal class BatchConfiguration : IEntityTypeConfiguration<Batch>
             .HasConversion(number => number.Value, value => new BatchNumber(value));
 
         builder
-            .Property(p => p.Date)
-            .HasConversion(date => new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, DateTimeKind.Utc), value => DateOnly.FromDateTime(value));
+            .Property(p => p.ExpirationDate)
+            .HasConversion(date => date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local), value => DateOnly.FromDateTime(value));
+
+        builder
+            .Property(p => p.ProductionDate)
+            .HasConversion(date => date.HasValue ? date.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Local) : (DateTime?)null, value => value.HasValue ? DateOnly.FromDateTime(value.Value) : null);
 
         builder
             .Property(c => c.Id)

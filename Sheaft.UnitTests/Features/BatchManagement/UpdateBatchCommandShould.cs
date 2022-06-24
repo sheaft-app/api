@@ -34,7 +34,7 @@ public class UpdateBatchCommandShould
         Assert.IsNotNull(batch);
         Assert.AreEqual("0002", batch.Number.Value);
         Assert.AreEqual(BatchDateKind.DDM, batch.DateKind);
-        Assert.AreEqual(DateOnly.FromDateTime(time), batch.Date);
+        Assert.AreEqual(DateOnly.FromDateTime(time), batch.ExpirationDate);
     }
 
     [Test]
@@ -84,10 +84,10 @@ public class UpdateBatchCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
+        context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateTime.Now, DateTime.Now, 
             supplier.Id));
         
-        var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
+        var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateTime.Now, DateTime.Now, 
             supplier.Id);
 
         if (useBatch)
@@ -118,7 +118,7 @@ public class UpdateBatchCommandShould
 
     private UpdateBatchCommand GetCommand(BatchId batchIdentifier, string number, BatchDateKind batchDateKind, DateTime dateTimeOffset)
     {
-        var command = new UpdateBatchCommand(SupplierId.New(), batchIdentifier, number, batchDateKind, DateOnly.FromDateTime(dateTimeOffset));
+        var command = new UpdateBatchCommand(SupplierId.New(), batchIdentifier, number, batchDateKind, DateTime.Now, DateTime.Now);
         return command;
     }
 }

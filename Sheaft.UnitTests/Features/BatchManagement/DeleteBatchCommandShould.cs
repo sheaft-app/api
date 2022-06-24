@@ -68,10 +68,10 @@ public class DeleteBatchCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
         
-        context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
+        context.Add(new Batch(new BatchNumber("12"), BatchDateKind.DDC, DateTime.Now, DateTime.Now, 
             supplier.Id));
         
-        var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow),
+        var batch = new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateTime.Now, DateTime.Now, 
             supplier.Id);
 
         if (useBatch)

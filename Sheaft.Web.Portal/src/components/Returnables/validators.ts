@@ -1,13 +1,9 @@
 ﻿import { create, enforce, test } from "vest";
-import type { Components } from "$types/api";
-import type {
-  CreateReturnableForm,
-  UpdateReturnableForm
-} from "$components/Returnables/types";
+import type {  ReturnableForm} from "$components/Returnables/types";
 
 export const suite = create(
   "returnable-suite",
-  (data: CreateReturnableForm | UpdateReturnableForm) => {
+  (data: ReturnableForm) => {
     test("name", "Le nom est requis", () => {
       enforce(data.name).isNotEmpty();
     });

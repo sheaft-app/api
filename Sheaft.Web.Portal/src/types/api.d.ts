@@ -102,12 +102,13 @@ declare namespace Components {
             totalItems?: number; // int32
             totalPages?: number; // int32
         }
-        export type BatchDateKind = 0 | 1 | 2; // int32
+        export type BatchDateKind = 0 | 1 | 2 | 3; // int32
         export interface BatchDto {
             id?: string | null;
             number?: string | null;
             kind?: DateTimeKind /* int32 */;
-            date?: DateOnly;
+            expirationDate?: string; // date-time
+            productionDate?: string | null; // date-time
             createdOn?: string; // date-time
             updatedOn?: string; // date-time
         }
@@ -129,7 +130,8 @@ declare namespace Components {
         export interface CreateBatchRequest {
             number?: string | null;
             dateKind?: BatchDateKind /* int32 */;
-            date?: DateOnly;
+            expirationDate?: string; // date-time
+            productionDate?: string | null; // date-time
         }
         export interface CreatePreparationDocumentRequest {
             orderIdentifiers?: string[] | null;
@@ -158,14 +160,6 @@ declare namespace Components {
             legalAddress?: AddressDto;
             deliveryAddress?: NamedAddressDto;
             billingAddress?: NamedAddressDto;
-        }
-        export interface DateOnly {
-            year?: number; // int32
-            month?: number; // int32
-            day?: number; // int32
-            dayOfWeek?: DayOfWeek /* int32 */;
-            dayOfYear?: number; // int32
-            dayNumber?: number; // int32
         }
         export type DateTimeKind = 0 | 1 | 2; // int32
         export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // int32
@@ -467,7 +461,8 @@ declare namespace Components {
         export interface UpdateBatchRequest {
             number?: string | null;
             dateKind?: BatchDateKind /* int32 */;
-            date?: DateOnly;
+            expirationDate?: string; // date-time
+            productionDate?: string | null; // date-time
         }
         export interface UpdateDraftProductsRequest {
             products?: ProductQuantityDto[] | null;

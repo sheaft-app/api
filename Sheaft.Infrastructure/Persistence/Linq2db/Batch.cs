@@ -21,7 +21,8 @@ namespace DataModel
 		[Column("CreatedOn"                                         )] public DateTimeOffset CreatedOn  { get; set; } // datetimeoffset(7)
 		[Column("UpdatedOn"                                         )] public DateTimeOffset UpdatedOn  { get; set; } // datetimeoffset(7)
 		[Column("DateKind"                                          )] public int            DateKind   { get; set; } // int
-		[Column("Date"                                              )] public DateTime       Date       { get; set; } // datetime2(7)
+		[Column("ExpirationDate"                                              )] public DateTime       ExpirationDate       { get; set; } // datetime2(7)
+		[Column("ProductionDate"                                              )] public DateTime?       ProductionDate       { get; set; } // datetime2(7)
 		[Column("SupplierId", CanBeNull = false                     )] public string         SupplierId { get; set; } = null!; // nvarchar(12)
 
 		#region Associations

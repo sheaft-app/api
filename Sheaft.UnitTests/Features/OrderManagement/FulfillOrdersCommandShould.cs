@@ -195,8 +195,7 @@ public class FulfillOrdersCommandShould
         var supplier = context.Suppliers.First();
         var customer = context.Customers.First();
 
-        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DLC, DateOnly.FromDateTime(DateTime.UtcNow),
-            supplier.Id));
+        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DLC, DateTime.Now, DateTime.Now, supplier.Id));
 
         var order = DataHelpers.CreateOrderWithLines(supplier, customer, false, context.Products.ToList());
 

@@ -23,7 +23,7 @@ internal class BatchQueries : Queries, IBatchQueries
             var batchesQuery =
                 from p in _context.Batches
                 where p.Id == identifier.Value
-                select new BatchDto(p.Id, p.Number, (DateTimeKind)p.DateKind, DateOnly.FromDateTime(p.Date),  p.CreatedOn, p.UpdatedOn);
+                select new BatchDto(p.Id, p.Number, (DateTimeKind)p.DateKind, p.ExpirationDate, p.ProductionDate, p.CreatedOn, p.UpdatedOn);
 
             var batches = await batchesQuery.FirstOrDefaultAsync(token);
             return batches== null
@@ -45,7 +45,8 @@ internal class BatchQueries : Queries, IBatchQueries
                     Id = p.Id,
                     Number = p.Number,
                     Kind = (DateTimeKind)p.DateKind,
-                    Date = p.Date,
+                    ExpirationDate = p.ExpirationDate,
+                    ProductionDate = p.ProductionDate,
                     CreatedOn = p.CreatedOn,
                     UpdatedOn = p.UpdatedOn,
                     TotalCount = Sql.Ext.Count().Over().ToValue()
@@ -60,7 +61,7 @@ internal class BatchQueries : Queries, IBatchQueries
             
             return Result.Success(new PagedResult<BatchDto>(
                 batches?
-                    .Select(p => new BatchDto(p.Id, p.Number, p.Kind, DateOnly.FromDateTime(p.Date), p.CreatedOn, p.UpdatedOn)), 
+                    .Select(p => new BatchDto(p.Id, p.Number, p.Kind, p.ExpirationDate, p.ProductionDate, p.CreatedOn, p.UpdatedOn)), 
                 pageInfo, batches?.Key ?? 0));
         });
     }

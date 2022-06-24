@@ -90,7 +90,7 @@
     </tbody>
   </table>
 </div>
-<p class='mt-3'>Veuillez indiquer si vous avez récupérer des consignes</p>
+<p class='mt-3'>Veuillez indiquer si vous avez récupéré des consignes</p>
 <div class='my-6'>
   <table>
     <thead>

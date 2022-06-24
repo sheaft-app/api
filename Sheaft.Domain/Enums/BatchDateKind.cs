@@ -4,5 +4,6 @@ public enum BatchDateKind
 {
     DLC,
     DDM,
-    DDC
+    DDC,
+    DCR
 }

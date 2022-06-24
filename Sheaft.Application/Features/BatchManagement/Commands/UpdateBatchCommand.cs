@@ -4,7 +4,7 @@ using Sheaft.Domain.BatchManagement;
 namespace Sheaft.Application.BatchManagement;
 
 public record UpdateBatchCommand(SupplierId SupplierId, BatchId BatchIdentifier, string Number,
-    BatchDateKind DateKind, DateOnly Date) : Command<Result>;
+    BatchDateKind DateKind, DateTime ExpirationDate, DateTime? ProductionDate) : Command<Result>;
 
 internal class UpdateBatchHandler : ICommandHandler<UpdateBatchCommand, Result>
 {
@@ -44,7 +44,7 @@ internal class UpdateBatchHandler : ICommandHandler<UpdateBatchCommand, Result>
                 return Result.Failure(ErrorKind.Conflict, "batch.number.already.exists");
         }
         
-        batch.Update(new BatchNumber(request.Number), request.DateKind, request.Date);
+        batch.Update(new BatchNumber(request.Number), request.DateKind, request.ExpirationDate, request.ProductionDate);
         
         _uow.Batches.Update(batch);
         return await _uow.Save(token);

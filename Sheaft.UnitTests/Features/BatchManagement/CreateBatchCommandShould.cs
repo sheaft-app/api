@@ -55,7 +55,7 @@ public class CreateBatchCommandShould
         context.Add(supplierAcct);
         context.Add(supplier);
 
-        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow), supplier.Id));
+        context.Add(new Batch(new BatchNumber("0001"), BatchDateKind.DDC, DateTime.Now, DateTime.Now, supplier.Id));
         context.SaveChanges();
         
         return (supplier.Id, context, handler);
@@ -63,7 +63,7 @@ public class CreateBatchCommandShould
 
     private CreateBatchCommand GetCommand(SupplierId supplierIdentifier, string? number = null)
     {
-        var command = new CreateBatchCommand(number ?? "test", BatchDateKind.DDC, DateOnly.FromDateTime(DateTime.UtcNow), supplierIdentifier);
+        var command = new CreateBatchCommand(number ?? "test", BatchDateKind.DDC, DateTime.Now, DateTime.Now, supplierIdentifier);
         return command;
     }
 }

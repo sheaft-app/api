@@ -3503,7 +3503,8 @@
         "enum": [
           0,
           1,
-          2
+          2,
+          3
         ],
         "type": "integer",
         "format": "int32"
@@ -3522,8 +3523,14 @@
           "kind": {
             "$ref": "#/components/schemas/DateTimeKind"
           },
-          "date": {
-            "$ref": "#/components/schemas/DateOnly"
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "productionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
           "createdOn": {
             "type": "string",
@@ -3603,8 +3610,14 @@
           "dateKind": {
             "$ref": "#/components/schemas/BatchDateKind"
           },
-          "date": {
-            "$ref": "#/components/schemas/DateOnly"
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "productionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3709,37 +3722,6 @@
           },
           "billingAddress": {
             "$ref": "#/components/schemas/NamedAddressDto"
-          }
-        },
-        "additionalProperties": false
-      },
-      "DateOnly": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "month": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "day": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "dayOfWeek": {
-            "$ref": "#/components/schemas/DayOfWeek"
-          },
-          "dayOfYear": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "dayNumber": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -4936,8 +4918,14 @@
           "dateKind": {
             "$ref": "#/components/schemas/BatchDateKind"
           },
-          "date": {
-            "$ref": "#/components/schemas/DateOnly"
+          "expirationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "productionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
         "additionalProperties": false
