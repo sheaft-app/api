@@ -156,6 +156,19 @@ declare namespace Components {
             returnedReturnables?: LineAdjustmentRequest[] | null;
             comments?: string | null;
         }
+        export interface DeliveryLineDto {
+            kind?: DeliveryLineKind /* int32 */;
+            identifier?: string | null;
+            name?: string | null;
+            code?: string | null;
+            quantity?: number; // int32
+            vat?: number; // double
+            unitPrice?: number; // double
+            totalWholeSalePrice?: number; // double
+            totalVatPrice?: number; // double
+            totalOnSalePrice?: number; // double
+        }
+        export type DeliveryLineKind = 0 | 1 | 2; // int32
         export interface DeliveryLineRequest {
             productIdentifier?: string | null;
             quantity?: number; // int32
@@ -194,6 +207,11 @@ declare namespace Components {
             id?: string | null;
             scheduledAt?: string; // date-time
             status?: DeliveryStatus /* int32 */;
+            totalWholeSalePrice?: number; // double
+            totalOnSalePrice?: number; // double
+            totalVatPrice?: number; // double
+            lines?: DeliveryLineDto[] | null;
+            adjustments?: DeliveryLineDto[] | null;
             address?: NamedAddressDto;
             comments?: string | null;
         }
@@ -271,8 +289,7 @@ declare namespace Components {
             identifier?: string | null;
             name?: string | null;
             code?: string | null;
-            orderedQuantity?: number; // int32
-            preparedQuantity?: null | number; // int32
+            quantity?: number; // int32
             vat?: number; // double
             unitPrice?: number; // double
             totalWholeSalePrice?: number; // double

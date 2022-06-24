@@ -3612,6 +3612,60 @@
         },
         "additionalProperties": false
       },
+      "DeliveryLineDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DeliveryLineKind"
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vat": {
+            "type": "number",
+            "format": "double"
+          },
+          "unitPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalWholeSalePrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalVatPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalOnSalePrice": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeliveryLineKind": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "DeliveryLineRequest": {
         "type": "object",
         "properties": {
@@ -3758,6 +3812,32 @@
           },
           "status": {
             "$ref": "#/components/schemas/DeliveryStatus"
+          },
+          "totalWholeSalePrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalOnSalePrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalVatPrice": {
+            "type": "number",
+            "format": "double"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryLineDto"
+            },
+            "nullable": true
+          },
+          "adjustments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeliveryLineDto"
+            },
+            "nullable": true
           },
           "address": {
             "$ref": "#/components/schemas/NamedAddressDto"
@@ -4060,14 +4140,9 @@
             "type": "string",
             "nullable": true
           },
-          "orderedQuantity": {
+          "quantity": {
             "type": "integer",
             "format": "int32"
-          },
-          "preparedQuantity": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
           },
           "vat": {
             "type": "number",

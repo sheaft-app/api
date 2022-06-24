@@ -9,7 +9,7 @@
   import { currency } from '$utils/money'
   import { formatInnerHtml } from '$actions/format'
   import { percent } from '$utils/percent'
-  import { LineKind, OrderStatus } from '$components/Orders/enums'
+  import { DeliveryStatus, LineKind, OrderStatus } from '$components/Orders/enums'
   import { GetOrderQuery } from '$components/Orders/queries/getOrder'
   import type { IModalResult } from '$components/Modal/modal'
   import AcceptOrder from '$components/Orders/Modals/AcceptOrder.svelte'
@@ -28,6 +28,13 @@
 
   let title = $page.title
   let order: Components.Schemas.OrderDetailsDto = null
+  
+  let products = [];
+  let returnables = [];
+  let returnedReturnables = [];
+  let totalWholeSalePrice = 0;
+  let totalVatPrice = 0;
+  let totalOnSalePrice = 0;
 
   const acceptOrder = () => {
     openModal(AcceptOrder)
@@ -69,6 +76,61 @@
     try {
       isLoading = true
       order = await mediator.send(new GetOrderQuery(orderId))
+      
+      switch(order.status)
+      {
+        case OrderStatus.Fulfilled:
+          totalWholeSalePrice = order.delivery.totalWholeSalePrice;
+          totalVatPrice = order.delivery.totalVatPrice;
+          totalOnSalePrice = order.delivery.totalOnSalePrice;
+          products = order.delivery.lines.filter(l => l.kind == LineKind.Product);
+          returnables = order.delivery.lines.filter(l => l.kind == LineKind.Returnable);
+          break;
+        case OrderStatus.Completed:
+          totalWholeSalePrice = order.delivery.totalWholeSalePrice;
+          totalVatPrice = order.delivery.totalVatPrice;
+          totalOnSalePrice = order.delivery.totalOnSalePrice;
+          products = order.delivery.lines.filter(l => l.kind == LineKind.Product);          
+          returnables = order.delivery.lines.filter(l => l.kind == LineKind.Returnable);
+          returnedReturnables = order.delivery.lines.filter(l => l.kind == LineKind.ReturnedReturnable);
+
+          products = products.map(p => {
+            let adjustedProduct = order.delivery.adjustments.filter(a => a.identifier == p.identifier && a.kind == LineKind.Product)[0];
+            console.log(p, adjustedProduct);
+            
+            return {
+              ...p,
+              quantity: p.quantity + adjustedProduct?.quantity ?? 0,
+              totalWholeSalePrice: p.totalWholeSalePrice + adjustedProduct?.totalWholeSalePrice ?? 0,
+              totalVatPrice: p.totalVatPrice + adjustedProduct?.totalVatPrice ?? 0,
+              totalOnSalePrice: p.totalOnSalePrice + adjustedProduct?.totalOnSalePrice ?? 0,
+            };
+          })
+          
+          returnables = returnables.map(r => {
+            let adjustedReturnable = order.delivery.adjustments.filter(a => a.identifier == r.identifier && a.kind == LineKind.Returnable)[0];
+
+            return {
+              ...r,
+              quantity: r.quantity + adjustedReturnable?.quantity ?? 0,
+              totalWholeSalePrice: r.totalWholeSalePrice + adjustedReturnable?.totalWholeSalePrice ?? 0,
+              totalVatPrice: r.totalVatPrice + adjustedReturnable?.totalVatPrice ?? 0,
+              totalOnSalePrice: r.totalOnSalePrice + adjustedReturnable?.totalOnSalePrice ?? 0,
+            };
+          })
+          
+          returnedReturnables = order.delivery.adjustments.filter(a => a.quantity < 0 && a.kind == LineKind.ReturnedReturnable);
+          
+          break;
+        default:
+          totalWholeSalePrice = order.totalWholeSalePrice;
+          totalVatPrice = order.totalVatPrice;
+          totalOnSalePrice = order.totalOnSalePrice;
+          products = order.lines.filter(l => l.kind == LineKind.Product);
+          returnables = order.lines.filter(l => l.kind == LineKind.Returnable);
+          break;
+      }
+      
       title = `Commande n°${order.code}`
       isLoading = false
     } catch (exc) {
@@ -119,9 +181,6 @@
   ]
 
   $: isLoading = true
-
-  $:returnables = order?.lines.filter(l => l.kind == LineKind.Returnable)
-  $:products = order?.lines.filter(l => l.kind == LineKind.Product)
 </script>
 
 <!-- routify:options title="Détails de la commande" -->
@@ -161,7 +220,7 @@
           Elle a été acceptée par le fournisseur, sa préparation est en cours
         {/if}
         {#if order?.status === OrderStatus.Accepted && $authStore.account.profile.kind === ProfileKind.Supplier}
-          Elle est en attente de préparation de votre part
+          Elle est cours de préparation
         {/if}
         {#if order?.status === OrderStatus.Fulfilled}
           Elle est prête à être livrée depuis le {dateStr(order?.fulfilledOn, "dd/MM/yyyy")}
@@ -170,10 +229,10 @@
           Elle a été livrée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
         {/if}
         {#if order?.status === OrderStatus.Cancelled}
-          Elle a été annulée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
+          Elle a été annulée le {dateStr(order?.abortedOn, "dd/MM/yyyy")}
         {/if}
         {#if order?.status === OrderStatus.Refused}
-          Elle a été refusée le {dateStr(order?.completedOn, "dd/MM/yyyy")}
+          Elle a été refusée le {dateStr(order?.abortedOn, "dd/MM/yyyy")}
         {/if}
       </p>
     </div>
@@ -222,19 +281,14 @@
         <td use:formatInnerHtml={currency} class='text-right'>{product.unitPrice}</td>
         <td use:formatInnerHtml={percent} class='text-right'>{product.vat}</td>
         <td class='text-right'>
-          {#if product.preparedQuantity > 0 && product.preparedQuantity !== product.orderedQuantity}
-            <p>{product.orderedQuantity} commandé(s)</p>
-            <p>{product.preparedQuantity} préparé(s)</p>
-          {:else}
-            {product.orderedQuantity}
-          {/if}
+            {product.quantity}
         </td>
         <td use:formatInnerHtml={currency} class='text-right'>{product.totalOnSalePrice}</td>
       </tr>
     {/each}
     {#if returnables?.length > 0}
       <tr class='bg-gray-50 hover:bg-gray-50 cursor-default'>
-        <th colspan='5' class='font-bold text-gray-600'>Consignes</th>
+        <th colspan='5' class='font-bold text-gray-600'>Consignes déposées</th>
       </tr>
       {#each returnables ?? [] as returnable}
         <tr class='cursor-default'>
@@ -242,8 +296,23 @@
           <td use:formatInnerHtml={currency} class='text-right'>{returnable.unitPrice}</td>
           <td use:formatInnerHtml={percent} class='text-right'>{returnable.vat}</td>
           <td
-            class='text-right'>{returnable.preparedQuantity > 0 ? returnable.preparedQuantity : returnable.orderedQuantity}</td>
+            class='text-right'>{returnable.quantity}</td>
           <td use:formatInnerHtml={currency} class='text-right'>{returnable.totalOnSalePrice}</td>
+        </tr>
+      {/each}
+    {/if}
+    {#if returnedReturnables?.length > 0}
+      <tr class='bg-gray-50 hover:bg-gray-50 cursor-default'>
+        <th colspan='5' class='font-bold text-gray-600'>Consignes récupérées</th>
+      </tr>
+      {#each returnedReturnables ?? [] as returnedReturnable}
+        <tr class='cursor-default'>
+          <td class='font-semibold'>{returnedReturnable.name}</td>
+          <td use:formatInnerHtml={currency} class='text-right'>{returnedReturnable.unitPrice}</td>
+          <td use:formatInnerHtml={percent} class='text-right'>{returnedReturnable.vat}</td>
+          <td
+            class='text-right'>{returnedReturnable.quantity}</td>
+          <td use:formatInnerHtml={currency} class='text-right'>{returnedReturnable.totalOnSalePrice}</td>
         </tr>
       {/each}
     {/if}
@@ -251,15 +320,15 @@
     <tfoot>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total HT</td>
-      <td class='font-medium text-right'>{currency(order?.totalWholeSalePrice)}</td>
+      <td class='font-medium text-right'>{currency(totalWholeSalePrice)}</td>
     </tr>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total TVA</td>
-      <td class='font-medium text-right'>{currency(order?.totalVatPrice)}</td>
+      <td class='font-medium text-right'>{currency(totalVatPrice)}</td>
     </tr>
     <tr class='hover:bg-white cursor-default'>
       <td colspan='4' class='text-right font-semibold'>Total TTC</td>
-      <td class='font-medium text-right'>{currency(order?.totalOnSalePrice)}</td>
+      <td class='font-medium text-right'>{currency(totalOnSalePrice)}</td>
     </tr>
     </tfoot>
   </table>

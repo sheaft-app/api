@@ -4,7 +4,7 @@ using Sheaft.Domain.OrderManagement;
 
 namespace Sheaft.Application.OrderManagement;
 
-public record FulfillOrdersCommand(OrderId OrderIdentifier, IEnumerable<DeliveryLineDto> DeliveryLines,
+public record FulfillOrdersCommand(OrderId OrderIdentifier, IEnumerable<DeliveryLineQuantityDto> DeliveryLines,
     DateTimeOffset? NewDeliveryDate) : Command<Result>;
 
 public class FulfillOrdersHandler : ICommandHandler<FulfillOrdersCommand, Result>

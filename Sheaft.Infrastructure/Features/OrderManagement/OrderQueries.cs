@@ -22,115 +22,90 @@ internal class OrderQueries : Queries, IOrderQueries
         {
             var ordersQuery =
                 from order in _context.Orders
-                from orderLine in _context.OrderLines.InnerJoin(ol => ol.OrderId == order.Id)
-                from delivery in _context.Deliveries.InnerJoin(d => d.Id == order.DeliveryId)
-                from deliveryLine in _context.DeliveryLines.LeftJoin(ol =>
-                    ol.DeliveryId == delivery.Id && ol.Identifier == orderLine.Identifier)
-                from deliveryAdjustment in _context.DeliveryAdjustments.LeftJoin(ol =>
-                    ol.DeliveryId == delivery.Id && ol.Identifier == deliveryLine.Identifier)
                 where order.Id == identifier.Value
-                group new {orderLine, deliveryLine, deliveryAdjustment} by new
-                {
+                join delivery in _context.Deliveries on order.DeliveryId equals delivery.Id
+                join orderLine in _context.OrderLines on order.Id equals orderLine.OrderId
+                    into orderLines
+                from dl in _context.Deliveries.InnerJoin(d => d.Id == order.DeliveryId)
+                join deliveryLine in _context.DeliveryLines on dl.Id equals deliveryLine.DeliveryId
+                    into deliveryLines
+                from da in _context.Deliveries.InnerJoin(d => d.Id == order.DeliveryId)
+                join deliveryAdjustment in _context.DeliveryAdjustments on da.Id equals deliveryAdjustment.DeliveryId
+                    into deliveryAdjustments
+                select new OrderDetailsDto(
                     order.Id,
                     order.Reference,
-                    order.Status,
+                    (OrderStatus) order.Status,
+                    order.TotalWholeSalePrice,
+                    order.TotalOnSalePrice,
+                    order.TotalVatPrice,
                     order.CreatedOn,
                     order.UpdatedOn,
                     order.PublishedOn,
                     order.AcceptedOn,
-                    order.CompletedOn,
+                    (OrderStatus) order.Status == OrderStatus.Completed ? order.CompletedOn : null,
+                    (OrderStatus) order.Status == OrderStatus.Refused ||
+                    (OrderStatus) order.Status == OrderStatus.Cancelled
+                        ? order.CompletedOn
+                        : null,
                     order.FulfilledOn,
-                    TotalWholeSalePrice =
-                        delivery != null && ((OrderStatus) order.Status == OrderStatus.Fulfilled ||
-                                             (OrderStatus) order.Status == OrderStatus.Completed)
-                            ? delivery.TotalWholeSalePrice
-                            : order.TotalWholeSalePrice,
-                    TotalVatPrice =
-                        delivery != null && ((OrderStatus) order.Status == OrderStatus.Fulfilled ||
-                                             (OrderStatus) order.Status == OrderStatus.Completed)
-                            ? delivery.TotalVatPrice
-                            : order.TotalVatPrice,
-                    TotalOnSalePrice =
-                        delivery != null && ((OrderStatus) order.Status == OrderStatus.Fulfilled ||
-                                             (OrderStatus) order.Status == OrderStatus.Completed)
-                            ? delivery.TotalOnSalePrice
-                            : order.TotalOnSalePrice,
-                    DeliveryId = delivery != null ? delivery.Id : null,
-                    DeliveryScheduledAt = delivery != null ? delivery.ScheduledAt : (DateTimeOffset?) null,
-                    DeliveryStatus = delivery != null ? delivery.Status : (int?) null,
-                    DeliveryAddressName = delivery != null ? delivery.AddressName : null,
-                    DeliveryAddressEmail = delivery != null ? delivery.AddressEmail : null,
-                    DeliveryAddressStreet = delivery != null ? delivery.AddressStreet : null,
-                    DeliveryAddressComplement = delivery != null ? delivery.AddressComplement : null,
-                    DeliveryAddressPostCode = delivery != null ? delivery.AddressPostcode : null,
-                    DeliveryAddressCity = delivery != null ? delivery.AddressCity : null,
-                    SupplierId = order.Supplier.Id,
-                    SupplierName = order.Supplier.TradeName,
-                    SupplierEmail = order.Supplier.Email,
-                    SupplierPhone = order.Supplier.Phone,
-                    CustomerId = order.Customer.Id,
-                    CustomerName = order.Customer.TradeName,
-                    CustomerEmail = order.Customer.Email,
-                    CustomerPhone = order.Customer.Phone,
-                    SupplierAccountId = order.Supplier.AccountId,
-                    CustomerAccountId = order.Customer.AccountId,
-                    Reason = order.FailureReason,
-                    DeliveryComments = delivery != null ? delivery.Comments : null
-                }
-                into g
-                select new OrderDetailsDto(
-                    g.Key.Id,
-                    g.Key.Reference,
-                    (OrderStatus) g.Key.Status,
-                    g.Key.TotalWholeSalePrice,
-                    g.Key.TotalOnSalePrice,
-                    g.Key.TotalVatPrice,
-                    g.Key.CreatedOn,
-                    g.Key.UpdatedOn,
-                    g.Key.PublishedOn,
-                    g.Key.AcceptedOn,
-                    (OrderStatus) g.Key.Status == OrderStatus.Completed ? g.Key.CompletedOn : null,
-                    (OrderStatus) g.Key.Status == OrderStatus.Refused ||
-                    (OrderStatus) g.Key.Status == OrderStatus.Cancelled
-                        ? g.Key.CompletedOn
-                        : null,
-                    g.Key.FulfilledOn,
-                    new OrderUserDto(g.Key.SupplierId, g.Key.SupplierName, g.Key.SupplierEmail, g.Key.SupplierPhone),
-                    new OrderUserDto(g.Key.CustomerId, g.Key.CustomerName, g.Key.CustomerEmail, g.Key.CustomerPhone),
-                    g.Select(l =>
+                    new OrderUserDto(order.SupplierId, order.Supplier.TradeName, order.Supplier.Email, order.Supplier.Phone),
+                    new OrderUserDto(order.CustomerId, order.Customer.TradeName, order.Customer.Email, order.Customer.Phone),
+                    orderLines.Select(l =>
                         new OrderLineDto(
-                            (OrderLineKind) l.orderLine.LineKind,
-                            l.orderLine.Identifier,
-                            l.orderLine.Name,
-                            l.orderLine.Reference,
-                            l.orderLine.Quantity,
-                            l.deliveryLine != null ? l.deliveryLine.Quantity : 0,
-                            l.deliveryLine != null ? l.deliveryLine.Vat : l.orderLine.Vat,
-                            l.deliveryLine != null ? l.deliveryLine.PriceInfoUnitPrice : l.orderLine.PriceInfoUnitPrice,
-                            l.deliveryLine != null
-                                ? l.deliveryLine.PriceInfoWholeSalePrice
-                                : l.orderLine.PriceInfoWholeSalePrice,
-                            l.deliveryLine != null ? l.deliveryLine.PriceInfoVatPrice : l.orderLine.PriceInfoVatPrice,
-                            l.deliveryLine != null
-                                ? l.deliveryLine.PriceInfoOnSalePrice
-                                : l.orderLine.PriceInfoOnSalePrice)),
-                    g.Key.DeliveryId != null
-                        ? new OrderDeliveryDto(g.Key.DeliveryId, g.Key.DeliveryScheduledAt.Value,
-                            (DeliveryStatus) g.Key.DeliveryStatus.Value,
-                            new NamedAddressDto(g.Key.DeliveryAddressName, g.Key.DeliveryAddressEmail,
-                                g.Key.DeliveryAddressStreet, g.Key.DeliveryAddressComplement,
-                                g.Key.DeliveryAddressPostCode, g.Key.DeliveryAddressCity), g.Key.DeliveryComments)
+                            (OrderLineKind) l.LineKind,
+                            l.Identifier,
+                            l.Name,
+                            l.Reference,
+                            l.Quantity,
+                            l.Vat,
+                            l.PriceInfoUnitPrice,
+                            l.PriceInfoWholeSalePrice,
+                            l.PriceInfoVatPrice,
+                            l.PriceInfoOnSalePrice)),
+                    delivery != null
+                        ? new OrderDeliveryDto(delivery.Id, delivery.ScheduledAt,
+                            (DeliveryStatus) delivery.Status,
+                            delivery.TotalWholeSalePrice,
+                            delivery.TotalOnSalePrice,
+                            delivery.TotalVatPrice,
+                            deliveryLines.Select(l => new DeliveryLineDto(
+                                (DeliveryLineKind) l.LineKind,
+                                l.Identifier,
+                                l.Name,
+                                l.Reference,
+                                l.Quantity,
+                                l.Vat,
+                                l.PriceInfoUnitPrice,
+                                l.PriceInfoWholeSalePrice,
+                                l.PriceInfoVatPrice,
+                                l.PriceInfoOnSalePrice)),
+                            deliveryAdjustments.Select(l => new DeliveryLineDto(
+                                (DeliveryLineKind) l.LineKind,
+                                l.Identifier,
+                                l.Name,
+                                l.Reference,
+                                l.Quantity,
+                                l.Vat,
+                                l.PriceInfoUnitPrice,
+                                l.PriceInfoWholeSalePrice,
+                                l.PriceInfoVatPrice,
+                                l.PriceInfoOnSalePrice)),
+                            new NamedAddressDto(delivery.AddressName, delivery.AddressEmail,
+                                delivery.AddressStreet, delivery.AddressComplement,
+                                delivery.AddressPostcode, delivery.AddressCity), delivery.Comments)
                         : null,
-                    accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Pending,
-                    (accountId.Value == g.Key.CustomerAccountId && (OrderStatus) g.Key.Status == OrderStatus.Pending) ||
-                    (accountId.Value == g.Key.SupplierAccountId &&
-                     ((OrderStatus) g.Key.Status == OrderStatus.Accepted ||
-                      (OrderStatus) g.Key.Status == OrderStatus.Fulfilled)),
-                    accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Accepted,
-                    accountId.Value == g.Key.SupplierAccountId && (OrderStatus) g.Key.Status == OrderStatus.Fulfilled,
-                    g.Key.Reason);
+                    accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Pending,
+                    (accountId.Value == order.Customer.AccountId && (OrderStatus) order.Status == OrderStatus.Pending) ||
+                    (accountId.Value == order.Supplier.AccountId &&
+                     ((OrderStatus) order.Status == OrderStatus.Accepted ||
+                      (OrderStatus) order.Status == OrderStatus.Fulfilled)),
+                    accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Accepted,
+                    accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Fulfilled,
+                    order.FailureReason);
 
             var orderResult = await ordersQuery.FirstOrDefaultAsync(token);
+            
             return orderResult == null
                 ? Result.Failure<OrderDetailsDto>(ErrorKind.NotFound, "order.notfound")
                 : Result.Success(orderResult);
@@ -205,9 +180,9 @@ internal class OrderQueries : Queries, IOrderQueries
                     order.Id,
                     order.Reference,
                     order.Status,
-                    order.TotalWholeSalePrice,
-                    order.TotalOnSalePrice,
-                    order.TotalVatPrice,
+                    TotalWholeSalePrice = delivery.Id != null && (DeliveryStatus)delivery.Status != DeliveryStatus.Pending ? delivery.TotalWholeSalePrice : order.TotalWholeSalePrice,
+                    TotalOnSalePrice = delivery.Id != null && (DeliveryStatus)delivery.Status != DeliveryStatus.Pending ? delivery.TotalOnSalePrice : order.TotalOnSalePrice,
+                    TotalVatPrice = delivery.Id != null && (DeliveryStatus)delivery.Status != DeliveryStatus.Pending ? delivery.TotalVatPrice : order.TotalVatPrice,
                     order.CreatedOn,
                     order.UpdatedOn,
                     order.PublishedOn,
@@ -218,8 +193,8 @@ internal class OrderQueries : Queries, IOrderQueries
                         ? order.CompletedOn
                         : null,
                     order.FulfilledOn,
-                    DeliveryScheduledAt = delivery != null ? delivery.ScheduledAt : (DateTimeOffset?) null,
-                    DeliveryStatus = delivery != null ? delivery.Status : (int?) null,
+                    DeliveryScheduledAt = delivery.Id != null ? delivery.ScheduledAt : (DateTimeOffset?) null,
+                    DeliveryStatus = delivery.Id != null ? delivery.Status : (int?) null,
                     CustomerName = order.Customer.TradeName,
                     SupplierName = order.Supplier.TradeName,
                     TotalCount = Sql.Ext.Count().Over().ToValue()

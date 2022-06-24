@@ -17,8 +17,8 @@
   const lines: LineQuantity[] = order?.lines.filter(l => l.kind == LineKind.Product).map(l => {
     return {
       identifier: l.identifier,
-      preparedQuantity: l.preparedQuantity,
-      quantity: l.preparedQuantity,
+      preparedQuantity: l.quantity,
+      quantity: l.quantity,
       name: l.name,
       code: l.code
     }

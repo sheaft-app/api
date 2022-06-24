@@ -26,7 +26,7 @@ public class FulfillOrder : Feature
             new FulfillOrdersCommand(
                 new OrderId(id),
                 data.DeliveryLines.Select(pb =>
-                    new DeliveryLineDto(pb.ProductIdentifier, pb.Quantity, pb.BatchIdentifiers)),
+                    new DeliveryLineQuantityDto(pb.ProductIdentifier, pb.Quantity, pb.BatchIdentifiers)),
                     data.NewDeliveryDate), token);
         
         return HandleCommandResult(result);

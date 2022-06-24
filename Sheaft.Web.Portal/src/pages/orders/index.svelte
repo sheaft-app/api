@@ -181,7 +181,14 @@
             <td>{dateStr(order.abortedOn, "dd/MM/yyyy")}</td>
           {/if}
           {#if selectedTab === OrderTab.Aborted || selectedTab === OrderTab.InProgress}
-            <td>{orderStatus(order)}</td>
+            <td>
+              <span 
+                class='rounded-full py-2 px-4 text-white'
+                class:bg-danger-400={order.status === OrderStatus.Refused}
+                class:bg-warning-400={order.status === OrderStatus.Accepted || order.status === OrderStatus.Cancelled}
+                class:bg-success-400={order.status === OrderStatus.Fulfilled}
+              >{orderStatus(order)}</span>
+            </td>
           {/if}
           {#if selectedTab === OrderTab.Draft || selectedTab === OrderTab.InProgress}
             <td use:formatInnerHtml='{dateDistance}'>{order.updatedOn}</td>

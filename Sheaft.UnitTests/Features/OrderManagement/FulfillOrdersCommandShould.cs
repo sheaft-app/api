@@ -27,7 +27,7 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>())), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -43,7 +43,7 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>())), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -60,7 +60,7 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())),
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>())),
             DateTimeOffset.UtcNow.AddDays(4));
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
@@ -79,7 +79,7 @@ public class FulfillOrdersCommandShould
         var order = InitOrder(context);
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>())), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>())), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -98,7 +98,7 @@ public class FulfillOrdersCommandShould
         
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>{batch.Id.Value})), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -116,7 +116,7 @@ public class FulfillOrdersCommandShould
         
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, 5, new List<string>{BatchId.New().Value})), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, 5, new List<string>{BatchId.New().Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -134,7 +134,7 @@ public class FulfillOrdersCommandShould
         
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(l.Identifier, -1, new List<string>{batch.Id.Value})), null);
+                .Select(l => new DeliveryLineQuantityDto(l.Identifier, -1, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 
@@ -152,7 +152,7 @@ public class FulfillOrdersCommandShould
         
         var fulfillOrderCommand = new FulfillOrdersCommand(order.Id,
             order.Lines.Where(l => l.LineKind == OrderLineKind.Product)
-                .Select(l => new DeliveryLineDto(ProductId.New().Value, -1, new List<string>{batch.Id.Value})), null);
+                .Select(l => new DeliveryLineQuantityDto(ProductId.New().Value, -1, new List<string>{batch.Id.Value})), null);
 
         var result = await handler.Handle(fulfillOrderCommand, CancellationToken.None);
 

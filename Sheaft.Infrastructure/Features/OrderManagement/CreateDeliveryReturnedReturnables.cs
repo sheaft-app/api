@@ -38,7 +38,7 @@ public class CreateDeliveryReturnedReturnables : ICreateDeliveryReturnedReturnab
                 return Result.Failure<IEnumerable<DeliveryLine>>(ErrorKind.BadRequest,
                     "delivery.returnables.quantity.must.be.lower.than.zero");
 
-            return Result.Success(adjustedReturnables);
+            return Result.Success(adjustedReturnables.Where(a => a.Quantity.Value < 0));
         }
         catch (Exception e)
         {

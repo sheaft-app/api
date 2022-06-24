@@ -16,8 +16,8 @@
   const lines: DeliveryLine[] = order?.lines.filter(l => l.kind == LineKind.Product).map(l => {
     return {
       productIdentifier: l.identifier,
-      orderedQuantity: l.orderedQuantity,
-      quantity: l.orderedQuantity,
+      orderedQuantity: l.quantity,
+      quantity: l.quantity,
       name: l.name,
       code: l.code
     }
