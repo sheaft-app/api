@@ -8,7 +8,7 @@ export const suite = create(
     test("number", "Le numéro de lot est requis", () => {
       enforce(data.number).isNotEmpty();
     });
-    test("dateKind", "Le type de date est requis", () => {
+    test("kind", "Le type de date est requis", () => {
       enforce(data.kind).isNotNull();
     });
     test("expirationDate", "La date est requise", () => {

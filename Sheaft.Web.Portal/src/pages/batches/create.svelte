@@ -11,6 +11,7 @@
   import { getFormValidators } from "$components/validate";
   import Batch from "$components/Batches/Batch.svelte";
   import { suite } from "$components/Batches/validators";
+  import { BatchDateKind } from '$components/Batches/enums'
 
   const module = getBatchModule($goto);
 
@@ -24,6 +25,9 @@
   };
 
   const { form, data, isSubmitting } = createForm<BatchForm>({
+    initialValues:{
+      kind: BatchDateKind.DLC
+    },
     onSubmit,
     onSuccess,
     extend: getFormValidators(suite)

@@ -18,7 +18,7 @@
   placeholder='ex: LT20220501-102'
   disabled='{disabled}' />
 <Radio
-  id='dateKind'
+  id='kind'
   label='Type de date'
   bind:value='{$data.kind}'
   values='{[{label: "DLC", value: BatchDateKind.DLC},{label: "DDM", value: BatchDateKind.DDM},{label: "DDC", value: BatchDateKind.DDC},{label: "DCR", value: BatchDateKind.DCR}]}'

@@ -37,11 +37,12 @@
 
 <h2 class='mb-4'>Préparer la commande n°{order.code}</h2>
 <hr />
+<p class='mt-3'>Cette commande est destinée à {order.customer.name}</p>
 <div class='my-6'>
   <table>
     <thead>
     <tr>
-      <th>Nom</th>
+      <th>Produit</th>
       <th>Commandé</th>
       <th>Préparé</th>
     </tr>
