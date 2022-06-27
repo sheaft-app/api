@@ -38,7 +38,7 @@ internal class BatchQueries : Queries, IBatchQueries
         {
             var batchesQuery =
                 from p in _context.Batches
-                orderby p.Number 
+                orderby p.ExpirationDate descending 
                 where p.SupplierId == supplierId.Value
                 select new 
                 {

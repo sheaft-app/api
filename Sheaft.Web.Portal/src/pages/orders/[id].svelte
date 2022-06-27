@@ -67,7 +67,8 @@
       {
         closeButton: false,
         closeOnEsc: true,
-        closeOnOuterClick: false
+        closeOnOuterClick: false,
+        styleWindow: { minWidth: '80%' },
       }
     )
   }

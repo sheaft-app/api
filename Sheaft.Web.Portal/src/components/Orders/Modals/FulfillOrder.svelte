@@ -1,5 +1,5 @@
 ﻿<script lang='ts'>
-  import { getContext } from 'svelte'
+  import { getContext, onMount } from 'svelte'
   import Button from '$components/Button/Button.svelte'
   import { type IModalResult, ModalResult } from '$components/Modal/modal'
   import type { Components } from '$types/api'
@@ -7,6 +7,9 @@
   import { FulfillOrderCommand } from '$components/Orders/commands/fulfillOrder'
   import type { DeliveryLine } from '$components/Orders/types'
   import { LineKind } from '$components/Orders/enums'
+  import Select from 'svelte-select'
+  import { ListBatchesQuery } from '$components/Batches/queries/listBatches'
+  import { dateStr } from '$utils/dates'
 
   export let order: Components.Schemas.OrderDetailsDto
   export let onClose: (result: IModalResult<string>) => {}
@@ -23,15 +26,39 @@
     }
   })
 
+  let isLoading = true
+  let batches: { label: string, value: string }[] = []
+
   const validate = async () => {
     try {
-      const result = await mediator.send(new FulfillOrderCommand(order.id, lines))
-      close()
+      isLoading = true
+      const result = await mediator.send(new FulfillOrderCommand(order.id, lines.map(l => {
+        return {
+          ...l, batchIdentifiers: l.batchIdentifiers?.map((bi: any) => {
+            return bi.value
+          })
+        }
+      })))
       await onClose(ModalResult.Success(result))
+      close()
     } catch (exc) {
+      isLoading = false
       console.error(exc)
     }
   }
+
+  onMount(async () => {
+    try {
+      isLoading = true
+      const result = await mediator.send(new ListBatchesQuery(1, 100))
+      batches = result.map(r => {
+        return { label: `${r.number} - ${dateStr(r.expirationDate)}`, value: r.id }
+      })
+      isLoading = false
+    } catch (exc) {
+      console.error(exc)
+    }
+  })
 
 </script>
 
@@ -45,6 +72,7 @@
       <th>Produit</th>
       <th>Commandé</th>
       <th>Préparé</th>
+      <th class='w-80'>Lots</th>
     </tr>
     </thead>
     <tbody>
@@ -55,7 +83,8 @@
           <small>#{line.code}</small>
         </td>
         <td>{line.orderedQuantity}</td>
-        <td><input type='number' bind:value={line.quantity} min='0' max='1000'/></td>
+        <td><input type='number' bind:value={line.quantity} min='0' max='1000' disabled='{isLoading}' /></td>
+        <td><Select items='{batches}' bind:value='{line.batchIdentifiers}' isMulti='{true}'></Select></td>
       </tr>
     {/each}
     </tbody>
@@ -63,16 +92,16 @@
 </div>
 <hr />
 <div class='flex items-center justify-evenly pt-4'>
-  <Button class='bg-default-600' on:click='{close}'>Fermer</Button>
-  <Button class='bg-accent-600' on:click='{validate}'>Valider</Button>
+  <Button class='bg-default-600' on:click='{close}' disabled='{isLoading}'>Fermer</Button>
+  <Button class='bg-accent-600' on:click='{validate}' {isLoading}>Valider</Button>
 </div>
 <style lang='scss'>
-  input{
+  input {
     max-width: 4em;
     @apply mb-0;
   }
-  
-  tbody, tfoot{
+
+  tbody, tfoot {
     @apply border-b-0;
   }
 </style>

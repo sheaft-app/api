@@ -9,5 +9,5 @@ export const dateStr = (date, pattern?: string | undefined): string => {
   if(!date)
     return '';
   
-  return format(new Date(date), pattern ?? "dd MMMM yyyy", { locale: fr });
+  return format(new Date(date), pattern ?? "dd/MM/yyyy", { locale: fr });
 };
