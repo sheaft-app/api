@@ -120,7 +120,7 @@
       title = `Commande ${order.code}`
       isLoading = false
     } catch (exc) {
-      module.goToList()
+      module.goBack()
     }
   }
 

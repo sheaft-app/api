@@ -23,7 +23,7 @@
       suppliers = await mediator.send(new ListAvailableSuppliersQuery(pageNumber, take));
       isLoading = false;
     } catch (exc) {
-      module.goToHome();
+      module.goBack();
     }
   });
 </script>

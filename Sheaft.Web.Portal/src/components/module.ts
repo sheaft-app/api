@@ -7,6 +7,7 @@ import { mediator } from "$components/mediator";
 export interface IAppModule {
   registerHandlers(): void;
   goToHome(): void;
+  goBack(): void;
 }
 
 export abstract class AppModule implements IAppModule {
@@ -18,6 +19,10 @@ export abstract class AppModule implements IAppModule {
 
   goToHome = () => {
     this.navigate("/");
+  };
+  
+  goBack = () => {
+    history.back();
   };
 
   setGoto = (goto: GotoHelper) => {

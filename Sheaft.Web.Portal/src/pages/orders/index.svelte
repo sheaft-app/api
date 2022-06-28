@@ -1,5 +1,5 @@
 ﻿<script lang='ts'>
-  import { goto, page, params } from '@roxi/routify'
+  import { afterPageLoad, goto, page, params } from '@roxi/routify'
   import PageContent from '$components/Page/PageContent.svelte'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import { dateDistance, dateStr } from '$utils/dates'
@@ -31,7 +31,7 @@
   const profileKind = $authStore.account?.profile?.kind
 
   let isLoading = true
-  let selectedTab: OrderTab = <OrderTab>$params.tab ?? OrderTab.InProgress
+  let selectedTab: OrderTab
   let orders: Components.Schemas.OrderDto[] = []
 
   const getOrderTargetName = (order: Components.Schemas.OrderDto): string => {
@@ -112,13 +112,22 @@
     ? [OrderTab.Draft, OrderTab.Sent, OrderTab.InProgress, OrderTab.Delivered, OrderTab.Aborted]
     : [OrderTab.Pending, OrderTab.InProgress, OrderTab.Delivered, OrderTab.Aborted]
 
-  $:listOrders(selectedTab)
+  $afterPageLoad(async (page) => {
+    selectedTab = <OrderTab>$params.tab ?? OrderTab.InProgress
+    await listOrders(selectedTab)
+  })
+
+  $:if (selectedTab)
+    module.goToList({ tab: selectedTab })
+
+
 </script>
 
 <!-- routify:options menu="Mes commandes" -->
 <!-- routify:options title="Mes commandes" -->
 <!-- routify:options index=true -->
 <!-- routify:options default=true -->
+<!-- routify:options search="tab=En cours" -->
 
 <PageHeader title='{$page.title}' actions='{actions}' />
 

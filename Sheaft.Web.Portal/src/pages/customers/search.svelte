@@ -23,7 +23,7 @@
       customers = await mediator.send(new ListAvailableCustomersQuery(pageNumber, take));
       isLoading = false;
     } catch (exc) {
-      module.goToHome();
+      module.goBack();
     }
   });
 </script>

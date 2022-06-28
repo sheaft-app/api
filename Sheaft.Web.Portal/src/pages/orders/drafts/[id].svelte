@@ -92,7 +92,7 @@
       })
       isLoading = false
     } catch (exc) {
-      module.goToList({tab:OrderTab.Draft})
+      module.goBack()
     }
   })
 

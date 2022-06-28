@@ -12,6 +12,8 @@
   import { dateDistance, dateStr } from '$utils/dates'
   import type { IAgreementModule } from '$components/Agreements/module'
   import { ProfileKind } from '$components/Account/enums'
+  import { afterPageLoad, params } from '@roxi/routify'
+  import { OrderTab } from '$components/Orders/enums'
 
   export let module: IAgreementModule
   export let pageNumber: number = 1,
@@ -20,7 +22,7 @@
     profileKind: ProfileKind
 
   let isLoading = true
-  let selectedTab = AgreementTab.Active
+  let selectedTab:AgreementTab;
   let agreements: Components.Schemas.AgreementDto[] = []
   let tableCreatedOnHeader:string;
   let noResultsMessage:string;
@@ -47,22 +49,29 @@
 
   $: kind = profileKind == ProfileKind.Customer ? 'magasin' : 'producteur';
 
-  $: if (selectedTab == AgreementTab.Active) {
-    pageNumber = 1
-    tableCreatedOnHeader = 'Depuis le';
-    noResultsMessage = `Aucun ${kind} disponible`;
-    listAgreements(new ListActiveAgreementsQuery(pageNumber, take))
-  } else if (selectedTab == AgreementTab.Sent) {
-    pageNumber = 1
-    tableCreatedOnHeader = 'Envoyée le';
-    noResultsMessage = `Aucune demande envoyée`;
-    listAgreements(new ListSentAgreementsQuery(pageNumber, take))
-  } else if (selectedTab == AgreementTab.Received) {
-    pageNumber = 1
-    tableCreatedOnHeader = 'Reçue le';
-    noResultsMessage = `Aucun demande reçue`;
-    listAgreements(new ListReceivedAgreementsQuery(pageNumber, take))
-  }
+  $afterPageLoad(async (page) => {
+    selectedTab = <AgreementTab>$params.tab ?? AgreementTab.Active
+    
+    if (selectedTab == AgreementTab.Active) {
+      pageNumber = 1
+      tableCreatedOnHeader = 'Depuis le';
+      noResultsMessage = `Aucun ${kind} disponible`;
+      await listAgreements(new ListActiveAgreementsQuery(pageNumber, take))
+    } else if (selectedTab == AgreementTab.Sent) {
+      pageNumber = 1
+      tableCreatedOnHeader = 'Envoyée le';
+      noResultsMessage = `Aucune demande envoyée`;
+      await listAgreements(new ListSentAgreementsQuery(pageNumber, take))
+    } else if (selectedTab == AgreementTab.Received) {
+      pageNumber = 1
+      tableCreatedOnHeader = 'Reçue le';
+      noResultsMessage = `Aucun demande reçue`;
+      await listAgreements(new ListReceivedAgreementsQuery(pageNumber, take))
+    }
+  })
+
+  $:if (selectedTab)
+    module.goToList({ tab: selectedTab })
 </script>
 
 <PageHeader title='{title}' actions='{actions}' />

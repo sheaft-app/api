@@ -66,8 +66,8 @@
     openModal(RevokeAgreement)
   }
 
-  const onClose = () => {
-    module.goToList()
+  const onClose = async () => {
+    await loadAgreement();
   }
 
   const openModal = Modal => {

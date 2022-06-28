@@ -46,7 +46,7 @@ import {
 export interface IAgreementModule extends IAppModule {
   goToSearch(): void;
   goToSearchProfile(id: string): void;
-  goToList(): void;
+  goToList(params?:any): void;
   goToDetails(id: string): void;
 }
 
@@ -101,8 +101,8 @@ export class AgreementModule extends AppModule implements IAgreementModule {
     )
   }
 
-  goToList(): void {
-    this.navigate(`${this._basePath}`)
+  goToList(params?:any): void {
+    this.navigate(`${this._basePath}`, params)
   }
 
   goToDetails(id: string): void {

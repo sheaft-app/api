@@ -26,12 +26,12 @@
       initializing = false;
     } catch (exc) {
       console.error(exc);
-      module.goToSearch();
+      module.goBack();
     }
   });
 
   const onClose = (result: IModalResult<string>) => {
-    module.goToSearch();
+    module.goBack();
   };
 
   const openModal = () => {
