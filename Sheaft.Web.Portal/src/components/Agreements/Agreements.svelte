@@ -1,4 +1,5 @@
 ﻿<script lang='ts'>
+  import { afterPageLoad, params } from '@roxi/routify'
   import PageHeader from '$components/Page/PageHeader.svelte'
   import PageContent from '$components/Page/PageContent.svelte'
   import type { Components } from '$types/api'
@@ -12,8 +13,6 @@
   import { dateDistance, dateStr } from '$utils/dates'
   import type { IAgreementModule } from '$components/Agreements/module'
   import { ProfileKind } from '$components/Account/enums'
-  import { afterPageLoad, params } from '@roxi/routify'
-  import { OrderTab } from '$components/Orders/enums'
 
   export let module: IAgreementModule
   export let pageNumber: number = 1,

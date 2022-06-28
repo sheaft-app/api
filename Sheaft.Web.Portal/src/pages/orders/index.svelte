@@ -120,14 +120,12 @@
   $:if (selectedTab)
     module.goToList({ tab: selectedTab })
 
-
 </script>
 
 <!-- routify:options menu="Mes commandes" -->
 <!-- routify:options title="Mes commandes" -->
 <!-- routify:options index=true -->
 <!-- routify:options default=true -->
-<!-- routify:options search="tab=En cours" -->
 
 <PageHeader title='{$page.title}' actions='{actions}' />
 
