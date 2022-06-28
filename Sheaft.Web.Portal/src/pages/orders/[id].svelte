@@ -28,13 +28,13 @@
 
   let title = $page.title
   let order: Components.Schemas.OrderDetailsDto = null
-  
-  let products = [];
-  let returnables = [];
-  let returnedReturnables = [];
-  let totalWholeSalePrice = 0;
-  let totalVatPrice = 0;
-  let totalOnSalePrice = 0;
+
+  let products = []
+  let returnables = []
+  let returnedReturnables = []
+  let totalWholeSalePrice = 0
+  let totalVatPrice = 0
+  let totalOnSalePrice = 0
 
   const acceptOrder = () => {
     openModal(AcceptOrder)
@@ -46,10 +46,10 @@
     openModal(CancelOrder)
   }
   const fulfillOrder = () => {
-    openModal(FulfillOrder)
+    openModal(FulfillOrder, true)
   }
   const deliverOrder = () => {
-    openModal(DeliverOrder)
+    openModal(DeliverOrder, true)
   }
 
   const onClose = async (result: IModalResult<any>) => {
@@ -57,7 +57,7 @@
       await loadOrder(id)
   }
 
-  const openModal = Modal => {
+  const openModal = (Modal, hasWidth: boolean = false) => {
     open(
       Modal,
       {
@@ -68,7 +68,7 @@
         closeButton: false,
         closeOnEsc: true,
         closeOnOuterClick: false,
-        styleWindow: { minWidth: '80%' },
+        styleWindow: hasWidth ? { minWidth: '80%' } : {}
       }
     )
   }
@@ -77,62 +77,47 @@
     try {
       isLoading = true
       order = await mediator.send(new GetOrderQuery(orderId))
-      
-      switch(order.status)
-      {
-        case OrderStatus.Fulfilled:
-          totalWholeSalePrice = order.delivery.totalWholeSalePrice;
-          totalVatPrice = order.delivery.totalVatPrice;
-          totalOnSalePrice = order.delivery.totalOnSalePrice;
-          products = order.delivery.lines.filter(l => l.kind == LineKind.Product);
-          returnables = order.delivery.lines.filter(l => l.kind == LineKind.Returnable);
-          break;
-        case OrderStatus.Completed:
-          totalWholeSalePrice = order.delivery.totalWholeSalePrice;
-          totalVatPrice = order.delivery.totalVatPrice;
-          totalOnSalePrice = order.delivery.totalOnSalePrice;
-          products = order.delivery.lines.filter(l => l.kind == LineKind.Product);          
-          returnables = order.delivery.lines.filter(l => l.kind == LineKind.Returnable);
-          returnedReturnables = order.delivery.lines.filter(l => l.kind == LineKind.ReturnedReturnable);
 
-          products = products.map(p => {
-            let adjustedProduct = order.delivery.adjustments.filter(a => a.identifier == p.identifier && a.kind == LineKind.Product)[0];
-            console.log(p, adjustedProduct);
-            
-            return {
-              ...p,
-              quantity: p.quantity + adjustedProduct?.quantity ?? 0,
-              totalWholeSalePrice: p.totalWholeSalePrice + adjustedProduct?.totalWholeSalePrice ?? 0,
-              totalVatPrice: p.totalVatPrice + adjustedProduct?.totalVatPrice ?? 0,
-              totalOnSalePrice: p.totalOnSalePrice + adjustedProduct?.totalOnSalePrice ?? 0,
-            };
-          })
-          
-          returnables = returnables.map(r => {
-            let adjustedReturnable = order.delivery.adjustments.filter(a => a.identifier == r.identifier && a.kind == LineKind.Returnable)[0];
-
-            return {
-              ...r,
-              quantity: r.quantity + adjustedReturnable?.quantity ?? 0,
-              totalWholeSalePrice: r.totalWholeSalePrice + adjustedReturnable?.totalWholeSalePrice ?? 0,
-              totalVatPrice: r.totalVatPrice + adjustedReturnable?.totalVatPrice ?? 0,
-              totalOnSalePrice: r.totalOnSalePrice + adjustedReturnable?.totalOnSalePrice ?? 0,
-            };
-          })
-          
-          returnedReturnables = order.delivery.adjustments.filter(a => a.quantity < 0 && a.kind == LineKind.ReturnedReturnable);
-          
-          break;
-        default:
-          totalWholeSalePrice = order.totalWholeSalePrice;
-          totalVatPrice = order.totalVatPrice;
-          totalOnSalePrice = order.totalOnSalePrice;
-          products = order.lines.filter(l => l.kind == LineKind.Product);
-          returnables = order.lines.filter(l => l.kind == LineKind.Returnable);
-          break;
+      if (order.delivery?.status != DeliveryStatus.Pending) {
+        totalWholeSalePrice = order.delivery.totalWholeSalePrice
+        totalVatPrice = order.delivery.totalVatPrice
+        totalOnSalePrice = order.delivery.totalOnSalePrice
+      } else {
+        totalWholeSalePrice = order.totalWholeSalePrice
+        totalVatPrice = order.totalVatPrice
+        totalOnSalePrice = order.totalOnSalePrice
       }
-      
-      title = `Commande n°${order.code}`
+
+      products = order.lines.filter(l => l.kind == LineKind.Product)?.map(p => {
+        const preparedProduct = order.delivery?.lines.filter(l => l.identifier == p.identifier && l.kind == LineKind.Product)[0]
+        const adjustedProduct = order.delivery?.adjustments.filter(l => l.identifier == p.identifier && l.kind == LineKind.Product)[0]
+
+        return {
+          ...p,
+          preparedQuantity: preparedProduct?.quantity ?? 0,
+          deliveredQuantity: (preparedProduct?.quantity + adjustedProduct?.quantity) ?? 0,
+          totalWholeSalePrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedProduct.totalWholeSalePrice ?? 0) + (adjustedProduct?.totalWholeSalePrice ?? 0) : p.totalWholeSalePrice,
+          totalVatPrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedProduct.totalVatPrice ?? 0) + (adjustedProduct?.totalVatPrice ?? 0) : p.totalVatPrice,
+          totalOnSalePrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedProduct.totalOnSalePrice ?? 0) + (adjustedProduct?.totalOnSalePrice ?? 0) : p.totalOnSalePrice
+        }
+      }) ?? []
+
+      returnables = order.lines.filter(l => l.kind == LineKind.Returnable)?.map(p => {
+        const preparedReturnable = order.delivery?.lines.filter(l => l.identifier == p.identifier && l.kind == LineKind.Returnable)[0]
+        const adjustedReturnable = order.delivery?.adjustments.filter(l => l.identifier == p.identifier && l.kind == LineKind.Returnable)[0]
+
+        return {
+          ...p,
+          quantity: (preparedReturnable?.quantity > 0 ? preparedReturnable.quantity : p.quantity) + (adjustedReturnable?.quantity ?? 0),
+          totalWholeSalePrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedReturnable.totalWholeSalePrice ?? 0) + (adjustedReturnable?.totalWholeSalePrice ?? 0) : p.totalWholeSalePrice,
+          totalVatPrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedReturnable.totalVatPrice ?? 0) + (adjustedReturnable?.totalVatPrice ?? 0) : p.totalVatPrice,
+          totalOnSalePrice: (order.delivery?.status !== DeliveryStatus.Pending) ? (preparedReturnable.totalOnSalePrice ?? 0) + (adjustedReturnable?.totalOnSalePrice ?? 0) : p.totalOnSalePrice
+        }
+      }) ?? []
+
+      returnedReturnables = order.delivery?.adjustments?.filter(a => a.quantity < 0 && a.kind == LineKind.ReturnedReturnable) ?? []
+
+      title = `Commande ${order.code}`
       isLoading = false
     } catch (exc) {
       module.goToList()
@@ -253,7 +238,7 @@
       <p>{order?.reason}</p>
     </div>
   {/if}
-  {#if order?.status === OrderStatus.Completed}
+  {#if order?.status === OrderStatus.Completed && order?.delivery?.comments?.length > 0}
     <div class='bg-white rounded py-4 px-6 mb-3 w-full'>
       <p class='font-medium'>Un commentaire a été laissé pour la livraison correspondante: </p>
       <p>{order?.delivery.comments}</p>
@@ -282,14 +267,24 @@
         <td use:formatInnerHtml={currency} class='text-right'>{product.unitPrice}</td>
         <td use:formatInnerHtml={percent} class='text-right'>{product.vat}</td>
         <td class='text-right'>
+          {#if order.delivery?.status === DeliveryStatus.Delivered}
+            <p>{product.quantity} commandés</p>
+            <p>{product.preparedQuantity} préparés</p>
+            <p>{product.deliveredQuantity} livrés</p>
+          {:else if order.delivery?.status === DeliveryStatus.Scheduled}
+            <p>{product.quantity} commandés</p>
+            <p>{product.preparedQuantity} préparés</p>
+          {:else}
             {product.quantity}
+          {/if}
         </td>
         <td use:formatInnerHtml={currency} class='text-right'>{product.totalOnSalePrice}</td>
       </tr>
     {/each}
     {#if returnables?.length > 0}
       <tr class='bg-gray-50 hover:bg-gray-50 cursor-default'>
-        <th colspan='5' class='font-bold text-gray-600'>Consignes déposées</th>
+        <th colspan='5' class='font-bold text-gray-600'>
+          Consignes {order.delivery?.status === DeliveryStatus.Delivered ? 'déposées' : ''}</th>
       </tr>
       {#each returnables ?? [] as returnable}
         <tr class='cursor-default'>
@@ -297,7 +292,9 @@
           <td use:formatInnerHtml={currency} class='text-right'>{returnable.unitPrice}</td>
           <td use:formatInnerHtml={percent} class='text-right'>{returnable.vat}</td>
           <td
-            class='text-right'>{returnable.quantity}</td>
+            class='text-right'>
+            {returnable.quantity}
+          </td>
           <td use:formatInnerHtml={currency} class='text-right'>{returnable.totalOnSalePrice}</td>
         </tr>
       {/each}

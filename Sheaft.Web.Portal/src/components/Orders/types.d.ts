@@ -20,6 +20,12 @@ export type DraftLine = {
   returnable?:any; 
 }
 
+export type BatchSelection = { label: string, value: string };
+
 export type DeliveryLine = ProductQuantity & { 
   batchIdentifiers?: string[];
+}
+
+export type DeliveryLineCompletion = ProductQuantity & { 
+  batchIdentifiers?: BatchSelection[];
 }
