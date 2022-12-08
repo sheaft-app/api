@@ -28,7 +28,7 @@
     <PackageReference Include="NewRelic.Agent" Version="8.39.2" />
     <PackageReference Include="NewRelic.Agent.Api" Version="8.39.2" />
     <PackageReference Include="NewRelic.LogEnrichers.Serilog" Version="1.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
