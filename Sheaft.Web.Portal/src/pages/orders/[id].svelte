@@ -21,6 +21,7 @@
   import { ProfileKind } from '$components/Account/enums'
   import { authStore } from '$components/Account/store'
   import DeliverOrder from '$components/Orders/Modals/DeliverOrder.svelte'
+  import InvoiceDelivery from '$components/Orders/Modals/InvoiceDelivery.svelte'
 
   export let id: string
   const module = getOrderModule($goto)
@@ -50,6 +51,9 @@
   }
   const deliverOrder = () => {
     openModal(DeliverOrder, true)
+  }
+  const invoiceDelivery = () => {
+    openModal(InvoiceDelivery)
   }
 
   const onClose = async (result: IModalResult<any>) => {
@@ -163,6 +167,13 @@
       visible: order?.canComplete,
       color: 'accent',
       action: () => deliverOrder()
+    },
+    {
+      name: 'Facturer',
+      disabled: isLoading,
+      visible: order?.canInvoice,
+      color: 'accent',
+      action: () => invoiceDelivery()
     }
   ]
 

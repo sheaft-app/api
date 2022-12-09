@@ -4096,6 +4096,13 @@
           "canComplete": {
             "type": "boolean"
           },
+          "canInvoice": {
+            "type": "boolean"
+          },
+          "invoiceId": {
+            "type": "string",
+            "nullable": true
+          },
           "reason": {
             "type": "string",
             "nullable": true
@@ -4239,6 +4246,14 @@
             "nullable": true
           },
           "supplierName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryId": {
+            "type": "string",
+            "nullable": true
+          },
+          "invoiceId": {
             "type": "string",
             "nullable": true
           }

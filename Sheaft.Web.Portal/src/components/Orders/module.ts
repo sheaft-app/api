@@ -34,6 +34,7 @@ import { RefuseOrderCommand, RefuseOrderHandler } from '$components/Orders/comma
 import { CancelOrderCommand, CancelOrderHandler } from '$components/Orders/commands/cancelOrder'
 import { FulfillOrderCommand, FulfillOrderHandler } from '$components/Orders/commands/fulfillOrder'
 import { DeliverOrderCommand, DeliverOrderHandler } from '$components/Orders/commands/deliverOrder'
+import { InvoiceDeliveryCommand, InvoiceDeliveryHandler } from '$components/Orders/commands/invoiceDelivery'
 
 export interface IOrderModule extends IAppModule {
   goToList(params?:{}): void;
@@ -116,6 +117,10 @@ class OrderModule extends AppModule implements IOrderModule {
 
     this.registerHandler(DeliverOrderCommand, request =>
       new DeliverOrderHandler(this._client, this._authStore).handle(request)
+    )
+
+    this.registerHandler(InvoiceDeliveryCommand, request =>
+      new InvoiceDeliveryHandler(this._client, this._authStore).handle(request)
     )
   }
 

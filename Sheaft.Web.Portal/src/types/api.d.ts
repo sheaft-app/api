@@ -249,6 +249,8 @@ declare namespace Components {
             canCancel?: boolean;
             canFulfill?: boolean;
             canComplete?: boolean;
+            canInvoice?: boolean;
+            invoiceId?: string | null;
             reason?: string | null;
         }
         export interface OrderDraftDto {
@@ -286,6 +288,8 @@ declare namespace Components {
             deliveryScheduledAt?: string | null; // date-time
             customerName?: string | null;
             supplierName?: string | null;
+            deliveryId?: string | null;
+            invoiceId?: string | null;
         }
         export interface OrderDtoPaginatedResults {
             items?: OrderDto[] | null;

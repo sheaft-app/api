@@ -94,7 +94,7 @@ public class CreateInvoices : ICreateInvoices
                 line.Quantity,
                 line.PriceInfo.UnitPrice, line.Vat,
                 new InvoiceDelivery(delivery.Reference, delivery.DeliveredOn.Value),
-                new DeliveryOrder(line.Order.Reference, line.Order.PublishedOn)));
+                line.Order != null ? new DeliveryOrder(line.Order.Reference, line.Order.PublishedOn) : null));
         }
 
         var invoiceLines = new List<InvoiceLine>();
@@ -108,7 +108,7 @@ public class CreateInvoices : ICreateInvoices
 
         var invoiceLinesWithInvalidQuantity = invoiceLines
             .Where(il => il.Quantity.Value < 0)
-            .Select(il => new { il.Identifier, il.Order.Reference, il.Quantity.Value})
+            .Select(il => new { il.Identifier, il.Order?.Reference, il.Quantity.Value})
             .ToList();
         
         foreach (var invoiceLineWithInvalidQuantity in invoiceLinesWithInvalidQuantity)
@@ -116,7 +116,7 @@ public class CreateInvoices : ICreateInvoices
             var quantityToRemove = invoiceLineWithInvalidQuantity.Value;
             var validInvoiceLines = invoiceLines.Where(il =>
                 il.Identifier == invoiceLineWithInvalidQuantity.Identifier &&
-                il.Order.Reference != invoiceLineWithInvalidQuantity.Reference)
+                il.Order?.Reference != invoiceLineWithInvalidQuantity.Reference)
                 .OrderByDescending(il => il.Quantity.Value)
                 .ToList();
 

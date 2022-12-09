@@ -102,6 +102,8 @@ internal class OrderQueries : Queries, IOrderQueries
                       (OrderStatus) order.Status == OrderStatus.Fulfilled)),
                     accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Accepted,
                     accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Fulfilled,
+                    accountId.Value == order.Supplier.AccountId && (OrderStatus) order.Status == OrderStatus.Completed && order.InvoiceId == null,
+                    order.InvoiceId,
                     order.FailureReason);
 
             var orderResult = await ordersQuery.FirstOrDefaultAsync(token);
@@ -193,6 +195,8 @@ internal class OrderQueries : Queries, IOrderQueries
                         ? order.CompletedOn
                         : null,
                     order.FulfilledOn,
+                    order.DeliveryId,
+                    order.InvoiceId,
                     DeliveryScheduledAt = delivery.Id != null ? delivery.ScheduledAt : (DateTimeOffset?) null,
                     DeliveryStatus = delivery.Id != null ? delivery.Status : (int?) null,
                     CustomerName = order.Customer.TradeName,
@@ -213,7 +217,7 @@ internal class OrderQueries : Queries, IOrderQueries
                         o.TotalVatPrice, o.CreatedOn, o.UpdatedOn, o.PublishedOn, o.AcceptedOn, o.CompletedOn,
                         o.AbortedOn,
                         o.FulfilledOn, o.DeliveryStatus.HasValue ? (DeliveryStatus) o.DeliveryStatus.Value : null,
-                        o.DeliveryScheduledAt, o.CustomerName, o.SupplierName)),
+                        o.DeliveryScheduledAt, o.CustomerName, o.SupplierName, o.DeliveryId, o.InvoiceId)),
                 pageInfo, orders?.Key ?? 0));
         });
     }

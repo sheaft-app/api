@@ -156,6 +156,7 @@
         {/if}
         {#if selectedTab === OrderTab.Delivered}
           <th>Livrée le</th>
+          <th>Facturation</th>
         {/if}
         {#if selectedTab === OrderTab.Aborted}
           <th>Avortée le</th>
@@ -189,6 +190,13 @@
           {/if}
           {#if selectedTab === OrderTab.Delivered}
             <td>{dateStr(order.completedOn, "dd/MM/yyyy")}</td>
+            <td>{#if !order.invoiceId}
+              <span
+                class='rounded-full py-2 px-4 text-white bg-warning-400'>En attente</span>
+              {:else}
+              <span
+              class='rounded-full py-2 px-4 text-white bg-success-400'>Facturée</span>
+              {/if}</td>
           {/if}
           {#if selectedTab === OrderTab.Aborted}
             <td>{dateStr(order.abortedOn, "dd/MM/yyyy")}</td>
